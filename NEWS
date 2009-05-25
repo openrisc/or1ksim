@@ -1,0 +1,41 @@
+New in release 0.3.0
+* No new features or bugs. This is the full release based on rc3.
+
+New in release 0.3.0rc3
+* Bug 376 fixed: 32 interrupts now supported
+* Bug 377 fixed: Level triggered interrupts now work correctly
+* Bug 378 fixed: xterm UART now works with RSP
+* Bug 379 fixed: RSP performance improved
+* Bug 380 fixed: GDB 6.8 stepi now works through Or1ksim JTAG interface
+* Bug 398 fixed: Lack of support for LEE bit in SR documented
+* Bug 415 fixed: NPC behavior on writing optionally matches real HW
+* Bug 418 fixed: All library up calls are host-endian
+
+* Feature 395 added: Boot from 0xf0000000 now enabled.
+* Feature 408 added: Image file may be NULL for or1ksim_init.
+* Feature 410 added: RSP now clears sigval on unstalling the processor.
+* Feature 417 added: Or1ksim prints out its version on startup.
+
+New in release 0.3.0rc2
+* A number of bug fixes
+* Updates to user guide
+
+New in release 0.3.0rc1
+* Numerous bug fixes (see the OpenRISC tracker and the ChangeLog file)
+* User Guide
+* Consistent coding style and file naming throughout
+* Support for external SystemC models
+
+New in release 1.9 (old style numbering):
+
+* support for binary COFF
+* generation of verilog memory models (used when you want to run simulation
+of OpenRISC processor cores)
+
+New in release 1.2 (old style numbering):
+
+* support for OR16 ISA
+
+New in release 1.1 (old style numbering):
+
+ * First release

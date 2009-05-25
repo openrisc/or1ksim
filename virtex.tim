@@ -1,0 +1,40 @@
+#
+# very draft timing table for FPGA Virtex, sg -5
+# size is in gates, delay in ns
+#
+# instruction_name size_normal size_immediate delay_normal delay_immediate
+#
+
+add   30.   15.   8.    4.
+sub   30.   15.   8.    4.
+and   5.    0.    1.    0.
+or    5.    0.    1.    0.
+xor   10.   2.    1.    0.5
+mul   700.  200.  12.   5.
+srl   100.  1.    24.   12.
+sll   100.  1.    24.   12.
+sra   100.  1.    24.   12.
+
+lb    50.   50.   5.    5.
+lh    50.   50.   5.    5.
+lw    50.   50.   5.    5.
+sb    50.   50.   5.    5.
+sh    50.   50.   5.    5.
+sw    50.   50.   5.    5.
+
+sfeq  20.   10.   5.    2.
+sfne  20.   10.   5.    2.
+sfle  30.   10.   8.    4.
+sflt  30.   10.   8.    4.
+sfgt  30.   10.   8.    4.
+sfge  30.   10.   8.    4.
+bf    50.   50.   1.    1.
+
+lrbb  60.   60.   1.    1.
+cmov  15.   15.   5.    2.
+reg   60.   60.   1.    1.
+
+call  100.  100.  3.    3.
+nop   0.    0.    0.    0.
+  
+

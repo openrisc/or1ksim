@@ -1,0 +1,3 @@
+strndup.lo: ../../port/strndup.c ../config.h
+
+../config.h:
