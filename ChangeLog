@@ -1,8 +1,20 @@
+2009-12-23  Mark Jarvin <mark.jarvin@opencores.org>
+	* configure.ac: Check for rl_event_hook in readline.
+	* configure: Regenerated from configure.ac
+	* config.h.in, or1ksim/autom4te.cache/traces.0,
+	or1ksim/autom4te.cache/output.1, or1ksim/autom4te.cache/traces.1,
+	or1ksim/autom4te.cache/requests, or1ksim/autom4te.cache/output.0,
+	or1ksim/aclocal.m4: Regenerated
+	* sim-cmd.c (initialize_readline): Only use rl_event_hook if
+	available.
+	* peripheral/atadevice.c: Apple specific includes for Mac OS
+	* port/strndup.c: Provide defn of size_t from stddef.h
+
 2009-03-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* README: Reference to installation instructions updated
 	* NEWS: Updated for release 0.3.0
 	* doc/or1ksim.texi: Copyright date updated
-	
+
 2009-02-24  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure.ac: Version number upped
 	* cpu/common/execute.h: cpu_state.npc_not_valid added
@@ -21,7 +33,7 @@
 	* sim-config.c, sim-config.h: new config fields for NPC
 	functionality added.
 	* toplevel-support.c (sim_init): Version number printed out
-	
+
 2008-11-17  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* sim-config.c: MERROR deleted (not used). WARNING replaced by
 	explicit fprintf calls.
@@ -31,11 +43,11 @@
 2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* debug/gdbcomm.c (get_server_socket): server_ip flag getting by
 	fcntl corrected (wrong syntax used for GETFL).
-	
+
 2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* doc/or1ksim.texi: Documentation of the various configuration
 	options added.
-	
+
 2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* cpu/or32/op-mftspr-op.h, cpu/or32/op.c, cpu/or32/dyn32-defs.h,
 	cpu/or32/def_op_t.h, cpu/or32/op-support.c, cpu/or32/op-swhb-op.h,
@@ -51,7 +63,7 @@
 	* cpu/or32/simple32-defs.h: Made conditional and added include of
 	* cpu/or32/Makefile.am: For simple execution removed insnset.c
 	from the sources and added it to EXTRA sources.
-	
+
 2008-10-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure.ac: Corrected gcc args for --enabled-profiling
 	* cpu/common/stats.h, cpu/common/stats.c: Moved definition of
@@ -59,7 +71,7 @@
 	non-static and added extern declaration to stats.h
 	* cpu/common/stats.c (printstats): Changed MAX_RANGE to RAW_RANGE
 	* cpu/or32/execute.c (evalsim_reg): Changed MAX_RAW_RANGE to RAW_RANGE
-	
+
 2008-10-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* all: Removed redundant headers added missing GPL statements,
 	formatted to GNU standard. Made all non-global functions and top
@@ -152,9 +164,9 @@
 	* cpu/or32/generate.c, cpu/or32/or32.c: Function debug moved from
 	generate.c to or32.c, renamed or32_debug and declared static, to
 	avoid confusion with main debug function in toplevel-support.c.
+
 	
-	
-	
+
 	
 
 2008-09-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
@@ -178,7 +190,7 @@
 
 	* toplevel_support.c, sim-config.c, support/dumpverilog.c:
 	or1ksim_ver replaced by PACKAGE_VERSION
-	
+
 2008-09-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* AUTHORS: Added Jeremy Bennett
@@ -217,7 +229,7 @@
 	toplevel_support.c
 	* toplevel_support.c: New file
 	* vapi/Makefile.am: Updated to use libtool libraries
-	
+
 2008-09-04 15:04	Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* bpb/Makefile.am: Added header to SOURCES, so included in TAGS

@@ -22,6 +22,10 @@
    */
 #undef HAVE_DECL_I_PUSH
 
+/* Define to 1 if you have the declaration of `rl_event_hook', and to 0 if you
+   don't. */
+#undef HAVE_DECL_RL_EVENT_HOOK
+
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
 #undef HAVE_DIRENT_H

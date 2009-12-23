@@ -29,6 +29,8 @@
 
 
 #ifndef HAVE_STRNDUP
+/* the definition of size_t is provided in stddef.h */
+#include <stddef.h>
 
 /* Taken from glibc */
 char *

@@ -837,8 +837,10 @@ initialize_readline (void)
   /* Tell the completer that we want a crack first. */
   rl_attempted_completion_function = sim_completion;
 
+#if HAVE_DECL_RL_EVENT_HOOK
   /* Handle the gdb socket while waiting for input */
   rl_event_hook = check_gdb_comm;
+#endif
 }
 
 /* Attempt to complete on the contents of TEXT.  START and END bound the

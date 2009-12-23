@@ -137,6 +137,8 @@ AC_CHECK_TYPES([__compar_fn_t])
 
 # check for GNU readline
 AC_CHECK_LIB(readline, add_history)
+# Not all versions of readline have rl_event_hook (e.g., Mac OS X)
+AC_CHECK_DECLS(rl_event_hook, [], [], [#include <readline/readline.h>])
 
 # yuck
 case "$host_os" in
