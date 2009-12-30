@@ -1,3 +1,0 @@
-crc32.lo: ../../peripheral/crc32.c ../../peripheral/crc32.h
-
-../../peripheral/crc32.h:

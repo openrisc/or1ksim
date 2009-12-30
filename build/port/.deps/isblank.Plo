@@ -1,3 +1,0 @@
-isblank.lo: ../../port/isblank.c ../config.h
-
-../config.h:
