@@ -61,6 +61,7 @@
 #include "execute.h"
 #include "spr-defs.h"
 #include "debug.h"
+#include "jtag.h"
 #include "misc.h"
 #include "argtable2.h"
 
@@ -114,6 +115,9 @@ init_defconfig ()
   config.sim.exe_log_marker = 0;
   config.sim.exe_log_fn     = strdup ("executed.log");
   config.sim.clkcycle_ps    = 4000;	/* 4000 for 4ns (250MHz) */
+
+  /* Debug */
+  config.debug.jtagcycle_ps = 40000;	/* 40000 for 40ns (25MHz) */
 
   /* VAPI */
   config.vapi.enabled        = 0;
@@ -238,6 +242,11 @@ init_defconfig ()
   runtime.sim.fprof                 = NULL;
   runtime.sim.fmprof                = NULL;
   runtime.sim.fout                  = stdout;
+
+  /* Debug */
+  runtime.debug.instr           = JI_UNDEFINED;
+  runtime.debug.mod_id          = JM_UNDEFINED;
+  runtime.debug.write_defined_p = 0;		/* No WRITE_COMMAND yet */
 
   /* NPC state. Set to 1 when NPC is changed while the processor is stalled. */
   cpu_state.npc_not_valid = 0;

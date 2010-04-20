@@ -268,7 +268,7 @@ void load_timing_table (char *filename)
 
   while (!feof(fi)) {
     char tmp[256];
-    int index;
+    int index = 0;
     if (fscanf (fi, "%s", tmp) != 1) break;
     if (tmp[0] == '#') {
       while (!feof (fi) && fgetc (fi) != '\n');

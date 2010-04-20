@@ -1,0 +1,31 @@
+		       Or1ksim Test Suite: uOS Micro OS
+		       ================================
+
+This is the Micro OS (uOS) developed by Damjan Lampret. At present the code
+builds, but there is no suitable Or1ksim configuration.
+
+Jeremy Bennett
+19 April 2010
+
+
+ORIGINAL README
+===============
+
+This is the Micro OS (uOS) for testing operating system features of OpenRISC
+1000 architecture. Specifically non reentrant, preemptive multitasking
+microkernel. Purpose of this code is not to be a true operating system but
+merely a testbench for testing the architecture, or1ksim and software
+development tools (GCC, Binutils, ...).
+
+This test OS has all necessary exception handlers to handle exceptions. There
+are two tasks: one task generates data and passes that data via IPC to the
+second task. Second task outputs the data via or1ksim syscall to the
+simulator.
+
+Currently only OR32 is supported (exception handlers are written in
+assembly). Tools required to compile sources are the latest or32-coff-gcc,
+or32-coff-as and or32-coff-ld. Also make sure you undefine
+VIRTUAL_MACHINE_ONLY when compiling or1ksim.
+
+--
+10/Jun/2000, Damjan Lampret, lampret@opencores.org

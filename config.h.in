@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
+
 /* Whether arithmethic instructions set flag on zero */
 #undef ARITH_SET_FLAG
 
@@ -25,10 +28,6 @@
 /* Define to 1 if you have the declaration of `rl_event_hook', and to 0 if you
    don't. */
 #undef HAVE_DECL_RL_EVENT_HOOK
-
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
-   */
-#undef HAVE_DIRENT_H
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -58,7 +57,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `isblank' function. */
+/* "Whether the isblank function is available" */
 #undef HAVE_ISBLANK
 
 /* Define to 1 if you have the <libintl.h> header file. */
@@ -82,9 +81,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
-#undef HAVE_NDIR_H
 
 /* Define to 1 if you have the <net/ethernet.h> header file. */
 #undef HAVE_NET_ETHERNET_H
@@ -116,7 +112,7 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define to 1 if you have the `strcasecmp' function. */
+/* "Whether the strcasecmp function is available" */
 #undef HAVE_STRCASECMP
 
 /* Define to 1 if you have the `strchr' function. */
@@ -138,7 +134,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the `strndup' function. */
+/* "Whether the strndup function is available" */
 #undef HAVE_STRNDUP
 
 /* Define to 1 if you have the `strrchr' function. */
@@ -147,19 +143,11 @@
 /* Define to 1 if you have the `strtol' function. */
 #undef HAVE_STRTOL
 
-/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
-   */
-#undef HAVE_SYS_DIR_H
-
 /* Define to 1 if you have the <sys/ethernet.h> header file. */
 #undef HAVE_SYS_ETHERNET_H
 
 /* Define to 1 if you have the <sys/file.h> header file. */
 #undef HAVE_SYS_FILE_H
-
-/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
-   */
-#undef HAVE_SYS_NDIR_H
 
 /* Define to 1 if you have the <sys/ptem.h> header file. */
 #undef HAVE_SYS_PTEM_H
@@ -214,6 +202,10 @@
 
 /* Define to 1 if the system has the type `__compar_fn_t'. */
 #undef HAVE___COMPAR_FN_T
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
@@ -270,9 +262,6 @@
 /* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
 
-/* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
-#undef STAT_MACROS_BROKEN
-
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
@@ -282,9 +271,17 @@
 /* Version number of package */
 #undef VERSION
 
-/* Define to 1 if your processor stores words with the most significant byte
-   first (like Motorola and SPARC, unlike Intel and VAX). */
-#undef WORDS_BIGENDIAN
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
 
 /* "The source code uses the GNU libraries */
 #undef _GNU_SOURCE

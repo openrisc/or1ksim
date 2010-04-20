@@ -75,7 +75,15 @@ int output_function (FILE *fo, const char *func_name, int level)
 
   while (!feof (fi)) {
     char line[10000], *str = line;
-    fgets (str, sizeof (line), fi);
+    char *res;
+
+    res = fgets (str, sizeof (line), fi);
+
+    if (NULL == res)
+      {
+	return  1;
+      }
+
     line[sizeof (line) - 1] = 0;
     line_num++;
     if (strncmp (str, "INSTRUCTION (", 13) == 0) {
@@ -100,7 +108,13 @@ int output_function (FILE *fo, const char *func_name, int level)
         shift_fprintf (level, fo, "%s", str);
         shift_fprintf (level, fo, "   /* \"%s\" */\n", func_name);
         do {
-          fgets (line, sizeof (line), fi);
+          res = fgets (line, sizeof (line), fi);
+
+	  if (NULL == res)
+	    {
+	      return  1;
+	    }
+
           line[sizeof(line) - 1] = 0;
           for (str = line; *str; str++) {
             if (*str == '{') olevel++;
@@ -312,7 +326,10 @@ static int generate_footer (FILE *fo)
 }
 
 /* Decodes all instructions and generates code for that.  This function
-   is similar to insn_decode, except it decodes all instructions. */
+   is similar to insn_decode, except it decodes all instructions.
+
+   JPB: Added code to generate an illegal instruction exception for invalid
+   instructions. */
 static int generate_body (FILE *fo, unsigned long *a, unsigned long cur_mask, int level)
 {
   unsigned long shift = *a;
@@ -342,6 +359,8 @@ static int generate_body (FILE *fo, unsigned long *a, unsigned long cur_mask, in
     }
     if (prev_inv) {
       shift_fprintf (++level, fo, "/* Invalid instruction(s) */\n");
+      shift_fprintf (level, fo,
+		     "except_handle (EXCEPT_ILLEGAL, cpu_state.pc);\n");
       shift_fprintf (level--, fo, "break;\n");
     }
     shift_fprintf (level, fo, "}\n");

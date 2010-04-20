@@ -52,7 +52,6 @@
 #include "vapi.h"
 #include "debug-unit.h"
 #include "branch-predict.h"
-#include "support/simprintf.h"
 #include "sprs.h"
 #include "rsp-server.h"
 
@@ -117,7 +116,7 @@ static void decode_execute (struct iqueue_entry *current);
 /*!Get an actual value of a specific register
 
    Implementation specific. Abort if we are given a duff register. Only used
-   externally to support simprintf().
+   externally to support simprintf(), which is now obsolete.
 
    @param[in] regno  The register of interest
 

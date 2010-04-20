@@ -21,6 +21,11 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Local macros
+ACLOCAL_AMFLAGS = -I m4
+
+DISTCHECK_CONFIGURE_FLAGS = --target=or32-elf
+
 SUBDIRS               = argtable2  \
 			cpu        \
                         bpb        \
@@ -35,7 +40,8 @@ SUBDIRS               = argtable2  \
                         debug      \
                         vapi       \
                         cuc        \
-                        port
+                        port       \
+                        testsuite
 
 # Build a standalone simulator and a linkable library of the simulator
 

@@ -1,7 +1,7 @@
-# configure.in -- Top level autoconf configuration file
+# configure.ac -- Top level autoconf configuration file
 #
 # Copyright (C) 1999-2008 OpenCores
-# Copyright (C) 2008 Embecosm Limited
+# Copyright (C) 2008, 2010 Embecosm Limited
 #
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
@@ -26,8 +26,17 @@
 # Process this file with autoconf to produce a configure script.
 
 
-AC_INIT([or1ksim], [0.3.0], [openrisc@opencores.org])
+# Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
+# preparing a release, otherwise use a the date version (x.y.z-yyyy-mm-dd).
+AC_INIT([or1ksim], [0.3.1-2010-04-20], [openrisc@opencores.org])
+AC_CONFIG_MACRO_DIR([m4])
+
+# Check we have the execute source file present for sanity. Specify a separate
+# config for the testsuite, since we'll need different tool chain there (the
+# OpenRISC one, rather than the native one).
 AC_CONFIG_SRCDIR([cpu/or32/execute.c])
+AC_CONFIG_SUBDIRS([testsuite])
+
 AC_CANONICAL_TARGET([])
 AC_PROG_LIBTOOL
 AM_INIT_AUTOMAKE
@@ -60,23 +69,22 @@ esac
 
 AC_SUBST(CPU_ARCH)
 
-# We want these before the checks, so the checks can modify their values.
-test -z "$CFLAGS" && CFLAGS="-g -Wall" auto_cflags=1
+# Set the CFLAGS we want
+CFLAGS="$CFLAGS -g -Wall -Werror -O2 -D$ARCH_ISA"
+
+AM_PROG_AS
 
 AC_PROG_CC
 AM_PROG_CC_C_O
 
 AC_PROG_MAKE_SET
 
-# If we're using gcc and the user hasn't specified CFLAGS, add -O2 to CFLAGS.
-test -n "$GCC" && test -n "$auto_cflags" && CFLAGS="$CFLAGS -O2 -D$ARCH_ISA"
-
-AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 AC_CHECK_PROG(AR, ar, ar)
 
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
+AC_SUBST(_GNU_SOURCE)
 
 # Set default for ARFLAGS, since autoconf does not have a macro for it.
 # This allows people to set it when running configure or make
@@ -87,19 +95,60 @@ MAKE_SHELL=/bin/sh
 AC_SUBST(MAKE_SHELL)
 
 AC_TYPE_SIGNAL
-AC_HEADER_STAT
-AC_HEADER_DIRENT
+AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h      \
+		 sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
+		 termcap.h termios.h termio.h sys/file.h locale.h getopt.h    \
+		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h)
 AC_CHECK_FUNCS(strcasecmp select setenv putenv tcgetattr setlocale lstat)
-AC_CHECK_FUNCS(strndup grantpt unlockpt ptsname on_exit isblank)
+AC_CHECK_FUNCS(grantpt unlockpt ptsname on_exit)
 AC_CHECK_FUNCS(basename)
 AC_FUNC_STRCOLL
-AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h \
-		sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
-		termcap.h termios.h termio.h sys/file.h locale.h getopt.h \
-		net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h)
-AC_CHECK_DECLS([I_PUSH])
+AC_CHECK_DECLS([I_PUSH, rl_event_hook], [], [], \
+	       [#include <readline/readline.h>])
 AC_C_BIGENDIAN
+
+# The test for strndup, strcasecmp and isblank fails on modern machines. I
+# think it's because GCC 4 does not like the way autoconf overrides the built
+# in type declaration. So we must check for them by steam.
+AC_MSG_CHECKING(for strndup)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_STRING_H
+				  #include <string.h>
+				  #else
+				  char *strndup (const char *s,
+				                 size_t      n);
+				  #endif]],                      \
+			        [[const char *s = "test";
+				  char       *t;
+				  t = strndup (s, 3);]])], \
+	       [AC_DEFINE(HAVE_STRNDUP, 1, \
+ 	       	          "Whether the strndup function is available") \
+	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for strcasecmp)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_STRINGS_H 
+			          #include <strings.h>
+				  #else
+				  int strcasecmp (const char *s1,
+				                  const char *s2);
+			          #endif]],                       \
+			        [[const char *s = "test";
+				  const char *t = "TEST";
+				  int         res;
+				  res = strcasecmp (s, t);]])], \
+	       [AC_DEFINE(HAVE_STRCASECMP, 1, \
+ 	       	          "Whether the strcasecmp function is available") \
+	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for isblank)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_CTYPE_H 
+			          #include <ctype.h>
+				  #else
+				  int isblank (int  c);
+			          #endif]],               \
+			        [[return isblank ('x');]])], \
+	       [AC_DEFINE(HAVE_ISBLANK, 1, \
+ 	       	          "Whether the isblank function is available") \
+	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])
 
 # Checks for typedefs, structures, and compiler characteristics (for argtable2)
 AC_C_CONST
@@ -137,8 +186,6 @@ AC_CHECK_TYPES([__compar_fn_t])
 
 # check for GNU readline
 AC_CHECK_LIB(readline, add_history)
-# Not all versions of readline have rl_event_hook (e.g., Mac OS X)
-AC_CHECK_DECLS(rl_event_hook, [], [], [#include <readline/readline.h>])
 
 # yuck
 case "$host_os" in
@@ -303,12 +350,25 @@ INCLUDES="$INCLUDES -I\${top_srcdir} -I\${top_srcdir}/cpu/common \
 -I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2"
 AC_SUBST(INCLUDES)
 
-AC_CONFIG_FILES([Makefile argtable2/Makefile bpb/Makefile cache/Makefile
-        cpu/Makefile cpu/common/Makefile cpu/or1k/Makefile cuc/Makefile
-	debug/Makefile doc/Makefile
-	support/Makefile mmu/Makefile peripheral/Makefile tick/Makefile
-	peripheral/channels/Makefile
-	pm/Makefile pic/Makefile vapi/Makefile port/Makefile])
+AC_CONFIG_FILES([Makefile                             \
+                 argtable2/Makefile                   \
+                 bpb/Makefile                         \
+                 cache/Makefile                       \
+                 cpu/Makefile                         \
+                 cpu/common/Makefile                  \
+                 cpu/or1k/Makefile                    \
+                 cuc/Makefile                         \
+                 debug/Makefile                       \
+                 doc/Makefile                         \
+                 support/Makefile                     \
+                 mmu/Makefile                         \
+                 peripheral/Makefile                  \
+                 tick/Makefile                        \
+                 peripheral/channels/Makefile         \
+                 pm/Makefile                          \
+                 pic/Makefile                         \
+                 vapi/Makefile                        \
+                 port/Makefile])
 
 # yuck. I don't know why I cannot just substitute $CPU_ARCH in the above
 case "$CPU_ARCH" in
@@ -316,8 +376,25 @@ dlx)    AC_CONFIG_FILES([cpu/dlx/Makefile]);;
 *)	AC_CONFIG_FILES([cpu/or32/Makefile]);;
 esac
 
-# Makefile uses this timestamp file to record whether config.h is up to date.
-# AC_CONFIG_COMMANDS([default],[[
-# echo > stamp-h
-# ]],[[]])
+# Generate the output
+AC_COPYRIGHT([Copyright (C) 1999-2008 OpenCores
+Copyright (C) 2008, 2010 Embecosm Limited
+
+Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+This file is part of OpenRISC 1000 Architectural Simulator.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>.])
+
 AC_OUTPUT

@@ -123,7 +123,10 @@ ata_read_sect (struct ata_device *dev)
   fseek (dev->conf.stream, dev->internals.lba, SEEK_SET);
 
   /* get the bytes from the stream                              */
-  fread (dev->internals.dbuf, BYTES_PER_SECTOR, 1, dev->conf.stream);
+  if (1 != fread (dev->internals.dbuf, BYTES_PER_SECTOR, 1, dev->conf.stream))
+    {
+      printf ("WARNING atadevice read short\n");
+    }
 
   /* set status register bits                                   */
   dev->regs.status = ATA_SR_DRDY | ATA_SR_DRQ;

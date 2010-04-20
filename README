@@ -9,15 +9,7 @@ This is OpenRISC 1000 architectural simulator. See the file COPYING
 for copying permission. To contact the authors, see the AUTHORS file.
 
 This simulator loads an assembly file for one of the both architectures
-and it simulates the operation of instructions.
-
-SVN Repository status
-=====================
-
-Or1ksim is now part of the openrisc project SVN repository. This contains
-Ork1sim from release 0.3.0 onwards. Earlier versions may be found in the
-legacy or1k project 
-repository.
+and it simulates the operation of instructions. 
 
 
 Pre-requisites
@@ -31,8 +23,7 @@ www.opencores.org
 Installation
 ============
 
-See the file INSTALL for generic installation instructions. Full details are
-in the user guide, which can be found in the 'doc' subdirectory.
+See the file INSTALL for generic installation instructions. Full details are in the user guide, which can be found in the 'doc' subdirectory.
 
 
 GNU Tools
@@ -46,8 +37,10 @@ Tool Chain: Installation Guide" <www.embecosm.com/download/ean2.html>.
 Simulator test
 ==============
 
-Follow the instructions in testbench/README to test the simulator. Be warned
-that these tests are very rudimentary in the current release.
+Or1ksim can be tested with "make check", but this requires the GNU tool chain
+to be installed (using the same target specification) and DejaGNU to be
+installed. Full details of the tests can be found in the 'testsuite'
+sub-directory.
 
 
 Help
@@ -56,7 +49,7 @@ Help
 Run sim with --help option for list of command line options and help in
 interactive mode, to list the commands.
 
-A user guide may be found in the doc sub-directory.
+A user guide may be found in the 'doc' sub-directory.
 
 If doxygen and dot are installed, structured documentation of the code base
 may be obtained by running the command:
@@ -81,5 +74,4 @@ For more information visit us at http://www.opencores.org.
 
 
 Upated by Jeremy Bennett (jeremy.bennett@embecosm.com)
-25 May 2009
-
+20 April 2010

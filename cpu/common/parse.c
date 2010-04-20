@@ -452,7 +452,8 @@ readsyms_coff (char *filename, uint32_t symptr, uint32_t syms)
       if (COFF_SHORT_H (coffsymhdr.e_scnum) >= 0
 	  && coffsymhdr.e_sclass[0] == C_EXT)
 	{
-	  if (*((uint32_t *) coffsymhdr.e.e.e_zeroes))
+	  uint32_t *ref = ((uint32_t *) coffsymhdr.e.e.e_zeroes);
+	  if (*ref)
 	    {
 	      if (strlen (coffsymhdr.e.e_name)
 		  && strlen (coffsymhdr.e.e_name) < 9)

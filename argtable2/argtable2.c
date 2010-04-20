@@ -756,7 +756,7 @@ void arg_print_gnuswitch(FILE *fp, struct arg_hdr **table)
     int tabindex;
     char *format1=" -%c";
     char *format2=" [-%c";
-    char *suffix="";
+    int   need_suffix=0;	/* JPB mod */
 
     /* print all mandatory switches that are without argument values */
     for(tabindex=0; table[tabindex] && !(table[tabindex]->flag&ARG_TERMINATOR); tabindex++)
@@ -797,10 +797,10 @@ void arg_print_gnuswitch(FILE *fp, struct arg_hdr **table)
         /* print first short option */
         fprintf(fp,format2,table[tabindex]->shortopts[0]);
         format2="%c";
-        suffix="]";
+        need_suffix=1;
         }
 
-    fprintf(fp,suffix);
+    fprintf(fp,need_suffix ? "]" : "");
     }
 
 

@@ -396,7 +396,7 @@ ata_devices_read (struct ata_devices * devices, char adr)
 	  return device->regs.cylinder_low;
 
 	case ATA_DR:
-	  if (!device->regs.status & ATA_SR_DRQ)
+	  if (!(device->regs.status & ATA_SR_DRQ))
 	    {
 	      return 0;
 	    }
@@ -468,7 +468,7 @@ ata_device_write (struct ata_device * device, char adr, short value)
       break;
 
     case ATA_DR:
-      if (!device->regs.status & ATA_SR_DRQ)
+      if (!(device->regs.status & ATA_SR_DRQ))
 	{
 	  break;
 	}

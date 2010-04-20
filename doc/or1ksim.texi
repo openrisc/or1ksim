@@ -98,7 +98,7 @@ Configure the software using the @command{configure} script in the
 main directory.
 
 The most significant argument is @code{--target}, which should specify
-the OpenRISC 1000 32-bit architecture. If this argument is omitted, it will
+the OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
 @example
@@ -106,12 +106,12 @@ default to OpenRISC 1000 32-bit with a warning
 @end example
 
 There are several other options available, many of which are standard
-to GNU @command{configure} scripts. Use @kbd{configure --help} to see
-all the options. The most useful is @code{--prefix} to specify a
+to GNU @command{configure} scripts.  Use @kbd{configure --help} to see
+all the options.  The most useful is @code{--prefix} to specify a
 directory for installation of the tools.
 
 A number of @value{OR1KSIM} features in the simulator do require enabling at
-configuration. These include
+configuration.  These include
 
 @table @code
 @item --enable-profiling
@@ -119,7 +119,7 @@ configuration. These include
 @itemx --disable-profiling
 @cindex @code{--disable-profiling}
 If enabled, @value{OR1KSIM} is compiled for profiling with
-@command{gprof}. This is disabled by default. Only really of value for
+@command{gprof}.  This is disabled by default.  Only really of value for
 developers of @value{OR1KSIM}.
 
 @item --enable-execution=simple
@@ -130,7 +130,7 @@ developers of @value{OR1KSIM}.
 @cindex complex model
 @cindex dynamic model
 @value{OR1KSIM} has developed to improve functionality and
-performance. This feature allows three versions of @value{OR1KSIM} to be built
+performance.  This feature allows three versions of @value{OR1KSIM} to be built
 
 @table @code
 
@@ -138,12 +138,12 @@ performance. This feature allows three versions of @value{OR1KSIM} to be built
 Build the original simple interpreting simulator
 
 @item --enable-execution=complex
-Build a more complex interpreting simulator. Experiments suggest this
-is 50% faster than the simple simulator. This is the default.
+Build a more complex interpreting simulator.  Experiments suggest this
+is 50% faster than the simple simulator.  This is the default.
 
 @item --enable-execution=dynamic
-Build a dynamically compiling simulator. This is the way many modern ISS are
-built. This represents a work in progress. Currently @value{OR1KSIM} will
+Build a dynamically compiling simulator.  This is the way many modern ISS are
+built.  This represents a work in progress.  Currently @value{OR1KSIM} will
 compile, but segfaults if configured with this option.
 
 @end table
@@ -157,9 +157,9 @@ The default is @code{--enable-execution=complex}.
 @cindex Ethernet via socket, enabling
 @cindex enabling Ethernet via socket
 If enabled, this option allows the Ethernet to be simulated by connecting via a
-socket (the alternative reads and writes, from and to files). This
+socket (the alternative reads and writes, from and to files).  This
 must then be configured using the relevant fields in the
-@code{ethernet} section of the configuration file. @xref{Ethernet
+@code{ethernet} section of the configuration file.  @xref{Ethernet
 Configuration, , Ethernet Configuration}.
 
 The default is for this to be disabled.
@@ -171,7 +171,7 @@ The default is for this to be disabled.
 @cindex statistics, register over time
 @cindex register over time statistics
 If enabled, this option allows statistics to be collected to analyse
-register access over time. The default is for this to be disabled.
+register access over time.  The default is for this to be disabled.
 
 @item --enable-ov-flag
 @cindex @code{--enable-ov-flag}
@@ -179,7 +179,7 @@ register access over time. The default is for this to be disabled.
 @cindex @code{--disable-ov-flag}
 @cindex overflow flag setting by instructions
 If enabled, this option causes instructions to set the overflow
-flag. The instructions affected by this are @code{l.add},
+flag.  The instructions affected by this are @code{l.add},
 @code{l.addc}, @code{l.addi}, @code{l.and}, @code{l.andi},
 @code{l.div}, @code{l.divu}, @code{l.mul}, @code{l.muli}, @code{l.or},
 @code{l.ori}, @code{l.sll}, @code{l.slli}, @code{l.srl},
@@ -190,12 +190,12 @@ The default is for this to be disabled.
 
 @quotation Caution
 This appears a very dangerous option, to the extent of arguably being
-a bug. Whether or not flags are set is part of the OpenRISC 1000
-architectural specification. Within the above list, the arithmetic
+a bug.  Whether or not flags are set is part of the OpenRISC 1000
+architectural specification.  Within the above list, the arithmetic
 instructions (@code{l.add}, @code{l.addc}, @code{l.addi},
 @code{l.div}, @code{l.divu}, @code{l.mul}, @code{l.muli} and
 @code{l.sub}), together with @code{l.addic} which is missed out, set
-the overflow flag. All the others (@code{l.and}, @code{l.andi},
+the overflow flag.  All the others (@code{l.and}, @code{l.andi},
 @code{l.or}, @code{l.ori}, @code{l.sll}, @code{l.slli}, @code{l.srl},
 @code{l.srli}, @code{l.sra}, @code{l.srai}, @code{l.xor} and
 @code{l.xori}) do not.
@@ -210,18 +210,18 @@ set.
 @cindex @code{--disable-arith-flag}
 @cindex flag setting by instructions
 If enabled, this option causes instructions to set the flag (@code{F} bit) in
-the supervision register. The instructions affected by this are @code{l.add},
+the supervision register.  The instructions affected by this are @code{l.add},
 @code{l.addc}, @code{l.addi}, @code{l.and} and @code{l.andi}.
 
 The default is for this to be disabled.
 
 @quotation Caution
 As with @code{--enable-ov-flag}, this appears another very dangerous option,
-to the extent of arguably being a bug. It also appears to be only partially
+to the extent of arguably being a bug.  It also appears to be only partially
 implemented---why only the instructions early in the alphabet?
 
 Whether or not flags are set is part of the OpenRISC 1000 architectural
-specification. The only flags which should set this are the ``set flag''
+specification.  The only flags which should set this are the ``set flag''
 instructions: @code{l.sfeq}, @code{l.sfeqi}, @code{l.sfges}, @code{l.sfgesi},
 @code{l.sfgeu}, @code{l.sfgeui}, @code{l.sfgts}, @code{l.sfgtsi},
 @code{l.sfgtu}, @code{l.sfgtui}, @code{l.sfles}, @code{l.sflesi},
@@ -241,19 +241,44 @@ Correct behavior is thus achieved if this flag is not set.
 @cindex @code{--disable-debug}
 @cindex debugging enabled (Argtable2)
 @cindex Argtable2 debugging
-This is a feature of the Argtable2 package used to process arguments. If
-enabled, some debugging features are turned on in Argtable2. It is provided for
+This is a feature of the Argtable2 package used to process arguments.  If
+enabled, some debugging features are turned on in Argtable2.  It is provided for
 completeness, but there is no reason why this feature should ever be needed by
 any @value{OR1KSIM} user.
+
+@item --enable-all-tests
+@cindex @code{--enable-all-tests}
+@itemx --disable-all-tests
+@cindex @code{--disable-all-tests}
+@cindex all tests enabled
+@cindex tests, all enabled.
+Some of the tests (at the time of writing just one) will not compile
+without error.  If enabled with this flag, all test programs will be
+compiled with @command{make check}.
+
+This flag is intended for those working on the test package, who wish to
+get the missing test(s) working.
 
 @end table
 
 @node Build and Install
 @section Building and Installing
-The tool is then built with:
+Build the tool with:
 
 @example
 @kbd{make all}
+@end example
+
+If you have the OpenRISC tool chain and DejaGNU installed, you can
+verify the tool as follows (otherwise omit this step):
+
+@example
+@kbd{make check}
+@end example
+
+Install the tool with:
+
+@example
 @kbd{make install}
 @end example
 
@@ -278,49 +303,49 @@ Postscript, DVI, HTML) with for example:
 @section Known Problems and Issues
 
 The following problems and issues are known about with @value{OR1KSIM}
-@value{VERSION}. The OpenRISC tracker may be used to see the current
-state of these issues and to raise new problems and feature requests. It
+@value{VERSION}.  The OpenRISC tracker may be used to see the current
+state of these issues and to raise new problems and feature requests.  It
 may be found at @url{http://www.opencores.org/ptracker.cgi/view/or1k/398}.
 
 @itemize @bullet
 @item
 The Supervision Register Little Endian Enable (LEE) bit is
-ignored. @value{OR1KSIM} can be built for either little endian or big endian
+ignored.  @value{OR1KSIM} can be built for either little endian or big endian
 use, but that behavior cannot be changed dynamically.
 
 @item
 The NPC is a read/write register, but after being written it clears the
-pipeline. This means that if the processor is stalled, the value should
+pipeline.  This means that if the processor is stalled, the value should
 subsequently read back as 0, until the processor is unstalled and able
-to refill its pipeline. By default @value{OR1KSIM} always reports back the value
+to refill its pipeline.  By default @value{OR1KSIM} always reports back the value
 of NPC, even when it has been written while stalled.
 
 There is now an option, @code{--strict-npc}, which will enforce this
-behavior. At some stage in the future it will become the default
+behavior.  At some stage in the future it will become the default
 behavior, but for now it is an option, since its use will break GDB.
 
 @item
-The memory components are given names in the configuration file. However
+The memory components are given names in the configuration file.  However
 there is currently no way for @value{OR1KSIM} to report that name back to the
 user (for example to identify which memory block corresponds to a
 particular access).
 
 @item
 @value{OR1KSIM} allows the processor to be stalled (from the command
-line), even if there is no debugger present. This seems to be a
+line), even if there is no debugger present.  This seems to be a
 meaningless operation.
 
 @item
 @value{OR1KSIM} is not reentrant, so a program cannot instantiate
-multiple instances using the library. This is clearly a problem when
-considering multi-core applications. However it stems from the original
-design, and can only be fixed by a complete rewrite. The entire source
+multiple instances using the library.  This is clearly a problem when
+considering multi-core applications.  However it stems from the original
+design, and can only be fixed by a complete rewrite.  The entire source
 code uses static global constants liberally!
 
 @item
 There is no support for floating point instructions currently in
-@value{OR1KSIM}. However this is a work in progress and should be available in
-the near future.
+@value{OR1KSIM}.  However this is a work in progress and should be available in
+the future.
 
 @end itemize
 
@@ -346,7 +371,7 @@ or32-uclinux-sim [-vhi] [-f @var{file}] [--nosrv] [--srv=[@var{n}]] [-d @var{str
                  [--enable-profile] [--enable-mprofile] [@var{file}]
 @end example
 
-Many of the options have both a short and a long form. For example
+Many of the options have both a short and a long form.  For example
 @code{-h} or @code{--help}.
 
 @table @code
@@ -370,33 +395,33 @@ Print out help about the command line options and what they mean.
 @cindex @code{--file}
 Read configuration commands from the specified file, looking first in
 the current directory, and otherwise in the @file{$HOME/.or1k}
-directory. If this argument is not specified, the file @file{sim.cfg}
-in those two locations is used. Failure to find the file is a fatal
-error. @xref{Configuration, , Configuration}, for detailed information
+directory.  If this argument is not specified, the file @file{sim.cfg}
+in those two locations is used.  Failure to find the file is a fatal
+error.  @xref{Configuration, , Configuration}, for detailed information
 on configuring @value{OR1KSIM}.
 
 @item --nosrv
 @cindex @code{--nosrv}
-Do not start up the debug server. This overrides any setting specified
-in the configuration file. This option may not be specified with
-@code{--srv}. If it is, a rude message is printed and the
+Do not start up the debug server.  This overrides any setting specified
+in the configuration file.  This option may not be specified with
+@code{--srv}.  If it is, a rude message is printed and the
 @code{--nosrv} option is ignored.
 
 @item --srv
 @item --srv=@var{n}
 @cindex @code{--srv}
-Start up the debug server. If the parameter, @var{n}, is specified,
+Start up the debug server.  If the parameter, @var{n}, is specified,
 use that as the TCP/IP port for the server, otherwise a random value
-from the private port range (41920-65535) will be used. This option
-may not be specified with @code{--nosrv}. If it is, a rude message is
+from the private port range (41920-65535) will be used.  This option
+may not be specified with @code{--nosrv}.  If it is, a rude message is
 printed and the @code{--nosrv} option is ignored.
 
 @item -d=@var{config_string}
 @itemx --debug-config=@var{config_string}
 @cindex @code{-d}
 @cindex @code{--debug-config}
-Enable selected debug messages in @value{OR1KSIM}. This parameter is
-for use by developers only, and is not covered further here. See the
+Enable selected debug messages in @value{OR1KSIM}.  This parameter is
+for use by developers only, and is not covered further here.  See the
 source code for more details.
 
 @item -i
@@ -409,18 +434,18 @@ shell.
 @item --strict-npc
 @cindex @code{--strict-npc}
 In real hardware, setting the next program counter (NPC, SPR 16),
-flushes the processor pipeline. The consequence of this is that until
-the pipeline refills, reading the NPC will return zero. This is typically
+flushes the processor pipeline.  The consequence of this is that until
+the pipeline refills, reading the NPC will return zero.  This is typically
 the case when debugging, since the processor is stalled.
 
 Historically, @value{OR1KSIM} has always returned the value of the NPC,
-irrespective of when it is changed. If the @code{--strict-npc} option is
-used, then @value{OR1KSIM} will mirror real hardware more accurately. If the NPC
+irrespective of when it is changed.  If the @code{--strict-npc} option is
+used, then @value{OR1KSIM} will mirror real hardware more accurately.  If the NPC
 is changed while the processor is stalled, subsequent reads of its value
 will return 0 until the processor is unstalled.
 
 This is not currently the default behavior, since tools such as GDB have
-been implemented assuming the historic @value{OR1KSIM} behavior. However at some
+been implemented assuming the historic @value{OR1KSIM} behavior.  However at some
 time in the future it will become the default.
 
 @item --enable-profile
@@ -439,14 +464,14 @@ Enable memory profiling.
 @cindex instruction profiling for @value{OR1KSIM}
 
 This utility analyses instruction profile data generated by
-@value{OR1KSIM}. It may be invoked as a standalone command, or from
-the @value{OR1KSIM} CLI. The general form the standalone command is:
+@value{OR1KSIM}.  It may be invoked as a standalone command, or from
+the @value{OR1KSIM} CLI.  The general form the standalone command is:
 
 @example
 or32-uclinux-profile [-vhcq] [-g=@var{file}]
 @end example
 
-Many of the options have both a short and a long form. For example
+Many of the options have both a short and a long form.  For example
 @code{-h} or @code{--help}.
 
 @table @code
@@ -480,7 +505,7 @@ Suppress messages
 @itemx --generate=@var{file}
 @cindex @code{-g}
 @cindex @code{--generate}
-The data file to analyse. If omitted, the default file,
+The data file to analyse.  If omitted, the default file,
 @file{sim.profile} is used.
 
 @end table
@@ -490,14 +515,14 @@ The data file to analyse. If omitted, the default file,
 @cindex memory profiling version of @value{OR1KSIM}
 
 This utility analyses memory profile data generated by
-@value{OR1KSIM}. It may be invoked as a standalone command, or from
-the @value{OR1KSIM} CLI. The general form the standalone command is:
+@value{OR1KSIM}.  It may be invoked as a standalone command, or from
+the @value{OR1KSIM} CLI.  The general form the standalone command is:
 
 @example
 or32-uclinux-mprofile  [-vh] [-m=@var{m}] [-g=@var{n}] [-f=@var{file}] @var{from} @var{to}
 @end example
 
-Many of the options have both a short and a long form. For example
+Many of the options have both a short and a long form.  For example
 @code{-h} or @code{--help}.
 
 @table @code
@@ -519,13 +544,13 @@ Print out help about the command line options and what they mean.
 @itemx --mode=@var{m}
 @cindex @code{-m}
 @cindex @code{--mode}
-Specify the mode out output. Permitted options are
+Specify the mode out output.  Permitted options are
 
 @table @code
 
 @item detailed
 @itemx d
-Detailed output. This is the default if no mode is specified.
+Detailed output.  This is the default if no mode is specified.
 
 @item pretty
 @itemx p
@@ -551,7 +576,7 @@ Group @math{2^n} bits of successive addresses together.
 @itemx --filename=@var{file}
 @cindex @code{-f}
 @cindex @code{--filename}
-The data file to analyse. If not specified, the default,
+The data file to analyse.  If not specified, the default,
 @file{sim.profile} is used.
 
 @item @var{from}
@@ -568,11 +593,11 @@ the region of memory to be analysed.
 @cindex library version of @value{OR1KSIM}
 
 @value{OR1KSIM} may be used as a static of dynamic library,
-@file{libsim.a} or @file{libsim.so}. When compiling with the static
+@file{libsim.a} or @file{libsim.so}.  When compiling with the static
 library, the flag, @code{-lsim} should be added to the link command.
 
 The header file @file{or1ksim.h} contains appropriate declarations of
-the functions exported by the @value{OR1KSIM} library. These are:
+the functions exported by the @value{OR1KSIM} library.  These are:
 
 @deftypefn {@file{or1ksim.h}} int or1ksim_init (const char *@var{config_file}, const char *@var{image_file}, void *@var{class_ptr}, unsigned long int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr}, unsigned long int @var{mask}), void (*@var{upw})(void *@var{class_ptr}, unsigned long int @var{addr}, unsigned long int @var{mask}, unsigned long int @var{wdata}))
 
@@ -587,17 +612,17 @@ configuring @value{OR1KSIM} and the format of the configuration file.
 
 @var{upw} is called for any write to an address external to the model
 (determined by a @code{generic} section in the configuration
-file). @var{upr} is called for any reads to an external address. The
+file).  @var{upr} is called for any reads to an external address.  The
 @var{class_ptr} is passed back with these upcalls, allowing the
 function to associate the call with the class which originally
 initialized the library.
 
 @var{mask} indicates which bytes in the word are to be written or
-read. Bytes to be read/written should have 0xff set in
-@var{mask}. Otherwise the byte should be zero.
+read.  Bytes to be read/written should have 0xff set in
+@var{mask}.  Otherwise the byte should be zero.
 
 @var{addr}, @var{mask}, @var{wdata} and the result from @var{upr} all
-use host-endianess, @emph{not} model-endianess. The internal
+use host-endianess, @emph{not} model-endianess.  The internal
 @value{OR1KSIM} routines manage all the conversion.
 
 @end deftypefn
@@ -611,7 +636,7 @@ Run the simulator for the simulated duration specified (in seconds).
 @deftypefn {@file{or1ksim.h}} void or1ksim_reset_duration (double @var{duration})
 
 Change the duration of a run specified in an earlier call to
-@code{or1ksim_run}. Typically this is called from an upcall, which
+@code{or1ksim_run}.  Typically this is called from an upcall, which
 realizes it needs to change the duration of the run specified in the
 call to @code{or1ksim_run} that has been interrupted by the upcall.
 
@@ -623,7 +648,7 @@ call to @code{or1ksim_run}).
 
 @deftypefn {@file{or1ksim.h}} void  or1ksim_set_time_point ()
 
-Set a timing point. For use with @code{or1ksim_get_time_period}.
+Set a timing point.  For use with @code{or1ksim_get_time_period}.
 
 @end deftypefn
 
@@ -643,15 +668,15 @@ little-endian, 0 otherwise.
 
 @deftypefn {@file{or1ksim.h}} unsigned long int  or1ksim_clock_rate ()
 
-Return the @value{OR1KSIM} clock rate (in Hz). This is the value
+Return the @value{OR1KSIM} clock rate (in Hz).  This is the value
 specified in the configuration file.
 
 @end deftypefn
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt (int  @var{i})
 
-Generate an edge-triggered interrupt on interrupt line @var{i}. The interrupt
-is then immediately cleared automatically. A warning will be generated and the
+Generate an edge-triggered interrupt on interrupt line @var{i}.  The interrupt
+is then immediately cleared automatically.  A warning will be generated and the
 interrupt request ignored if level sensitive interrupts have been configured
 with the programmable interrupt controller (@pxref{Interrupt Configuration, ,
 Interrupt Configuration}).
@@ -660,9 +685,9 @@ Interrupt Configuration}).
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt_set (int  @var{i})
 
-Assert a level-triggered interrupt on interrupt line @var{i}. The interrupt
+Assert a level-triggered interrupt on interrupt line @var{i}.  The interrupt
 must be cleared separately by an explicit call to
-@code{or1ksim_interrupt_clear}. A warning will be generated, and the interrupt
+@code{or1ksim_interrupt_clear}.  A warning will be generated, and the interrupt
 request ignored if edge sensitive interrupts have been configured with the
 programmable interrupt controller (@pxref{Interrupt Configuration, , Interrupt
 Configuration}).
@@ -672,7 +697,7 @@ Configuration}).
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt_clear (int  @var{i})
 
 Clear a level-triggered interrupt on interrupt line @var{i}, which was
-previously asserted by a call to @code{or1ksim_interrupt_set}. A warning will
+previously asserted by a call to @code{or1ksim_interrupt_set}.  A warning will
 be generated, and the interrupt request ignored if edge sensitive interrupts
 have been configured with the programmable interrupt controller
 (@pxref{Interrupt Configuration, , Interrupt Configuration}).
@@ -684,7 +709,7 @@ main installation directory (as specified with the @option{--prefix}
 option to the @command{configure} script).
 
 For example if the main installation directory is @file{/opt/or1ksim},
-the library will be found in the @file{/opt/or1ksim/lib} directory. It
+the library will be found in the @file{/opt/or1ksim/lib} directory.  It
 is available as both a static library (@file{libsim.a}) and a shared
 object (@file{libsim.so}).
 
@@ -695,7 +720,7 @@ and do one of the following:
 
 @item
 Add the library directory to the @code{LD_LIBRARY_PATH} environment
-variable during execution. For example:
+variable during execution.  For example:
 
 @example
 export LD_LIBRARY_PATH=/opt/or1ksim/lib:$LD_LIBRARY_PATH
@@ -703,7 +728,7 @@ export LD_LIBRARY_PATH=/opt/or1ksim/lib:$LD_LIBRARY_PATH
 
 @item
 Add the library directory to the @code{LD_RUN_PATH} environment
-variable during linking. For example:
+variable during linking.  For example:
 
 @example
 export LD_RUN_PATH=/opt/or1ksim/lib:$LD_RUN_PATH
@@ -711,10 +736,10 @@ export LD_RUN_PATH=/opt/or1ksim/lib:$LD_RUN_PATH
 
 @item
 Use the linker @option{--rpath} option and specify the library
-directory when linking your program. For example
+directory when linking your program.  For example
 
 @example
-gcc ... -Wl,--rpath -Wl,/opt/or1ksim/lib ...
+gcc ...  -Wl,--rpath -Wl,/opt/or1ksim/lib ...
 @end example
 
 @item
@@ -726,10 +751,10 @@ Add the library directory to @file{/etc/ld.so.conf}
 @chapter Configuration
 @cindex configuring @value{OR1KSIM}
 
-@value{OR1KSIM} is configured through a configuration file. This is specified
+@value{OR1KSIM} is configured through a configuration file.  This is specified
 through the @code{-f} parameter to the @value{OR1KSIM} command, or passed as a
-string when initializing the @value{OR1KSIM} library. If no file is specified,
-the default @file{sim.cfg} is used. The file is looked for first in the
+string when initializing the @value{OR1KSIM} library.  If no file is specified,
+the default @file{sim.cfg} is used.  The file is looked for first in the
 current directory, then in the @file{$HOME/.or1k} directory of the user.
 
 @menu
@@ -753,7 +778,7 @@ The configuration file is a plain text file.
 @node Configuration File Preprocessing
 @subsection Configuration File Preprocessing
 
-The configuration file may include C style comments (i.e. delimited by
+The configuration file may include C style comments (i.e.  delimited by
 @code{/*} and @code{*/}).
 
 Configure files may be included, using
@@ -788,8 +813,8 @@ per line, withe the general form
 
 Depending on the parameter, the value may be a named value (an enumeration),
 an integer (specified in any format acceptable in C) or a string in doubple
-quotes. For flag parameters, the value 1 is used to mean ``true'' or ``on''
-and the value ``0'' to mean ``false'' or ``off''. An example from a memory
+quotes.  For flag parameters, the value 1 is used to mean ``true'' or ``on''
+and the value ``0'' to mean ``false'' or ``off''.  An example from a memory
 section shows each of these
 
 @example
@@ -802,13 +827,13 @@ end
 @end example
 
 Many parameters are optional and take reasonable default values if not
-specified. However there are some parameters (for example the
+specified.  However there are some parameters (for example the
 @code{ce} parameter in @code{@w{section memory}}) @emph{must} be
 specified.
 
 Subsections are introduced by a keyword, with a parameter value (no
 @code{=} sign), and end with the same keyword prefixed by
-@code{end}. Thus the ATA/ATAPI inteface (@code{@w{section ata}}) has a
+@code{end}.  Thus the ATA/ATAPI inteface (@code{@w{section ata}}) has a
 @code{device} subsection, thus:
 
 @example
@@ -824,13 +849,13 @@ end
 @end example
 
 Some sections (for example @code{@w{section sim}}) should appear only
-once. Others (for example @code{@w{section memory}} may appear
+once.  Others (for example @code{@w{section memory}} may appear
 multiple times.
 
 Sections may be omitted, @emph{unless they contain parameters which
-are non-optional}. If the section describes a part of the simulator
+are non-optional}.  If the section describes a part of the simulator
 which is optional (for example whether it has a UART), then that
-functionality will not be provided. If the section describes a part of
+functionality will not be provided.  If the section describes a part of
 the simulator which is not optional (for example the CPU), then all the
 parameters of that section will take their default values.
 
@@ -839,7 +864,7 @@ sections including a @code{enabled} parameter, which can be set to 0
 to ensure that functionality is explicitly omitted.
 
 Even if a section is disabled, all its parameters will be read and
-stored. This is helpful if the section is subsequently enabled from
+stored.  This is helpful if the section is subsequently enabled from
 the @value{OR1KSIM} command line (@pxref{Interactive Command Line, ,
 Interactive Command Line}).
 
@@ -866,49 +891,49 @@ parameters which may be set in each.
 @cindex configuring the behavior of @value{OR1KSIM}
 @cindex simulator configuration
 @cindex @code{section sim}
-Simulator behavior is described in @code{section sim}. This section
-should appear only once. The following parameters may be specified.
+Simulator behavior is described in @code{section sim}.  This section
+should appear only once.  The following parameters may be specified.
 
 @table @code
 
 @item verbose = 0|1
 @cindex @code{verbose} (simulator configuration)
-If 1 (true), print extra messages. Default 0.
+If 1 (true), print extra messages.  Default 0.
 
 @item debug = 0-9
 @cindex @code{debug} (simulator configuration)
-0 means no debug messages. 1-9 means produce debug messages. The higher the
-value the greater the number of messages. Default 0. Negative values
-will be treated as 0 (with a warning). Values that are too large will
+0 means no debug messages.  1-9 means produce debug messages.  The higher the
+value the greater the number of messages.  Default 0.  Negative values
+will be treated as 0 (with a warning).  Values that are too large will
 be treated as 9 (with a warning).
 
 @item profile = 0|1
 @cindex @code{profile} (simulator configuration)
 If 1 (true) generate a profiling file using the file specified in the
-@code{prof_file} parameter or otherwise @file{sim.profile}. Default 0.
+@code{prof_file} parameter or otherwise @file{sim.profile}.  Default 0.
 
 @item prof_file = ``@var{filename}''
 @cindex @code{prof_file} (simulator configuration)
 @cindex @code{prof_fn} (simulator configuration - deprecated)
-Specifies the file to be used with the @code{profile} parameter. Default
-@file{sim.profile}. For backwards compatibility, the alternative name
+Specifies the file to be used with the @code{profile} parameter.  Default
+@file{sim.profile}.  For backwards compatibility, the alternative name
 @code{prof_fn} is supported for this parameter, but deprecated.
 
 @item mprofile = 0|1
 @cindex @code{mprofile} (simulator configuration)
 If 1 (true) generate a memory profiling file using the file specified in the
-@code{mprof_file} parameter or otherwise @file{sim.mprofile}. Default 0.
+@code{mprof_file} parameter or otherwise @file{sim.mprofile}.  Default 0.
 
 @item mprof_fn = ``@var{filename}''
 @cindex @code{mprof_file} (simulator configuration)
 @cindex @code{mprof_fn} (simulator configuration - deprecated)
-Specifies the file to be used with the @code{mprofile} parameter. Default
-@file{sim.mprofile}. For backwards compatibility, the alternative name
+Specifies the file to be used with the @code{mprofile} parameter.  Default
+@file{sim.mprofile}.  For backwards compatibility, the alternative name
 @code{mprof_fn} is supported for this parameter, but deprecated.
 
 @item history = 0|1
 @cindex @code{history} (simulator configuration)
-If 1 (true) track execution flow. Default 0.
+If 1 (true) track execution flow.  Default 0.
 
 @quotation Note
 Setting this parameter seriously degrades performance.
@@ -922,8 +947,8 @@ Configuration, , CPU Configuration}).
 
 @item exe_log = 0|1
 @cindex @code{exe_log} (simulator configuration)
-If 1 (true), generate an execution log. Log is written to the file specified
-in parameter @code{exe_log_file}. Default 0.
+If 1 (true), generate an execution log.  Log is written to the file specified
+in parameter @code{exe_log_file}.  Default 0.
 
 @quotation Note
 Setting this parameter seriously degrades performance.
@@ -937,7 +962,7 @@ Type of execution log to produce.
 
 @item default
 @cindex @code{exe_log_type=default} (simulator configuration)
-Produce default output for the execution log. In the current implementation
+Produce default output for the execution log.  In the current implementation
 this is the equivalent of @code{hardware}.
 
 @item hardware
@@ -955,12 +980,12 @@ far and the next instruction to execute, symbolically disassembled.
 @item software
 @cindex @code{exe_log_type=software} (simulator configuration)
 After each instruction execution, log the number of instructions executed so
-far and the next instruction to execute, symbolically disassembled. Also show
+far and the next instruction to execute, symbolically disassembled.  Also show
 the value of each operand to the instruction.
 
 @end table
 
-Default value @code{hardware}. Any unrecognized keyword (case
+Default value @code{hardware}.  Any unrecognized keyword (case
 insensitive) will be treated as the default with a warning.
 
 @quotation Note
@@ -969,29 +994,29 @@ Execution logs can be @emph{very} big.
 
 @item exe_log_start = @var{value}
 @cindex @code{exe_log_start} (simulator configuration)
-Address of the first instruction to start logging. Default 0.
+Address of the first instruction to start logging.  Default 0.
 
 @item exe_log_end = @var{value}
 @cindex @code{exe_log_end} (simulator configuration)
-Address of the last instruction to log. Default no limit (i.e once started
+Address of the last instruction to log.  Default no limit (i.e once started
 logging will continue until the simulator exits).
 
 @item exe_log_marker = @var{value}
 @cindex @code{exe_log_marker} (simulator configuration)
 Specifies the number of instructions between printing horizontal
-markers. Default is to produce no markers.
+markers.  Default is to produce no markers.
 
 @item exe_log_file = @var{filename}
 @cindex @code{exe_log_file} (simulator configuration)
 @cindex @code{exe_log_fn} (simulator configuration - deprecated)
-Filename for the execution log filename if @code{exe_log} is enabled. Default
-@file{executed.log}. For backwards compatibility, the alternative name
+Filename for the execution log filename if @code{exe_log} is enabled.  Default
+@file{executed.log}.  For backwards compatibility, the alternative name
 @code{exe_log_fn} is supported for this parameter, but deprecated.
 
 @item clkcycle = @var{value}[ps|ns|us|ms]
 @cindex @code{clkcycle} (simulator configuration)
-Specify the time taken by one clock cycle. If no units are specified,
-@code{ps} is assumed. Default 4000ps (250MHz).
+Specify the time taken by one clock cycle.  If no units are specified,
+@code{ps} is assumed.  Default 4000ps (250MHz).
 
 @end table
 
@@ -1003,24 +1028,24 @@ Specify the time taken by one clock cycle. If no units are specified,
 @cindex @code{section vapi}
 The Verification API (VAPI) provides a TCP/IP interface to allow
 components of the simulation to be controlled
-externally. @xref{Verification API, , Verification API}, for more
+externally.  @xref{Verification API, , Verification API}, for more
 details.
 
 Verification API configuration is described in @code{section
-vapi}. This section may appear at most once. The following parameters
+vapi}.  This section may appear at most once.  The following parameters
 may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (verification API configuration)
-If 1 (true), verification API is enabled and its server started. If 0
+If 1 (true), verification API is enabled and its server started.  If 0
 (the default), it is disabled.
 
 @item server_port = @var{value}
 @cindex @code{server_port} (verification API configuration)
 When VAPI is enabled, communication will be via TCP/IP on the port
-specified by @var{value}. The value must lie in the range 1 to 65535.
+specified by @var{value}.  The value must lie in the range 1 to 65535.
 The default value is 50000.
 
 @quotation Tip
@@ -1028,15 +1053,15 @@ The default value is 50000.
 @cindex port range for TCP/IP
 @cindex dynamic ports, use of
 @cindex private ports, use of
-There is no registered port for @value{OR1KSIM} VAPI. Good practice
+There is no registered port for @value{OR1KSIM} VAPI.  Good practice
 suggests users should adopt port values in the @dfn{Dynamic} or
-@dfn{Private} port range, i.e. 49152-65535.
+@dfn{Private} port range, i.e.  49152-65535.
 @end quotation
 
 @item log_enabled = 0|1
 @cindex @code{log_enabled} (verification API configuration)
-If 1 (true), all VAPI requests and sent commands will be logged. If 0
-(the default), logging is diabled. Logs are written to the file
+If 1 (true), all VAPI requests and sent commands will be logged.  If 0
+(the default), logging is diabled.  Logs are written to the file
 specified by the @code{vapi_log_file} field (see below).
 
 @quotation Caution
@@ -1046,15 +1071,15 @@ degrade simulator performance.
 
 @item hide_device_id = 0|1
 @cindex @code{hide_device_id} (verification API configuration)
-If 1 (true) don't log the device ID. If 0 (the default), log the
-device ID. This feature (when set to 1) is provided for backwards
+If 1 (true) don't log the device ID.  If 0 (the default), log the
+device ID.  This feature (when set to 1) is provided for backwards
 compatibility with an old version of VAPI.
 
 @item vapi_log_file = "@var{filename}"
 @cindex @code{vapi_log_file} (verification API configuration)
 @cindex @code{vapi_log_fn} (verification API configuration - deprecated)
 Use @file{filename} as the file for logged data is logging is enabled
-(see @code{log_enabled} above). The default is @code{"vapi.log"}. For
+(see @code{log_enabled} above).  The default is @code{"vapi.log"}.  For
 backwards compatibility, the alternative name @code{vapi_log_fn} is
 supported for this parameter, but deprecated.
 
@@ -1067,12 +1092,12 @@ supported for this parameter, but deprecated.
 @cindex CUC configuration
 @cindex @code{section cuc}
 The Custom Unit Compiler (CUC) was a project by Marko Mlinar to generate
-Verilog from ANSI C functions. The project seems to not have progressed
-beyond the initial prototype phase. The configuration parameters are
+Verilog from ANSI C functions.  The project seems to not have progressed
+beyond the initial prototype phase.  The configuration parameters are
 described here for the record.
 
-CUC configuration is described in @code{@w{section cuc}}. This section
-may appear at most once. The following parameters may be specified.
+CUC configuration is described in @code{@w{section cuc}}.  This section
+may appear at most once.  The following parameters may be specified.
 
 @table @code
 
@@ -1084,44 +1109,44 @@ This parameter specifies the memory ordering required:
 
 @item memory_order=none
 @cindex @code{memory_order=none} (CUC configuration)
-Different memory ordering, even if there are dependencies. Bursts can
+Different memory ordering, even if there are dependencies.  Bursts can
 be made, width can change.
 
 @cindex @code{memory_order=weak} (CUC configuration)
-Different memory ordering, even if there are dependencies. If
+Different memory ordering, even if there are dependencies.  If
 dependencies cannot occur, then bursts can be made, width can change.
 
 @cindex @code{memory_order=strong} (CUC configuration)
-Same memory ordering. Bursts can be made, width can change.
+Same memory ordering.  Bursts can be made, width can change.
 
 @cindex @code{memory_order=exact} (CUC configuration)
 Exactly the same memory ordering and widths.
 
 @end table
 
-The default value is @code{memory_order=exact}. Invalid memory
+The default value is @code{memory_order=exact}.  Invalid memory
 orderings are ignored with a warning.
 
 @item calling_convention = 0|1
 @cindex @code{calling_convention} (CUC configuration)
-If 1 (true), programs follow OpenRISC calling conventions. If 0 (the
+If 1 (true), programs follow OpenRISC calling conventions.  If 0 (the
 default), they may use other convenitions.
 
 @item enable_bursts = 0 | 1
 @cindex @code{enable_bursts} (CUC configuration)
-If 1 (true), bursts are detected. If 0 (the default), bursts are not
+If 1 (true), bursts are detected.  If 0 (the default), bursts are not
 detected.
 
 @item no_multicycle = 0 | 1
 @cindex @code{no_multicycle} (CUC configuration)
-If 1 (true), no multicycle logic paths will be generated. If 0 (the
+If 1 (true), no multicycle logic paths will be generated.  If 0 (the
 default), multicycle logic paths will be generated.
 
 @item timings_file = "@var{filename}"
 @cindex @code{timings_file} (CUC configuration)
 @cindex @code{timings_fn} (CUC configuration - deprecated)
-@var{filename} specifies a file containing timing information. The
-default value is @code{"virtex.tim"}. For backwards compatibility, the
+@var{filename} specifies a file containing timing information.  The
+default value is @code{"virtex.tim"}.  For backwards compatibility, the
 alternative name @code{timings_fn} is supported for this parameter,
 but deprecated.
 
@@ -1148,9 +1173,9 @@ but deprecated.
 @cindex CPU configuration
 @cindex processor configuration
 @cindex @code{section cpu}
-CPU configuration is described in @code{section cpu}. This section
-should appear only once. At present @value{OR1KSIM} does not model multi-CPU
-systems. The following parameters may be specified.
+CPU configuration is described in @code{section cpu}.  This section
+should appear only once.  At present @value{OR1KSIM} does not model multi-CPU
+systems.  The following parameters may be specified.
 
 @table @code
 
@@ -1160,14 +1185,14 @@ systems. The following parameters may be specified.
 @cindex @code{ver} (CPU configuration)
 @cindex @code{rev} (CPU configuration)
 The values are used to form the corresponding fields in the @code{VR}
-Special Purpose Register (SPR 0). Default values 0. A warning is given
+Special Purpose Register (SPR 0).  Default values 0.  A warning is given
 and the value truncated if it is too large (8 bits for @code{ver} and
 @code{cfg}, 6 bits for @code{rev}).
 
 @item upr = @var{value}
 @cindex @code{upr} (CPU configuration)
 Used as the value of the Unit Present Register (UPR) Special Purpose Register
-(SPR 1) to @var{value}. Default value is 0x0000075f, i.e.
+(SPR 1) to @var{value}.  Default value is 0x0000075f, i.e.
 @itemize @bullet
 @item
 UPR present (0x00000001)
@@ -1197,19 +1222,19 @@ configuration sections.
 @item cfgr = @var{value}
 @cindex @code{cfgr} (CPU configuration)
 Sets the CPU configuration register (Special Purpose Register 2) to
-@var{value}. Default value is 0x00000020, i.e. support for the ORBIS32
-instruction set. Attempts to set any other value are accepted, but
+@var{value}.  Default value is 0x00000020, i.e.  support for the ORBIS32
+instruction set.  Attempts to set any other value are accepted, but
 issue a warning that there is no support for the instruction set.
 
 @item sr = @var{value}
 @cindex @code{sr} (CPU configuration)
 Sets the supervision register Special Purpose Register (SPR 0x11) to
-@var{value}. Default value is 0x00008001, i.e. start in supervision
+@var{value}.  Default value is 0x00008001, i.e.  start in supervision
 mode (0x00000001) and set the ``Fixed One'' bit (0x00008000).
 
 @item superscalar = 0|1
 @cindex @code{superscalar} (CPU configuration)
-If 1, the processor operates in superscalar mode. Default value is
+If 1, the processor operates in superscalar mode.  Default value is
 0.
 
 In the current simulator, the only functional effect of superscalar
@@ -1223,12 +1248,12 @@ users are advised not to use this option.
 
 @item hazards = 0|1
 @cindex @code{hazards} (CPU configuration)
-If 1, data hazards are tracked in a superscalar CPU. Default value is
+If 1, data hazards are tracked in a superscalar CPU.  Default value is
 0.
 
 In the current simulator, the only functional effect is to cause
 logging of hazard waiting information if the CPU is
-superscalar. However nowhere in the simulator is this data actually
+superscalar.  However nowhere in the simulator is this data actually
 computed, so the net result is probably to have no effect.
 
 if harzards are tracked, current hazards can be displayed using the
@@ -1241,7 +1266,7 @@ users are advised not to use this option.
 
 @item dependstats = 0|1
 @cindex @code{dependstats} (CPU configuration)
-If 1, inter-instruction dependencies are calculated. Default value 0.
+If 1, inter-instruction dependencies are calculated.  Default value 0.
 
 If these values are calculated, the depencies can be displayed using
 the simulator's @command{stat} command.
@@ -1256,8 +1281,8 @@ Behavior}).
 @item sbuf_len = @var{value}
 @cindex @code{sbuf_len} (CPU configuration)
 The length of the store buffer is set to @var{value}, which must be no
-greater than 256. Larger values will be truncated to 256 with a
-warning. Negative values will be treated as 0 with a warning. Use 0 to
+greater than 256.  Larger values will be truncated to 256 with a
+warning.  Negative values will be treated as 0 with a warning.  Use 0 to
 disable the store buffer.
 
 When the store buffer is active, stores are accumulated and committed
@@ -1270,22 +1295,22 @@ when I/O is idle.
 @cindex configuring memory
 @cindex memory configuration
 @cindex @code{section memory}
-Memory configuration is described in @code{section memory}. This
+Memory configuration is described in @code{section memory}.  This
 section may appear multiple times, specifying multiple blocks of
-memory. The following parameters may be specified.
+memory.  The following parameters may be specified.
 
 @table @code
 
 @item type=random|pattern|unknown|zero
 @cindex @code{type} (memory configuration)
-Specifies the values to which memory should be initialized. The
+Specifies the values to which memory should be initialized.  The
 default value is @code{unknown}.
 
 @table @code
 
 @item random
 @cindex @code{type=random} (memory configuration)
-Set the memory values to be a random value. A seed for the random
+Set the memory values to be a random value.  A seed for the random
 generator may be set using the @code{random_seed} field in this
 section (see below), thus ensuring the same ``random'' values are used
 each time.
@@ -1297,12 +1322,12 @@ Set the memory values to be a pattern value, which is set using the
 
 @item unknown
 @cindex @code{type=unknown} (memory configuration)
-The memory values are not initialized (i.e. left ``unknown''). This
+The memory values are not initialized (i.e.  left ``unknown'').  This
 option will yield faster initialization of the simulator.
 
 @item zero
 @cindex @code{type=zero} (memory configuration)
-Set the memory values to be 0. This is the equivalent of
+Set the memory values to be 0.  This is the equivalent of
 @code{type=pattern} and a @code{pattern} value of 0, and implemented
 as such.
 
@@ -1316,41 +1341,41 @@ instead of zero to initialize the memory.
 
 @item random_seed = @var{value}
 @cindex @code{random_seed} (memory configuration)
-Set the seed for the random number generator to @var{value}. This only
+Set the seed for the random number generator to @var{value}.  This only
 has any effect for memory type @code{random}.
 
 The default value is -1,
 which means the seed will be set from a call to the @code{time}
 function, thus ensuring different random values are used on each
-run. The simulator prints out the seed used in this case, allowing
+run.  The simulator prints out the seed used in this case, allowing
 repeat runs to regenerate the same random values used in any
 particular run.
 
 @item pattern = @var{value}
 @cindex @code{pattern} (memory configuration)
 Set the pattern to be used when initializing memory to
-@var{value}. The default value is 0. This only has any effect for
-memory type @code{pattern}. The least significant 8 bits of this value
-is used to initialize each byte. More than 8 bits can be specified,
+@var{value}.  The default value is 0.  This only has any effect for
+memory type @code{pattern}.  The least significant 8 bits of this value
+is used to initialize each byte.  More than 8 bits can be specified,
 but will ignored with a warning.
 
 @quotation Tip
 The default value, is equivalent to setting the memory @code{type} to
-be @code{zero}. If that is what is intended, then using
+be @code{zero}.  If that is what is intended, then using
 @code{type=zero} explicitly is better than using @code{type=pattern}
 and not specifying a value for @code{pattern}.
 @end quotation
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (memory configuration)
-Set the base address of the memory to @var{value}. It should be
+Set the base address of the memory to @var{value}.  It should be
 aligned to a multiple of the memory size rounded up to the nearest
-@math{2^n}. The default value is 0.
+@math{2^n}.  The default value is 0.
 
 @item size = @var{value}
 @cindex @code{size} (memory configuration)
-Set the size of the memory block to be @var{value} bytes. This should be a
-multiple of 4 (i.e. word aligned). The default value is 1024.
+Set the size of the memory block to be @var{value} bytes.  This should be a
+multiple of 4 (i.e.  word aligned).  The default value is 1024.
 
 @quotation Note
 When allocating memory, the simulator will allocate the nearest
@@ -1359,61 +1384,61 @@ notice memory misses in any part of the memory between @var{value} and
 the amount allocated.
 
 As a consequence users are strongly recommended to specify memory
-sizes that are an exact power of 2. If some other amount of memory is
+sizes that are an exact power of 2.  If some other amount of memory is
 required, it should be specified as separate, contiguous blocks, each
 of which is a power of 2 in size.
 @end quotation
 
 @item name = "@var{text}"
 @cindex @code{name} (memory configuration)
-Name the block. Typically these describe the type of memory being
-modeled (thus @code{"SRAM"} or @code{"Flash"}. The default is
+Name the block.  Typically these describe the type of memory being
+modeled (thus @code{"SRAM"} or @code{"Flash"}.  The default is
 @code{@w{"anonymous memory block"}}.
 
 @quotation Note
 It is not clear that this information is currently ever used in normal
-operation of the simulator. Even the @command{info} command of the simulator
+operation of the simulator.  Even the @command{info} command of the simulator
 ignores it.
 @end quotation
 
 @item ce = @var{value}
 @cindex @code{ce} (memory configuration)
-Set the chip enable index of the memory instance. Each memory instance
+Set the chip enable index of the memory instance.  Each memory instance
 should have a unique chip enable index, which should be greater
-than or equal to zero. This is used by the memory controller when
+than or equal to zero.  This is used by the memory controller when
 identifying different memory instances.
 
 The default value is -1 (invalid).
 
 @item mc = @var{value}
 @cindex @code{mc} (memory configuration)
-Specifies the memory controller this memory is connected to. It should
+Specifies the memory controller this memory is connected to.  It should
 correspond to the @code{index} field specified in a @code{@w{section
 mc}} for a memory controller (@pxref{Memory Controller Configuration,
 , Memory Controller Configuration}).
 
 Default value is 0, which is also the default value of a memory
-controller @code{index} field. This is suitable therefore for designs
+controller @code{index} field.  This is suitable therefore for designs
 with just one memory controller.
 
 @item delayr = @var{value}
 @cindex @code{delayr} (memory configuration)
-The number of cycles required for a read access. Set to -1 if the
-memory does not support reading. Default value 1. The simulator will
+The number of cycles required for a read access.  Set to -1 if the
+memory does not support reading.  Default value 1.  The simulator will
 add this number of cycles to the total instruction cycle count when
 reading from main memory.
 
 @item delayw = @var{value}
 @cindex @code{delayw} (memory configuration)
-The number of cycles required for a write access. Set to -1 if the
-memory does not support writing. Default value 1. The simulator will
+The number of cycles required for a write access.  Set to -1 if the
+memory does not support writing.  Default value 1.  The simulator will
 add this number of cycles to the total instruction cycle count when
 writing to main memory.
 
 @item log = "@var{file}"
 @cindex @code{log} (memory configuration)
 If specified, @file{file} names a file for all memory accesses to be
-logged. If not specified, the default value, NULL is used, meaning
+logged.  If not specified, the default value, NULL is used, meaning
 that the memory is not logged.
 
 @end table
@@ -1430,7 +1455,7 @@ that the memory is not logged.
 @cindex @code{section immu}
 Memory Management Unit (MMU) configuration is described in
 @code{section dmmu} (for the data MMU) and @code{section immu} (for
-the instruction MMU). Each section should appear at most once. The
+the instruction MMU).  Each section should appear at most once.  The
 following parameters may be specified.
 
 @table @code
@@ -1438,36 +1463,36 @@ following parameters may be specified.
 @item enabled = 0|1
 @cindex @code{enabled} (MMU configuration)
 If 1 (true), the data or instruction (as appropriate) MMU is
-enabled. If 0 (the default), it is disabled.
+enabled.  If 0 (the default), it is disabled.
 
 @item nsets = @var{value}
 @cindex @code{nsets} (MMU configuration)
 Sets the number of data or instruction (as appropriate) TLB sets to
-@var{value}, which must be a power of two, not exceeding 128. Values
-which do not fit these criteria are ignored with a warning. The
-default value is 1. 
+@var{value}, which must be a power of two, not exceeding 128.  Values
+which do not fit these criteria are ignored with a warning.  The
+default value is 1.  
 
 @item nways = @var{value}
 @cindex @code{nways} (MMU configuration)
 Sets the number of data or instruction (as appropriate) TLB ways to
-@var{value}. The value must be in the range 1 to 4. Values outside
-this range are ignored with a warning. The default value is 1.
+@var{value}.  The value must be in the range 1 to 4.  Values outside
+this range are ignored with a warning.  The default value is 1.
 
 @item pagesize = @var{value}
 @cindex @code{pagesize} (MMU configuration)
 The data or instruction (as appropriate) MMU page size is set to
-@var{value}, which must be a power of 2. Values which are not a power
-of 2 are ignored with a warning. The default is 8192 (0x2000).
+@var{value}, which must be a power of 2.  Values which are not a power
+of 2 are ignored with a warning.  The default is 8192 (0x2000).
 
 @item entrysize = @var{value}
 @cindex @code{entrysize} (MMU configuration)
 The data or instruction (as appropriate) MMU entry size is set to
-@var{value}, which must be a power of 2. Values which are not a power
-of 2 are ignored with a warning. The default value is 1.
+@var{value}, which must be a power of 2.  Values which are not a power
+of 2 are ignored with a warning.  The default value is 1.
 
 @quotation Note
 @value{OR1KSIM} does not appear to use the @code{entrysize} parameter
-in its simulation of the MMUs. Thus setting this value does not seem
+in its simulation of the MMUs.  Thus setting this value does not seem
 to matter.
 @end quotation
 
@@ -1475,24 +1500,24 @@ to matter.
 @cindex @code{ustates} (MMU configuration)
 The number of instruction usage states for the data or instruction (as
 appropriate) MMU is set to @var{value}, which must be 2, 3 or
-4. Values outside this range are ignored with a warning. The default
+4.  Values outside this range are ignored with a warning.  The default
 value is 2.
 
 @quotation Note
 @value{OR1KSIM} does not appear to use the @code{ustates} parameter in
-its simulation of the MMUs. Thus setting this value does not seem to
+its simulation of the MMUs.  Thus setting this value does not seem to
 matter.
 @end quotation
 
 @item hitdelay = @var{value}
 @cindex @code{hitdelay} (MMU configuration)
 Set the number of cycles a data or instruction (as appropriate) MMU
-hit costs. Default value 1.
+hit costs.  Default value 1.
 
 @item missdelay = @var{value}
 @cindex @code{missdelay} (MMU configuration)
 Set the number of cycles a data or instruction (as appropriate) MMU
-miss costs. Default value 1.
+miss costs.  Default value 1.
 
 @end table
 
@@ -1505,72 +1530,72 @@ miss costs. Default value 1.
 @cindex @code{section dc}
 @cindex @code{section ic}
 Cache configuration is described in @code{section dc} (for the data
-cache) and @code{seciton ic} (for the instruction cache). Each section
-should appear at most once. The following parameters may be specified.
+cache) and @code{seciton ic} (for the instruction cache).  Each section
+should appear at most once.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (cache configuration)
 If 1 (true), the data or instruction (as appropriate) cache is
-enabled. If 0 (the default), it is disabled.
+enabled.  If 0 (the default), it is disabled.
 
 @item nsets = @var{value}
 @cindex @code{nsets} (cache configuration)
 Sets the number of data or instruction (as appropriate) cache sets to
 @var{value}, which must be a power of two, not exceeding
 @code{MAX_DC_SETS} (for the data cache) or @code{MAX_IC_SETS} (for the
-instruction cache). At the time of writing, these constants are
-both defined in the code to be 1024). The default value is 1.
+instruction cache).  At the time of writing, these constants are
+both defined in the code to be 1024).  The default value is 1.
 
 @item nways = @var{value}
 @cindex @code{nways} (cache configuration)
 Sets the number of data or instruction (as appropriate) cache ways to
 @var{value}, which must be a power of two, not exceeding
 @code{MAX_DC_WAYS} (for the data cache) or @code{MAX_IC_WAYS} (for the
-instruction cache). At the time of writing, these constants are both
-defined in the code to be 32). The default value is 1.
+instruction cache).  At the time of writing, these constants are both
+defined in the code to be 32).  The default value is 1.
 
 @item blocksize = @var{value}
 @cindex @code{blocksize} (cache configuration)
 The data or instruction (as appropriate) cache block size is set to
-@var{value} bytes, which must be either 16 or 32. The default is 16.
+@var{value} bytes, which must be either 16 or 32.  The default is 16.
 
 @item ustates = @var{value}
 @cindex @code{ustates} (cache configuration)
 The number of instruction usage states for the data or instruction (as
-appropriate) cache is set to @var{value}, which must be 2, 3 or 4. The
+appropriate) cache is set to @var{value}, which must be 2, 3 or 4.  The
 default value is 2.
 
 @item hitdelay = @var{value}
 @cindex @code{hitdelay} (instruction cache configuration)
-@emph{Instruction cache only}. Set the number of cycles an instruction
-cache hit costs. Default value 1.
+@emph{Instruction cache only}.  Set the number of cycles an instruction
+cache hit costs.  Default value 1.
 
 @item missdelay = @var{value}
 @cindex @code{missdelay} (instruction cache configuration)
-@emph{Instruction cache only}. Set the number of cycles an instruction
-cache miss costs. Default value 1.
+@emph{Instruction cache only}.  Set the number of cycles an instruction
+cache miss costs.  Default value 1.
 
 @item load_hitdelay = @var{value}
 @cindex @code{load_hitdelay} (data cache configuration)
-@emph{Data cache only}. Set the number of cycles a data load cache hit
-costs. Default value 2.
+@emph{Data cache only}.  Set the number of cycles a data load cache hit
+costs.  Default value 2.
 
 @item load_missdelay = @var{value}
 @cindex @code{load_missdelay} (data cache configuration)
-@emph{Data cache only}. Set the number of cycles a data load cache
-miss costs. Default value 2.
+@emph{Data cache only}.  Set the number of cycles a data load cache
+miss costs.  Default value 2.
 
 @item store_hitdelay = @var{value}
 @cindex @code{store_hitdelay} (data cache configuration)
-@emph{Data cache only}. Set the number of cycles a data store cache hit
-costs. Default value 0.
+@emph{Data cache only}.  Set the number of cycles a data store cache hit
+costs.  Default value 0.
 
 @item store_missdelay = @var{value}
 @cindex @code{store_missdelay} (data cache configuration)
-@emph{Data cache only}. Set the number of cycles a data store cache
-miss costs. Default value 0.
+@emph{Data cache only}.  Set the number of cycles a data store cache
+miss costs.  Default value 0.
 
 @end table
 
@@ -1582,21 +1607,21 @@ miss costs. Default value 0.
 @cindex PIC configuration
 @cindex @code{section pic}
 Programmable Interrupt Controller (PIC) configuration is described in
-@code{section pic}. This section may appear at most
+@code{section pic}.  This section may appear at most
 once---@value{OR1KSIM} has no mechanism for handling multiple
-interrupt controllers. The following parameters may be specified.
+interrupt controllers.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (interrupt controller)
-If 1 (true), the programmable interrupt controller is enabled. If 0
+If 1 (true), the programmable interrupt controller is enabled.  If 0
 (the default), it is disabled.
 
 @item edge_trigger = 0|1
 @cindex @code{edge_trigger} (interrupt controller)
 If 1 (true, the default), the programmable interrupt controller is
-edge triggered. If 0 (false), it is level triggered.
+edge triggered.  If 0 (false), it is level triggered.
 
 @end table
 
@@ -1606,7 +1631,7 @@ edge triggered. If 0 (false), it is level triggered.
 @cindex power management configuration
 @cindex PMU configuration
 @cindex @code{section pmu}
-Power management implementation is incomplete. At present the effect
+Power management implementation is incomplete.  At present the effect
 (which only happens when the power management unit is enabled) of
 setting the different bits in the power management Special Purpose
 Register (PMR, SPR 0x4000) is
@@ -1631,7 +1656,7 @@ No effect - these bits are ignored
 @cindex power management register, SME
 @cindex PMR - SME
 Both these bits cause the processor to stop executing
-instructions. However all other functions (debug interaction, CLI,
+instructions.  However all other functions (debug interaction, CLI,
 VAPI etc) carry on as normal.
 
 @item DCGE (bit mask 0x00000004)
@@ -1653,14 +1678,14 @@ processor is suspending and the simulator exits.
 
 On reset all bits are cleared.
 
-Power management configuration is described in @code{section pm}. This
-section may appear at most once. The following parameter may be specified.
+Power management configuration is described in @code{section pm}.  This
+section may appear at most once.  The following parameter may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (power management configuration)
-If 1 (true), power management is enabled. If 0 (the default), it is
+If 1 (true), power management is enabled.  If 0 (the default), it is
 disabled.
 
 @end table
@@ -1672,42 +1697,42 @@ disabled.
 @cindex BPB configuration
 @cindex @code{section bpb}
 From examining the code base, it seems the branch prediction function
-is not fully implemented. At present the functionality seems
+is not fully implemented.  At present the functionality seems
 restricted to collection of statistics.
 
-Branch prediction configuration is described in @code{section bpb}. This
-section may appear at most once. The following parameters may be specified.
+Branch prediction configuration is described in @code{section bpb}.  This
+section may appear at most once.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (branch prediction configuration)
-If 1 (true), branch prediction is enabled. If 0 (the default), it is
+If 1 (true), branch prediction is enabled.  If 0 (the default), it is
 disabled.
 
 @item btic = 0|1
 @cindex @code{btic} (branch prediction configuration)
-If 1 (true), the branch target instruction cache model is enabled. If
+If 1 (true), the branch target instruction cache model is enabled.  If
 0 (the default), it is disabled.
 
 @item sbp_bf_fwd = 0|1
 @cindex @code{sbp_bf_fwd} (branch prediction configuration)
-If 1 (true), use forward prediction for the @code{l.bf} instruction. If
+If 1 (true), use forward prediction for the @code{l.bf} instruction.  If
 0 (the default), do not use forward prediction for this instruction.
 
 @item sbp_bnf_fwd = 0|1
 @cindex @code{sbp_bnf_fwd} (branch prediction configuration)
-If 1 (true), use forward prediction for the @code{l.bnf} instruction. If
+If 1 (true), use forward prediction for the @code{l.bnf} instruction.  If
 0 (the default), do not use forward prediction for this instruction.
 
 @item hitdelay = @var{value}
 @cindex @code{hitdelay} (branch prediction configuration)
-Set the number of cycles a branch prediction hit costs. Default value
+Set the number of cycles a branch prediction hit costs.  Default value
 0.
 
 @item missdelay = @var{value}
 @cindex @code{missdelay} (branch prediction configuration)
-Set the number of cycles a branch prediction miss costs. Default value
+Set the number of cycles a branch prediction miss costs.  Default value
 0.
 
 @end table
@@ -1719,18 +1744,19 @@ Set the number of cycles a branch prediction miss costs. Default value
 @cindex debug interface configuration
 @cindex @code{section debug}
 The debug unit and debug interface configuration is described in
-@code{@w{section debug}}. This section may appear at most once. The
+@code{@w{section debug}}.  This section may appear at most once.  The
 following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (debug interface configuration)
-If 1 (true), the debug unit is enabled. If 0 (the default), it is disabled.
+If 1 (true), the debug unit is enabled.  If 0 (the default), it is disabled.
 
 @quotation Note
 This enables the functionality of the debug unit (its registers etc) within
-the mode. It does not provide any external interface to the debug unit. For
+the mode.  It does not provide any external interface to the debug unit.
+For
 that, see @code{gdb_enabled} and @code{rsp_enabled} below.
 @end quotation
 
@@ -1740,7 +1766,7 @@ that, see @code{gdb_enabled} and @code{rsp_enabled} below.
 If 1 (true), the GDB @dfn{Remote Serial Protocol} server is started, provding
 an interface to an external GNU debugger, using the port specified in the
 @code{rsp_port} field (see below), or the @code{or1ksim-rsp} TCP/IP
-service. If 0 (the default), the server is not started, and no external
+service.  If 0 (the default), the server is not started, and no external
 interface is provided.
 
 For more detailed information on the interface to the GNU Debugger see
@@ -1749,7 +1775,8 @@ Experience with the OpenRISC 1000 Architecture}, by Jeremy Bennett, published
 by Embecosm Limited (@url{www.embecosm.com}).
 
 @quotation Note
-@code{rsp_enabled} may not be enabled with @code{gdb_enabled} (see below). If
+@code{rsp_enabled} may not be enabled with @code{gdb_enabled} (see
+below).  If
 both are enabled, a warning is issued and only the @dfn{Remote Serial
 Protocol} interface is enabled.
 @end quotation
@@ -1757,22 +1784,23 @@ Protocol} interface is enabled.
 @item rsp_port = @var{value}
 @cindex @code{rsp_port} (debug interface configuration)
 @var{value} specifies the port to be used for the GDB @dfn{Remote Serial
-Protocol} interface to the GNU Debugger (GDB). Default value 51000. If
+Protocol} interface to the GNU Debugger (GDB).  Default value 51000.  If
 the value 0 is specified, @value{OR1KSIM} will instead look for a TCP/IP
 service named @code{or1ksim-rsp}.
 
 @quotation Tip
 @cindex TCP/IP port range for @code{or1ksim-rsp} service
 There is no registered port for @value{OR1KSIM} @dfn{Remote Serial Protocol}
-service @code{or1ksim-rsp}. Good practice suggests users should adopt port
-values in the @dfn{Dynamic} or @dfn{Private} port range, i.e. 49152-65535.
+service @code{or1ksim-rsp}.  Good practice suggests users should adopt port
+values in the @dfn{Dynamic} or @dfn{Private} port range, i.e.  49152-65535.
 @end quotation
 
 @item gdb_enabled = 0|1
 @cindex @code{gdb_enabled} (debug interface configuration)
 If 1 (true), the OpenRISC Remote JTAG protocol server is started, provding an
 interface to an external GNU debugger, using the port specified in the
-@code{server_port} field (see below), or the @code{or1ksim} TCP/IP service. If
+@code{server_port} field (see below), or the @code{or1ksim} TCP/IP
+service.  If
 0 (the default), the server is not started, and no external interface is
 provided.
 
@@ -1783,13 +1811,13 @@ by Embecosm Limited (@url{www.embecosm.com}).
 
 @quotation Note
 The OpenRISC Remote JTAG protocol is unique to OpenRISC, and remains only for
-backward compatibility. New users should adopt the standard GDB @dfn{Remote
+backward compatibility.  New users should adopt the standard GDB @dfn{Remote
 Serial Protocol} interface (see @code{rsp_enabled} above) providing access to
 a wider range of GDB functionality.
 @end quotation
 
 @quotation Note
-@code{gdb_enabled} may not be enabled with @code{rsp_enabled}. If both are
+@code{gdb_enabled} may not be enabled with @code{rsp_enabled}.  If both are
 enabled, a warning is issued and only the @dfn{Remote Serial Protocol}
 interface is enabled.
 @end quotation
@@ -1797,35 +1825,35 @@ interface is enabled.
 @item server_port = @var{value}
 @cindex @code{server_port} (debug interface configuration)
 @var{value} specifies the port to be used for the OpenRISC Rmote JTAG
-protocol interface to the GNU Debugger (GDB). Default value 51000. If
+protocol interface to the GNU Debugger (GDB).  Default value 51000.  If
 the value 0 is specified, @value{OR1KSIM} will instead look for a TCP/IP
 service named @code{or1ksim}.
 
 @quotation Tip
 @cindex TCP/IP port range for @code{or1ksim} service
 There is no registered port for @value{OR1KSIM} Remote JTAG Interface
-or service @code{or1ksim}. Good practice suggests users should adopt
+or service @code{or1ksim}.  Good practice suggests users should adopt
 port values in the @dfn{Dynamic} or @dfn{Private} port range,
-i.e. 49152-65535.
+i.e.  49152-65535.
 @end quotation
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (debug interface configuration)
 @var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the debug unit. @xref{Verification API, ,
+address to be used with the debug unit.  @xref{Verification API, ,
 Verification API}, for more details.
 
 If this is specified and @var{value} is non-zero, all OpenRISC Remote
 JTAG protocol transactions will be logged to the VAPI log file, if
-enabled. This is the only functionality associated with VAPI for the
-debug unit. No VAPI commands are sent, nor requests handled.
+enabled.  This is the only functionality associated with VAPI for the
+debug unit.  No VAPI commands are sent, nor requests handled.
 
 @end table
 
 @node Peripheral Configuration
 @section Configuring Memory Mapped Peripherals
 
-All peripheral components are optional. If they are specified, then
+All peripheral components are optional.  If they are specified, then
 (unlike other components) by default they are enabled.
 
 @menu
@@ -1848,25 +1876,25 @@ All peripheral components are optional. If they are specified, then
 @cindex @code{section mc}
 The memory controller used in @value{OR1KSIM} is the component
 implemented at OpenCores, and found in the top level CVS directory,
-@file{mem_ctrl}. It is described in the document @cite{Memory
+@file{mem_ctrl}.  It is described in the document @cite{Memory
 Controller IP Core} by Rudolf Usselmann, which can be found in the
-@file{doc} subdirectory. It is a memory mapped component, which
+@file{doc} subdirectory.  It is a memory mapped component, which
 resides on the main OpenRISC Wishbone data bus.
 
 The memory controller configuration is described in @code{@w{section
-mc}}. This section may appear multiple times, specifying multiple
-memory controllers. The following parameters may be specified.
+mc}}.  This section may appear multiple times, specifying multiple
+memory controllers.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (memory controller configuration)
-If 1 (true, the default), this memory controller is enabled. If 0, it is
+If 1 (true, the default), this memory controller is enabled.  If 0, it is
 disabled.
 
 @quotation Note
 The memory controller can effectively also be disabled by setting an
-appropriate power on control register value (see below). However this
+appropriate power on control register value (see below).  However this
 should only be used if it is desired to specifically model this
 behavior of the memory controller, not as a way of disabling the
 memory controller in general.
@@ -1875,7 +1903,7 @@ memory controller in general.
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (memory controller configuration)
 Set the base address of the memory controller's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The memory controller has a 7 bit address bus, with a total of 19
@@ -1900,7 +1928,7 @@ is likely not the most suitable value
 @item index = @var{value}
 @cindex @code{index} (memory controller configuration)
 Specify the index of this memory controller amongst all the memory
-controllers. This value should be unique for each memory controller,
+controllers.  This value should be unique for each memory controller,
 and is used to associate specific memories with the controller,
 through the @code{mc} field in the @code{@w{section memory}}
 configuration (@pxref{Memory Configuration, , Memory Configuration}).
@@ -1915,26 +1943,26 @@ The default value, 0, is suitable when there is only one memory controller.
 @cindex UART configuration
 @cindex @code{section uart}
 The UART implemented in @value{OR1KSIM} follows the specification of the
-National Semiconductor 16450 and 16550 parts. It is a memory mapped
+National Semiconductor 16450 and 16550 parts.  It is a memory mapped
 component, which resides on the main OpenRISC Wishbone data bus.
 
 The component provides a number of interfaces to emulate the behavior
 of an external terminal connected to the UART.
 
-UART configuration is described in @code{section uart}. This section
-may appear multiple times, specifying multiple UARTs. The following
+UART configuration is described in @code{section uart}.  This section
+may appear multiple times, specifying multiple UARTs.  The following
 parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (UART configuration)
-If 1 (true, the default), this UART is enabled. If 0, it is disabled.
+If 1 (true, the default), this UART is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (UART configuration)
 Set the base address of the UART's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The UART has a 3 bit address bus, with a total of 8 8-bit registers,
@@ -1957,7 +1985,7 @@ required).
 @cindex UART I/O from/to an @command{xterm}
 Create an xterm on startup, write UART Tx traffic to the xterm and
 take Rx traffic from the keyboard when the xterm window is
-selected. Additional arguments to the xterm command (for example
+selected.  Additional arguments to the xterm command (for example
 specifying window size may be specified in @var{args}, or this may be
 left blank.
 
@@ -1970,10 +1998,10 @@ Typically a telnet session is connected to the other end of this port.
 
 @quotation Tip
 There is no registered port for @value{OR1KSIM} telnet UART
-connection. Priviledged access is required to read traffic on the
-registered ``well-known'' telnet port (23). Instead users should use
+connection.  Priviledged access is required to read traffic on the
+registered ``well-known'' telnet port (23).  Instead users should use
 port values in the @dfn{Dynamic} or @dfn{Private} port range,
-i.e. 49152-65535.
+i.e.  49152-65535.
 @end quotation
 
 @item channel="fd:@code{rxfd},@code{txfd}"
@@ -1983,7 +2011,7 @@ descriptors, file @code{rxfd} and @code{txfd}.
 
 @item channel="tty:device=/dev/ttyS0,baud=9600"
 @cindex UART I/O from/to a physical serial port
-Read and write characters from and to a physical serial port. The
+Read and write characters from and to a physical serial port.  The
 precise device (shown here as @code{/dev/ttyS0}) may vary from machine
 to machine.
 
@@ -1993,18 +2021,18 @@ The default value for this field is @code{"xterm:"}.
 
 @item irq = @var{value}
 @cindex @code{irq} (UART configuration)
-Use @var{value} as the IRQ number of this UART. Default value 0.
+Use @var{value} as the IRQ number of this UART.  Default value 0.
 
 @item 16550 = 0|1
 @cindex @code{16550} (UART configuration)
-If 1 (true), the UART has the functionality of a 16550. If 0 (the
-default), it has the functionality of a 16450. The principal
+If 1 (true), the UART has the functionality of a 16550.  If 0 (the
+default), it has the functionality of a 16450.  The principal
 difference is that the 16550 can buffer multiple characters.
 
 @item jitter = @var{value}
 @cindex @code{jitter} (UART configuration)
 Set the jitter, modeled as a time to block, to @var{value}
-milliseconds. Set to -1 to disable jitter modeling. Default value 0.
+milliseconds.  Set to -1 to disable jitter modeling.  Default value 0.
 
 @quotation Note
 This functionality has yet to be implemented, so this parameter has no
@@ -2014,7 +2042,7 @@ effect.
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (UART configuration)
 @var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the UART. @xref{Verification API, ,
+address to be used with the UART.  @xref{Verification API, ,
 Verification API}, for more details, which details the use of the VAPI
 with the UART.
 
@@ -2027,44 +2055,44 @@ with the UART.
 @cindex @code{section dma}
 The DMA controller used in @value{OR1KSIM} is the component
 implemented at OpenCores, and found in the top level CVS directory,
-@file{wb_dma}. It is described in the document @cite{Wishbone
+@file{wb_dma}.  It is described in the document @cite{Wishbone
 DMA/Bridge IP Core} by Rudolf Usselmann, which can be found in the
-@file{doc} subdirectory. It is a memory mapped component, which
-resides on the main OpenRISC Wishbone data bus. The present
+@file{doc} subdirectory.  It is a memory mapped component, which
+resides on the main OpenRISC Wishbone data bus.  The present
 implementation is incomplete, intended only to support the Ethernet
 interface (@pxref{Ethernet Configuration}), although the Ethernet
 interface is not yet completed.
 
-DMA configuration is described in @code{@w{section dma}}. This section
-may appear multiple times, specifying multiple DMA controllers. The
+DMA configuration is described in @code{@w{section dma}}.  This section
+may appear multiple times, specifying multiple DMA controllers.  The
 following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (DMA configuration)
-If 1 (true, the default), this DMA controller is enabled. If 0, it is disabled.
+If 1 (true, the default), this DMA controller is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (DMA configuration)
 Set the base address of the DMA's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The DMA controller has a 10 bit address bus, with a total of 253
-32-bit registers. The first 5 registers at addresses 0x000 through
-0x010 control the overall behavior of the DMA controller. There are
+32-bit registers.  The first 5 registers at addresses 0x000 through
+0x010 control the overall behavior of the DMA controller.  There are
 then 31 blocks of 8 registers, controlling each of the 31 DMA channels
-available. Addresses 0x014 through 0x01c are not used.
+available.  Addresses 0x014 through 0x01c are not used.
 
 @item irq = @var{value}
 @cindex @code{irq} (DMA configuration)
-Use @var{value} as the IRQ number of this DMA controller. Default value 0.
+Use @var{value} as the IRQ number of this DMA controller.  Default value 0.
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (DMA configuration)
 @var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the DMA controller. @xref{Verification API, ,
+address to be used with the DMA controller.  @xref{Verification API, ,
 Verification API}, for more details, which details the use of the VAPI
 with the DMA controller.
 
@@ -2077,45 +2105,45 @@ with the DMA controller.
 @cindex @code{section ethernet}
 The Ethernet MAC used in @value{OR1KSIM} is the component implemented
 at OpenCores, and found in the top level CVS directory,
-@file{ethernet}. It also forms part of the OpenRISC SoC, ORPSoC. It is
+@file{ethernet}.  It also forms part of the OpenRISC SoC, ORPSoC.  It is
 described in the document @cite{Ethernet IP Core Specification} by
-Igor Mohor, which can be found in the @file{doc} subdirectory. It is a
+Igor Mohor, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
 
-Ethernet configuration is described in @code{section ethernet}. This
+Ethernet configuration is described in @code{section ethernet}.  This
 section may appear multiple times, specifying multiple Ethernet
-interfaces. The following parameters may be specified.
+interfaces.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (Ethernet configuration)
-If 1 (true, the default), this Ethernet MAC is enabled. If 0, it is
+If 1 (true, the default), this Ethernet MAC is enabled.  If 0, it is
 disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (Ethernet configuration)
 Set the base address of the MAC's memory mapped registers to
-@var{value}. The default is 0, which is probably not a sensible value.
+@var{value}.  The default is 0, which is probably not a sensible value.
 
 The Ethernet MAC has a 7-bit address bus, with a total of 21
-32-bit registers. Addresses 0x54 through 0x7c are not used.
+32-bit registers.  Addresses 0x54 through 0x7c are not used.
 
 @quotation Note
 The Ethernet specification describes a Tx control register,
-@code{TXCTRL}, at address 0x50. However this register is not
+@code{TXCTRL}, at address 0x50.  However this register is not
 implemented in the @value{OR1KSIM} model.
 @end quotation
 
 @item dma = @var{value}
 @cindex @code{dma} (Ethernet configuration)
 @var{value} specifies the DMA controller with which this Ethernet is
-associated. The default value is 0.
+associated.  The default value is 0.
 
 @quotation Note
 Support for external DMA is not provided in the current
-implementation, and this value is ignored. In any case there is no
+implementation, and this value is ignored.  In any case there is no
 equivalent field to which this can be matched in the current DMA
 component implementation (@pxref{DMA Configuration, , DMA
 Configuration}).
@@ -2123,17 +2151,17 @@ Configuration}).
 
 @item irq = @var{value}
 @cindex @code{dma} (Ethernet configuration)
-Use @var{value} as the IRQ number of this Ethernet MAC. Default value 0.
+Use @var{value} as the IRQ number of this Ethernet MAC.  Default value 0.
 
 @item rtx_type = 0|1
 @cindex @code{rtx_type} (Ethernet configuration)
 If 1 (true) use a socket interface to the Ethernet (see parameter
-@code{sockif} below). If 0 (the default), use a file interface,
+@code{sockif} below).  If 0 (the default), use a file interface,
 reading and writing from and to the files specified in the
 @code{rxfile} and @code{txfile} parameters (see below).
 
 @quotation Note
-By default the socket interface is not provided in @value{OR1KSIM}. If
+By default the socket interface is not provided in @value{OR1KSIM}.  If
 it is required, this must be requested when configuring, by use of the
 @code{--enable-ethphy} option to @command{configure}.
 
@@ -2147,7 +2175,7 @@ configure --target=or32-uclinux --enable-ethphy ...
 @itemx tx_channel = @var{txvalue}
 @cindex @code{tx_channel} (Ethernet configuration)
 @var{rxvalue} specifies the DMA channel to use for receive and
-@var{txvalue} the DMA channel to use for transmit. Both default to 0.
+@var{txvalue} the DMA channel to use for transmit.  Both default to 0.
 
 @quotation Note
 As noted above, support for external DMA is not provided in the
@@ -2162,26 +2190,26 @@ When @code{rtx_type} is 0 (see above), @var{rxfile} specifies the file
 to use as input and @var{txfile} specifies the fie to use as
 output.
 
-The file contains a sequence of packets. Each packet consists of a
-packet length (32 bits), followed by that many bytes of data. Once the
+The file contains a sequence of packets.  Each packet consists of a
+packet length (32 bits), followed by that many bytes of data.  Once the
 input file is empty, the Ethernet MAC behaves as though there were no
-data on the Ethernet. The default values of these parameters are
+data on the Ethernet.  The default values of these parameters are
 @code{"eth_rx"} and @code{"eth_tx"} respectively.
 
-The input file must exist and be readable. The output file must be
-writable and will be created if necessary. If either of these
+The input file must exist and be readable.  The output file must be
+writable and will be created if necessary.  If either of these
 conditions is not met, a warning will be given.
 
 @item sockif = "@var{service}"
 @cindex @code{sockif} (Ethernet configuration)
 When @code{rtx_type} is 1 (see above), @var{service} specifies the
-service to use for communication. This may be TCP/IP or UDP/IP. The
+service to use for communication.  This may be TCP/IP or UDP/IP.  The
 default value of this parameter is @code{"or1ksim_eth"}.
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (DMA configuration)
 @var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the Ethernet PHY. @xref{Verification API, ,
+address to be used with the Ethernet PHY.  @xref{Verification API, ,
 Verification API}, for more details, which details the use of the VAPI
 with the DMA controller.
 
@@ -2193,43 +2221,43 @@ with the DMA controller.
 @cindex GPIO configuration
 @cindex @code{section cpio}
 The GPIO used in @value{OR1KSIM} is the component implemented at
-OpenCores, and found in the top level CVS directory, @file{gpio}. It
+OpenCores, and found in the top level CVS directory, @file{gpio}.  It
 is described in the document @cite{GPIO IP Core Specification} by
 Damjan Lampret and Goran Djakovic, which can be found in the
-@file{doc} subdirectory. It is a memory mapped component, which
+@file{doc} subdirectory.  It is a memory mapped component, which
 resides on the main OpenRISC Wishbone data bus.
 
-GPIO configuration is described in @code{@w{section gpio}}. This section
-may appear multiple times, specifying multiple GPIO devices. The
+GPIO configuration is described in @code{@w{section gpio}}.  This section
+may appear multiple times, specifying multiple GPIO devices.  The
 following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (GPIO configuration)
-If 1 (true, the default), this GPIO is enabled. If 0, it is disabled.
+If 1 (true, the default), this GPIO is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (GPIO configuration)
 Set the base address of the GPIO's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The GPIO has a 6 bit address bus, with a total of 10 32-bit registers,
-although the number of bits that are actively used varies. Addresses
+although the number of bits that are actively used varies.  Addresses
 0x28 through 0x3c are not used.
 
 @item irq = @var{value}
 @cindex @code{irq} (GPIO configuration)
-Use @var{value} as the IRQ number of this GPIO. Default value 0.
+Use @var{value} as the IRQ number of this GPIO.  Default value 0.
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (GPIO configuration)
 @cindex @code{base_vapi_id} (GPIO configuration - deprecated)
 @var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the GPIO. @xref{Verification API, ,
+address to be used with the GPIO.  @xref{Verification API, ,
 Verification API}, for more details, which details the use of the VAPI
-with the GPIO controller. For backwards compatibility, the
+with the GPIO controller.  For backwards compatibility, the
 alternative name @code{base_vapi_id} is supported for this parameter,
 but deprecated.
 
@@ -2244,9 +2272,9 @@ but deprecated.
 @value{OR1KSIM} models a VGA interface to an external monitor.  The
 VGA controller used in @value{OR1KSIM} is the component implemented at
 OpenCores, and found in the top level CVS directory, @file{vga_lcd},
-with no support for the optional hardware cursors. It is described in
+with no support for the optional hardware cursors.  It is described in
 the document @cite{VGA/LCD Core v2.0 Specifications} by Richard
-Herveille, which can be found in the @file{doc} subdirectory. It is a
+Herveille, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
 
@@ -2254,34 +2282,34 @@ The current implementation provides only functionality to dump the
 screen to a file at intervals.
 
 VGA controller configuration is described in @code{@w{section
-vga}}. This section may appear multiple times, specifying multiple
-VGA controllers. The following parameters may be specified.
+vga}}.  This section may appear multiple times, specifying multiple
+VGA controllers.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (VGA configuration)
-If 1 (true, the default), this VGA is enabled. If 0, it is disabled.
+If 1 (true, the default), this VGA is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (VGA configuration)
 Set the base address of the VGA controller's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The VGA controller has a 12-bit address bus, with 7 32-bit registers, at
 addresses 0x000 through 0x018, and two color lookup tables at
-addresses 0x800 through 0xfff. The hardware cursor registers are not
+addresses 0x800 through 0xfff.  The hardware cursor registers are not
 implemented, so addresses 0x01c through 0x7fc are not used.
 
 @item irq = @var{value}
 @cindex @code{irq} (VGA configuration)
-Use @var{value} as the IRQ number of this VGA controller. Default
+Use @var{value} as the IRQ number of this VGA controller.  Default
 value 0.
 
 @item refresh_rate = @var{value}
 @cindex @code{refresh_rate} (VGA configuration)
-@var{value} specifies number of cycles between screen dumps. Default
+@var{value} specifies number of cycles between screen dumps.  Default
 value is derived from the simulation clock cycle time
 (@pxref{Simulator Behavior, , Simulator Behavior}), to correspond
 to dumping 50 times per simulated second.
@@ -2290,10 +2318,10 @@ to dumping 50 times per simulated second.
 @cindex @code{txfile} (VGA configuration)
 @cindex @code{filename} (VGA configuration - deprecated)
 @var{file} specifies the base of the filename for screen
-dumps. Successive screen dumps will be in BMP format, in files with
+dumps.  Successive screen dumps will be in BMP format, in files with
 the name @file{@var{file}@var{nnnn}.bmp}, where @var{nnnn} is a
-sequential count of the screen dumps starting at zero. The default
-value is @code{"vga_out"}. For backwards compatibility, the
+sequential count of the screen dumps starting at zero.  The default
+value is @code{"vga_out"}.  For backwards compatibility, the
 alternative name @code{filename} is supported for this parameter,
 but deprecated.
 
@@ -2305,35 +2333,35 @@ but deprecated.
 @cindex frame buffer configuration
 @cindex @code{section fb}
 @quotation Caution
-The frame buffer is only partially implemented. Its configuration
+The frame buffer is only partially implemented.  Its configuration
 fields are described here, but the component should not be used at
-this time. Like the VGA controller, it is designed to make screen
+this time.  Like the VGA controller, it is designed to make screen
 dumps to file.
 @end quotation
 
-Frame buffer configuration is described in @code{section fb}. This
+Frame buffer configuration is described in @code{section fb}.  This
 section may appear multiple times, specifying multiple frame
-buffers. The following parameters may be specified.
+buffers.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (frame buffer configuration)
-If 1 (true, the default), this frame buffer is enabled. If 0, it is disabled.
+If 1 (true, the default), this frame buffer is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (frame buffer configuration)
 Set the base address of the frame buffer's memory mapped registers to
-@var{value}. The default is 0, which is probably not a sensible value.
+@var{value}.  The default is 0, which is probably not a sensible value.
 
 The frame buffer has an 121-bit address bus, with 4 32-bit registers,
 at addresses 0x000 through 0x00c, and a PAL lookup table at addresses
-0x400 through 0x4ff. Addresses 0x010 through 0x3fc and addresses 0x500
+0x400 through 0x4ff.  Addresses 0x010 through 0x3fc and addresses 0x500
 through 0x7ff are not used.
 
 @item refresh_rate = @var{value}
 @cindex @code{refresh_rate} (frame buffer configuration)
-@var{value} specifies number of cycles between screen dumps. Default
+@var{value} specifies number of cycles between screen dumps.  Default
 value is derived from the simulation clock cycle time
 (@pxref{Simulator Behavior, , Simulator Behavior}), to correspond to
 dumping 50 times per simulated second.
@@ -2342,10 +2370,10 @@ dumping 50 times per simulated second.
 @cindex @code{txfile} (frame buffer configuration)
 @cindex @code{filename} (frame buffer configuration - deprecated)
 @var{file} specifies the base of the filename for screen
-dumps. Successive screen dumps will be in BMP format, in files with
+dumps.  Successive screen dumps will be in BMP format, in files with
 the name @file{@var{file}@var{nnnn}.bmp}, where @var{nnnn} is a
-sequential count of the screen dumps starting at zero. The default
-value is @code{"fb_out"}. For backwards compatibility, the
+sequential count of the screen dumps starting at zero.  The default
+value is @code{"fb_out"}.  For backwards compatibility, the
 alternative name @code{filename} is supported for this parameter,
 but deprecated.
 
@@ -2358,44 +2386,44 @@ but deprecated.
 @cindex keyboard configuration
 @cindex PS2 configuration
 @cindex @code{section kb}
-The PS2 interface provided by @value{OR1KSIM} is not documented. It
+The PS2 interface provided by @value{OR1KSIM} is not documented.  It
 may be based on the PS2 project at OpenCores, and found in
-the top level CVS directory, @file{ps2}. However this project lacks
-any documentation beyond its project webpage. Since most PS2
+the top level CVS directory, @file{ps2}.  However this project lacks
+any documentation beyond its project webpage.  Since most PS2
 interfaces follow the Intel i8042 standard, this is presumably what is
 expected with this device.
 
 The implementation only provides for keyboard support, which is
-modelled as a file of keystrokes. There is no mouse support.
+modelled as a file of keystrokes.  There is no mouse support.
 
 @quotation Caution
 A standard i8042 device has two registers at addresses 0x60 (command)
-and 0x64 (status). Inspection of the code, suggests that the
+and 0x64 (status).  Inspection of the code, suggests that the
 @value{OR1KSIM} component places these registers at addresses 0x00 and
 0x04.
 
 The port of Linux for the OpenRISC 1000, which runs on @value{OR1KSIM}
 implements the i8042 device driver, anticipating these registers
-reside at their conventional address. It seems unlikel that this code
+reside at their conventional address.  It seems unlikel that this code
 will work.
 
 This component should be used with caution.
 @end quotation
 
-Keyboard configuration is described in @code{section kbd}. This
+Keyboard configuration is described in @code{section kbd}.  This
 section may appear multiple times, specifying multiple keyboard
-interfaces. The following parameters may be specified.
+interfaces.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (keyboard configuration)
-If 1 (true, the default), this keyboard is enabled. If 0, it is disabled.
+If 1 (true, the default), this keyboard is enabled.  If 0, it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (keyboard configuration)
 Set the base address of the keyboard's memory mapped registers to
-@var{value}. The default is 0, which is probably not a sensible value.
+@var{value}.  The default is 0, which is probably not a sensible value.
 
 The keyboard PS/2 interface has an 3-bit address bus, with 2 8-bit registers,
 at addresses 0x000 and 0x004.
@@ -2408,13 +2436,13 @@ these registers at locations 0x60 and 0x64, thus requiring at least a
 
 @item irq = @var{value}
 @cindex @code{irq} (keyboard configuration)
-Use @var{value} as the IRQ number of this Keyboard interface. Default
+Use @var{value} as the IRQ number of this Keyboard interface.  Default
 value 0.
 
 @item rxfile = "@var{file}"
 @cindex @code{file} (keyboard configuration)
 @file{file} specifies a file containing raw key stroke data, which
-models the input from a physical keyboard. The default value is
+models the input from a physical keyboard.  The default value is
 @code{"kbd_in"}.
 
 @end table
@@ -2427,53 +2455,53 @@ models the input from a physical keyboard. The default value is
 @cindex @code{section ata}
 The ATA/ATAPI disc controller used in @value{OR1KSIM} is the OCIDEC
 (OpenCores IDE Controller) component implemented at OpenCores, and
-found in the top level CVS directory, @file{ata}. It is described in
+found in the top level CVS directory, @file{ata}.  It is described in
 the document @cite{ATA/ATAPI-5 Core Specification} by Richard
-Herveille, which can be found in the @file{doc} subdirectory. It is a
+Herveille, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
 
-ATA/ATAPI configuration is described in @code{@w{section ata}}. This section
-may appear multiple times, specifying multiple disc controllers. The
+ATA/ATAPI configuration is described in @code{@w{section ata}}.  This section
+may appear multiple times, specifying multiple disc controllers.  The
 following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (ATA/ATAPI configuration)
-If 1 (true, the default), this ATA/ATAPI interface is enabled. If 0,
+If 1 (true, the default), this ATA/ATAPI interface is enabled.  If 0,
 it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (ATA/ATAPI configuration)
 Set the base address of the ATA/ATAPI interface's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The ATA/ATAPI PS/2 interface has an 5-bit address bus, with 8 32-bit
-registers. Depending on the version of the OCIDEC ATA/ATAPI interface
+registers.  Depending on the version of the OCIDEC ATA/ATAPI interface
 selected (see @code{dev_id} below), not all registers will be available.
 
 @item irq = @var{value}
 @cindex @code{irq} (ATA/ATAPI configuration)
-Use @var{value} as the IRQ number of this ATA/ATAPI interface. Default
+Use @var{value} as the IRQ number of this ATA/ATAPI interface.  Default
 value 0.
 
 @item dev_id = 1|2|3
 @cindex @code{dev_id} (ATA/ATAPI configuration)
 This parameter specifies which version of the OCIDEC ATA/ATAPI
-interface to model. The default value is 1.
+interface to model.  The default value is 1.
 
 Version 1 supports only the @code{CTRL}, @code{STAT} and @code{PCTR}
-registers. Versions 2 & 3 add the @code{FCTR} registers, Version 3
+registers.  Versions 2 & 3 add the @code{FCTR} registers, Version 3
 adds the @code{DTR} registers and the @code{RXD}/@code{TXD} registers.
 
 @item rev = @var{value}
 @cindex @code{rev} (ATA/ATAPI configuration)
 Set the @var{value} as the revision of the OCIDEC ATA/ATAPI
-interface. The default value is 1. The default value is 0. Its value
-should be in the range 0-15. Larger values are truncated with a
-warning. This only affects the reset value of the @code{STAT}
+interface.  The default value is 1.  The default value is 0.  Its value
+should be in the range 0-15.  Larger values are truncated with a
+warning.  This only affects the reset value of the @code{STAT}
 register, where it forms bits 24-27.
 
 @item pio_mode0_t1 = @var{value}
@@ -2485,13 +2513,13 @@ register, where it forms bits 24-27.
 @itemx pio_mode0_teoc = @var{value}
 @cindex @code{pio_mode0_teoc} (ATA/ATAPI configuration)
 These parameters specify the timings for use with Programmed
-Input/Output (PIO) transfers. They are specified as the number of
+Input/Output (PIO) transfers.  They are specified as the number of
 clock cycles - 2, rounded up to the next highest integer, or zero if
-that would be negative. The values should not exceed 255. If they do,
+that would be negative.  The values should not exceed 255.  If they do,
 they will be ignored with a warning.
 
 See the ATA/ATAPI-5 specification for explanations of each of these
-timing parameters. The default values are:
+timing parameters.  The default values are:
 
 @example
 pio_mode0_t1   =  6
@@ -2506,14 +2534,14 @@ pio_mode0_teoc = 23
 @cindex @code{dma_mode0_td} (ATA/ATAPI configuration)
 @itemx dma_mode0_teoc = @var{value}
 @cindex @code{dma_mode0_teoc} (ATA/ATAPI configuration)
-These parameters specify the timings for use with DMA transfers. They
+These parameters specify the timings for use with DMA transfers.  They
 are specified as the number of clock cycles - 2, rounded up to the
-next highest integer, or zero if that would be negative. The values
-should not exceed 255. If they do, they will be ignored with a
+next highest integer, or zero if that would be negative.  The values
+should not exceed 255.  If they do, they will be ignored with a
 warning.
 
 See the ATA/ATAPI-5 specification for explanations of each of these
-timing parameters. The default values are:
+timing parameters.  The default values are:
 
 @example
 dma_mode0_tm   =  4
@@ -2527,16 +2555,16 @@ dma_mode0_teoc = 21
 @cindex disc interface device configuration
 @cindex ATA/ATAPI device configuration
 Within the @code{@w{section ata}}, each device is specified
-separately. The device subsection is introduced by
+separately.  The device subsection is introduced by
 
 @example
 device @var{value}
 @end example
 
-@var{value} is the device number, which should be 0 or 1. The
-subsection ends with @code{enddevice}. Note that if the same device
+@var{value} is the device number, which should be 0 or 1.  The
+subsection ends with @code{enddevice}.  Note that if the same device
 number is specified more than once, the previous values will be
-overwritten. Within the @code{device} subsection, the following
+overwritten.  Within the @code{device} subsection, the following
 parameters may appear:
 
 @table @code
@@ -2550,39 +2578,39 @@ hard disk.
 @item file = "@var{filename}"
 @cindex @code{file} (ATA/ATAPI device configuration)
 @file{filename} specifies the file to be used for a simulated ATA
-device if the file type (see @code{type} above) is 1. Default value
+device if the file type (see @code{type} above) is 1.  Default value
 @code{"ata-File@var{n}"}, where @var{n} is the device number.
 
 @item size = @var{value}
 @cindex @code{size} (ATA/ATAPI device configuration)
 @var{value} specifies the size of a simulated ATA device if the file
-type (see @code{type} above) is 1. The default value is zero.
+type (see @code{type} above) is 1.  The default value is zero.
 
 @item packet = 0|1
 @cindex @code{packet} (ATA/ATAPI device configuration)
-If 1 (true), implement the PACKET command feature set. If 0 (the
+If 1 (true), implement the PACKET command feature set.  If 0 (the
 default), do not implement the PACKET command feature set.
 
 @item firmware = "@var{str}"
 @cindex @code{firmware} (ATA/ATAPI device configuration)
 Firmware to report in response to the ``Identify Device''
-command. Default @code{"02207031"}.
+command.  Default @code{"02207031"}.
 
 @item heads = @var{value}
 @cindex @code{heads} (ATA/ATAPI device configuration)
-Number of heads in the device. Default 7, use -1 to disable all heads.
+Number of heads in the device.  Default 7, use -1 to disable all heads.
 
 @item sectors = @var{value}
 @cindex @code{sectors} (ATA/ATAPI device configuration)
-Number of sectors per track in the device. Default 32.
+Number of sectors per track in the device.  Default 32.
 
 @item mwdma = 0|1|2|-1
 @cindex @code{mwdma} (ATA/ATAPI device configuration)
-Highest multi-word DMA mode supported. Default 2, use -1 to disable.
+Highest multi-word DMA mode supported.  Default 2, use -1 to disable.
 
 @item pio = 0|1|2|3|4
 @cindex @code{pio} (ATA/ATAPI device configuration)
-Highest PIO mode supported. Default 4.
+Highest PIO mode supported.  Default 4.
 
 @end table
 
@@ -2593,26 +2621,26 @@ Highest PIO mode supported. Default 4.
 @cindex @code{section generic}
 When used as a library (@pxref{Simulator Library, , Simulator
 Library}), @value{OR1KSIM} makes provision for any additional peripheral to be
-implemented externally. Any read or write access to this peripheral's
-memory map generates @dfn{upcall}s to an external handler. This
+implemented externally.  Any read or write access to this peripheral's
+memory map generates @dfn{upcall}s to an external handler.  This
 interface can support either C or C++, and was particularly designed
 to facilitate support for OSCI SystemC (see @url{http://www.systemc.org}).
 
 Generic peripheral configuration is described in @code{@w{section
-generic}}. This section may appear multiple times, specifying multiple
-external peripherals. The following parameters may be specified.
+generic}}.  This section may appear multiple times, specifying multiple
+external peripherals.  The following parameters may be specified.
 
 @table @code
 
 @item enabled = 0|1
 @cindex @code{enabled} (generic peripheral configuration)
-If 1 (true, the default), this ATA/ATAPI interface is enabled. If 0,
+If 1 (true, the default), this ATA/ATAPI interface is enabled.  If 0,
 it is disabled.
 
 @item baseaddr = @var{value}
 @cindex @code{baseaddr} (generic peripheral configuration)
 Set the base address of the generic peripheral's memory mapped
-registers to @var{value}. The default is 0, which is probably not a
+registers to @var{value}.  The default is 0, which is probably not a
 sensible value.
 
 The size of the memory mapped register space is controlled by the
@@ -2621,21 +2649,21 @@ The size of the memory mapped register space is controlled by the
 @item size = @var{value}
 @cindex @code{size} (generic peripheral configuration)
 Set the size of the generic peripheral's memory mapped register space
-to @var{value} bytes. Any read or write accesses to addresses with
+to @var{value} bytes.  Any read or write accesses to addresses with
 offsets of 0 to @var{value}-1 bytes from the base address specified in
 parameter @code{baseaddr} (see above) will be directed to the external
 interface.
 
-@var{value} will be rounded up the nearest power of 2. It's default
-value is zero. If @var{value} is not an exact power of two, accesses
+@var{value} will be rounded up the nearest power of 2.  It's default
+value is zero.  If @var{value} is not an exact power of two, accesses
 to address offsets of @var{value} or above up to the next power of 2
 will generate a warning, and have no effect (reads will return zero).
 
 @item name = "@var{str}"
 @cindex @code{name} (generic peripheral configuration)
-This gives the peripheral the name @code{"@var{str}"}. This is used to
+This gives the peripheral the name @code{"@var{str}"}.  This is used to
 identify the peripheral in error messages and warnings, and when
-reporting its status. The default value is @code{@w{"anonymous
+reporting its status.  The default value is @code{@w{"anonymous
 external peripheral"}}.
 
 @item byte_enabled = 0|1
@@ -2645,7 +2673,7 @@ external peripheral"}}.
 @itemx word_enabled = 0|1
 @cindex @code{word_enabled} (generic peripheral configuration)
 If 1 (true, the default), these parameters respectively enable the
-device for byte wide, half-word wide and word wide accesses. If 0,
+device for byte wide, half-word wide and word wide accesses.  If 0,
 accesses of that width will fail.
 
 @end table
@@ -2655,7 +2683,7 @@ accesses of that width will fail.
 
 If started with the @code{-f} flag, or if interrupted with
 @kbd{ctrl-C}, @value{OR1KSIM} provides the user with an interactive
-command line. The commands available, which may not be abbreviated, are:
+command line.  The commands available, which may not be abbreviated, are:
 
 @table @code
 
@@ -2668,7 +2696,7 @@ Exit the simulator
 @cindex @code{r} (Interactive CLI)
 @cindex displaying registers (Interactive CLI)
 @cindex register display (Interactive CLI)
-Display all the General Purpose Registers (GPRs). Also shows the just
+Display all the General Purpose Registers (GPRs).  Also shows the just
 executed and next to be executed instructions symbolically and the
 state of the flag in the Supervision Register.
 
@@ -2682,7 +2710,7 @@ information as with the @code{r} command (see above).
 @cindex @code{run} (Interactive CLI)
 @cindex running code (Interactive CLI)
 @cindex executing code (Interactive CLI)
-Execute @var{num} instructions. The register/instruction information
+Execute @var{num} instructions.  The register/instruction information
 is displayed after each instruction, as with the @code{r} command (see
 above) @emph{unless} @code{hush} is specified.
 
@@ -2696,13 +2724,13 @@ Patch register @var{reg} with @var{value}.
 @cindex @code{dm} (Interactive CLI)
 @cindex displaying memory (Interactive CLI)
 @cindex memory display (Interactive CLI)
-Display memory bytes between @var{fromaddr} and @var{toaddr}. If
+Display memory bytes between @var{fromaddr} and @var{toaddr}.  If
 @var{toaddr} is not given, 64 bytes are displayed, starting at
 @var{fromaddr}.
 
 @quotation Caution
-The output from this command is broken (a bug). @value{OR1KSIM}
-attempts to print out 16 bytes per row. However, instead of printing
+The output from this command is broken (a bug).  @value{OR1KSIM}
+attempts to print out 16 bytes per row.  However, instead of printing
 out the address at the start of each row, it prints the address (of
 the first of the 16 bytes) before @emph{each} byte.
 @end quotation
@@ -2710,7 +2738,7 @@ the first of the 16 bytes) before @emph{each} byte.
 @item de @var{fromaddr} [ @var{toaddr} ]
 @cindex @code{dm} (Interactive CLI)
 @cindex disassemble (Interactive CLI)
-Disassemble code between @var{fromaddr} and @var{toaddr}. If
+Disassemble code between @var{fromaddr} and @var{toaddr}.  If
 @var{toaddr} is not given, 16 instructions are disassembled.
 
 The disassembly is entirely numerical, and gives no symbolic
@@ -2753,7 +2781,7 @@ List all set breakpoints
 @cindex @code{reset} (Interactive CLI)
 @cindex simulator reset (Interactive CLI)
 @cindex reset the simulator (Interactive CLI)
-Reset the simulator. Includes modeling a reset of the processor, so
+Reset the simulator.  Includes modeling a reset of the processor, so
 execution will restart from the reset vector location, 0x100.
 
 @item hist
@@ -2767,8 +2795,8 @@ Behavior, , Simulator Behavior}), display the execution history.
 @cindex @code{stall} (Interactive CLI)
 @cindex processor stall (Interactive CLI)
 @cindex stall the processor (Interactive CLI)
-Stall the processor, so that control is passed to the debug unit. When
-stalled, the processor can execute no instructions. This command is
+Stall the processor, so that control is passed to the debug unit.  When
+stalled, the processor can execute no instructions.  This command is
 useful when debugging the JTAG interface, used by debuggers such as
 GDB.
 
@@ -2776,7 +2804,7 @@ GDB.
 @cindex @code{unstall} (Interactive CLI)
 @cindex processor unstall (Interactive CLI)
 @cindex unstall the processor (Interactive CLI)
-Unstall the processor, so that normal execution can continue. This command is
+Unstall the processor, so that normal execution can continue.  This command is
 useful when debugging the JTAG interface, used by debuggers such as GDB.
 
 @item stats @var{category} | clear
@@ -2784,7 +2812,7 @@ useful when debugging the JTAG interface, used by debuggers such as GDB.
 @cindex simulator statistics (Interactive CLI)
 @cindex statistics, simulation (Interactive CLI)
 Print the statistics for the given @var{category}, if available, or
-clear if @code{clear} is specified. The categories are:
+clear if @code{clear} is specified.  The categories are:
 
 @table @asis
 
@@ -2799,23 +2827,23 @@ Achitectural Components}, for details of how to enable these various
 features.
 
 @item 2
-Instruction usage statistics. Requires hazard analysis to be enabled
+Instruction usage statistics.  Requires hazard analysis to be enabled
 (@pxref{CPU Configuration, ,CPU Configuration}).
 
 @item 3
-Instruction dependency statistics. Requires hazard analysis to be enabled
+Instruction dependency statistics.  Requires hazard analysis to be enabled
 (@pxref{CPU Configuration, ,CPU Configuration}).
 
 @item 4
-Functional unit dependency statistics. Requires hazard analysis to be enabled
+Functional unit dependency statistics.  Requires hazard analysis to be enabled
 (@pxref{CPU Configuration, ,CPU Configuration}).
 
 @item 5
-Raw register usage over time. Requires hazard analysis to be enabled
+Raw register usage over time.  Requires hazard analysis to be enabled
 (@pxref{CPU Configuration, ,CPU Configuration}).
 
 @item 6
-Store buffer statistics. Requires the store buffer to be enabled
+Store buffer statistics.  Requires the store buffer to be enabled
 (@pxref{CPU Configuration, ,CPU Configuration}).
 
 @end table
@@ -2824,7 +2852,7 @@ Store buffer statistics. Requires the store buffer to be enabled
 @cindex @code{info} (Interactive CLI)
 @cindex simulator configuration info (Interactive CLI)
 @cindex configuration info (Interactive CLI)
-Display detailed information about the simulator configuration. This
+Display detailed information about the simulator configuration.  This
 is quite a lengthy about, because all MMU TLB information is displayed.
 
 @item dv @var{fromaddr} [ @var{toaddr} ] [ @var{module} ]
@@ -2833,8 +2861,8 @@ is quite a lengthy about, because all MMU TLB information is displayed.
 @cindex memory dump, Verilog (Interactive CLI)
 Dump the area of memory between @var{fromaddr} and @var{toaddr} as
 Verilog code for a synchronous, 23-bit wide SRAM module, named
-@var{module}. If @var{toaddr} is not specified, then 64 bytes are
-dumped (as 16 32-bit words). If @var{module} is not specified,
+@var{module}.  If @var{toaddr} is not specified, then 64 bytes are
+dumped (as 16 32-bit words).  If @var{module} is not specified,
 @code{or1k_mem} is used.
 
 To save to a file, use the redirection function (described after this
@@ -2845,7 +2873,7 @@ table, below).
 @cindex hexadecimal memory dump (Interactive CLI)
 @cindex memory dump, hexadecimal (Interactive CLI)
 Dump the area of memory between @var{fromaddr} and @var{toaddr} as
-32-bit hex numbers (no @code{0x}, or @code{32'h} prefix). If
+32-bit hex numbers (no @code{0x}, or @code{32'h} prefix).  If
 @var{toaddr} is not specified, then 64 bytes are dumped (as 16 32-bit
 words).
 
@@ -2856,7 +2884,7 @@ table, below).
 @cindex @code{setdbch} (Interactive CLI)
 @cindex debug channel toggle (Interactive CLI)
 @cindex toggle debug channels (Interactive CLI)
-Toggle debug channels on/off. @xref{Standalone Simulator, , Standalone
+Toggle debug channels on/off.  @xref{Standalone Simulator, , Standalone
 Simulator}, for a description of specifying debug channels on the
 command line.
 
@@ -2864,19 +2892,19 @@ command line.
 @cindex @code{set} (Interactive CLI)
 @cindex configuration parameter setting (Interactive CLI)
 Set the configuration parameter @var{para} in section @var{section} to
-@var{value}. @xref{Configuration, , Configuration}, for details of
+@var{value}.  @xref{Configuration, , Configuration}, for details of
 configuration parameters and their settings.
 
 @item debug
 @cindex @code{debug} (Interactive CLI)
 @cindex debug mode toggle (Interactive CLI)
 @cindex toggle debug mode (Interactive CLI)
-Toggle the simulator debug mode. @xref{Debug Interface Configuration,
+Toggle the simulator debug mode.  @xref{Debug Interface Configuration,
 , Debug Interface Configuration}, for information on this parameter.
 
 @quotation Caution
-This is effectively enabling or disabling the debug unit. It does not
-effect the remote GDB debug interface. However using the remote debug
+This is effectively enabling or disabling the debug unit.  It does not
+effect the remote GDB debug interface.  However using the remote debug
 interface while the debug unit is disabled will lead to undefined
 behavior and likely crash @value{OR1KSIM}
 @end quotation
@@ -2888,8 +2916,8 @@ Enter the the Custom Unit Compiler command prompt (@pxref{CUC
 Configuration, , CUC Configuration}).
 
 @quotation Caution
-The CUC must be properly configured, for this to succeed. In
-particular a timing file must be available and readable. Otherwise
+The CUC must be properly configured, for this to succeed.  In
+particular a timing file must be available and readable.  Otherwise
 @value{OR1KSIM} will crash.
 @end quotation
 
@@ -2901,7 +2929,7 @@ Print out brief information about each command available.
 @item mprofile [-vh] [-m @var{m}] [-g @var{n}] [-f @var{file}] @var{from} @var{to}
 @cindex @code{mprofile} (Interactive CLI)
 @cindex memory profiling utility (Interactive CLI)
-Run the memory profiling utility. This follows the same usage as the
+Run the memory profiling utility.  This follows the same usage as the
 standalone command (@pxref{Memory Profiling Utility, , Memory
 Profiling Utility}).
 
@@ -2909,7 +2937,7 @@ Profiling Utility}).
 @cindex @code{mprofile} (Interactive CLI)
 @cindex profiling utility (Interactive CLI)
 @cindex instruction profiling utility (Interactive CLI)
-Run the instruction profiling utility. This follows the same usage as the
+Run the instruction profiling utility.  This follows the same usage as the
 standalone command (@pxref{Profiling Utility, , Profiling Utility}).
 
 @end table
@@ -2925,9 +2953,9 @@ This is particularly useful for commands dumping a large amount of
 output, such as @code{dv}.
 
 @quotation Caution
-Unfortunately there is a serious bug with the redirection operator. It
+Unfortunately there is a serious bug with the redirection operator.  It
 does not return output to standard output after the command
-completes. Until this bug is fixed, file redirection should not be
+completes.  Until this bug is fixed, file redirection should not be
 used.
 @end quotation
 
@@ -2935,22 +2963,22 @@ used.
 @chapter Verification API (VAPI)
 
 The Verification API (VAPI) provides a TCP/IP interface to allow
-components of the simulation to be controlled externally. The
+components of the simulation to be controlled externally.  The
 interface is polled for new requests on each simulated clock
-cycle. Components within the simulator may send responses to such
+cycle.  Components within the simulator may send responses to such
 requests.
 
-The inteface is an asynchronous duplex protocol. On the request side
+The inteface is an asynchronous duplex protocol.  On the request side
 it provides for simple commands, known as VAPI IDs (a 32 bit integer),
-with a single piece of data (also a 32 bit integer). On the send side,
-it provides for sending a single VAPI ID and data. However there is no
-explicit command-response structure. Some components just accept
-requests (e.g. to set values), some just generate sends (to report
+with a single piece of data (also a 32 bit integer).  On the send side,
+it provides for sending a single VAPI ID and data.  However there is no
+explicit command-response structure.  Some components just accept
+requests (e.g.  to set values), some just generate sends (to report
 values), and some do both.
 
 Each component has a base ID (32 bit) and its commands will start from
-that base ID. This provides a simple partitioning of the command space
-amongst components. Request commands will be directed to the component with
+that base ID.  This provides a simple partitioning of the command space
+amongst components.  Request commands will be directed to the component with
 the closest base ID lower than the VAPI ID of the command.
 
 Thus if there are two components with base IDs of 0x200 and 0x300, and
@@ -3009,7 +3037,7 @@ The UART skew is set from the least significant 16 bits of the data
 @item 0x04
 @cindex 0x04 UART VAPI sub-command (UART verification)
 If the 16th most significant bit of the data is 1, start sending
-breaks, otherwise stop sending breaks. The breaks are sent or cleared
+breaks, otherwise stop sending breaks.  The breaks are sent or cleared
 after the number of UART clock divider ticks specified by the data
 (immediately if the data is zero).
 
@@ -3025,9 +3053,9 @@ currently implemented.
 @item Ethernet
 @cindex Ethernet verification (VAPI)
 @cindex VAPI for Ethernet
-The following requests are handled by the Ethernet. Specified
+The following requests are handled by the Ethernet.  Specified
 symbolically, these are the increments from the base VAPI ID of the
-Ethernet. At present no implementation is provided behind these VAPI
+Ethernet.  At present no implementation is provided behind these VAPI
 requests.
 
 @table @code
@@ -3047,7 +3075,7 @@ If a base VAPI ID is specified, the GPIO sends out on its base VAPI ID
 (symbolically, GPIO_VAPI_DATA (0) offset from the base VAPI ID) any
 changes in outputs.
 
-The following requests are handled by the GPIO. Specified
+The following requests are handled by the GPIO.  Specified
 symbolically, these are the increments from the VAPI base ID of the
 GPIO.
 
@@ -3092,10 +3120,10 @@ Set th next control input to the data field
 @node Code Internals
 @chapter A Guide to @value{OR1KSIM} Internals
 
-These are notes to help those wanting to extend @value{OR1KSIM}. This
+These are notes to help those wanting to extend @value{OR1KSIM}.  This
 section assumes the use of a tag file, so file locations of entities'
-definitions are not in general provided. For more on tags, see the
-Linux manual page for @command{etags}. A tag file can be created
+definitions are not in general provided.  For more on tags, see the
+Linux manual page for @command{etags}.  A tag file can be created
 with:
 
 @example
@@ -3119,7 +3147,7 @@ extensions to @value{OR1KSIM}
 
 @item GNU Coding Standard
 Code should follow the GNU coding standard for C
-(@url{http://www.gnu.org/prep/standards/}. If in doubt, put your code
+(@url{http://www.gnu.org/prep/standards/}.  If in doubt, put your code
 through the @command{indent} program.
 
 @item @code{#include} headers
@@ -3134,8 +3162,8 @@ If @file{port.h} is required, it should be the first package header to
 be included after the system headers.
 
 All C source code and header files should directly include any system
-or package header they depend on, i.e. not rely on any other header
-having already included it. The two exceptions are
+or package header they depend on, i.e.  not rely on any other header
+having already included it.  The two exceptions are
 
 @enumerate
 @item
@@ -3145,7 +3173,7 @@ included.
 @item
 System headers which impose portability problems should be included by
 using the package header @file{port.h}, rather than the system headers
-themselves. This is the case for code requiring
+themselves.  This is the case for code requiring
 
 @itemize @bullet
 
@@ -3165,7 +3193,7 @@ Integer types (@code{int@var{n}_t}, @code{uint@var{n}_t}) (from
 
 @item @code{#include} files once only
 All include files should be protected by @code{#ifndef} to ensure
-their definitions are only included once. For instance a header file
+their definitions are only included once.  For instance a header file
 @file{@var{x-y.h}} should surround its contents with:
 
 @example
@@ -3179,9 +3207,9 @@ their definitions are only included once. For instance a header file
 
 @item Avoid @code{typedef}
 The GNU coding style for C does not have a clear way to distinguish
-between user type name and user variables. For this reason
+between user type name and user variables.  For this reason
 @code{typedef} should be avoided except for the most ubiquitous user
-defined types. This makes the code much easier to read.
+defined types.  This makes the code much easier to read.
 
 There are some @code{typedef} declarations in the @command{argtable2}
 library and the @acronym{ELF} and @acronym{COFF} headers, because this
@@ -3207,30 +3235,30 @@ entities: addresses (@code{oraddr_t}), unsigned register values
 @end itemize
 
 Where new types are defined, they should appear in one of these two
-files as appropriate. @value{OR1KSIM} specific types appearing in
+files as appropriate.  @value{OR1KSIM} specific types appearing in
 @file{arch.h} should always have the suffix @file{_h}.
 
 @item Don't begin names with underscore
 Names beginning with @code{_} are intended to be part of the C
-infrastructure. They should not be used in the simulator code.
+infrastructure.  They should not be used in the simulator code.
 
 @item Keep Non-global top level entities static
 All top level entities (functions, variables), which are not
-explicitly part of a global interface should be declared static. This
+explicitly part of a global interface should be declared static.  This
 ensures that unwanted connections are not inadvertently built across
 the program.
 
 @item Use of @code{inline}
-Code should not be declared @code{inline}. Modern compilers can work
+Code should not be declared @code{inline}.  Modern compilers can work
 out for themselves what is best in this respect.
 
 @item Initialization
-All data structures should be explicitly initialized. In particular
+All data structures should be explicitly initialized.  In particular
 code should not rely on static data structures being initialized to
 zero.
 
 The rationale is that in future static data structures may become
-dynamic. This has been a particular source of bugs in @value{OR1KSIM}
+dynamic.  This has been a particular source of bugs in @value{OR1KSIM}
 historically.
 
 A specific case is with new peripherals, which should always include a
@@ -3254,7 +3282,7 @@ at run time when the parameter is first used.
 @vindex config
 The global variable @code{config} of type @code{struct config} holds
 the configuration data for some of the @value{OR1KSIM} components which
-are always present. At present the components are:
+are always present.  At present the components are:
 
 @itemize @bullet
 
@@ -3310,7 +3338,7 @@ Interface Configuration, , Debug Interface Configuration}).
 @end itemize
 
 This struct is made of a collection of structs, one for each
-component. For example the simulator configuration is held in
+component.  For example the simulator configuration is held in
 @code{config.sim}.
 
 @item config
@@ -3318,8 +3346,8 @@ component. For example the simulator configuration is held in
 @vindex sections
 This is a linked list of data structures holding configuration data
 for all sections which are not held in the main @code{config} data
-structure. In general these are components (such as peripherals and
-memory) which may occur multiple times. However it also handles some
+structure.  In general these are components (such as peripherals and
+memory) which may occur multiple times.  However it also handles some
 architectural components which may occur only once, such as the memory
 management units, the instruction cache, the interrupt controller and
 branch prediction.
@@ -3328,7 +3356,7 @@ branch prediction.
 @cindex runtime global structure
 @vindex runtime
 The global variable @code{runtime} of type @code{struct runtime} holds
-all the runtime information about the simulation. To access this
+all the runtime information about the simulation.  To access this
 variable, @file{sim-config.h} must be included.
 
 @vindex runtime.cpu
@@ -3349,7 +3377,7 @@ time state), @code{vapi} (for Verification API state) and @code{cuc}
 @item Output Redirection
 @cindex output rediretion
 @vindex runtime.cpu.fout
-The current output stream is held in @code{runtime.cpu.fout}. Output
+The current output stream is held in @code{runtime.cpu.fout}.  Output
 should be explicitly written to this stream, or may use the
 @code{PRINTF} macro, which will write its arguments to this output stream.
 
@@ -3358,7 +3386,7 @@ should be explicitly written to this stream, or may use the
 @findex reg_sim_reset
 Any peripheral may register a routine to be called when the the
 processor is reset by calling @code{reg_sim_reset}, providing a
-function and pointer to a data structure as arguments. On reset that
+function and pointer to a data structure as arguments.  On reset that
 function will be called with the data stucture pointer as argument.
 
 @end table
@@ -3368,7 +3396,7 @@ function will be called with the data stucture pointer as argument.
 @cindex internal debugging
 
 The function @code{debug} is like @code{printf}, but with an extra
-first argument, which is the debug level. If the debug level specified
+first argument, which is the debug level.  If the debug level specified
 in the simulator configuration (@pxref{Simulator Behavior, , Simulator
 Behavior}) is greater than or equal to this value, the remaining
 arguments are printed to the current output stream (@pxref{Output

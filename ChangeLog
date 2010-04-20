@@ -1,14 +1,56 @@
-2009-12-23  Mark Jarvin <mark.jarvin@opencores.org>
-	* configure.ac: Check for rl_event_hook in readline.
-	* configure: Regenerated from configure.ac
-	* config.h.in, or1ksim/autom4te.cache/traces.0,
-	or1ksim/autom4te.cache/output.1, or1ksim/autom4te.cache/traces.1,
-	or1ksim/autom4te.cache/requests, or1ksim/autom4te.cache/output.0,
-	or1ksim/aclocal.m4: Regenerated
-	* sim-cmd.c (initialize_readline): Only use rl_event_hook if
-	available.
-	* peripheral/atadevice.c: Apple specific includes for Mac OS
-	* port/strndup.c: Provide defn of size_t from stddef.h
+2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* doc/or1ksim.texi: Updated with new testing instructions.
+	* README: Updated.
+	* configure.ac: Check for rl_event_hook declaration.
+	* sim-cmd.c (initialize_readline): Only use rl_event_hook if it's
+	  available.
+	* peripheral/atadevice.c: Added conditional includes for Apple	MAC.
+	* port/strndup.c: Include stddef.h to define size_t.
+
+2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or1k/spr-defs.h: NOP_PRINTF removed.
+	* support/simprintf.h, support/simprintf.h: Deleted
+	* support/dbchs.h: simprintf channel removed.
+	* support/Makefile.am: References to simprintf.* removed.
+	* cpu/or32/generate.c (generate_body): Generate exception for
+	  illegal instructions.
+	* cpu/or32/insnset.c: NOP_PRINTF and stackaddr removed.
+	* cpu/or32/execute.c (evalsim_reg): Remove simprintf reference.
+	* peripheral/channels/xterm.c (xterm_open): write result used.
+	* peripheral/generic.c (htoml): Fixed punning dereference.
+	* peripheral/generic.c (htoms): Fixed punning dereference.
+	* peripheral/generic.c (generic_read_byte): Fixed punning dereference.
+	* peripheral/generic.c (generic_write_byte): Fixed punning dereference.
+	* peripheral/generic.c (generic_read_hw): Fixed punning dereference.
+	* peripheral/generic.c (generic_write_hw): Fixed punning dereference.
+	* peripheral/atadevice.c (ata_devices_read): Clarified precedence.
+	* peripheral/atadevice.c (ata_devices_write): Clarified precedence.
+	* peripheral/atadevice-cmdi.c (ata_read_sect): fread result used.
+	* debug/debug-unit.c (calculate_watchpoints): memset fixed.
+	* debug/jtag.c (crc32): i correctly initialized.
+	* debug/jtag.c (construct_response): operator precedence clarified.
+	* debug/jtag.c (construct_response): jreg[zero_bytes] fixed.
+	* debug/jtag.c (validate_spr_fields): Format char fixed in printf.
+	* debug/jtag.c: "/*" within comments removed.
+	* debug/jtag.c: included toplevel-support.h
+	* cuc/bb.c (reg_dep): Duplicate code removed.
+	* cuc/bb.c (detect_bb): Array bound check added
+	* cuc/timings.c (load_timing_table): index initialized.
+
+2010-04-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* COPYING: Updated to v3.
+	* peripheral/gpio.c: #defines transfered to gpio.h
+	* peripheral/gpio.h: #defines transfered from gpio.c
+	* peripheral/mc.c: #defines transfered to mc.h
+	* peripheral/mc.h: #defines transfered from mc.c
+
+2010-04-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or32/insnset.c: Added support for new timing NOPs.
+	* cpu/or1k/spr-defs.h: NOP_GET_TICKS and NOP_GET_PS added.
+
+2010-04-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* peripheral/eth.c: #defines transfered to eth.h
+	* peripheral/eth.h: #defines transfered from eth.c
 
 2009-03-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* README: Reference to installation instructions updated

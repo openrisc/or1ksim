@@ -153,6 +153,7 @@ struct config
     int server_port;		/* Port for legacy GDB connection */
     int rsp_port;		/* Port for RSP GDB connection */
     unsigned long vapi_id;	/* "Fake" vapi dev id for JTAG proxy */
+    long int  jtagcycle_ps;	/* JTAG clock duration in ps */
   } debug;
 };
 
@@ -186,6 +187,16 @@ struct runtime
 
     int  hush;			/* Is simulator to do reg dumps */
   } sim;
+
+  struct
+  {
+    unsigned int  instr;	/* Current JTAG instruction */
+    unsigned long int  mod_id;	/* Currently selected module */
+    int  write_defined_p;	/* WRITE_COMMAND has set details for GO */
+    unsigned char  acc_type;	/* Access type for GO */
+    unsigned long int  addr;	/* Address to read/write for GO */
+    unsigned long int  size;	/* Number of bytes to read/write */
+  } debug;
 
   struct
   {

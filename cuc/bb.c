@@ -182,25 +182,40 @@ void detect_bb (cuc_func *f)
   int i, j, end_bb = 0, eb = 0;
 
   /* Mark block starts/ends */
-  for (i = 0; i < num_insn; i++) {
-    if (end_bb) insn[i].type |= IT_BBSTART;
-    end_bb = 0;
-    if (insn[i].type & IT_BRANCH) {
-      int jt = insn[i].op[0];
-      insn[i].type |= IT_BBEND;
-      end_bb = 1;
-      if (jt < 0 || jt >= num_insn) {
-	fprintf (stderr, "Instruction #%i:Jump out of function '%s'.\n", i, insn[i].disasm);
-	exit (1);
-      }
-      if (jt > 0) insn[jt - 1].type |= IT_BBEND;
-      insn[jt].type |= IT_BBSTART;
+  for (i = 0; i < num_insn; i++)
+    {
+      insn[i].type |= end_bb ? IT_BBSTART : 0;
+
+      end_bb = 0;
+
+      if (insn[i].type & IT_BRANCH)
+	{
+	  int jt = insn[i].op[0];
+	  insn[i].type |= IT_BBEND;
+	  end_bb = 1;
+
+	  if (jt < 0 || jt >= num_insn)
+	    {
+	      fprintf (stderr, "Instruction #%i:Jump out of function '%s'.\n",
+		       i, insn[i].disasm);
+	      exit (1);
+	    }
+
+	  if (jt > 0)
+	    {
+	      insn[jt - 1].type |= IT_BBEND;
+	    }
+
+	  insn[jt].type     |= IT_BBSTART;
+	}
     }
-  }
 
   /* Initialize bb array */
   insn[0].type |= IT_BBSTART;
-  insn[num_insn - 1].type |= IT_BBEND;
+  if (num_insn > 0)
+    {
+      insn[num_insn - 1].type |= IT_BBEND;
+    }
   f->num_bb = 0;
   for (i = 0; i < num_insn; i++) {
     if (insn[i].type & IT_BBSTART) {
@@ -1081,16 +1096,18 @@ void reg_dep (cuc_func *f)
 
   /* SSAs with final register value are marked as outputs */
   assert (f->bb[f->num_bb - 1].next[0] == BBID_END);
-  for (i = 0; i < MAX_REGS; i++) if (!caller_saved[i]) {
-    int t = f->bb[f->num_bb - 1].last_used_reg[i];
-    /* Mark them volatile, so optimizer does not remove them */
-    if (t >= 0) f->bb[REF_BB(t)].insn[REF_I(t)].type |= IT_OUTPUT;
-  }
-  {
-    int t = f->bb[f->num_bb - 1].last_used_reg[i];
-    /* Mark them volatile, so optimizer does not remove them */
-    if (t >= 0) f->bb[REF_BB(t)].insn[REF_I(t)].type |= IT_OUTPUT;
-  }
+  for (i = 0; i < MAX_REGS; i++)
+    {
+      if (!caller_saved[i])
+	{
+	  int t = f->bb[f->num_bb - 1].last_used_reg[i];
+	  /* Mark them volatile, so optimizer does not remove them */
+	  if (t >= 0)
+	    {
+	      f->bb[REF_BB(t)].insn[REF_I(t)].type |= IT_OUTPUT;
+	    }
+	}
+    }
 }
 
 /* split the BB, based on the group numbers in .tmp */

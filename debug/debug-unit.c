@@ -208,8 +208,8 @@ calculate_watchpoints (enum debug_unit_action  action,
   unsigned char  mp[MAX_MATCHPOINTS];	/* Which matchpoints matched */
   unsigned char  wp[MAX_WATCHPOINTS];	/* Which watchpoints matched */
 
-  memset (mp, sizeof (mp), 0);
-  memset (wp, sizeof (wp), 0);
+  memset (mp, 0, sizeof (mp));
+  memset (wp, 0, sizeof (wp));
 
   /* First find the matchpoints */
 

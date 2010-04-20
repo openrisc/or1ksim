@@ -249,7 +249,10 @@ xterm_open (void *data)
       xt->argv[0] = "xterm";
       xt->argv[1] = arg;
       execvp ("xterm", xt->argv);
-      write (master, "\n", 1);
+      if (write (master, "\n", 1) < 0)	/* Don't ignore result */
+	{
+	  printf ("ERROR: xterm: write failed\n");
+	}
       exit (1);
     }
 

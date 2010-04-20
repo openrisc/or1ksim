@@ -39,6 +39,7 @@
 #include "sched.h"
 #include "execute.h"
 #include "pic.h"
+#include "jtag.h"
 
 
 /*---------------------------------------------------------------------------*/
@@ -149,15 +150,12 @@ or1ksim_run (double duration)
      duration) */
   while (duration < 0.0 || (runtime.sim.cycles < runtime.sim.end_cycles))
     {
-
       long long int time_start = runtime.sim.cycles;
       int i;			/* Interrupt # */
 
       /* Each cycle has counter of mem_cycles; this value is joined with cycles
        * at the end of the cycle; no sim originated memory accesses should be
-       * performed inbetween.
-       */
-
+       * performed in between. */
       runtime.sim.mem_cycles = 0;
 
       if (cpu_clock ())
@@ -198,7 +196,6 @@ or1ksim_run (double duration)
 	}
 
       /* Update the scheduler queue */
-
       scheduler.job_queue->time -= (runtime.sim.cycles - time_start);
 
       if (scheduler.job_queue->time <= 0)
@@ -385,3 +382,91 @@ or1ksim_interrupt_clear (int i)
       runtime.sim.ext_int_clr |= 1 << i;	// Better not be > 31!
     }
 }	/* or1ksim_interrupt() */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Reset the JTAG interface
+
+   @note Like all the JTAG interface functions, this must not be called
+         re-entrantly while a call to any other function (e.g. or1kim_run ())
+         is in progress. It is the responsibility of the caller to ensure this
+         constraint is met, for example by use of a SystemC mutex.
+
+   @return  The time in seconds which the reset took.                        */
+/*---------------------------------------------------------------------------*/
+double
+or1ksim_jtag_reset ()
+{
+  return  (double) jtag_reset () * (double) config.debug.jtagcycle_ps / 1.0e12;
+
+}	/* or1ksim_jtag_reset () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Shift a JTAG instruction register
+
+   @note Like all the JTAG interface functions, this must not be called
+         re-entrantly while a call to any other function (e.g. or1kim_run ())
+         is in progress. It is the responsibility of the caller to ensure this
+         constraint is met, for example by use of a SystemC mutex.
+
+   The register is represented as a vector of bytes, with the byte at offset
+   zero being shifted first, and the least significant bit in each byte being
+   shifted first. Where the register will not fit in an exact number of bytes,
+   the odd bits are in the highest numbered byte, shifted to the low end.
+
+   The only JTAG instruction for which we have any significant behavior in
+   this model is DEBUG. For completeness the register is parsed and a warning
+   given if any register other than DEBUG is shifted.
+
+   @param[in,out] jreg  The register to shift in, and the register shifted
+                        back out.
+
+   @return  The time in seconds which the shift took.                        */
+/*---------------------------------------------------------------------------*/
+double
+or1ksim_jtag_shift_ir (unsigned char *jreg)
+{
+  return  (double) jtag_shift_ir (jreg) * (double) config.debug.jtagcycle_ps /
+          1.0e12;
+
+}	/* or1ksim_jtag_shift_ir () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Shift a JTAG data register
+
+   @note Like all the JTAG interface functions, this must not be called
+         re-entrantly while a call to any other function (e.g. or1kim_run ())
+         is in progress. It is the responsibility of the caller to ensure this
+         constraint is met, for example by use of a SystemC mutex.
+
+   The register is represented as a vector of bytes, with the byte at offset
+   zero being shifted first, and the least significant bit in each byte being
+   shifted first. Where the register will not fit in an exact number of bytes,
+   the odd bits are in the highest numbered byte, shifted to the low end.
+
+   The register is parsed to determine which of the six possible register
+   types it could be.
+   - MODULE_SELECT
+   - WRITE_COMMNAND
+   - READ_COMMAND
+   - GO_COMMAND
+   - WRITE_CONTROL
+   - READ_CONTROL
+
+   @note In practice READ_COMMAND is not used. However the functionality is
+         provided for future compatibility.
+
+   @param[in,out] jreg  The register to shift in, and the register shifted
+                        back out.
+
+   @return  The time in seconds which the shift took.                        */
+/*---------------------------------------------------------------------------*/
+double
+or1ksim_jtag_shift_dr (unsigned char *jreg)
+{
+  return  (double) jtag_shift_dr (jreg) * (double) config.debug.jtagcycle_ps /
+          1.0e12;
+
+}	/* or1ksim_jtag_shift_dr () */

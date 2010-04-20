@@ -99,7 +99,8 @@ htoml (unsigned long int  host_val)
   model_array[3] = (host_val >> 24) & 0xff;
 #endif
 
-  return *((unsigned long int *)model_array);
+  unsigned long int *res = (unsigned long int *) model_array;
+  return *res;
 
 }	/* htoml () */
 
@@ -118,7 +119,8 @@ htoms (unsigned short int  host_val)
   model_array[1] = (host_val >>  8) & 0xff;
 #endif
 
-  return *((unsigned short int *)model_array);
+  unsigned short int *res = (unsigned short int *) model_array;
+  return *res;
 
 }	/* htoms () */
 
@@ -226,7 +228,8 @@ generic_read_byte (oraddr_t addr, void *dat)
       memset (mask_array, 0, 4);
       mask_array[bytenum] = 0xff;
 
-      res       = ext_read (wordaddr, *((unsigned int *)mask_array));
+      unsigned int *arg_ptr = (unsigned int *) mask_array;
+      res       = ext_read (wordaddr, *arg_ptr);
       res_array = (uint8_t *)(&res);
 
       return  res_array[bytenum];
@@ -263,8 +266,9 @@ generic_write_byte (oraddr_t addr, uint8_t value, void *dat)
       memset (value_array, 0, 4);
       value_array[bytenum] = value;
 
-      ext_write (wordaddr, *((unsigned long int *)mask_array),
-		 *((unsigned long int *)value_array));
+      unsigned long int *arg1_ptr = (unsigned long int *)mask_array;
+      unsigned long int *arg2_ptr = (unsigned long int *)value_array;
+      ext_write (wordaddr, *arg1_ptr, *arg2_ptr);
     }
 }				/* generic_write_byte() */
 
@@ -309,13 +313,15 @@ generic_read_hw (oraddr_t addr, void *dat)
       mask_array[bytenum]     = 0xff;
       mask_array[bytenum + 1] = 0xff;
 
-      res       = ext_read (wordaddr, *((unsigned int *)mask_array));
+      unsigned int *arg_ptr = (unsigned int *) mask_array;
+      res       = ext_read (wordaddr, *arg_ptr);
       res_array = (uint8_t *)(&res);
 
       hwres_array[0] = res_array[bytenum];
       hwres_array[1] = res_array[bytenum + 1];
 
-      return htoms (*((uint16_t *)hwres_array));
+      uint16_t *hwres_ptr = (uint16_t *) hwres_array;
+      return htoms (*hwres_ptr);
     }
 }				/* generic_read_hw() */
 
@@ -362,8 +368,9 @@ generic_write_hw (oraddr_t addr, uint16_t value, void *dat)
       value_array[bytenum]     = hw_value_array[0];
       value_array[bytenum + 1] = hw_value_array[1];
 
-      ext_write (wordaddr, *((unsigned long int *)mask_array),
-		 *((unsigned long int *)value_array));
+      unsigned long int *arg1_ptr = (unsigned long int *)mask_array;
+      unsigned long int *arg2_ptr = (unsigned long int *)value_array;
+      ext_write (wordaddr, *arg1_ptr, *arg2_ptr);
     }
 }				/* generic_write_hw() */
 

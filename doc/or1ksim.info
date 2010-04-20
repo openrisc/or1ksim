@@ -1,4 +1,4 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.11 from
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
 ../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-0.3.0.tar.bz2
+     tar jxf or1ksim-0.3.1-2010-04-20.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -78,23 +78,23 @@ Configure the software using the `configure' script in the main
 directory.
 
 The most significant argument is `--target', which should specify the
-OpenRISC 1000 32-bit architecture. If this argument is omitted, it will
+OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-0.3.0/configure --target=or32-uclinux ...
+     ../or1ksim-0.3.1-2010-04-20/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
-to GNU `configure' scripts. Use `configure --help' to see all the
-options. The most useful is `--prefix' to specify a directory for
+to GNU `configure' scripts.  Use `configure --help' to see all the
+options.  The most useful is `--prefix' to specify a directory for
 installation of the tools.
 
 A number of Or1ksim features in the simulator do require enabling at
-configuration. These include
+configuration.  These include
 
 `--enable-profiling'
 `--disable-profiling'
-     If enabled, Or1ksim is compiled for profiling with `gprof'. This
-     is disabled by default. Only really of value for developers of
+     If enabled, Or1ksim is compiled for profiling with `gprof'.  This
+     is disabled by default.  Only really of value for developers of
      Or1ksim.
 
 `--enable-execution=simple'
@@ -107,15 +107,15 @@ configuration. These include
           Build the original simple interpreting simulator
 
     `--enable-execution=complex'
-          Build a more complex interpreting simulator. Experiments
-          suggest this is 50% faster than the simple simulator. This is
-          the default.
+          Build a more complex interpreting simulator.  Experiments
+          suggest this is 50% faster than the simple simulator.  This
+          is the default.
 
     `--enable-execution=dynamic'
-          Build a dynamically compiling simulator. This is the way many
-          modern ISS are built. This represents a work in progress.
-          Currently Or1ksim will compile, but segfaults if configured
-          with this option.
+          Build a dynamically compiling simulator.  This is the way
+          many modern ISS are built.  This represents a work in
+          progress.  Currently Or1ksim will compile, but segfaults if
+          configured with this option.
 
 
      The default is `--enable-execution=complex'.
@@ -124,8 +124,8 @@ configuration. These include
 `--disable-ethphy'
      If enabled, this option allows the Ethernet to be simulated by
      connecting via a socket (the alternative reads and writes, from
-     and to files). This must then be configured using the relevant
-     fields in the `ethernet' section of the configuration file. *Note
+     and to files).  This must then be configured using the relevant
+     fields in the `ethernet' section of the configuration file.  *Note
      Ethernet Configuration: Ethernet Configuration.
 
      The default is for this to be disabled.
@@ -133,13 +133,13 @@ configuration. These include
 `--enable-range-stats'
 `--disable-range-stats'
      If enabled, this option allows statistics to be collected to
-     analyse register access over time. The default is for this to be
+     analyse register access over time.  The default is for this to be
      disabled.
 
 `--enable-ov-flag'
 `--disable-ov-flag'
      If enabled, this option causes instructions to set the overflow
-     flag. The instructions affected by this are `l.add', `l.addc',
+     flag.  The instructions affected by this are `l.add', `l.addc',
      `l.addi', `l.and', `l.andi', `l.div', `l.divu', `l.mul', `l.muli',
      `l.or', `l.ori', `l.sll', `l.slli', `l.srl', `l.srli', `l.sra',
      `l.srai', `l.sub', `l.xor' and `l.xori'.
@@ -147,14 +147,14 @@ configuration. These include
      The default is for this to be disabled.
 
           Caution: This appears a very dangerous option, to the extent
-          of arguably being a bug. Whether or not flags are set is part
-          of the OpenRISC 1000 architectural specification. Within the
-          above list, the arithmetic instructions (`l.add', `l.addc',
-          `l.addi', `l.div', `l.divu', `l.mul', `l.muli' and `l.sub'),
-          together with `l.addic' which is missed out, set the overflow
-          flag. All the others (`l.and', `l.andi', `l.or', `l.ori',
-          `l.sll', `l.slli', `l.srl', `l.srli', `l.sra', `l.srai',
-          `l.xor' and `l.xori') do not.
+          of arguably being a bug.  Whether or not flags are set is
+          part of the OpenRISC 1000 architectural specification.
+          Within the above list, the arithmetic instructions (`l.add',
+          `l.addc', `l.addi', `l.div', `l.divu', `l.mul', `l.muli' and
+          `l.sub'), together with `l.addic' which is missed out, set
+          the overflow flag.  All the others (`l.and', `l.andi',
+          `l.or', `l.ori', `l.sll', `l.slli', `l.srl', `l.srli',
+          `l.sra', `l.srai', `l.xor' and `l.xori') do not.
 
           Thus it is impossible to get correct behavior whichever way
           this option is set.
@@ -162,7 +162,7 @@ configuration. These include
 `--enable-arith-flag'
 `--disable-arith-flag'
      If enabled, this option causes instructions to set the flag (`F'
-     bit) in the supervision register. The instructions affected by
+     bit) in the supervision register.  The instructions affected by
      this are `l.add', `l.addc', `l.addi', `l.and' and `l.andi'.
 
      The default is for this to be disabled.
@@ -173,7 +173,7 @@ configuration. These include
           the instructions early in the alphabet?
 
           Whether or not flags are set is part of the OpenRISC 1000
-          architectural specification. The only flags which should set
+          architectural specification.  The only flags which should set
           this are the "set flag" instructions: `l.sfeq', `l.sfeqi',
           `l.sfges', `l.sfgesi', `l.sfgeu', `l.sfgeui', `l.sfgts',
           `l.sfgtsi', `l.sfgtu', `l.sfgtui', `l.sfles', `l.sflesi',
@@ -190,9 +190,18 @@ configuration. These include
 `--enable-debug'
 `--disable-debug'
      This is a feature of the Argtable2 package used to process
-     arguments. If enabled, some debugging features are turned on in
-     Argtable2. It is provided for completeness, but there is no reason
-     why this feature should ever be needed by any Or1ksim user.
+     arguments.  If enabled, some debugging features are turned on in
+     Argtable2.  It is provided for completeness, but there is no
+     reason why this feature should ever be needed by any Or1ksim user.
+
+`--enable-all-tests'
+`--disable-all-tests'
+     Some of the tests (at the time of writing just one) will not
+     compile without error.  If enabled with this flag, all test
+     programs will be compiled with `make check'.
+
+     This flag is intended for those working on the test package, who
+     wish to get the missing test(s) working.
 
 
 
@@ -201,9 +210,17 @@ File: or1ksim.info,  Node: Build and Install,  Next: Known Issues,  Prev: Config
 1.3 Building and Installing
 ===========================
 
-The tool is then built with:
+Build the tool with:
 
      make all
+
+If you have the OpenRISC tool chain and DejaGNU installed, you can
+verify the tool as follows (otherwise omit this step):
+
+     make check
+
+Install the tool with:
+
      make install
 
 This will install the three variations of the Or1ksim tool,
@@ -225,24 +242,25 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 1.4 Known Problems and Issues
 =============================
 
-The following problems and issues are known about with Or1ksim 0.3.0.
-The OpenRISC tracker may be used to see the current state of these
-issues and to raise new problems and feature requests. It may be found
-at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
+The following problems and issues are known about with Or1ksim
+0.3.1-2010-04-20.  The OpenRISC tracker may be used to see the current
+state of these issues and to raise new problems and feature requests.
+It may be found at
+`http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
    * The Supervision Register Little Endian Enable (LEE) bit is
-     ignored. Or1ksim can be built for either little endian or big
+     ignored.  Or1ksim can be built for either little endian or big
      endian use, but that behavior cannot be changed dynamically.
 
    * The NPC is a read/write register, but after being written it
-     clears the pipeline. This means that if the processor is stalled,
+     clears the pipeline.  This means that if the processor is stalled,
      the value should subsequently read back as 0, until the processor
-     is unstalled and able to refill its pipeline. By default Or1ksim
+     is unstalled and able to refill its pipeline.  By default Or1ksim
      always reports back the value of NPC, even when it has been
      written while stalled.
 
      There is now an option, `--strict-npc', which will enforce this
-     behavior. At some stage in the future it will become the default
+     behavior.  At some stage in the future it will become the default
      behavior, but for now it is an option, since its use will break
      GDB.
 
@@ -252,18 +270,18 @@ at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
      corresponds to a particular access).
 
    * Or1ksim allows the processor to be stalled (from the command
-     line), even if there is no debugger present. This seems to be a
+     line), even if there is no debugger present.  This seems to be a
      meaningless operation.
 
    * Or1ksim is not reentrant, so a program cannot instantiate multiple
-     instances using the library. This is clearly a problem when
-     considering multi-core applications. However it stems from the
-     original design, and can only be fixed by a complete rewrite. The
+     instances using the library.  This is clearly a problem when
+     considering multi-core applications.  However it stems from the
+     original design, and can only be fixed by a complete rewrite.  The
      entire source code uses static global constants liberally!
 
    * There is no support for floating point instructions currently in
-     Or1ksim. However this is a work in progress and should be
-     available in the near future.
+     Or1ksim.  However this is a work in progress and should be
+     available in the future.
 
 
 
@@ -290,8 +308,8 @@ The general form the standalone command is:
      or32-uclinux-sim [-vhi] [-f FILE] [--nosrv] [--srv=[N]] [-d STR]
                       [--enable-profile] [--enable-mprofile] [FILE]
 
-Many of the options have both a short and a long form. For example `-h'
-or `--help'.
+Many of the options have both a short and a long form.  For example
+`-h' or `--help'.
 
 `-v'
 `--version'
@@ -305,30 +323,30 @@ or `--help'.
 `--file FILE'
      Read configuration commands from the specified file, looking first
      in the current directory, and otherwise in the `$HOME/.or1k'
-     directory. If this argument is not specified, the file `sim.cfg'
-     in those two locations is used. Failure to find the file is a fatal
-     error. *Note Configuration: Configuration, for detailed information
-     on configuring Or1ksim.
+     directory.  If this argument is not specified, the file `sim.cfg'
+     in those two locations is used.  Failure to find the file is a
+     fatal error.  *Note Configuration: Configuration, for detailed
+     information on configuring Or1ksim.
 
 `--nosrv'
-     Do not start up the debug server. This overrides any setting
-     specified in the configuration file. This option may not be
-     specified with `--srv'. If it is, a rude message is printed and the
-     `--nosrv' option is ignored.
+     Do not start up the debug server.  This overrides any setting
+     specified in the configuration file.  This option may not be
+     specified with `--srv'.  If it is, a rude message is printed and
+     the `--nosrv' option is ignored.
 
 `--srv'
 
 `--srv=N'
-     Start up the debug server. If the parameter, N, is specified, use
+     Start up the debug server.  If the parameter, N, is specified, use
      that as the TCP/IP port for the server, otherwise a random value
-     from the private port range (41920-65535) will be used. This option
-     may not be specified with `--nosrv'. If it is, a rude message is
-     printed and the `--nosrv' option is ignored.
+     from the private port range (41920-65535) will be used.  This
+     option may not be specified with `--nosrv'.  If it is, a rude
+     message is printed and the `--nosrv' option is ignored.
 
 `-d=CONFIG_STRING'
 `--debug-config=CONFIG_STRING'
-     Enable selected debug messages in Or1ksim. This parameter is for
-     use by developers only, and is not covered further here. See the
+     Enable selected debug messages in Or1ksim.  This parameter is for
+     use by developers only, and is not covered further here.  See the
      source code for more details.
 
 `-i'
@@ -337,15 +355,15 @@ or `--help'.
 
 `--strict-npc'
      In real hardware, setting the next program counter (NPC, SPR 16),
-     flushes the processor pipeline. The consequence of this is that
-     until the pipeline refills, reading the NPC will return zero. This
-     is typically the case when debugging, since the processor is
+     flushes the processor pipeline.  The consequence of this is that
+     until the pipeline refills, reading the NPC will return zero.
+     This is typically the case when debugging, since the processor is
      stalled.
 
      Historically, Or1ksim has always returned the value of the NPC,
-     irrespective of when it is changed. If the `--strict-npc' option is
-     used, then Or1ksim will mirror real hardware more accurately. If
-     the NPC is changed while the processor is stalled, subsequent
+     irrespective of when it is changed.  If the `--strict-npc' option
+     is used, then Or1ksim will mirror real hardware more accurately.
+     If the NPC is changed while the processor is stalled, subsequent
      reads of its value will return 0 until the processor is unstalled.
 
      This is not currently the default behavior, since tools such as
@@ -365,14 +383,14 @@ File: or1ksim.info,  Node: Profiling Utility,  Next: Memory Profiling Utility,  
 2.2 Profiling Utility
 =====================
 
-This utility analyses instruction profile data generated by Or1ksim. It
-may be invoked as a standalone command, or from the Or1ksim CLI. The
-general form the standalone command is:
+This utility analyses instruction profile data generated by Or1ksim.
+It may be invoked as a standalone command, or from the Or1ksim CLI.
+The general form the standalone command is:
 
      or32-uclinux-profile [-vhcq] [-g=FILE]
 
-Many of the options have both a short and a long form. For example `-h'
-or `--help'.
+Many of the options have both a short and a long form.  For example
+`-h' or `--help'.
 
 `-v'
 `--version'
@@ -393,7 +411,7 @@ or `--help'.
 
 `-g=FILE'
 `--generate=FILE'
-     The data file to analyse. If omitted, the default file,
+     The data file to analyse.  If omitted, the default file,
      `sim.profile' is used.
 
 
@@ -403,14 +421,14 @@ File: or1ksim.info,  Node: Memory Profiling Utility,  Next: Simulator Library,  
 2.3 Memory Profiling Utility
 ============================
 
-This utility analyses memory profile data generated by Or1ksim. It may
-be invoked as a standalone command, or from the Or1ksim CLI. The
+This utility analyses memory profile data generated by Or1ksim.  It may
+be invoked as a standalone command, or from the Or1ksim CLI.  The
 general form the standalone command is:
 
      or32-uclinux-mprofile  [-vh] [-m=M] [-g=N] [-f=FILE] FROM TO
 
-Many of the options have both a short and a long form. For example `-h'
-or `--help'.
+Many of the options have both a short and a long form.  For example
+`-h' or `--help'.
 
 `-v'
 `--version'
@@ -423,11 +441,11 @@ or `--help'.
 
 `-m=M'
 `--mode=M'
-     Specify the mode out output. Permitted options are
+     Specify the mode out output.  Permitted options are
 
     `detailed'
     `d'
-          Detailed output. This is the default if no mode is specified.
+          Detailed output.  This is the default if no mode is specified.
 
     `pretty'
     `p'
@@ -448,7 +466,7 @@ or `--help'.
 
 `-f=FILE'
 `--filename=FILE'
-     The data file to analyse. If not specified, the default,
+     The data file to analyse.  If not specified, the default,
      `sim.profile' is used.
 
 `FROM'
@@ -464,11 +482,11 @@ File: or1ksim.info,  Node: Simulator Library,  Prev: Memory Profiling Utility,  
 =====================
 
 Or1ksim may be used as a static of dynamic library, `libsim.a' or
-`libsim.so'. When compiling with the static library, the flag, `-lsim'
+`libsim.so'.  When compiling with the static library, the flag, `-lsim'
 should be added to the link command.
 
 The header file `or1ksim.h' contains appropriate declarations of the
-functions exported by the Or1ksim library. These are:
+functions exported by the Or1ksim library.  These are:
 
  -- `or1ksim.h': int or1ksim_init (const char *CONFIG_FILE, const char
           *IMAGE_FILE, void *CLASS_PTR, unsigned long int (*UPR)(void
@@ -485,17 +503,18 @@ functions exported by the Or1ksim library. These are:
      configuring Or1ksim and the format of the configuration file.
 
      UPW is called for any write to an address external to the model
-     (determined by a `generic' section in the configuration file). UPR
-     is called for any reads to an external address. The CLASS_PTR is
-     passed back with these upcalls, allowing the function to associate
-     the call with the class which originally initialized the library.
+     (determined by a `generic' section in the configuration file).
+     UPR is called for any reads to an external address.  The CLASS_PTR
+     is passed back with these upcalls, allowing the function to
+     associate the call with the class which originally initialized the
+     library.
 
      MASK indicates which bytes in the word are to be written or read.
-     Bytes to be read/written should have 0xff set in MASK. Otherwise
+     Bytes to be read/written should have 0xff set in MASK.  Otherwise
      the byte should be zero.
 
      ADDR, MASK, WDATA and the result from UPR all use host-endianess,
-     _not_ model-endianess. The internal Or1ksim routines manage all
+     _not_ model-endianess.  The internal Or1ksim routines manage all
      the conversion.
 
 
@@ -506,7 +525,7 @@ functions exported by the Or1ksim library. These are:
 
  -- `or1ksim.h': void or1ksim_reset_duration (double DURATION)
      Change the duration of a run specified in an earlier call to
-     `or1ksim_run'. Typically this is called from an upcall, which
+     `or1ksim_run'.  Typically this is called from an upcall, which
      realizes it needs to change the duration of the run specified in
      the call to `or1ksim_run' that has been interrupted by the upcall.
 
@@ -516,7 +535,7 @@ functions exported by the Or1ksim library. These are:
 
 
  -- `or1ksim.h': void or1ksim_set_time_point ()
-     Set a timing point. For use with `or1ksim_get_time_period'.
+     Set a timing point.  For use with `or1ksim_get_time_period'.
 
 
  -- `or1ksim.h': double or1ksim_get_time_period ()
@@ -530,13 +549,13 @@ functions exported by the Or1ksim library. These are:
 
 
  -- `or1ksim.h': unsigned long int or1ksim_clock_rate ()
-     Return the Or1ksim clock rate (in Hz). This is the value specified
-     in the configuration file.
+     Return the Or1ksim clock rate (in Hz).  This is the value
+     specified in the configuration file.
 
 
  -- `or1ksim.h': void or1ksim_interrupt (int I)
-     Generate an edge-triggered interrupt on interrupt line I. The
-     interrupt is then immediately cleared automatically. A warning
+     Generate an edge-triggered interrupt on interrupt line I.  The
+     interrupt is then immediately cleared automatically.  A warning
      will be generated and the interrupt request ignored if level
      sensitive interrupts have been configured with the programmable
      interrupt controller (*note Interrupt Configuration: Interrupt
@@ -544,9 +563,9 @@ functions exported by the Or1ksim library. These are:
 
 
  -- `or1ksim.h': void or1ksim_interrupt_set (int I)
-     Assert a level-triggered interrupt on interrupt line I. The
+     Assert a level-triggered interrupt on interrupt line I.  The
      interrupt must be cleared separately by an explicit call to
-     `or1ksim_interrupt_clear'. A warning will be generated, and the
+     `or1ksim_interrupt_clear'.  A warning will be generated, and the
      interrupt request ignored if edge sensitive interrupts have been
      configured with the programmable interrupt controller (*note
      Interrupt Configuration: Interrupt Configuration.).
@@ -554,7 +573,7 @@ functions exported by the Or1ksim library. These are:
 
  -- `or1ksim.h': void or1ksim_interrupt_clear (int I)
      Clear a level-triggered interrupt on interrupt line I, which was
-     previously asserted by a call to `or1ksim_interrupt_set'. A
+     previously asserted by a call to `or1ksim_interrupt_set'.  A
      warning will be generated, and the interrupt request ignored if
      edge sensitive interrupts have been configured with the
      programmable interrupt controller (*note Interrupt Configuration:
@@ -566,7 +585,7 @@ installation directory (as specified with the `--prefix' option to the
 `configure' script).
 
 For example if the main installation directory is `/opt/or1ksim', the
-library will be found in the `/opt/or1ksim/lib' directory. It is
+library will be found in the `/opt/or1ksim/lib' directory.  It is
 available as both a static library (`libsim.a') and a shared object
 (`libsim.so').
 
@@ -574,19 +593,19 @@ To link against the library add the `-lsim' flag when linking and do
 one of the following:
 
    * Add the library directory to the `LD_LIBRARY_PATH' environment
-     variable during execution. For example:
+     variable during execution.  For example:
 
           export LD_LIBRARY_PATH=/opt/or1ksim/lib:$LD_LIBRARY_PATH
 
    * Add the library directory to the `LD_RUN_PATH' environment
-     variable during linking. For example:
+     variable during linking.  For example:
 
           export LD_RUN_PATH=/opt/or1ksim/lib:$LD_RUN_PATH
 
    * Use the linker `--rpath' option and specify the library directory
-     when linking your program. For example
+     when linking your program.  For example
 
-          gcc ... -Wl,--rpath -Wl,/opt/or1ksim/lib ...
+          gcc ...  -Wl,--rpath -Wl,/opt/or1ksim/lib ...
 
    * Add the library directory to `/etc/ld.so.conf'
 
@@ -597,10 +616,10 @@ File: or1ksim.info,  Node: Configuration,  Next: Interactive Command Line,  Prev
 3 Configuration
 ***************
 
-Or1ksim is configured through a configuration file. This is specified
+Or1ksim is configured through a configuration file.  This is specified
 through the `-f' parameter to the Or1ksim command, or passed as a
-string when initializing the Or1ksim library. If no file is specified,
-the default `sim.cfg' is used. The file is looked for first in the
+string when initializing the Or1ksim library.  If no file is specified,
+the default `sim.cfg' is used.  The file is looked for first in the
 current directory, then in the `$HOME/.or1k' directory of the user.
 
 * Menu:
@@ -629,7 +648,7 @@ File: or1ksim.info,  Node: Configuration File Preprocessing,  Next: Configuratio
 3.1.1 Configuration File Preprocessing
 --------------------------------------
 
-The configuration file may include C style comments (i.e. delimited by
+The configuration file may include C style comments (i.e.  delimited by
 `/*' and `*/').
 
 Configure files may be included, using
@@ -661,8 +680,8 @@ one per line, withe the general form
 
 Depending on the parameter, the value may be a named value (an
 enumeration), an integer (specified in any format acceptable in C) or a
-string in doubple quotes. For flag parameters, the value 1 is used to
-mean "true" or "on" and the value "0" to mean "false" or "off". An
+string in doubple quotes.  For flag parameters, the value 1 is used to
+mean "true" or "on" and the value "0" to mean "false" or "off".  An
 example from a memory section shows each of these
 
      section memory
@@ -673,11 +692,11 @@ example from a memory section shows each of these
      end
 
 Many parameters are optional and take reasonable default values if not
-specified. However there are some parameters (for example the `ce'
+specified.  However there are some parameters (for example the `ce'
 parameter in `section memory') _must_ be specified.
 
 Subsections are introduced by a keyword, with a parameter value (no `='
-sign), and end with the same keyword prefixed by `end'. Thus the
+sign), and end with the same keyword prefixed by `end'.  Thus the
 ATA/ATAPI inteface (`section ata') has a `device' subsection, thus:
 
      section ata
@@ -694,9 +713,9 @@ Some sections (for example `section sim') should appear only once.
 Others (for example `section memory' may appear multiple times.
 
 Sections may be omitted, _unless they contain parameters which are
-non-optional_. If the section describes a part of the simulator which
+non-optional_.  If the section describes a part of the simulator which
 is optional (for example whether it has a UART), then that
-functionality will not be provided. If the section describes a part of
+functionality will not be provided.  If the section describes a part of
 the simulator which is not optional (for example the CPU), then all the
 parameters of that section will take their default values.
 
@@ -705,8 +724,8 @@ sections including a `enabled' parameter, which can be set to 0 to
 ensure that functionality is explicitly omitted.
 
 Even if a section is disabled, all its parameters will be read and
-stored. This is helpful if the section is subsequently enabled from the
-Or1ksim command line (*note Interactive Command Line: Interactive
+stored.  This is helpful if the section is subsequently enabled from
+the Or1ksim command line (*note Interactive Command Line: Interactive
 Command Line.).
 
      Tip: It generally clearer to have sections describing _all_
@@ -734,40 +753,41 @@ File: or1ksim.info,  Node: Simulator Behavior,  Next: Verification API Configura
 3.2.1 Simulator Behavior
 ------------------------
 
-Simulator behavior is described in `section sim'. This section should
-appear only once. The following parameters may be specified.
+Simulator behavior is described in `section sim'.  This section should
+appear only once.  The following parameters may be specified.
 
 `verbose = 0|1'
-     If 1 (true), print extra messages. Default 0.
+     If 1 (true), print extra messages.  Default 0.
 
 `debug = 0-9'
-     0 means no debug messages. 1-9 means produce debug messages. The
-     higher the value the greater the number of messages. Default 0.
-     Negative values will be treated as 0 (with a warning). Values that
-     are too large will be treated as 9 (with a warning).
+     0 means no debug messages.  1-9 means produce debug messages.  The
+     higher the value the greater the number of messages.  Default 0.
+     Negative values will be treated as 0 (with a warning).  Values
+     that are too large will be treated as 9 (with a warning).
 
 `profile = 0|1'
      If 1 (true) generate a profiling file using the file specified in
-     the `prof_file' parameter or otherwise `sim.profile'. Default 0.
+     the `prof_file' parameter or otherwise `sim.profile'.  Default 0.
 
 `prof_file = ``FILENAME'''
-     Specifies the file to be used with the `profile' parameter. Default
-     `sim.profile'. For backwards compatibility, the alternative name
-     `prof_fn' is supported for this parameter, but deprecated.
+     Specifies the file to be used with the `profile' parameter.
+     Default `sim.profile'.  For backwards compatibility, the
+     alternative name `prof_fn' is supported for this parameter, but
+     deprecated.
 
 `mprofile = 0|1'
      If 1 (true) generate a memory profiling file using the file
      specified in the `mprof_file' parameter or otherwise
-     `sim.mprofile'. Default 0.
+     `sim.mprofile'.  Default 0.
 
 `mprof_fn = ``FILENAME'''
      Specifies the file to be used with the `mprofile' parameter.
-     Default `sim.mprofile'. For backwards compatibility, the
+     Default `sim.mprofile'.  For backwards compatibility, the
      alternative name `mprof_fn' is supported for this parameter, but
      deprecated.
 
 `history = 0|1'
-     If 1 (true) track execution flow. Default 0.
+     If 1 (true) track execution flow.  Default 0.
 
           Note: Setting this parameter seriously degrades performance.
 
@@ -776,8 +796,8 @@ appear only once. The following parameters may be specified.
           section (*note CPU Configuration: CPU Configuration.).
 
 `exe_log = 0|1'
-     If 1 (true), generate an execution log. Log is written to the file
-     specified in parameter `exe_log_file'. Default 0.
+     If 1 (true), generate an execution log.  Log is written to the
+     file specified in parameter `exe_log_file'.  Default 0.
 
           Note: Setting this parameter seriously degrades performance.
 
@@ -785,7 +805,7 @@ appear only once. The following parameters may be specified.
      Type of execution log to produce.
 
     `default'
-          Produce default output for the execution log. In the current
+          Produce default output for the execution log.  In the current
           implementation this is the equivalent of `hardware'.
 
     `hardware'
@@ -803,35 +823,35 @@ appear only once. The following parameters may be specified.
     `software'
           After each instruction execution, log the number of
           instructions executed so far and the next instruction to
-          execute, symbolically disassembled. Also show the value of
+          execute, symbolically disassembled.  Also show the value of
           each operand to the instruction.
 
 
-     Default value `hardware'. Any unrecognized keyword (case
+     Default value `hardware'.  Any unrecognized keyword (case
      insensitive) will be treated as the default with a warning.
 
           Note: Execution logs can be _very_ big.
 
 `exe_log_start = VALUE'
-     Address of the first instruction to start logging. Default 0.
+     Address of the first instruction to start logging.  Default 0.
 
 `exe_log_end = VALUE'
-     Address of the last instruction to log. Default no limit (i.e once
-     started logging will continue until the simulator exits).
+     Address of the last instruction to log.  Default no limit (i.e
+     once started logging will continue until the simulator exits).
 
 `exe_log_marker = VALUE'
      Specifies the number of instructions between printing horizontal
-     markers. Default is to produce no markers.
+     markers.  Default is to produce no markers.
 
 `exe_log_file = FILENAME'
      Filename for the execution log filename if `exe_log' is enabled.
-     Default `executed.log'. For backwards compatibility, the
+     Default `executed.log'.  For backwards compatibility, the
      alternative name `exe_log_fn' is supported for this parameter, but
      deprecated.
 
 `clkcycle = VALUE[ps|ns|us|ms]'
-     Specify the time taken by one clock cycle. If no units are
-     specified, `ps' is assumed. Default 4000ps (250MHz).
+     Specify the time taken by one clock cycle.  If no units are
+     specified, `ps' is assumed.  Default 4000ps (250MHz).
 
 
 
@@ -841,11 +861,11 @@ File: or1ksim.info,  Node: Verification API Configuration,  Next: CUC Configurat
 -------------------------------------------
 
 The Verification API (VAPI) provides a TCP/IP interface to allow
-components of the simulation to be controlled externally. *Note
+components of the simulation to be controlled externally.  *Note
 Verification API: Verification API, for more details.
 
-Verification API configuration is described in `section vapi'. This
-section may appear at most once. The following parameters may be
+Verification API configuration is described in `section vapi'.  This
+section may appear at most once.  The following parameters may be
 specified.
 
 `enabled = 0|1'
@@ -854,29 +874,29 @@ specified.
 
 `server_port = VALUE'
      When VAPI is enabled, communication will be via TCP/IP on the port
-     specified by VALUE. The value must lie in the range 1 to 65535.
+     specified by VALUE.  The value must lie in the range 1 to 65535.
      The default value is 50000.
 
-          Tip: There is no registered port for Or1ksim VAPI. Good
+          Tip: There is no registered port for Or1ksim VAPI.  Good
           practice suggests users should adopt port values in the
-          "Dynamic" or "Private" port range, i.e. 49152-65535.
+          "Dynamic" or "Private" port range, i.e.  49152-65535.
 
 `log_enabled = 0|1'
      If 1 (true), all VAPI requests and sent commands will be logged.
-     If 0 (the default), logging is diabled. Logs are written to the
+     If 0 (the default), logging is diabled.  Logs are written to the
      file specified by the `vapi_log_file' field (see below).
 
           Caution: This can generate a substantial amount of file I/O
           and seriously degrade simulator performance.
 
 `hide_device_id = 0|1'
-     If 1 (true) don't log the device ID. If 0 (the default), log the
-     device ID. This feature (when set to 1) is provided for backwards
+     If 1 (true) don't log the device ID.  If 0 (the default), log the
+     device ID.  This feature (when set to 1) is provided for backwards
      compatibility with an old version of VAPI.
 
 `vapi_log_file = "FILENAME"'
      Use `filename' as the file for logged data is logging is enabled
-     (see `log_enabled' above). The default is `"vapi.log"'. For
+     (see `log_enabled' above).  The default is `"vapi.log"'.  For
      backwards compatibility, the alternative name `vapi_log_fn' is
      supported for this parameter, but deprecated.
 
@@ -888,12 +908,12 @@ File: or1ksim.info,  Node: CUC Configuration,  Prev: Verification API Configurat
 ----------------------------------------------
 
 The Custom Unit Compiler (CUC) was a project by Marko Mlinar to generate
-Verilog from ANSI C functions. The project seems to not have progressed
-beyond the initial prototype phase. The configuration parameters are
+Verilog from ANSI C functions.  The project seems to not have progressed
+beyond the initial prototype phase.  The configuration parameters are
 described here for the record.
 
-CUC configuration is described in `section cuc'. This section may
-appear at most once. The following parameters may be specified.
+CUC configuration is described in `section cuc'.  This section may
+appear at most once.  The following parameters may be specified.
 
 `memory_order = none|weak|strong|exact'
      This parameter specifies the memory ordering required:
@@ -902,33 +922,33 @@ appear at most once. The following parameters may be specified.
           Different memory ordering, even if there are dependencies.
           Bursts can be made, width can change.
 
-          Different memory ordering, even if there are dependencies. If
+          Different memory ordering, even if there are dependencies.  If
           dependencies cannot occur, then bursts can be made, width can
           change.
 
-          Same memory ordering. Bursts can be made, width can change.
+          Same memory ordering.  Bursts can be made, width can change.
 
           Exactly the same memory ordering and widths.
 
 
-     The default value is `memory_order=exact'. Invalid memory
+     The default value is `memory_order=exact'.  Invalid memory
      orderings are ignored with a warning.
 
 `calling_convention = 0|1'
-     If 1 (true), programs follow OpenRISC calling conventions. If 0
+     If 1 (true), programs follow OpenRISC calling conventions.  If 0
      (the default), they may use other convenitions.
 
 `enable_bursts = 0 | 1'
-     If 1 (true), bursts are detected. If 0 (the default), bursts are
+     If 1 (true), bursts are detected.  If 0 (the default), bursts are
      not detected.
 
 `no_multicycle = 0 | 1'
-     If 1 (true), no multicycle logic paths will be generated. If 0 (the
-     default), multicycle logic paths will be generated.
+     If 1 (true), no multicycle logic paths will be generated.  If 0
+     (the default), multicycle logic paths will be generated.
 
 `timings_file = "FILENAME"'
-     FILENAME specifies a file containing timing information. The
-     default value is `"virtex.tim"'. For backwards compatibility, the
+     FILENAME specifies a file containing timing information.  The
+     default value is `"virtex.tim"'.  For backwards compatibility, the
      alternative name `timings_fn' is supported for this parameter, but
      deprecated.
 
@@ -956,8 +976,8 @@ File: or1ksim.info,  Node: CPU Configuration,  Next: Memory Configuration,  Up: 
 3.3.1 CPU Configuration
 -----------------------
 
-CPU configuration is described in `section cpu'. This section should
-appear only once. At present Or1ksim does not model multi-CPU systems.
+CPU configuration is described in `section cpu'.  This section should
+appear only once.  At present Or1ksim does not model multi-CPU systems.
 The following parameters may be specified.
 
 `ver = VALUE'
@@ -966,13 +986,13 @@ The following parameters may be specified.
 
 `rev = VALUE'
      The values are used to form the corresponding fields in the `VR'
-     Special Purpose Register (SPR 0). Default values 0. A warning is
+     Special Purpose Register (SPR 0).  Default values 0.  A warning is
      given and the value truncated if it is too large (8 bits for `ver'
      and `cfg', 6 bits for `rev').
 
 `upr = VALUE'
      Used as the value of the Unit Present Register (UPR) Special
-     Purpose Register (SPR 1) to VALUE. Default value is 0x0000075f,
+     Purpose Register (SPR 1) to VALUE.  Default value is 0x0000075f,
      i.e.
         * UPR present (0x00000001)
 
@@ -998,17 +1018,17 @@ The following parameters may be specified.
 
 `cfgr = VALUE'
      Sets the CPU configuration register (Special Purpose Register 2) to
-     VALUE. Default value is 0x00000020, i.e. support for the ORBIS32
-     instruction set. Attempts to set any other value are accepted, but
+     VALUE.  Default value is 0x00000020, i.e.  support for the ORBIS32
+     instruction set.  Attempts to set any other value are accepted, but
      issue a warning that there is no support for the instruction set.
 
 `sr = VALUE'
      Sets the supervision register Special Purpose Register (SPR 0x11)
-     to VALUE. Default value is 0x00008001, i.e. start in supervision
+     to VALUE.  Default value is 0x00008001, i.e.  start in supervision
      mode (0x00000001) and set the "Fixed One" bit (0x00008000).
 
 `superscalar = 0|1'
-     If 1, the processor operates in superscalar mode. Default value is
+     If 1, the processor operates in superscalar mode.  Default value is
      0.
 
      In the current simulator, the only functional effect of superscalar
@@ -1019,8 +1039,8 @@ The following parameters may be specified.
           well tested, so users are advised not to use this option.
 
 `hazards = 0|1'
-     If 1, data hazards are tracked in a superscalar CPU. Default value
-     is 0.
+     If 1, data hazards are tracked in a superscalar CPU.  Default
+     value is 0.
 
      In the current simulator, the only functional effect is to cause
      logging of hazard waiting information if the CPU is superscalar.
@@ -1034,8 +1054,8 @@ The following parameters may be specified.
           well tested, so users are advised not to use this option.
 
 `dependstats = 0|1'
-     If 1, inter-instruction dependencies are calculated. Default value
-     0.
+     If 1, inter-instruction dependencies are calculated.  Default
+     value 0.
 
      If these values are calculated, the depencies can be displayed
      using the simulator's `stat' command.
@@ -1047,9 +1067,9 @@ The following parameters may be specified.
 
 `sbuf_len = VALUE'
      The length of the store buffer is set to VALUE, which must be no
-     greater than 256. Larger values will be truncated to 256 with a
-     warning. Negative values will be treated as 0 with a warning. Use
-     0 to disable the store buffer.
+     greater than 256.  Larger values will be truncated to 256 with a
+     warning.  Negative values will be treated as 0 with a warning.
+     Use 0 to disable the store buffer.
 
      When the store buffer is active, stores are accumulated and
      committed when I/O is idle.
@@ -1061,16 +1081,16 @@ File: or1ksim.info,  Node: Memory Configuration,  Next: Memory Management Config
 3.3.2 Memory Configuration
 --------------------------
 
-Memory configuration is described in `section memory'. This section may
-appear multiple times, specifying multiple blocks of memory. The
+Memory configuration is described in `section memory'.  This section
+may appear multiple times, specifying multiple blocks of memory.  The
 following parameters may be specified.
 
 `type=random|pattern|unknown|zero'
-     Specifies the values to which memory should be initialized. The
+     Specifies the values to which memory should be initialized.  The
      default value is `unknown'.
 
     `random'
-          Set the memory values to be a random value. A seed for the
+          Set the memory values to be a random value.  A seed for the
           random generator may be set using the `random_seed' field in
           this section (see below), thus ensuring the same "random"
           values are used each time.
@@ -1080,11 +1100,11 @@ following parameters may be specified.
           using the `pattern' field in this section (see below).
 
     `unknown'
-          The memory values are not initialized (i.e. left "unknown").
+          The memory values are not initialized (i.e.  left "unknown").
           This option will yield faster initialization of the simulator.
 
     `zero'
-          Set the memory values to be 0. This is the equivalent of
+          Set the memory values to be 0.  This is the equivalent of
           `type=pattern' and a `pattern' value of 0, and implemented as
           such.
 
@@ -1095,35 +1115,36 @@ following parameters may be specified.
 
 
 `random_seed = VALUE'
-     Set the seed for the random number generator to VALUE. This only
+     Set the seed for the random number generator to VALUE.  This only
      has any effect for memory type `random'.
 
      The default value is -1, which means the seed will be set from a
      call to the `time' function, thus ensuring different random values
-     are used on each run. The simulator prints out the seed used in
+     are used on each run.  The simulator prints out the seed used in
      this case, allowing repeat runs to regenerate the same random
      values used in any particular run.
 
 `pattern = VALUE'
-     Set the pattern to be used when initializing memory to VALUE. The
-     default value is 0. This only has any effect for memory type
-     `pattern'. The least significant 8 bits of this value is used to
-     initialize each byte. More than 8 bits can be specified, but will
+     Set the pattern to be used when initializing memory to VALUE.  The
+     default value is 0.  This only has any effect for memory type
+     `pattern'.  The least significant 8 bits of this value is used to
+     initialize each byte.  More than 8 bits can be specified, but will
      ignored with a warning.
 
           Tip: The default value, is equivalent to setting the memory
-          `type' to be `zero'. If that is what is intended, then using
+          `type' to be `zero'.  If that is what is intended, then using
           `type=zero' explicitly is better than using `type=pattern'
           and not specifying a value for `pattern'.
 
 `baseaddr = VALUE'
-     Set the base address of the memory to VALUE. It should be aligned
+     Set the base address of the memory to VALUE.  It should be aligned
      to a multiple of the memory size rounded up to the nearest 2^n.
      The default value is 0.
 
 `size = VALUE'
-     Set the size of the memory block to be VALUE bytes. This should be
-     a multiple of 4 (i.e. word aligned). The default value is 1024.
+     Set the size of the memory block to be VALUE bytes.  This should
+     be a multiple of 4 (i.e.  word aligned).  The default value is
+     1024.
 
           Note: When allocating memory, the simulator will allocate the
           nearest 2^n bytes greater than or equal to VALUE, and will not
@@ -1131,53 +1152,53 @@ following parameters may be specified.
           and the amount allocated.
 
           As a consequence users are strongly recommended to specify
-          memory sizes that are an exact power of 2. If some other
+          memory sizes that are an exact power of 2.  If some other
           amount of memory is required, it should be specified as
           separate, contiguous blocks, each of which is a power of 2 in
           size.
 
 `name = "TEXT"'
-     Name the block. Typically these describe the type of memory being
-     modeled (thus `"SRAM"' or `"Flash"'. The default is
+     Name the block.  Typically these describe the type of memory being
+     modeled (thus `"SRAM"' or `"Flash"'.  The default is
      `"anonymous memory block"'.
 
           Note: It is not clear that this information is currently ever
-          used in normal operation of the simulator. Even the `info'
+          used in normal operation of the simulator.  Even the `info'
           command of the simulator ignores it.
 
 `ce = VALUE'
-     Set the chip enable index of the memory instance. Each memory
+     Set the chip enable index of the memory instance.  Each memory
      instance should have a unique chip enable index, which should be
-     greater than or equal to zero. This is used by the memory
+     greater than or equal to zero.  This is used by the memory
      controller when identifying different memory instances.
 
      The default value is -1 (invalid).
 
 `mc = VALUE'
-     Specifies the memory controller this memory is connected to. It
+     Specifies the memory controller this memory is connected to.  It
      should correspond to the `index' field specified in a `section mc'
      for a memory controller (*note Memory Controller Configuration:
      Memory Controller Configuration.).
 
      Default value is 0, which is also the default value of a memory
-     controller `index' field. This is suitable therefore for designs
+     controller `index' field.  This is suitable therefore for designs
      with just one memory controller.
 
 `delayr = VALUE'
-     The number of cycles required for a read access. Set to -1 if the
-     memory does not support reading. Default value 1. The simulator
+     The number of cycles required for a read access.  Set to -1 if the
+     memory does not support reading.  Default value 1.  The simulator
      will add this number of cycles to the total instruction cycle
      count when reading from main memory.
 
 `delayw = VALUE'
-     The number of cycles required for a write access. Set to -1 if the
-     memory does not support writing. Default value 1. The simulator
+     The number of cycles required for a write access.  Set to -1 if the
+     memory does not support writing.  Default value 1.  The simulator
      will add this number of cycles to the total instruction cycle
      count when writing to main memory.
 
 `log = "FILE"'
      If specified, `file' names a file for all memory accesses to be
-     logged. If not specified, the default value, NULL is used, meaning
+     logged.  If not specified, the default value, NULL is used, meaning
      that the memory is not logged.
 
 
@@ -1189,55 +1210,55 @@ File: or1ksim.info,  Node: Memory Management Configuration,  Next: Cache Configu
 
 Memory Management Unit (MMU) configuration is described in `section
 dmmu' (for the data MMU) and `section immu' (for the instruction MMU).
-Each section should appear at most once. The following parameters may
+Each section should appear at most once.  The following parameters may
 be specified.
 
 `enabled = 0|1'
      If 1 (true), the data or instruction (as appropriate) MMU is
-     enabled. If 0 (the default), it is disabled.
+     enabled.  If 0 (the default), it is disabled.
 
 `nsets = VALUE'
      Sets the number of data or instruction (as appropriate) TLB sets to
-     VALUE, which must be a power of two, not exceeding 128. Values
-     which do not fit these criteria are ignored with a warning. The
+     VALUE, which must be a power of two, not exceeding 128.  Values
+     which do not fit these criteria are ignored with a warning.  The
      default value is 1.
 
 `nways = VALUE'
      Sets the number of data or instruction (as appropriate) TLB ways to
-     VALUE. The value must be in the range 1 to 4. Values outside this
-     range are ignored with a warning. The default value is 1.
+     VALUE.  The value must be in the range 1 to 4.  Values outside
+     this range are ignored with a warning.  The default value is 1.
 
 `pagesize = VALUE'
      The data or instruction (as appropriate) MMU page size is set to
-     VALUE, which must be a power of 2. Values which are not a power of
-     2 are ignored with a warning. The default is 8192 (0x2000).
+     VALUE, which must be a power of 2.  Values which are not a power
+     of 2 are ignored with a warning.  The default is 8192 (0x2000).
 
 `entrysize = VALUE'
      The data or instruction (as appropriate) MMU entry size is set to
-     VALUE, which must be a power of 2. Values which are not a power of
-     2 are ignored with a warning. The default value is 1.
+     VALUE, which must be a power of 2.  Values which are not a power
+     of 2 are ignored with a warning.  The default value is 1.
 
           Note: Or1ksim does not appear to use the `entrysize' parameter
-          in its simulation of the MMUs. Thus setting this value does
+          in its simulation of the MMUs.  Thus setting this value does
           not seem to matter.
 
 `ustates = VALUE'
      The number of instruction usage states for the data or instruction
      (as appropriate) MMU is set to VALUE, which must be 2, 3 or 4.
-     Values outside this range are ignored with a warning. The default
+     Values outside this range are ignored with a warning.  The default
      value is 2.
 
           Note: Or1ksim does not appear to use the `ustates' parameter
-          in its simulation of the MMUs. Thus setting this value does
+          in its simulation of the MMUs.  Thus setting this value does
           not seem to matter.
 
 `hitdelay = VALUE'
      Set the number of cycles a data or instruction (as appropriate) MMU
-     hit costs. Default value 1.
+     hit costs.  Default value 1.
 
 `missdelay = VALUE'
      Set the number of cycles a data or instruction (as appropriate) MMU
-     miss costs. Default value 1.
+     miss costs.  Default value 1.
 
 
 
@@ -1247,30 +1268,30 @@ File: or1ksim.info,  Node: Cache Configuration,  Next: Interrupt Configuration, 
 -------------------------
 
 Cache configuration is described in `section dc' (for the data cache)
-and `seciton ic' (for the instruction cache). Each section should
-appear at most once. The following parameters may be specified.
+and `seciton ic' (for the instruction cache).  Each section should
+appear at most once.  The following parameters may be specified.
 
 `enabled = 0|1'
      If 1 (true), the data or instruction (as appropriate) cache is
-     enabled. If 0 (the default), it is disabled.
+     enabled.  If 0 (the default), it is disabled.
 
 `nsets = VALUE'
      Sets the number of data or instruction (as appropriate) cache sets
      to VALUE, which must be a power of two, not exceeding
      `MAX_DC_SETS' (for the data cache) or `MAX_IC_SETS' (for the
-     instruction cache). At the time of writing, these constants are
-     both defined in the code to be 1024). The default value is 1.
+     instruction cache).  At the time of writing, these constants are
+     both defined in the code to be 1024).  The default value is 1.
 
 `nways = VALUE'
      Sets the number of data or instruction (as appropriate) cache ways
      to VALUE, which must be a power of two, not exceeding
      `MAX_DC_WAYS' (for the data cache) or `MAX_IC_WAYS' (for the
-     instruction cache). At the time of writing, these constants are
-     both defined in the code to be 32). The default value is 1.
+     instruction cache).  At the time of writing, these constants are
+     both defined in the code to be 32).  The default value is 1.
 
 `blocksize = VALUE'
      The data or instruction (as appropriate) cache block size is set to
-     VALUE bytes, which must be either 16 or 32. The default is 16.
+     VALUE bytes, which must be either 16 or 32.  The default is 16.
 
 `ustates = VALUE'
      The number of instruction usage states for the data or instruction
@@ -1278,28 +1299,28 @@ appear at most once. The following parameters may be specified.
      The default value is 2.
 
 `hitdelay = VALUE'
-     _Instruction cache only_. Set the number of cycles an instruction
-     cache hit costs. Default value 1.
+     _Instruction cache only_.  Set the number of cycles an instruction
+     cache hit costs.  Default value 1.
 
 `missdelay = VALUE'
-     _Instruction cache only_. Set the number of cycles an instruction
-     cache miss costs. Default value 1.
+     _Instruction cache only_.  Set the number of cycles an instruction
+     cache miss costs.  Default value 1.
 
 `load_hitdelay = VALUE'
-     _Data cache only_. Set the number of cycles a data load cache hit
-     costs. Default value 2.
+     _Data cache only_.  Set the number of cycles a data load cache hit
+     costs.  Default value 2.
 
 `load_missdelay = VALUE'
-     _Data cache only_. Set the number of cycles a data load cache miss
-     costs. Default value 2.
+     _Data cache only_.  Set the number of cycles a data load cache
+     miss costs.  Default value 2.
 
 `store_hitdelay = VALUE'
-     _Data cache only_. Set the number of cycles a data store cache hit
-     costs. Default value 0.
+     _Data cache only_.  Set the number of cycles a data store cache hit
+     costs.  Default value 0.
 
 `store_missdelay = VALUE'
-     _Data cache only_. Set the number of cycles a data store cache
-     miss costs. Default value 0.
+     _Data cache only_.  Set the number of cycles a data store cache
+     miss costs.  Default value 0.
 
 
 
@@ -1309,17 +1330,17 @@ File: or1ksim.info,  Node: Interrupt Configuration,  Next: Power Management Conf
 -----------------------------
 
 Programmable Interrupt Controller (PIC) configuration is described in
-`section pic'. This section may appear at most once--Or1ksim has no
-mechanism for handling multiple interrupt controllers. The following
+`section pic'.  This section may appear at most once--Or1ksim has no
+mechanism for handling multiple interrupt controllers.  The following
 parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true), the programmable interrupt controller is enabled. If 0
-     (the default), it is disabled.
+     If 1 (true), the programmable interrupt controller is enabled.  If
+     0 (the default), it is disabled.
 
 `edge_trigger = 0|1'
      If 1 (true, the default), the programmable interrupt controller is
-     edge triggered. If 0 (false), it is level triggered.
+     edge triggered.  If 0 (false), it is level triggered.
 
 
 
@@ -1328,7 +1349,7 @@ File: or1ksim.info,  Node: Power Management Configuration,  Next: Branch Predict
 3.3.6 Power Management Configuration
 ------------------------------------
 
-Power management implementation is incomplete. At present the effect
+Power management implementation is incomplete.  At present the effect
 (which only happens when the power management unit is enabled) of
 setting the different bits in the power management Special Purpose
 Register (PMR, SPR 0x4000) is
@@ -1339,7 +1360,7 @@ Register (PMR, SPR 0x4000) is
 `DME (bit mask 0x00000010)'
 `SME (bit mask 0x00000020)'
      Both these bits cause the processor to stop executing
-     instructions. However all other functions (debug interaction, CLI,
+     instructions.  However all other functions (debug interaction, CLI,
      VAPI etc) carry on as normal.
 
 `DCGE (bit mask 0x00000004)'
@@ -1352,13 +1373,13 @@ Register (PMR, SPR 0x4000) is
 
 On reset all bits are cleared.
 
-Power management configuration is described in `section pm'. This
-section may appear at most once. The following parameter may be
+Power management configuration is described in `section pm'.  This
+section may appear at most once.  The following parameter may be
 specified.
 
 `enabled = 0|1'
-     If 1 (true), power management is enabled. If 0 (the default), it is
-     disabled.
+     If 1 (true), power management is enabled.  If 0 (the default), it
+     is disabled.
 
 
 
@@ -1368,15 +1389,15 @@ File: or1ksim.info,  Node: Branch Prediction Configuration,  Next: Debug Interfa
 -------------------------------------
 
 From examining the code base, it seems the branch prediction function
-is not fully implemented. At present the functionality seems restricted
-to collection of statistics.
+is not fully implemented.  At present the functionality seems
+restricted to collection of statistics.
 
-Branch prediction configuration is described in `section bpb'. This
-section may appear at most once. The following parameters may be
+Branch prediction configuration is described in `section bpb'.  This
+section may appear at most once.  The following parameters may be
 specified.
 
 `enabled = 0|1'
-     If 1 (true), branch prediction is enabled. If 0 (the default), it
+     If 1 (true), branch prediction is enabled.  If 0 (the default), it
      is disabled.
 
 `btic = 0|1'
@@ -1384,21 +1405,21 @@ specified.
      If 0 (the default), it is disabled.
 
 `sbp_bf_fwd = 0|1'
-     If 1 (true), use forward prediction for the `l.bf' instruction. If
+     If 1 (true), use forward prediction for the `l.bf' instruction.  If
      0 (the default), do not use forward prediction for this
      instruction.
 
 `sbp_bnf_fwd = 0|1'
-     If 1 (true), use forward prediction for the `l.bnf' instruction. If
-     0 (the default), do not use forward prediction for this
+     If 1 (true), use forward prediction for the `l.bnf' instruction.
+     If 0 (the default), do not use forward prediction for this
      instruction.
 
 `hitdelay = VALUE'
-     Set the number of cycles a branch prediction hit costs. Default
+     Set the number of cycles a branch prediction hit costs.  Default
      value 0.
 
 `missdelay = VALUE'
-     Set the number of cycles a branch prediction miss costs. Default
+     Set the number of cycles a branch prediction miss costs.  Default
      value 0.
 
 
@@ -1409,23 +1430,23 @@ File: or1ksim.info,  Node: Debug Interface Configuration,  Prev: Branch Predicti
 -----------------------------------
 
 The debug unit and debug interface configuration is described in
-`section debug'. This section may appear at most once. The following
+`section debug'.  This section may appear at most once.  The following
 parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true), the debug unit is enabled. If 0 (the default), it is
+     If 1 (true), the debug unit is enabled.  If 0 (the default), it is
      disabled.
 
           Note: This enables the functionality of the debug unit (its
-          registers etc) within the mode. It does not provide any
-          external interface to the debug unit. For that, see
+          registers etc) within the mode.  It does not provide any
+          external interface to the debug unit.  For that, see
           `gdb_enabled' and `rsp_enabled' below.
 
 `rsp_enabled = 0|1'
      If 1 (true), the GDB "Remote Serial Protocol" server is started,
      provding an interface to an external GNU debugger, using the port
      specified in the `rsp_port' field (see below), or the
-     `or1ksim-rsp' TCP/IP service. If 0 (the default), the server is
+     `or1ksim-rsp' TCP/IP service.  If 0 (the default), the server is
      not started, and no external interface is provided.
 
      For more detailed information on the interface to the GNU Debugger
@@ -1433,27 +1454,27 @@ parameters may be specified.
      Practical Experience with the OpenRISC 1000 Architecture', by
      Jeremy Bennett, published by Embecosm Limited (`www.embecosm.com').
 
-          Note: `rsp_enabled' may not be enabled with `gdb_enabled'
-          (see below). If both are enabled, a warning is issued and
-          only the "Remote Serial Protocol" interface is enabled.
+          Note: `rsp_enabled' may not be enabled with `gdb_enabled' (see
+          below).  If both are enabled, a warning is issued and only
+          the "Remote Serial Protocol" interface is enabled.
 
 `rsp_port = VALUE'
      VALUE specifies the port to be used for the GDB "Remote Serial
-     Protocol" interface to the GNU Debugger (GDB). Default value
-     51000. If the value 0 is specified, Or1ksim will instead look for
+     Protocol" interface to the GNU Debugger (GDB).  Default value
+     51000.  If the value 0 is specified, Or1ksim will instead look for
      a TCP/IP service named `or1ksim-rsp'.
 
           Tip: There is no registered port for Or1ksim "Remote Serial
-          Protocol" service `or1ksim-rsp'. Good practice suggests users
-          should adopt port values in the "Dynamic" or "Private" port
-          range, i.e. 49152-65535.
+          Protocol" service `or1ksim-rsp'.  Good practice suggests
+          users should adopt port values in the "Dynamic" or "Private"
+          port range, i.e.  49152-65535.
 
 `gdb_enabled = 0|1'
      If 1 (true), the OpenRISC Remote JTAG protocol server is started,
      provding an interface to an external GNU debugger, using the port
      specified in the `server_port' field (see below), or the `or1ksim'
-     TCP/IP service. If 0 (the default), the server is not started, and
-     no external interface is provided.
+     TCP/IP service.  If 0 (the default), the server is not started,
+     and no external interface is provided.
 
      For more detailed information on the interface to the GNU Debugger
      see Embecosm Application Note 2, `Howto: Porting the GNU Debugger
@@ -1461,35 +1482,35 @@ parameters may be specified.
      Jeremy Bennett, published by Embecosm Limited (`www.embecosm.com').
 
           Note: The OpenRISC Remote JTAG protocol is unique to
-          OpenRISC, and remains only for backward compatibility. New
+          OpenRISC, and remains only for backward compatibility.  New
           users should adopt the standard GDB "Remote Serial Protocol"
           interface (see `rsp_enabled' above) providing access to a
           wider range of GDB functionality.
 
-          Note: `gdb_enabled' may not be enabled with `rsp_enabled'. If
-          both are enabled, a warning is issued and only the "Remote
+          Note: `gdb_enabled' may not be enabled with `rsp_enabled'.
+          If both are enabled, a warning is issued and only the "Remote
           Serial Protocol" interface is enabled.
 
 `server_port = VALUE'
      VALUE specifies the port to be used for the OpenRISC Rmote JTAG
-     protocol interface to the GNU Debugger (GDB). Default value 51000.
-     If the value 0 is specified, Or1ksim will instead look for a TCP/IP
-     service named `or1ksim'.
+     protocol interface to the GNU Debugger (GDB).  Default value
+     51000.  If the value 0 is specified, Or1ksim will instead look for
+     a TCP/IP service named `or1ksim'.
 
           Tip: There is no registered port for Or1ksim Remote JTAG
-          Interface or service `or1ksim'. Good practice suggests users
+          Interface or service `or1ksim'.  Good practice suggests users
           should adopt port values in the "Dynamic" or "Private" port
-          range, i.e. 49152-65535.
+          range, i.e.  49152-65535.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the debug unit. *Note Verification API:
+     address to be used with the debug unit.  *Note Verification API:
      Verification API, for more details.
 
      If this is specified and VALUE is non-zero, all OpenRISC Remote
      JTAG protocol transactions will be logged to the VAPI log file, if
-     enabled. This is the only functionality associated with VAPI for
-     the debug unit. No VAPI commands are sent, nor requests handled.
+     enabled.  This is the only functionality associated with VAPI for
+     the debug unit.  No VAPI commands are sent, nor requests handled.
 
 
 
@@ -1498,7 +1519,7 @@ File: or1ksim.info,  Node: Peripheral Configuration,  Prev: Core OpenRISC Config
 3.4 Configuring Memory Mapped Peripherals
 =========================================
 
-All peripheral components are optional. If they are specified, then
+All peripheral components are optional.  If they are specified, then
 (unlike other components) by default they are enabled.
 
 * Menu:
@@ -1521,29 +1542,30 @@ File: or1ksim.info,  Node: Memory Controller Configuration,  Next: UART Configur
 -------------------------------------
 
 The memory controller used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `mem_ctrl'. It is
+OpenCores, and found in the top level CVS directory, `mem_ctrl'.  It is
 described in the document `Memory Controller IP Core' by Rudolf
-Usselmann, which can be found in the `doc' subdirectory. It is a memory
-mapped component, which resides on the main OpenRISC Wishbone data bus.
+Usselmann, which can be found in the `doc' subdirectory.  It is a
+memory mapped component, which resides on the main OpenRISC Wishbone
+data bus.
 
-The memory controller configuration is described in `section mc'. This
+The memory controller configuration is described in `section mc'.  This
 section may appear multiple times, specifying multiple memory
-controllers. The following parameters may be specified.
+controllers.  The following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this memory controller is enabled. If 0,
-     it is disabled.
+     If 1 (true, the default), this memory controller is enabled.  If
+     0, it is disabled.
 
           Note: The memory controller can effectively also be disabled
           by setting an appropriate power on control register value
-          (see below). However this should only be used if it is
+          (see below).  However this should only be used if it is
           desired to specifically model this behavior of the memory
           controller, not as a way of disabling the memory controller
           in general.
 
 `baseaddr = VALUE'
      Set the base address of the memory controller's memory mapped
-     registers to VALUE. The default is 0, which is probably not a
+     registers to VALUE.  The default is 0, which is probably not a
      sensible value.
 
      The memory controller has a 7 bit address bus, with a total of 19
@@ -1565,7 +1587,7 @@ controllers. The following parameters may be specified.
 
 `index = VALUE'
      Specify the index of this memory controller amongst all the memory
-     controllers. This value should be unique for each memory
+     controllers.  This value should be unique for each memory
      controller, and is used to associate specific memories with the
      controller, through the `mc' field in the `section memory'
      configuration (*note Memory Configuration: Memory Configuration.).
@@ -1581,23 +1603,23 @@ File: or1ksim.info,  Node: UART Configuration,  Next: DMA Configuration,  Prev: 
 ------------------------
 
 The UART implemented in Or1ksim follows the specification of the
-National Semiconductor 16450 and 16550 parts. It is a memory mapped
+National Semiconductor 16450 and 16550 parts.  It is a memory mapped
 component, which resides on the main OpenRISC Wishbone data bus.
 
 The component provides a number of interfaces to emulate the behavior
 of an external terminal connected to the UART.
 
-UART configuration is described in `section uart'. This section may
-appear multiple times, specifying multiple UARTs. The following
+UART configuration is described in `section uart'.  This section may
+appear multiple times, specifying multiple UARTs.  The following
 parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this UART is enabled. If 0, it is
+     If 1 (true, the default), this UART is enabled.  If 0, it is
      disabled.
 
 `baseaddr = VALUE'
      Set the base address of the UART's memory mapped registers to
-     VALUE. The default is 0, which is probably not a sensible value.
+     VALUE.  The default is 0, which is probably not a sensible value.
 
      The UART has a 3 bit address bus, with a total of 8 8-bit
      registers, at addresses 0x0 through 0x7.
@@ -1614,9 +1636,9 @@ parameters may be specified.
     `channel="xterm:ARGS"'
           Create an xterm on startup, write UART Tx traffic to the
           xterm and take Rx traffic from the keyboard when the xterm
-          window is selected. Additional arguments to the xterm command
-          (for example specifying window size may be specified in ARGS,
-          or this may be left blank.
+          window is selected.  Additional arguments to the xterm
+          command (for example specifying window size may be specified
+          in ARGS, or this may be left blank.
 
     `channel="tcp:VALUE"'
           Open the TCP/IP port specified by VALUE and read and write
@@ -1626,10 +1648,10 @@ parameters may be specified.
           this port.
 
                Tip: There is no registered port for Or1ksim telnet UART
-               connection. Priviledged access is required to read
+               connection.  Priviledged access is required to read
                traffic on the registered "well-known" telnet port (23).
                Instead users should use port values in the "Dynamic" or
-               "Private" port range, i.e. 49152-65535.
+               "Private" port range, i.e.  49152-65535.
 
     `channel="fd:`rxfd',`txfd'"'
           Read and write characters from and to the existing open
@@ -1644,23 +1666,23 @@ parameters may be specified.
      The default value for this field is `"xterm:"'.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this UART. Default value 0.
+     Use VALUE as the IRQ number of this UART.  Default value 0.
 
 `16550 = 0|1'
-     If 1 (true), the UART has the functionality of a 16550. If 0 (the
-     default), it has the functionality of a 16450. The principal
+     If 1 (true), the UART has the functionality of a 16550.  If 0 (the
+     default), it has the functionality of a 16450.  The principal
      difference is that the 16550 can buffer multiple characters.
 
 `jitter = VALUE'
      Set the jitter, modeled as a time to block, to VALUE milliseconds.
-     Set to -1 to disable jitter modeling. Default value 0.
+     Set to -1 to disable jitter modeling.  Default value 0.
 
           Note: This functionality has yet to be implemented, so this
           parameter has no effect.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the UART. *Note Verification API:
+     address to be used with the UART.  *Note Verification API:
      Verification API, for more details, which details the use of the
      VAPI with the UART.
 
@@ -1672,39 +1694,39 @@ File: or1ksim.info,  Node: DMA Configuration,  Next: Ethernet Configuration,  Pr
 -----------------------
 
 The DMA controller used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `wb_dma'. It is
+OpenCores, and found in the top level CVS directory, `wb_dma'.  It is
 described in the document `Wishbone DMA/Bridge IP Core' by Rudolf
-Usselmann, which can be found in the `doc' subdirectory. It is a memory
-mapped component, which resides on the main OpenRISC Wishbone data bus.
-The present implementation is incomplete, intended only to support the
-Ethernet interface (*note Ethernet Configuration::), although the
-Ethernet interface is not yet completed.
+Usselmann, which can be found in the `doc' subdirectory.  It is a
+memory mapped component, which resides on the main OpenRISC Wishbone
+data bus.  The present implementation is incomplete, intended only to
+support the Ethernet interface (*note Ethernet Configuration::),
+although the Ethernet interface is not yet completed.
 
-DMA configuration is described in `section dma'. This section may
-appear multiple times, specifying multiple DMA controllers. The
+DMA configuration is described in `section dma'.  This section may
+appear multiple times, specifying multiple DMA controllers.  The
 following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this DMA controller is enabled. If 0, it
-     is disabled.
+     If 1 (true, the default), this DMA controller is enabled.  If 0,
+     it is disabled.
 
 `baseaddr = VALUE'
      Set the base address of the DMA's memory mapped registers to
-     VALUE. The default is 0, which is probably not a sensible value.
+     VALUE.  The default is 0, which is probably not a sensible value.
 
      The DMA controller has a 10 bit address bus, with a total of 253
-     32-bit registers. The first 5 registers at addresses 0x000 through
-     0x010 control the overall behavior of the DMA controller. There are
-     then 31 blocks of 8 registers, controlling each of the 31 DMA
-     channels available. Addresses 0x014 through 0x01c are not used.
+     32-bit registers.  The first 5 registers at addresses 0x000 through
+     0x010 control the overall behavior of the DMA controller.  There
+     are then 31 blocks of 8 registers, controlling each of the 31 DMA
+     channels available.  Addresses 0x014 through 0x01c are not used.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this DMA controller. Default value
+     Use VALUE as the IRQ number of this DMA controller.  Default value
      0.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the DMA controller. *Note Verification
+     address to be used with the DMA controller.  *Note Verification
      API: Verification API, for more details, which details the use of
      the VAPI with the DMA controller.
 
@@ -1716,52 +1738,52 @@ File: or1ksim.info,  Node: Ethernet Configuration,  Next: GPIO Configuration,  P
 ----------------------------
 
 The Ethernet MAC used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `ethernet'. It
-also forms part of the OpenRISC SoC, ORPSoC. It is described in the
+OpenCores, and found in the top level CVS directory, `ethernet'.  It
+also forms part of the OpenRISC SoC, ORPSoC.  It is described in the
 document `Ethernet IP Core Specification' by Igor Mohor, which can be
-found in the `doc' subdirectory. It is a memory mapped component, which
-resides on the main OpenRISC Wishbone data bus.
+found in the `doc' subdirectory.  It is a memory mapped component,
+which resides on the main OpenRISC Wishbone data bus.
 
-Ethernet configuration is described in `section ethernet'. This section
-may appear multiple times, specifying multiple Ethernet interfaces. The
-following parameters may be specified.
+Ethernet configuration is described in `section ethernet'.  This
+section may appear multiple times, specifying multiple Ethernet
+interfaces.  The following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this Ethernet MAC is enabled. If 0, it is
-     disabled.
+     If 1 (true, the default), this Ethernet MAC is enabled.  If 0, it
+     is disabled.
 
 `baseaddr = VALUE'
      Set the base address of the MAC's memory mapped registers to
-     VALUE. The default is 0, which is probably not a sensible value.
+     VALUE.  The default is 0, which is probably not a sensible value.
 
      The Ethernet MAC has a 7-bit address bus, with a total of 21
-     32-bit registers. Addresses 0x54 through 0x7c are not used.
+     32-bit registers.  Addresses 0x54 through 0x7c are not used.
 
           Note: The Ethernet specification describes a Tx control
-          register, `TXCTRL', at address 0x50. However this register is
-          not implemented in the Or1ksim model.
+          register, `TXCTRL', at address 0x50.  However this register
+          is not implemented in the Or1ksim model.
 
 `dma = VALUE'
      VALUE specifies the DMA controller with which this Ethernet is
-     associated. The default value is 0.
+     associated.  The default value is 0.
 
           Note: Support for external DMA is not provided in the current
-          implementation, and this value is ignored. In any case there
+          implementation, and this value is ignored.  In any case there
           is no equivalent field to which this can be matched in the
           current DMA component implementation (*note DMA
           Configuration: DMA Configuration.).
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this Ethernet MAC. Default value 0.
+     Use VALUE as the IRQ number of this Ethernet MAC.  Default value 0.
 
 `rtx_type = 0|1'
      If 1 (true) use a socket interface to the Ethernet (see parameter
-     `sockif' below). If 0 (the default), use a file interface, reading
-     and writing from and to the files specified in the `rxfile' and
-     `txfile' parameters (see below).
+     `sockif' below).  If 0 (the default), use a file interface,
+     reading and writing from and to the files specified in the
+     `rxfile' and `txfile' parameters (see below).
 
           Note: By default the socket interface is not provided in
-          Or1ksim. If it is required, this must be requested when
+          Or1ksim.  If it is required, this must be requested when
           configuring, by use of the `--enable-ethphy' option to
           `configure'.
 
@@ -1770,7 +1792,7 @@ following parameters may be specified.
 `rx_channel = RXVALUE'
 `tx_channel = TXVALUE'
      RXVALUE specifies the DMA channel to use for receive and TXVALUE
-     the DMA channel to use for transmit. Both default to 0.
+     the DMA channel to use for transmit.  Both default to 0.
 
           Note: As noted above, support for external DMA is not
           provided in the current implementation, and so these values
@@ -1781,24 +1803,24 @@ following parameters may be specified.
      When `rtx_type' is 0 (see above), RXFILE specifies the file to use
      as input and TXFILE specifies the fie to use as output.
 
-     The file contains a sequence of packets. Each packet consists of a
-     packet length (32 bits), followed by that many bytes of data. Once
-     the input file is empty, the Ethernet MAC behaves as though there
-     were no data on the Ethernet. The default values of these
+     The file contains a sequence of packets.  Each packet consists of a
+     packet length (32 bits), followed by that many bytes of data.
+     Once the input file is empty, the Ethernet MAC behaves as though
+     there were no data on the Ethernet.  The default values of these
      parameters are `"eth_rx"' and `"eth_tx"' respectively.
 
-     The input file must exist and be readable. The output file must be
-     writable and will be created if necessary. If either of these
+     The input file must exist and be readable.  The output file must be
+     writable and will be created if necessary.  If either of these
      conditions is not met, a warning will be given.
 
 `sockif = "SERVICE"'
      When `rtx_type' is 1 (see above), SERVICE specifies the service to
-     use for communication. This may be TCP/IP or UDP/IP. The default
+     use for communication.  This may be TCP/IP or UDP/IP.  The default
      value of this parameter is `"or1ksim_eth"'.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the Ethernet PHY. *Note Verification API:
+     address to be used with the Ethernet PHY.  *Note Verification API:
      Verification API, for more details, which details the use of the
      VAPI with the DMA controller.
 
@@ -1810,35 +1832,35 @@ File: or1ksim.info,  Node: GPIO Configuration,  Next: Display Interface Configur
 ------------------------
 
 The GPIO used in Or1ksim is the component implemented at OpenCores, and
-found in the top level CVS directory, `gpio'. It is described in the
+found in the top level CVS directory, `gpio'.  It is described in the
 document `GPIO IP Core Specification' by Damjan Lampret and Goran
-Djakovic, which can be found in the `doc' subdirectory. It is a memory
+Djakovic, which can be found in the `doc' subdirectory.  It is a memory
 mapped component, which resides on the main OpenRISC Wishbone data bus.
 
-GPIO configuration is described in `section gpio'. This section may
-appear multiple times, specifying multiple GPIO devices. The following
+GPIO configuration is described in `section gpio'.  This section may
+appear multiple times, specifying multiple GPIO devices.  The following
 parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this GPIO is enabled. If 0, it is
+     If 1 (true, the default), this GPIO is enabled.  If 0, it is
      disabled.
 
 `baseaddr = VALUE'
      Set the base address of the GPIO's memory mapped registers to
-     VALUE. The default is 0, which is probably not a sensible value.
+     VALUE.  The default is 0, which is probably not a sensible value.
 
      The GPIO has a 6 bit address bus, with a total of 10 32-bit
      registers, although the number of bits that are actively used
-     varies. Addresses 0x28 through 0x3c are not used.
+     varies.  Addresses 0x28 through 0x3c are not used.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this GPIO. Default value 0.
+     Use VALUE as the IRQ number of this GPIO.  Default value 0.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the GPIO. *Note Verification API:
+     address to be used with the GPIO.  *Note Verification API:
      Verification API, for more details, which details the use of the
-     VAPI with the GPIO controller. For backwards compatibility, the
+     VAPI with the GPIO controller.  For backwards compatibility, the
      alternative name `base_vapi_id' is supported for this parameter,
      but deprecated.
 
@@ -1852,39 +1874,39 @@ File: or1ksim.info,  Node: Display Interface Configuration,  Next: Frame Buffer 
 Or1ksim models a VGA interface to an external monitor.  The VGA
 controller used in Or1ksim is the component implemented at OpenCores,
 and found in the top level CVS directory, `vga_lcd', with no support
-for the optional hardware cursors. It is described in the document
+for the optional hardware cursors.  It is described in the document
 `VGA/LCD Core v2.0 Specifications' by Richard Herveille, which can be
-found in the `doc' subdirectory. It is a memory mapped component, which
-resides on the main OpenRISC Wishbone data bus.
+found in the `doc' subdirectory.  It is a memory mapped component,
+which resides on the main OpenRISC Wishbone data bus.
 
 The current implementation provides only functionality to dump the
 screen to a file at intervals.
 
-VGA controller configuration is described in `section vga'. This
+VGA controller configuration is described in `section vga'.  This
 section may appear multiple times, specifying multiple VGA controllers.
 The following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this VGA is enabled. If 0, it is
+     If 1 (true, the default), this VGA is enabled.  If 0, it is
      disabled.
 
 `baseaddr = VALUE'
      Set the base address of the VGA controller's memory mapped
-     registers to VALUE. The default is 0, which is probably not a
+     registers to VALUE.  The default is 0, which is probably not a
      sensible value.
 
      The VGA controller has a 12-bit address bus, with 7 32-bit
      registers, at addresses 0x000 through 0x018, and two color lookup
-     tables at addresses 0x800 through 0xfff. The hardware cursor
+     tables at addresses 0x800 through 0xfff.  The hardware cursor
      registers are not implemented, so addresses 0x01c through 0x7fc
      are not used.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this VGA controller. Default value
+     Use VALUE as the IRQ number of this VGA controller.  Default value
      0.
 
 `refresh_rate = VALUE'
-     VALUE specifies number of cycles between screen dumps. Default
+     VALUE specifies number of cycles between screen dumps.  Default
      value is derived from the simulation clock cycle time (*note
      Simulator Behavior: Simulator Behavior.), to correspond to dumping
      50 times per simulated second.
@@ -1893,7 +1915,7 @@ The following parameters may be specified.
      FILE specifies the base of the filename for screen dumps.
      Successive screen dumps will be in BMP format, in files with the
      name `FILENNNN.bmp', where NNNN is a sequential count of the
-     screen dumps starting at zero. The default value is `"vga_out"'.
+     screen dumps starting at zero.  The default value is `"vga_out"'.
      For backwards compatibility, the alternative name `filename' is
      supported for this parameter, but deprecated.
 
@@ -1904,30 +1926,31 @@ File: or1ksim.info,  Node: Frame Buffer Configuration,  Next: Keyboard Configura
 3.4.7 Frame Buffer Configuration
 --------------------------------
 
-     Caution: The frame buffer is only partially implemented. Its
+     Caution: The frame buffer is only partially implemented.  Its
      configuration fields are described here, but the component should
-     not be used at this time. Like the VGA controller, it is designed
+     not be used at this time.  Like the VGA controller, it is designed
      to make screen dumps to file.
 
-Frame buffer configuration is described in `section fb'. This section
-may appear multiple times, specifying multiple frame buffers. The
+Frame buffer configuration is described in `section fb'.  This section
+may appear multiple times, specifying multiple frame buffers.  The
 following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this frame buffer is enabled. If 0, it
+     If 1 (true, the default), this frame buffer is enabled.  If 0, it
      is disabled.
 
 `baseaddr = VALUE'
      Set the base address of the frame buffer's memory mapped registers
-     to VALUE. The default is 0, which is probably not a sensible value.
+     to VALUE.  The default is 0, which is probably not a sensible
+     value.
 
      The frame buffer has an 121-bit address bus, with 4 32-bit
      registers, at addresses 0x000 through 0x00c, and a PAL lookup
-     table at addresses 0x400 through 0x4ff. Addresses 0x010 through
+     table at addresses 0x400 through 0x4ff.  Addresses 0x010 through
      0x3fc and addresses 0x500 through 0x7ff are not used.
 
 `refresh_rate = VALUE'
-     VALUE specifies number of cycles between screen dumps. Default
+     VALUE specifies number of cycles between screen dumps.  Default
      value is derived from the simulation clock cycle time (*note
      Simulator Behavior: Simulator Behavior.), to correspond to dumping
      50 times per simulated second.
@@ -1936,7 +1959,7 @@ following parameters may be specified.
      FILE specifies the base of the filename for screen dumps.
      Successive screen dumps will be in BMP format, in files with the
      name `FILENNNN.bmp', where NNNN is a sequential count of the
-     screen dumps starting at zero. The default value is `"fb_out"'.
+     screen dumps starting at zero.  The default value is `"fb_out"'.
      For backwards compatibility, the alternative name `filename' is
      supported for this parameter, but deprecated.
 
@@ -1947,38 +1970,38 @@ File: or1ksim.info,  Node: Keyboard Configuration,  Next: Disc Interface Configu
 3.4.8 Keyboard Configuration (PS2)
 ----------------------------------
 
-The PS2 interface provided by Or1ksim is not documented. It may be
+The PS2 interface provided by Or1ksim is not documented.  It may be
 based on the PS2 project at OpenCores, and found in the top level CVS
-directory, `ps2'. However this project lacks any documentation beyond
-its project webpage. Since most PS2 interfaces follow the Intel i8042
+directory, `ps2'.  However this project lacks any documentation beyond
+its project webpage.  Since most PS2 interfaces follow the Intel i8042
 standard, this is presumably what is expected with this device.
 
 The implementation only provides for keyboard support, which is
-modelled as a file of keystrokes. There is no mouse support.
+modelled as a file of keystrokes.  There is no mouse support.
 
      Caution: A standard i8042 device has two registers at addresses
-     0x60 (command) and 0x64 (status). Inspection of the code, suggests
-     that the Or1ksim component places these registers at addresses
-     0x00 and 0x04.
+     0x60 (command) and 0x64 (status).  Inspection of the code,
+     suggests that the Or1ksim component places these registers at
+     addresses 0x00 and 0x04.
 
      The port of Linux for the OpenRISC 1000, which runs on Or1ksim
      implements the i8042 device driver, anticipating these registers
-     reside at their conventional address. It seems unlikel that this
+     reside at their conventional address.  It seems unlikel that this
      code will work.
 
      This component should be used with caution.
 
-Keyboard configuration is described in `section kbd'. This section may
-appear multiple times, specifying multiple keyboard interfaces. The
+Keyboard configuration is described in `section kbd'.  This section may
+appear multiple times, specifying multiple keyboard interfaces.  The
 following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this keyboard is enabled. If 0, it is
+     If 1 (true, the default), this keyboard is enabled.  If 0, it is
      disabled.
 
 `baseaddr = VALUE'
      Set the base address of the keyboard's memory mapped registers to
-     VALUE. The default is 0, which is probably not a sensible value.
+     VALUE.  The default is 0, which is probably not a sensible value.
 
      The keyboard PS/2 interface has an 3-bit address bus, with 2 8-bit
      registers, at addresses 0x000 and 0x004.
@@ -1988,12 +2011,12 @@ following parameters may be specified.
           0x64, thus requiring at least a 7-bit bus.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this Keyboard interface. Default
+     Use VALUE as the IRQ number of this Keyboard interface.  Default
      value 0.
 
 `rxfile = "FILE"'
      `file' specifies a file containing raw key stroke data, which
-     models the input from a physical keyboard. The default value is
+     models the input from a physical keyboard.  The default value is
      `"kbd_in"'.
 
 
@@ -2005,36 +2028,36 @@ File: or1ksim.info,  Node: Disc Interface Configuration,  Next: Generic Peripher
 
 The ATA/ATAPI disc controller used in Or1ksim is the OCIDEC (OpenCores
 IDE Controller) component implemented at OpenCores, and found in the
-top level CVS directory, `ata'. It is described in the document
+top level CVS directory, `ata'.  It is described in the document
 `ATA/ATAPI-5 Core Specification' by Richard Herveille, which can be
-found in the `doc' subdirectory. It is a memory mapped component, which
-resides on the main OpenRISC Wishbone data bus.
+found in the `doc' subdirectory.  It is a memory mapped component,
+which resides on the main OpenRISC Wishbone data bus.
 
-ATA/ATAPI configuration is described in `section ata'. This section may
-appear multiple times, specifying multiple disc controllers. The
+ATA/ATAPI configuration is described in `section ata'.  This section
+may appear multiple times, specifying multiple disc controllers.  The
 following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this ATA/ATAPI interface is enabled. If
+     If 1 (true, the default), this ATA/ATAPI interface is enabled.  If
      0, it is disabled.
 
 `baseaddr = VALUE'
      Set the base address of the ATA/ATAPI interface's memory mapped
-     registers to VALUE. The default is 0, which is probably not a
+     registers to VALUE.  The default is 0, which is probably not a
      sensible value.
 
      The ATA/ATAPI PS/2 interface has an 5-bit address bus, with 8
-     32-bit registers. Depending on the version of the OCIDEC ATA/ATAPI
-     interface selected (see `dev_id' below), not all registers will be
-     available.
+     32-bit registers.  Depending on the version of the OCIDEC
+     ATA/ATAPI interface selected (see `dev_id' below), not all
+     registers will be available.
 
 `irq = VALUE'
-     Use VALUE as the IRQ number of this ATA/ATAPI interface. Default
+     Use VALUE as the IRQ number of this ATA/ATAPI interface.  Default
      value 0.
 
 `dev_id = 1|2|3'
      This parameter specifies which version of the OCIDEC ATA/ATAPI
-     interface to model. The default value is 1.
+     interface to model.  The default value is 1.
 
      Version 1 supports only the `CTRL', `STAT' and `PCTR' registers.
      Versions 2 & 3 add the `FCTR' registers, Version 3 adds the `DTR'
@@ -2042,8 +2065,8 @@ following parameters may be specified.
 
 `rev = VALUE'
      Set the VALUE as the revision of the OCIDEC ATA/ATAPI interface.
-     The default value is 1. The default value is 0. Its value should
-     be in the range 0-15. Larger values are truncated with a warning.
+     The default value is 1.  The default value is 0.  Its value should
+     be in the range 0-15.  Larger values are truncated with a warning.
      This only affects the reset value of the `STAT' register, where it
      forms bits 24-27.
 
@@ -2052,13 +2075,13 @@ following parameters may be specified.
 `pio_mode0_t4 = VALUE'
 `pio_mode0_teoc = VALUE'
      These parameters specify the timings for use with Programmed
-     Input/Output (PIO) transfers. They are specified as the number of
+     Input/Output (PIO) transfers.  They are specified as the number of
      clock cycles - 2, rounded up to the next highest integer, or zero
-     if that would be negative. The values should not exceed 255. If
+     if that would be negative.  The values should not exceed 255.  If
      they do, they will be ignored with a warning.
 
      See the ATA/ATAPI-5 specification for explanations of each of these
-     timing parameters. The default values are:
+     timing parameters.  The default values are:
 
           pio_mode0_t1   =  6
           pio_mode0_t2   = 28
@@ -2071,11 +2094,11 @@ following parameters may be specified.
      These parameters specify the timings for use with DMA transfers.
      They are specified as the number of clock cycles - 2, rounded up
      to the next highest integer, or zero if that would be negative.
-     The values should not exceed 255. If they do, they will be ignored
-     with a warning.
+     The values should not exceed 255.  If they do, they will be
+     ignored with a warning.
 
      See the ATA/ATAPI-5 specification for explanations of each of these
-     timing parameters. The default values are:
+     timing parameters.  The default values are:
 
           dma_mode0_tm   =  4
           dma_mode0_td   = 21
@@ -2085,15 +2108,15 @@ following parameters may be specified.
 3.4.9.1 ATA/ATAPI Device Configuration
 ......................................
 
-Within the `section ata', each device is specified separately. The
+Within the `section ata', each device is specified separately.  The
 device subsection is introduced by
 
      device VALUE
 
-VALUE is the device number, which should be 0 or 1. The subsection ends
-with `enddevice'. Note that if the same device number is specified more
-than once, the previous values will be overwritten. Within the `device'
-subsection, the following parameters may appear:
+VALUE is the device number, which should be 0 or 1.  The subsection
+ends with `enddevice'.  Note that if the same device number is
+specified more than once, the previous values will be overwritten.
+Within the `device' subsection, the following parameters may appear:
 
 `type = VALUE'
      VALUEspecifies the type of device: 0 (the default) for "not
@@ -2102,15 +2125,15 @@ subsection, the following parameters may appear:
 
 `file = "FILENAME"'
      `filename' specifies the file to be used for a simulated ATA
-     device if the file type (see `type' above) is 1. Default value
+     device if the file type (see `type' above) is 1.  Default value
      `"ata-FileN"', where N is the device number.
 
 `size = VALUE'
      VALUE specifies the size of a simulated ATA device if the file
-     type (see `type' above) is 1. The default value is zero.
+     type (see `type' above) is 1.  The default value is zero.
 
 `packet = 0|1'
-     If 1 (true), implement the PACKET command feature set. If 0 (the
+     If 1 (true), implement the PACKET command feature set.  If 0 (the
      default), do not implement the PACKET command feature set.
 
 `firmware = "STR"'
@@ -2118,18 +2141,18 @@ subsection, the following parameters may appear:
      Default `"02207031"'.
 
 `heads = VALUE'
-     Number of heads in the device. Default 7, use -1 to disable all
+     Number of heads in the device.  Default 7, use -1 to disable all
      heads.
 
 `sectors = VALUE'
-     Number of sectors per track in the device. Default 32.
+     Number of sectors per track in the device.  Default 32.
 
 `mwdma = 0|1|2|-1'
-     Highest multi-word DMA mode supported. Default 2, use -1 to
+     Highest multi-word DMA mode supported.  Default 2, use -1 to
      disable.
 
 `pio = 0|1|2|3|4'
-     Highest PIO mode supported. Default 4.
+     Highest PIO mode supported.  Default 4.
 
 
 
@@ -2140,22 +2163,22 @@ File: or1ksim.info,  Node: Generic Peripheral Configuration,  Prev: Disc Interfa
 
 When used as a library (*note Simulator Library: Simulator Library.),
 Or1ksim makes provision for any additional peripheral to be implemented
-externally. Any read or write access to this peripheral's memory map
-generates "upcall"s to an external handler. This interface can support
+externally.  Any read or write access to this peripheral's memory map
+generates "upcall"s to an external handler.  This interface can support
 either C or C++, and was particularly designed to facilitate support
 for OSCI SystemC (see `http://www.systemc.org').
 
 Generic peripheral configuration is described in `section generic'.
 This section may appear multiple times, specifying multiple external
-peripherals. The following parameters may be specified.
+peripherals.  The following parameters may be specified.
 
 `enabled = 0|1'
-     If 1 (true, the default), this ATA/ATAPI interface is enabled. If
+     If 1 (true, the default), this ATA/ATAPI interface is enabled.  If
      0, it is disabled.
 
 `baseaddr = VALUE'
      Set the base address of the generic peripheral's memory mapped
-     registers to VALUE. The default is 0, which is probably not a
+     registers to VALUE.  The default is 0, which is probably not a
      sensible value.
 
      The size of the memory mapped register space is controlled by the
@@ -2163,27 +2186,27 @@ peripherals. The following parameters may be specified.
 
 `size = VALUE'
      Set the size of the generic peripheral's memory mapped register
-     space to VALUE bytes. Any read or write accesses to addresses with
+     space to VALUE bytes.  Any read or write accesses to addresses with
      offsets of 0 to VALUE-1 bytes from the base address specified in
      parameter `baseaddr' (see above) will be directed to the external
      interface.
 
-     VALUE will be rounded up the nearest power of 2. It's default
-     value is zero. If VALUE is not an exact power of two, accesses to
+     VALUE will be rounded up the nearest power of 2.  It's default
+     value is zero.  If VALUE is not an exact power of two, accesses to
      address offsets of VALUE or above up to the next power of 2 will
      generate a warning, and have no effect (reads will return zero).
 
 `name = "STR"'
-     This gives the peripheral the name `"STR"'. This is used to
+     This gives the peripheral the name `"STR"'.  This is used to
      identify the peripheral in error messages and warnings, and when
-     reporting its status. The default value is
+     reporting its status.  The default value is
      `"anonymous external peripheral"'.
 
 `byte_enabled = 0|1'
 `hw_enabled = 0|1'
 `word_enabled = 0|1'
      If 1 (true, the default), these parameters respectively enable the
-     device for byte wide, half-word wide and word wide accesses. If 0,
+     device for byte wide, half-word wide and word wide accesses.  If 0,
      accesses of that width will fail.
 
 
@@ -2194,14 +2217,14 @@ File: or1ksim.info,  Node: Interactive Command Line,  Next: Verification API,  P
 **************************
 
 If started with the `-f' flag, or if interrupted with `ctrl-C', Or1ksim
-provides the user with an interactive command line. The commands
+provides the user with an interactive command line.  The commands
 available, which may not be abbreviated, are:
 
 `q'
      Exit the simulator
 
 `r'
-     Display all the General Purpose Registers (GPRs). Also shows the
+     Display all the General Purpose Registers (GPRs).  Also shows the
      just executed and next to be executed instructions symbolically
      and the state of the flag in the Supervision Register.
 
@@ -2210,7 +2233,7 @@ available, which may not be abbreviated, are:
      information as with the `r' command (see above).
 
 `run NUM [ hush ]'
-     Execute NUM instructions. The register/instruction information is
+     Execute NUM instructions.  The register/instruction information is
      displayed after each instruction, as with the `r' command (see
      above) _unless_ `hush' is specified.
 
@@ -2218,17 +2241,17 @@ available, which may not be abbreviated, are:
      Patch register REG with VALUE.
 
 `dm FROMADDR [ TOADDR ]'
-     Display memory bytes between FROMADDR and TOADDR. If TOADDR is not
-     given, 64 bytes are displayed, starting at FROMADDR.
+     Display memory bytes between FROMADDR and TOADDR.  If TOADDR is
+     not given, 64 bytes are displayed, starting at FROMADDR.
 
           Caution: The output from this command is broken (a bug).
-          Or1ksim attempts to print out 16 bytes per row. However,
+          Or1ksim attempts to print out 16 bytes per row.  However,
           instead of printing out the address at the start of each row,
           it prints the address (of the first of the 16 bytes) before
           _each_ byte.
 
 `de FROMADDR [ TOADDR ]'
-     Disassemble code between FROMADDR and TOADDR. If TOADDR is not
+     Disassemble code between FROMADDR and TOADDR.  If TOADDR is not
      given, 16 instructions are disassembled.
 
      The disassembly is entirely numerical, and gives no symbolic
@@ -2250,8 +2273,8 @@ available, which may not be abbreviated, are:
      List all set breakpoints
 
 `reset'
-     Reset the simulator. Includes modeling a reset of the processor, so
-     execution will restart from the reset vector location, 0x100.
+     Reset the simulator.  Includes modeling a reset of the processor,
+     so execution will restart from the reset vector location, 0x100.
 
 `hist'
      If saving the execution history has been configured (*note
@@ -2260,18 +2283,18 @@ available, which may not be abbreviated, are:
 
 `stall'
      Stall the processor, so that control is passed to the debug unit.
-     When stalled, the processor can execute no instructions. This
+     When stalled, the processor can execute no instructions.  This
      command is useful when debugging the JTAG interface, used by
      debuggers such as GDB.
 
 `unstall'
-     Unstall the processor, so that normal execution can continue. This
-     command is useful when debugging the JTAG interface, used by
+     Unstall the processor, so that normal execution can continue.
+     This command is useful when debugging the JTAG interface, used by
      debuggers such as GDB.
 
 `stats CATEGORY | clear'
      Print the statistics for the given CATEGORY, if available, or
-     clear if `clear' is specified. The categories are:
+     clear if `clear' is specified.  The categories are:
 
     1
           Miscellaneous statistics: branch predictions (if branch
@@ -2284,24 +2307,24 @@ available, which may not be abbreviated, are:
           various features.
 
     2
-          Instruction usage statistics. Requires hazard analysis to be
+          Instruction usage statistics.  Requires hazard analysis to be
           enabled (*note CPU Configuration: CPU Configuration.).
 
     3
-          Instruction dependency statistics. Requires hazard analysis
+          Instruction dependency statistics.  Requires hazard analysis
           to be enabled (*note CPU Configuration: CPU Configuration.).
 
     4
-          Functional unit dependency statistics. Requires hazard
+          Functional unit dependency statistics.  Requires hazard
           analysis to be enabled (*note CPU Configuration: CPU
           Configuration.).
 
     5
-          Raw register usage over time. Requires hazard analysis to be
+          Raw register usage over time.  Requires hazard analysis to be
           enabled (*note CPU Configuration: CPU Configuration.).
 
     6
-          Store buffer statistics. Requires the store buffer to be
+          Store buffer statistics.  Requires the store buffer to be
           enabled (*note CPU Configuration: CPU Configuration.).
 
 
@@ -2312,23 +2335,23 @@ available, which may not be abbreviated, are:
 
 `dv FROMADDR [ TOADDR ] [ MODULE ]'
      Dump the area of memory between FROMADDR and TOADDR as Verilog
-     code for a synchronous, 23-bit wide SRAM module, named MODULE. If
+     code for a synchronous, 23-bit wide SRAM module, named MODULE.  If
      TOADDR is not specified, then 64 bytes are dumped (as 16 32-bit
-     words). If MODULE is not specified, `or1k_mem' is used.
+     words).  If MODULE is not specified, `or1k_mem' is used.
 
      To save to a file, use the redirection function (described after
      this table, below).
 
 `dh FROMADDR [ TOADDR ]'
      Dump the area of memory between FROMADDR and TOADDR as 32-bit hex
-     numbers (no `0x', or `32'h' prefix). If TOADDR is not specified,
+     numbers (no `0x', or `32'h' prefix).  If TOADDR is not specified,
      then 64 bytes are dumped (as 16 32-bit words).
 
      To save to a file, use the redirection function (described after
      this table, below).
 
 `setdbch'
-     Toggle debug channels on/off. *Note Standalone Simulator:
+     Toggle debug channels on/off.  *Note Standalone Simulator:
      Standalone Simulator, for a description of specifying debug
      channels on the command line.
 
@@ -2338,12 +2361,12 @@ available, which may not be abbreviated, are:
      parameters and their settings.
 
 `debug'
-     Toggle the simulator debug mode. *Note Debug Interface
+     Toggle the simulator debug mode.  *Note Debug Interface
      Configuration: Debug Interface Configuration, for information on
      this parameter.
 
           Caution: This is effectively enabling or disabling the debug
-          unit. It does not effect the remote GDB debug interface.
+          unit.  It does not effect the remote GDB debug interface.
           However using the remote debug interface while the debug unit
           is disabled will lead to undefined behavior and likely crash
           Or1ksim
@@ -2353,21 +2376,21 @@ available, which may not be abbreviated, are:
      Configuration: CUC Configuration.).
 
           Caution: The CUC must be properly configured, for this to
-          succeed. In particular a timing file must be available and
-          readable. Otherwise Or1ksim will crash.
+          succeed.  In particular a timing file must be available and
+          readable.  Otherwise Or1ksim will crash.
 
 `help'
      Print out brief information about each command available.
 
 `mprofile [-vh] [-m M] [-g N] [-f FILE] FROM TO'
-     Run the memory profiling utility. This follows the same usage as
+     Run the memory profiling utility.  This follows the same usage as
      the standalone command (*note Memory Profiling Utility: Memory
      Profiling Utility.).
 
 `profile [-vhcq] [-g FILE]'
-     Run the instruction profiling utility. This follows the same usage
-     as the standalone command (*note Profiling Utility: Profiling
-     Utility.).
+     Run the instruction profiling utility.  This follows the same
+     usage as the standalone command (*note Profiling Utility:
+     Profiling Utility.).
 
 
 For all commands, it is possible to redirect the output to a file, by
@@ -2379,8 +2402,8 @@ This is particularly useful for commands dumping a large amount of
 output, such as `dv'.
 
      Caution: Unfortunately there is a serious bug with the redirection
-     operator. It does not return output to standard output after the
-     command completes. Until this bug is fixed, file redirection
+     operator.  It does not return output to standard output after the
+     command completes.  Until this bug is fixed, file redirection
      should not be used.
 
 
@@ -2390,21 +2413,21 @@ File: or1ksim.info,  Node: Verification API,  Next: Code Internals,  Prev: Inter
 *************************
 
 The Verification API (VAPI) provides a TCP/IP interface to allow
-components of the simulation to be controlled externally. The interface
-is polled for new requests on each simulated clock cycle. Components
-within the simulator may send responses to such requests.
+components of the simulation to be controlled externally.  The
+interface is polled for new requests on each simulated clock cycle.
+Components within the simulator may send responses to such requests.
 
-The inteface is an asynchronous duplex protocol. On the request side it
-provides for simple commands, known as VAPI IDs (a 32 bit integer),
-with a single piece of data (also a 32 bit integer). On the send side,
-it provides for sending a single VAPI ID and data. However there is no
-explicit command-response structure. Some components just accept
-requests (e.g. to set values), some just generate sends (to report
+The inteface is an asynchronous duplex protocol.  On the request side
+it provides for simple commands, known as VAPI IDs (a 32 bit integer),
+with a single piece of data (also a 32 bit integer).  On the send side,
+it provides for sending a single VAPI ID and data.  However there is no
+explicit command-response structure.  Some components just accept
+requests (e.g.  to set values), some just generate sends (to report
 values), and some do both.
 
 Each component has a base ID (32 bit) and its commands will start from
-that base ID. This provides a simple partitioning of the command space
-amongst components. Request commands will be directed to the component
+that base ID.  This provides a simple partitioning of the command space
+amongst components.  Request commands will be directed to the component
 with the closest base ID lower than the VAPI ID of the command.
 
 Thus if there are two components with base IDs of 0x200 and 0x300, and
@@ -2450,9 +2473,9 @@ UART
 
     `0x04'
           If the 16th most significant bit of the data is 1, start
-          sending breaks, otherwise stop sending breaks. The breaks are
-          sent or cleared after the number of UART clock divider ticks
-          specified by the data (immediately if the data is zero).
+          sending breaks, otherwise stop sending breaks.  The breaks
+          are sent or cleared after the number of UART clock divider
+          ticks specified by the data (immediately if the data is zero).
 
 
 DMA
@@ -2461,9 +2484,9 @@ DMA
      implemented.
 
 Ethernet
-     The following requests are handled by the Ethernet. Specified
+     The following requests are handled by the Ethernet.  Specified
      symbolically, these are the increments from the base VAPI ID of the
-     Ethernet. At present no implementation is provided behind these
+     Ethernet.  At present no implementation is provided behind these
      VAPI requests.
 
     `ETH_VAPI_DATA (0)'
@@ -2475,7 +2498,7 @@ GPIO
      VAPI ID (symbolically, GPIO_VAPI_DATA (0) offset from the base
      VAPI ID) any changes in outputs.
 
-     The following requests are handled by the GPIO. Specified
+     The following requests are handled by the GPIO.  Specified
      symbolically, these are the increments from the VAPI base ID of the
      GPIO.
 
@@ -2512,10 +2535,10 @@ File: or1ksim.info,  Node: Code Internals,  Next: GNU Free Documentation License
 6 A Guide to Or1ksim Internals
 ******************************
 
-These are notes to help those wanting to extend Or1ksim. This section
+These are notes to help those wanting to extend Or1ksim.  This section
 assumes the use of a tag file, so file locations of entities'
-definitions are not in general provided. For more on tags, see the
-Linux manual page for `etags'. A tag file can be created with:
+definitions are not in general provided.  For more on tags, see the
+Linux manual page for `etags'.  A tag file can be created with:
 
      make tags
 
@@ -2537,7 +2560,7 @@ extensions to Or1ksim
 
 _GNU Coding Standard_
      Code should follow the GNU coding standard for C
-     (`http://www.gnu.org/prep/standards/'. If in doubt, put your code
+     (`http://www.gnu.org/prep/standards/'.  If in doubt, put your code
      through the `indent' program.
 
 _`#include' headers_
@@ -2552,15 +2575,15 @@ _`#include' headers_
      be included after the system headers.
 
      All C source code and header files should directly include any
-     system or package header they depend on, i.e. not rely on any
-     other header having already included it. The two exceptions are
+     system or package header they depend on, i.e.  not rely on any
+     other header having already included it.  The two exceptions are
 
        1. All header files may assume that `config.h' has already been
           included.
 
        2. System headers which impose portability problems should be
           included by using the package header `port.h', rather than
-          the system headers themselves. This is the case for code
+          the system headers themselves.  This is the case for code
           requiring
 
              * `strndup' (from `string.h')
@@ -2573,7 +2596,7 @@ _`#include' headers_
 
 _`#include' files once only_
      All include files should be protected by `#ifndef' to ensure their
-     definitions are only included once. For instance a header file
+     definitions are only included once.  For instance a header file
      `X-Y.H' should surround its contents with:
 
           #ifndef X_Y__H
@@ -2585,9 +2608,9 @@ _`#include' files once only_
 
 _Avoid `typedef'_
      The GNU coding style for C does not have a clear way to distinguish
-     between user type name and user variables. For this reason
+     between user type name and user variables.  For this reason
      `typedef' should be avoided except for the most ubiquitous user
-     defined types. This makes the code much easier to read.
+     defined types.  This makes the code much easier to read.
 
      There are some `typedef' declarations in the `argtable2' library
      and the ELF and COFF headers, because this code is taken from
@@ -2609,12 +2632,12 @@ _Avoid `typedef'_
 
 
      Where new types are defined, they should appear in one of these two
-     files as appropriate. Or1ksim specific types appearing in `arch.h'
-     should always have the suffix `_h'.
+     files as appropriate.  Or1ksim specific types appearing in
+     `arch.h' should always have the suffix `_h'.
 
 _Don't begin names with underscore_
      Names beginning with `_' are intended to be part of the C
-     infrastructure. They should not be used in the simulator code.
+     infrastructure.  They should not be used in the simulator code.
 
 _Keep Non-global top level entities static_
      All top level entities (functions, variables), which are not
@@ -2623,16 +2646,16 @@ _Keep Non-global top level entities static_
      across the program.
 
 _Use of `inline'_
-     Code should not be declared `inline'. Modern compilers can work
+     Code should not be declared `inline'.  Modern compilers can work
      out for themselves what is best in this respect.
 
 _Initialization_
-     All data structures should be explicitly initialized. In particular
-     code should not rely on static data structures being initialized to
-     zero.
+     All data structures should be explicitly initialized.  In
+     particular code should not rely on static data structures being
+     initialized to zero.
 
      The rationale is that in future static data structures may become
-     dynamic. This has been a particular source of bugs in Or1ksim
+     dynamic.  This has been a particular source of bugs in Or1ksim
      historically.
 
      A specific case is with new peripherals, which should always
@@ -2654,7 +2677,7 @@ File: or1ksim.info,  Node: Global Data Structures,  Next: Concepts,  Prev: Codin
 `config'
      The global variable `config' of type `struct config' holds the
      configuration data for some of the Or1ksim components which are
-     always present. At present the components are:
+     always present.  At present the components are:
 
         * The simulator defined in `section sim' (*note Simulator
           Configuration: Simulator Configuration.).
@@ -2690,21 +2713,21 @@ File: or1ksim.info,  Node: Global Data Structures,  Next: Concepts,  Prev: Codin
 
 
      This struct is made of a collection of structs, one for each
-     component. For example the simulator configuration is held in
+     component.  For example the simulator configuration is held in
      `config.sim'.
 
 `config'
      This is a linked list of data structures holding configuration data
      for all sections which are not held in the main `config' data
-     structure. In general these are components (such as peripherals and
-     memory) which may occur multiple times. However it also handles
-     some architectural components which may occur only once, such as
-     the memory management units, the instruction cache, the interrupt
-     controller and branch prediction.
+     structure.  In general these are components (such as peripherals
+     and memory) which may occur multiple times.  However it also
+     handles some architectural components which may occur only once,
+     such as the memory management units, the instruction cache, the
+     interrupt controller and branch prediction.
 
 `runtime'
      The global variable `runtime' of type `struct runtime' holds all
-     the runtime information about the simulation. To access this
+     the runtime information about the simulation.  To access this
      variable, `sim-config.h' must be included.
 
      This struct is itself made of 3 other structs, `cpu' (for CPU run
@@ -2719,7 +2742,7 @@ File: or1ksim.info,  Node: Concepts,  Next: Internal Debugging,  Prev: Global Da
 ============
 
 _Output Redirection_
-     The current output stream is held in `runtime.cpu.fout'. Output
+     The current output stream is held in `runtime.cpu.fout'.  Output
      should be explicitly written to this stream, or may use the
      `PRINTF' macro, which will write its arguments to this output
      stream.
@@ -2727,7 +2750,7 @@ _Output Redirection_
 _Reset Hooks_
      Any peripheral may register a routine to be called when the the
      processor is reset by calling `reg_sim_reset', providing a
-     function and pointer to a data structure as arguments. On reset
+     function and pointer to a data structure as arguments.  On reset
      that function will be called with the data stucture pointer as
      argument.
 
@@ -2739,11 +2762,11 @@ File: or1ksim.info,  Node: Internal Debugging,  Prev: Concepts,  Up: Code Intern
 ======================
 
 The function `debug' is like `printf', but with an extra first
-argument, which is the debug level. If the debug level specified in the
-simulator configuration (*note Simulator Behavior: Simulator Behavior.)
-is greater than or equal to this value, the remaining arguments are
-printed to the current output stream (*note Output Redirection: Output
-Redirection.).
+argument, which is the debug level.  If the debug level specified in
+the simulator configuration (*note Simulator Behavior: Simulator
+Behavior.) is greater than or equal to this value, the remaining
+arguments are printed to the current output stream (*note Output
+Redirection: Output Redirection.).
 
 
 File: or1ksim.info,  Node: GNU Free Documentation License,  Next: Index,  Prev: Code Internals,  Up: Top
@@ -3189,6 +3212,8 @@ Index
 * --cumulative:                          Profiling Utility.   (line  26)
 * --debug-config:                        Standalone Simulator.
                                                               (line  48)
+* --disable-all-tests:                   Configuring the Build.
+                                                              (line 128)
 * --disable-arith-flag:                  Configuring the Build.
                                                               (line  93)
 * --disable-debug:                       Configuring the Build.
@@ -3201,6 +3226,8 @@ Index
                                                               (line  25)
 * --disable-range-stats:                 Configuring the Build.
                                                               (line  64)
+* --enable-all-tests:                    Configuring the Build.
+                                                              (line 127)
 * --enable-arith-flag:                   Configuring the Build.
                                                               (line  92)
 * --enable-debug:                        Configuring the Build.
@@ -3283,6 +3310,8 @@ Index
 * 0x04 UART VAPI sub-command (UART verification): Verification API.
                                                               (line  66)
 * 16550 (UART configuration):            UART Configuration.  (line  73)
+* all tests enabled:                     Configuring the Build.
+                                                              (line 128)
 * Argtable2 debugging:                   Configuring the Build.
                                                               (line 121)
 * ATA/ATAPI configuration:               Disc Interface Configuration.
@@ -3306,7 +3335,7 @@ Index
 * baseaddr (memory configuration):       Memory Configuration.
                                                               (line  62)
 * baseaddr (memory controller configuration): Memory Controller Configuration.
-                                                              (line  28)
+                                                              (line  29)
 * baseaddr (UART configuration):         UART Configuration.  (line  22)
 * baseaddr (VGA configuration):          Display Interface Configuration.
                                                               (line  26)
@@ -3330,12 +3359,12 @@ Index
 * cache configuration:                   Cache Configuration. (line   6)
 * calling_convention (CUC configuration): CUC Configuration.  (line  34)
 * ce (memory configuration):             Memory Configuration.
-                                                              (line  91)
+                                                              (line  92)
 * cfgr (CPU configuration):              CPU Configuration.   (line  47)
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
                                                               (line  57)
-* clkcycle (simulator configuration):    Simulator Behavior.  (line 102)
+* clkcycle (simulator configuration):    Simulator Behavior.  (line 103)
 * cm (Interactive CLI):                  Interactive Command Line.
                                                               (line  54)
 * command line for Or1ksim standalone use: Standalone Simulator.
@@ -3439,9 +3468,9 @@ Index
 * debugging enabled (Argtable2):         Configuring the Build.
                                                               (line 121)
 * delayr (memory configuration):         Memory Configuration.
-                                                              (line 109)
+                                                              (line 110)
 * delayw (memory configuration):         Memory Configuration.
-                                                              (line 115)
+                                                              (line 116)
 * dependstats (CPU configuration):       CPU Configuration.   (line  84)
 * dev_id (ATA/ATAPI configuration):      Disc Interface Configuration.
                                                               (line  36)
@@ -3506,7 +3535,7 @@ Index
 * enabled (keyboard configuration):      Keyboard Configuration.
                                                               (line  32)
 * enabled (memory controller configuration): Memory Controller Configuration.
-                                                              (line  17)
+                                                              (line  18)
 * enabled (MMU configuration):           Memory Management Configuration.
                                                               (line  12)
 * enabled (power management configuration): Power Management Configuration.
@@ -3527,24 +3556,24 @@ Index
 * Ethernet verification (VAPI):          Verification API.    (line  78)
 * Ethernet via socket, enabling:         Configuring the Build.
                                                               (line  54)
-* exe_log (simulator configuration):     Simulator Behavior.  (line  48)
-* exe_log_end (simulator configuration): Simulator Behavior.  (line  88)
-* exe_log_file (simulator configuration): Simulator Behavior. (line  96)
+* exe_log (simulator configuration):     Simulator Behavior.  (line  49)
+* exe_log_end (simulator configuration): Simulator Behavior.  (line  89)
+* exe_log_file (simulator configuration): Simulator Behavior. (line  97)
 * exe_log_fn (simulator configuration - deprecated): Simulator Behavior.
-                                                              (line  96)
+                                                              (line  97)
 * exe_log_marker (simulator configuration): Simulator Behavior.
-                                                              (line  92)
+                                                              (line  93)
 * exe_log_start (simulator configuration): Simulator Behavior.
-                                                              (line  85)
-* exe_log_type (simulator configuration): Simulator Behavior. (line  54)
+                                                              (line  86)
+* exe_log_type (simulator configuration): Simulator Behavior. (line  55)
 * exe_log_type=default (simulator configuration): Simulator Behavior.
-                                                              (line  57)
+                                                              (line  58)
 * exe_log_type=hardware (simulator configuration): Simulator Behavior.
-                                                              (line  61)
+                                                              (line  62)
 * exe_log_type=simple (simulator configuration): Simulator Behavior.
-                                                              (line  68)
+                                                              (line  69)
 * exe_log_type=software (simulator configuration): Simulator Behavior.
-                                                              (line  73)
+                                                              (line  74)
 * executing code (Interactive CLI):      Interactive Command Line.
                                                               (line  23)
 * execution history (Interactive CLI):   Interactive Command Line.
@@ -3554,7 +3583,7 @@ Index
 * file (keyboard configuration):         Keyboard Configuration.
                                                               (line  51)
 * filename (frame buffer configuration - deprecated): Frame Buffer Configuration.
-                                                              (line  35)
+                                                              (line  36)
 * filename (VGA configuration - deprecated): Display Interface Configuration.
                                                               (line  47)
 * firmware (ATA/ATAPI device configuration): Disc Interface Configuration.
@@ -3587,7 +3616,7 @@ Index
                                                               (line  36)
 * hist (Interactive CLI):                Interactive Command Line.
                                                               (line  67)
-* history (simulator configuration):     Simulator Behavior.  (line  39)
+* history (simulator configuration):     Simulator Behavior.  (line  40)
 * history of execution (Interactive CLI): Interactive Command Line.
                                                               (line  67)
 * hitdelay (branch prediction configuration): Branch Prediction Configuration.
@@ -3601,7 +3630,7 @@ Index
 * IMMU configuration:                    Memory Management Configuration.
                                                               (line   6)
 * index (memory controller configuration): Memory Controller Configuration.
-                                                              (line  50)
+                                                              (line  51)
 * info (Interactive CLI):                Interactive Command Line.
                                                               (line 119)
 * installing Or1ksim:                    Installation.        (line   6)
@@ -3636,12 +3665,12 @@ Index
 * load_missdelay (data cache configuration): Cache Configuration.
                                                               (line  50)
 * log (memory configuration):            Memory Configuration.
-                                                              (line 121)
+                                                              (line 122)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
-* long:                                  Simulator Library.   (line  73)
+* long:                                  Simulator Library.   (line  74)
 * mc (memory configuration):             Memory Configuration.
-                                                              (line  99)
+                                                              (line 100)
 * memory configuration:                  Memory Configuration.
                                                               (line   6)
 * memory controller configuration:       Memory Controller Configuration.
@@ -3677,18 +3706,18 @@ Index
                                                               (line  55)
 * MMU configuration:                     Memory Management Configuration.
                                                               (line   6)
-* mprof_file (simulator configuration):  Simulator Behavior.  (line  33)
+* mprof_file (simulator configuration):  Simulator Behavior.  (line  34)
 * mprof_fn (simulator configuration - deprecated): Simulator Behavior.
-                                                              (line  33)
+                                                              (line  34)
 * mprofile (Interactive CLI):            Interactive Command Line.
                                                               (line 173)
-* mprofile (simulator configuration):    Simulator Behavior.  (line  28)
+* mprofile (simulator configuration):    Simulator Behavior.  (line  29)
 * mwdma (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 128)
 * name (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  42)
 * name (memory configuration):           Memory Configuration.
-                                                              (line  82)
+                                                              (line  83)
 * no_multicycle (CUC configuration):     CUC Configuration.   (line  42)
 * nsets (cache configuration):           Cache Configuration. (line  15)
 * nsets (MMU configuration):             Memory Management Configuration.
@@ -3696,15 +3725,15 @@ Index
 * nways (cache configuration):           Cache Configuration. (line  22)
 * nways (MMU configuration):             Memory Management Configuration.
                                                               (line  22)
-* or1ksim_get_time_period:               Simulator Library.   (line  63)
+* or1ksim_get_time_period:               Simulator Library.   (line  64)
 * or1ksim_init:                          Simulator Library.   (line  18)
-* or1ksim_interrupt:                     Simulator Library.   (line  78)
-* or1ksim_interrupt_clear:               Simulator Library.   (line  96)
-* or1ksim_interrupt_set:                 Simulator Library.   (line  87)
-* or1ksim_is_le:                         Simulator Library.   (line  68)
-* or1ksim_reset_duration:                Simulator Library.   (line  48)
-* or1ksim_run:                           Simulator Library.   (line  43)
-* or1ksim_set_time_point:                Simulator Library.   (line  59)
+* or1ksim_interrupt:                     Simulator Library.   (line  79)
+* or1ksim_interrupt_clear:               Simulator Library.   (line  97)
+* or1ksim_interrupt_set:                 Simulator Library.   (line  88)
+* or1ksim_is_le:                         Simulator Library.   (line  69)
+* or1ksim_reset_duration:                Simulator Library.   (line  49)
+* or1ksim_run:                           Simulator Library.   (line  44)
+* or1ksim_set_time_point:                Simulator Library.   (line  60)
 * output rediretion:                     Concepts.            (line   7)
 * overflow flag setting by instructions: Configuring the Build.
                                                               (line  70)
@@ -3749,7 +3778,7 @@ Index
 * PMU configuration:                     Power Management Configuration.
                                                               (line   6)
 * poc (memory controller configuration): Memory Controller Configuration.
-                                                              (line  37)
+                                                              (line  38)
 * port range for TCP/IP:                 Verification API Configuration.
                                                               (line  23)
 * power management configuration:        Power Management Configuration.
@@ -3795,7 +3824,7 @@ Index
 * random_seed (memory configuration):    Memory Configuration.
                                                               (line  40)
 * refresh_rate (frame buffer configuration): Frame Buffer Configuration.
-                                                              (line  29)
+                                                              (line  30)
 * refresh_rate (VGA configuration):      Display Interface Configuration.
                                                               (line  41)
 * reg_sim_reset:                         Concepts.            (line  13)
@@ -3953,6 +3982,8 @@ Index
                                                               (line  74)
 * TCP/IP port range for or1ksim-rsp service: Debug Interface Configuration.
                                                               (line  41)
+* tests, all enabled.:                   Configuring the Build.
+                                                              (line 128)
 * timings_file (CUC configuration):      CUC Configuration.   (line  46)
 * timings_fn (CUC configuration - deprecated): CUC Configuration.
                                                               (line  46)
@@ -3967,7 +3998,7 @@ Index
 * txfile (Ethernet configuration):       Ethernet Configuration.
                                                               (line  69)
 * txfile (frame buffer configuration):   Frame Buffer Configuration.
-                                                              (line  35)
+                                                              (line  36)
 * txfile (VGA configuration):            Display Interface Configuration.
                                                               (line  47)
 * type (ATA/ATAPI device configuration): Disc Interface Configuration.
@@ -4033,51 +4064,51 @@ Tag Table:
 Node: Top814
 Node: Installation1224
 Node: Preparation1471
-Node: Configuring the Build1761
-Node: Build and Install6872
-Node: Known Issues7561
-Node: Usage9691
-Node: Standalone Simulator9905
-Node: Profiling Utility12794
-Node: Memory Profiling Utility13702
-Node: Simulator Library15061
-Node: Configuration20523
-Node: Configuration File Format21129
-Node: Configuration File Preprocessing21421
-Node: Configuration File Syntax21791
-Node: Simulator Configuration24569
-Node: Simulator Behavior24860
-Node: Verification API Configuration28876
-Node: CUC Configuration30805
-Node: Core OpenRISC Configuration32710
-Node: CPU Configuration33212
-Node: Memory Configuration37002
-Node: Memory Management Configuration42278
-Node: Cache Configuration44639
-Node: Interrupt Configuration47005
-Node: Power Management Configuration47737
-Node: Branch Prediction Configuration49009
-Node: Debug Interface Configuration50362
-Node: Peripheral Configuration54562
-Node: Memory Controller Configuration55187
-Node: UART Configuration57784
-Node: DMA Configuration61290
-Node: Ethernet Configuration63145
-Node: GPIO Configuration67101
-Node: Display Interface Configuration68724
-Node: Frame Buffer Configuration71024
-Node: Keyboard Configuration72874
-Node: Disc Interface Configuration75100
-Node: Generic Peripheral Configuration80015
-Node: Interactive Command Line82299
-Node: Verification API89247
-Node: Code Internals93665
-Node: Coding Conventions94222
-Node: Global Data Structures98637
-Node: Concepts101289
-Ref: Output Redirection101434
-Node: Internal Debugging101971
-Node: GNU Free Documentation License102467
-Node: Index124874
+Node: Configuring the Build1772
+Node: Build and Install7257
+Node: Known Issues8103
+Node: Usage10249
+Node: Standalone Simulator10463
+Node: Profiling Utility13366
+Node: Memory Profiling Utility14276
+Node: Simulator Library15641
+Node: Configuration21126
+Node: Configuration File Format21735
+Node: Configuration File Preprocessing22027
+Node: Configuration File Syntax22398
+Node: Simulator Configuration25183
+Node: Simulator Behavior25474
+Node: Verification API Configuration29518
+Node: CUC Configuration31458
+Node: Core OpenRISC Configuration33375
+Node: CPU Configuration33877
+Node: Memory Configuration37682
+Node: Memory Management Configuration42995
+Node: Cache Configuration45372
+Node: Interrupt Configuration47758
+Node: Power Management Configuration48494
+Node: Branch Prediction Configuration49771
+Node: Debug Interface Configuration51131
+Node: Peripheral Configuration55351
+Node: Memory Controller Configuration55977
+Node: UART Configuration58582
+Node: DMA Configuration62101
+Node: Ethernet Configuration63968
+Node: GPIO Configuration67946
+Node: Display Interface Configuration69579
+Node: Frame Buffer Configuration71888
+Node: Keyboard Configuration73752
+Node: Disc Interface Configuration75990
+Node: Generic Peripheral Configuration80933
+Node: Interactive Command Line83228
+Node: Verification API90202
+Node: Code Internals94632
+Node: Coding Conventions95192
+Node: Global Data Structures99619
+Node: Concepts102276
+Ref: Output Redirection102421
+Node: Internal Debugging102960
+Node: GNU Free Documentation License103457
+Node: Index125864
 
 End Tag Table

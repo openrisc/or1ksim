@@ -312,7 +312,6 @@ INSTRUCTION (l_rfe) {
   mtspr(SPR_SR, cpu_state.sprs[SPR_ESR_BASE]);
 }
 INSTRUCTION (l_nop) {
-  oraddr_t stackaddr;
   uint32_t k = PARAM0;
   switch (k) {
     case NOP_NOP:
@@ -338,13 +337,16 @@ INSTRUCTION (l_nop) {
       runtime.sim.reset_cycles = runtime.sim.cycles;
       runtime.cpu.reset_instructions = runtime.cpu.instructions;
       break;    
-    case NOP_PRINTF:
-      stackaddr = evalsim_reg(4);
-      simprintf(stackaddr, evalsim_reg(3));
-      break;
     case NOP_PUTC:		/*JPB */
       printf( "%c", (char)(evalsim_reg( 3 ) & 0xff));
       fflush( stdout );
+      break;
+    case NOP_GET_TICKS:
+      cpu_state.reg[11] = runtime.sim.cycles & 0xffffffff;
+      cpu_state.reg[12] = runtime.sim.cycles >> 32;
+      break;
+    case NOP_GET_PS:
+      cpu_state.reg[11] = config.sim.clkcycle_ps;
       break;
     case NOP_REPORT:
       PRINTF("report(0x%"PRIxREG");\n", evalsim_reg(3));

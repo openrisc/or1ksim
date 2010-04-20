@@ -46,34 +46,43 @@ enum  or1ksim_rc {
 extern "C" {
 #endif
 
-int  or1ksim_init( const char         *config_file,
+int  or1ksim_init (const char         *config_file,
 		   const char         *image_file,
 		   void               *class_ptr,
-		   unsigned long int (*upr)( void              *class_ptr,
+		   unsigned long int (*upr) (void              *class_ptr,
 					     unsigned long int  addr,
 					     unsigned long int  mask),
-		   void              (*upw)( void              *class_ptr,
+		   void              (*upw) (void              *class_ptr,
 					     unsigned long int  addr,
 					     unsigned long int  mask,
-					     unsigned long int  wdata ) );
+					     unsigned long int  wdata));
 
-int  or1ksim_run( double  duration );
+int  or1ksim_run (double  duration);
 
-void  or1ksim_reset_duration( double duration );
+void  or1ksim_reset_duration (double duration);
 
-void  or1ksim_set_time_point();
+void  or1ksim_set_time_point ();
 
-double  or1ksim_get_time_period();
+double  or1ksim_get_time_period ();
 
-int  or1ksim_is_le();
+int  or1ksim_is_le ();
 
 unsigned long int  or1ksim_clock_rate();
 
-void or1ksim_interrupt( int  i );
+/* Interrupt handling interface */
+void  or1ksim_interrupt (int  i);
 
-void or1ksim_interrupt_set( int  i );
+void or1ksim_interrupt_set (int  i);
 
-void or1ksim_interrupt_clear( int  i );
+void  or1ksim_interrupt_clear (int  i);
+
+/* JTAG interface */
+double  or1ksim_jtag_reset ();
+
+double  or1ksim_jtag_shift_ir (unsigned char *jreg);
+
+double  or1ksim_jtag_shift_dr (unsigned char *jreg);
+
 
 #ifdef __cplusplus
 }

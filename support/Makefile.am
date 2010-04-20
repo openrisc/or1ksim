@@ -22,8 +22,7 @@
 
 
 noinst_LTLIBRARIES     = libsupport.la
-libsupport_la_SOURCES  = simprintf.c   \
-                         dumpverilog.c \
+libsupport_la_SOURCES  = dumpverilog.c \
                          profile.c     \
                          sched.c       \
                          debug.c       \
@@ -33,5 +32,4 @@ libsupport_la_SOURCES  = simprintf.c   \
                          dumpverilog.h \
                          misc.h        \
                          profile.h     \
-                         sched.h       \
-			 simprintf.h
+                         sched.h
