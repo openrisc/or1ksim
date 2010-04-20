@@ -226,7 +226,7 @@ ic_inv (oraddr_t dataaddr)
 /*---------------------------------------------------------------------------*/
 /*!Enable or disable the instruction cache
 
-   Set the corresponding field in the UPR
+   Set the corresponding fields in the UPR
 
    @param[in] val  The value to use
    @param[in] dat  The config data structure                                 */
@@ -483,9 +483,11 @@ ic_end_sec (void *dat)
 	  exit (1);
 	}
 
+      /* Clear the cache data. John Alfredo's fix for using 0 (which is a
+	 valid tag), so we now use -1 */
       memset (ic->mem,  0, size);
       memset (ic->lrus, 0, ic->nsets * ic->nways * sizeof (unsigned int));
-      memset (ic->tags, 0, ic->nsets * ic->nways * sizeof (oraddr_t));
+      memset (ic->tags, -1, ic->nsets * ic->nways * sizeof (oraddr_t));
     }
   else
     {
