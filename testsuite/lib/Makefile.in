@@ -128,7 +128,6 @@ LOCAL_DEFS = @LOCAL_DEFS@
 LOCAL_LDFLAGS = @LOCAL_LDFLAGS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
-MAKE_SHELL = @MAKE_SHELL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -152,7 +151,6 @@ STRIP = @STRIP@
 SUMVERSION = @SUMVERSION@
 TERMCAP_LIB = @TERMCAP_LIB@
 VERSION = @VERSION@
-_GNU_SOURCE = @_GNU_SOURCE@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -212,7 +210,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Just distribute this stuff
-EXTRA_DIST = or1ksim.exp
+EXTRA_DIST = libsim.exp  \
+	     or1ksim.exp
+
 all: all-am
 
 .SUFFIXES:

@@ -28,4 +28,5 @@
 
 
 # Just distribute this stuff
-EXTRA_DIST = or1ksim.exp
+EXTRA_DIST = libsim.exp  \
+	     or1ksim.exp

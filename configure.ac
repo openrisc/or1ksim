@@ -31,6 +31,9 @@
 AC_INIT([or1ksim], [2010-04-21], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
+# Generically use extensions such as _GNU_SOURCE if available.
+AC_USE_SYSTEM_EXTENSIONS
+
 # Check we have the execute source file present for sanity. Specify a separate
 # config for the testsuite OR1K specific programs, since we'll need different
 # tool chain there (the OpenRISC one, rather than the native one).
@@ -40,6 +43,7 @@ AC_CONFIG_SUBDIRS([testsuite/test-code-or1k])
 AC_CANONICAL_TARGET([])
 AC_PROG_LIBTOOL
 AM_INIT_AUTOMAKE
+
 AC_CONFIG_HEADERS([config.h])
 
 AC_REVISION([$Id$ using automake version] AC_ACVERSION)
@@ -82,17 +86,9 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_CHECK_PROG(AR, ar, ar)
 
-# This is GNU compliant source and uses GNU libraries
-AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)
-AC_SUBST(_GNU_SOURCE)
-
 # Set default for ARFLAGS, since autoconf does not have a macro for it.
 # This allows people to set it when running configure or make
 test -n "$ARFLAGS" || ARFLAGS="cr"
-
-MAKE_SHELL=/bin/sh
-
-AC_SUBST(MAKE_SHELL)
 
 AC_TYPE_SIGNAL
 AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h      \
@@ -205,7 +201,6 @@ solaris*) LIBS="-lsocket -lnsl" ;;
 esac
 
 # define options
-
 AC_MSG_CHECKING(whether to enable profiling)
 AC_ARG_ENABLE(profiling,
     [  --enable-profiling      generate profiling code], [
