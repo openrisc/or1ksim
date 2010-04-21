@@ -23,10 +23,14 @@ The following feature requests have been rejected.
 * Feature  409: Separate ELF loader library already exists in binutils.
 * Feature  586: Ignoring HW breakpoints is already possible.
 
-The following bugs are fixed:
-* Bug 1773: Or1ksim now accepts ELF image when working through RSP.
-* Bug 1723: PS2 keyboard error message clearer if RX file won't open.
+The following bugs are fixed.
+* Bug  534: Test suite fixed (see above).
 * Bug 1710: mprofile now handles mode args correctly.
+* Bug 1723: PS2 keyboard error message clearer if RX file won't open.
+* Bug 1773: Or1ksim now accepts ELF image when working through RSP.
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
 
 New in release 0.3.0
 ====================
