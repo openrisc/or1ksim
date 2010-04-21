@@ -1,25 +1,47 @@
-Authors of the OpenRISC 1000 architectural simulator
-====================================================
+	      Or1ksim: The OpenRISC 1000 Architectural Simulator
+	      ==================================================
 
-Damjan Lampret, <lampret@opencores.org>
-  Original author of the simulator.
 
-Johan Rydberg, <johan.rydberg@netinsight.se>
-  Added support for GNU readline aswell as adopted
-  it to GNU autoconf and automake.
+Authors of Or1ksim
+==================
+
+These are the main contributors known from the source code. Please advise if I
+have omitted anyone.
+
+Jeremy Bennett, <jeremy@jeremybennett.com>
+ 21 Apr 10: Complete rework of the testsuite. Various bugs fixed.
+ 12 Oct 08: Complete tidy-up of the code base, fixing a string of bugs to make
+            version 0.3.0 release candidate 1.
+  9 Jun 08: Added OSCI SystemC TLM 2.0 wrapper and tidied up for GCC 4.3.0 and
+            OpenRISC 1000 GDB 6.8
 
 Jimmy Chen-Min Chen, <jimmy@ee.nctu.edu.tw>
   Defined and Added support for OR16 ISA(cpu/or16).
   05/04/2000
 
+Damjan Lampret, <lampret@opencores.org>
+  Original author of the simulator.
+
 Richard Prescott, <rip@step.polymtl.ca>
   Added channels for peripheral to communicate with host
 
-Jeremy Bennett, <jeremy@jeremybennett.com>
-  9 Jun 08: Added OSCI SystemC TLM 2.0 wrapper and tidied up for GCC 4.3.0 and
-            OpenRISC 1000 GDB 6.8
- 12 Oct 08: Complete tidy-up of the code base, fixing a string of bugs to make
-            version 0.3.0 release candidate 1.
+Johan Rydberg, <johan.rydberg@netinsight.se>
+  Added support for GNU readline aswell as adopted
+  it to GNU autoconf and automake.
+
+
+Bug reporters and fixers
+========================
+
+John Alfredo
+  Icache initialization
+
+Julius Baxter
+  Use of RSP with pre-loaded image.
+
+Mark Jarvin
+  MAC OS X support
+
 
 Authors of the argtable2 library
 ================================

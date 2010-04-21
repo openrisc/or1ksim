@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (x.y.z-yyyy-mm-dd).
-AC_INIT([or1ksim], [0.3.1-2010-04-20], [openrisc@opencores.org])
+AC_INIT([or1ksim], [0.3.1-2010-04-21], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Check we have the execute source file present for sanity. Specify a separate

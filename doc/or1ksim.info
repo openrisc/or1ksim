@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-0.3.1-2010-04-20.tar.bz2
+     tar jxf or1ksim-0.3.1-2010-04-21.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-0.3.1-2010-04-20/configure --target=or32-uclinux ...
+     ../or1ksim-0.3.1-2010-04-21/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -243,7 +243,7 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 =============================
 
 The following problems and issues are known about with Or1ksim
-0.3.1-2010-04-20.  The OpenRISC tracker may be used to see the current
+0.3.1-2010-04-21.  The OpenRISC tracker may be used to see the current
 state of these issues and to raise new problems and feature requests.
 It may be found at
 `http://www.opencores.org/ptracker.cgi/view/or1k/398'.

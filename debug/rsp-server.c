@@ -385,6 +385,7 @@ rsp_get_client ()
   fflush (stdout);
 
   /* Accept a client which connects */
+  len = sizeof (socklen_t);		/* Bug fix by Julius Baxter */
   rsp.client_fd = accept (tmp_fd, (struct sockaddr *)&sock_addr, &len);
 
   if (-1 == rsp.client_fd)

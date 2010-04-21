@@ -1,7 +1,34 @@
+	      Or1ksim: The OpenRISC 1000 Architectural Simulator
+	      ==================================================
+
+
+New in top of tree
+==================
+
+* testbench now renamed testsuite and fully integrated using DejaGNU.
+  "make check" now works correctly if the OpenRISC toolchain is installed.
+
+The following features are added:
+* Feature  469: Icache tags now intialized as invalid.
+* Feature 1673: Or1ksim now builds on Mac OS X.
+* Feature 1678: download, patch and build dirs removed from SVN.
+
+The following features will not be provided and have been closed:
+* Feature  399: Writeable SR_LEE bit will not be provided.
+* Feature  409: Separate ELF loader library already exists in binutils.
+* Feature  586: Ignoring HW breakpoints is already possible.
+
+The following bugs are fixed:
+* Bug 1773: Or1ksim now accepts ELF image when working through RSP.
+
 New in release 0.3.0
+====================
+
 * No new features or bugs. This is the full release based on rc3.
 
 New in release 0.3.0rc3
+=======================
+
 * Bug 376 fixed: 32 interrupts now supported
 * Bug 377 fixed: Level triggered interrupts now work correctly
 * Bug 378 fixed: xterm UART now works with RSP
@@ -17,25 +44,32 @@ New in release 0.3.0rc3
 * Feature 417 added: Or1ksim prints out its version on startup.
 
 New in release 0.3.0rc2
+=======================
+
 * A number of bug fixes
 * Updates to user guide
 
 New in release 0.3.0rc1
+=======================
+
 * Numerous bug fixes (see the OpenRISC tracker and the ChangeLog file)
 * User Guide
 * Consistent coding style and file naming throughout
 * Support for external SystemC models
 
-New in release 1.9 (old style numbering):
+New in release 1.9 (old style numbering)
+========================================
 
 * support for binary COFF
 * generation of verilog memory models (used when you want to run simulation
 of OpenRISC processor cores)
 
-New in release 1.2 (old style numbering):
+New in release 1.2 (old style numbering)
+========================================
 
 * support for OR16 ISA
 
-New in release 1.1 (old style numbering):
+New in release 1.1 (old style numbering)
+========================================
 
  * First release
