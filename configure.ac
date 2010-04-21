@@ -32,10 +32,10 @@ AC_INIT([or1ksim], [2010-04-21], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Check we have the execute source file present for sanity. Specify a separate
-# config for the testsuite, since we'll need different tool chain there (the
-# OpenRISC one, rather than the native one).
+# config for the testsuite OR1K specific programs, since we'll need different
+# tool chain there (the OpenRISC one, rather than the native one).
 AC_CONFIG_SRCDIR([cpu/or32/execute.c])
-AC_CONFIG_SUBDIRS([testsuite])
+AC_CONFIG_SUBDIRS([testsuite/test-code-or1k])
 
 AC_CANONICAL_TARGET([])
 AC_PROG_LIBTOOL
@@ -319,7 +319,14 @@ AM_CONDITIONAL(DYNAMIC_EXECUTION, test x$execution = x2)
 
 
 test -n "$profile"  && CFLAGS="$CFLAGS $profile" LDFLAGS="$LDFLAGS $profile"
-# CFLAGS="$CFLAGS -O4"
+
+# Check for a DejaGNU global config file. If not set, then set it
+# ourselves. This stops runtest complaining
+if test x"$DEJAGNU" = x
+then
+  DEJAGNU="\$(top_srcdir)/testsuite/default-global-conf.exp"
+  AC_SUBST(DEJAGNU)
+fi
 
 BUILD_DIR=`pwd`
 AC_SUBST(BUILD_DIR)
@@ -350,25 +357,32 @@ INCLUDES="$INCLUDES -I\${top_srcdir} -I\${top_srcdir}/cpu/common \
 -I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2"
 AC_SUBST(INCLUDES)
 
-AC_CONFIG_FILES([Makefile                             \
-                 argtable2/Makefile                   \
-                 bpb/Makefile                         \
-                 cache/Makefile                       \
-                 cpu/Makefile                         \
-                 cpu/common/Makefile                  \
-                 cpu/or1k/Makefile                    \
-                 cuc/Makefile                         \
-                 debug/Makefile                       \
-                 doc/Makefile                         \
-                 support/Makefile                     \
-                 mmu/Makefile                         \
-                 peripheral/Makefile                  \
-                 tick/Makefile                        \
-                 peripheral/channels/Makefile         \
-                 pm/Makefile                          \
-                 pic/Makefile                         \
-                 vapi/Makefile                        \
-                 port/Makefile])
+AC_CONFIG_FILES([Makefile                                \
+                 argtable2/Makefile                      \
+                 bpb/Makefile                            \
+                 cache/Makefile                          \
+                 cpu/Makefile                            \
+                 cpu/common/Makefile                     \
+                 cpu/or1k/Makefile                       \
+                 cuc/Makefile                            \
+                 debug/Makefile                          \
+                 doc/Makefile                            \
+                 mmu/Makefile                            \
+                 peripheral/Makefile                     \
+                 peripheral/channels/Makefile            \
+                 pm/Makefile                             \
+                 pic/Makefile                            \
+                 port/Makefile                           \
+                 support/Makefile                        \
+                 testsuite/Makefile                      \
+		 testsuite/config/Makefile               \
+		 testsuite/lib/Makefile                  \
+		 testsuite/libsim.tests/Makefile         \
+		 testsuite/or1ksim.tests/Makefile        \
+		 testsuite/test-code/Makefile            \
+		 testsuite/test-code/lib-iftest/Makefile \
+                 tick/Makefile                           \
+                 vapi/Makefile])
 
 # yuck. I don't know why I cannot just substitute $CPU_ARCH in the above
 case "$CPU_ARCH" in

@@ -27,15 +27,14 @@
 # -----------------------------------------------------------------------------
 
 
-# Local macros
-ACLOCAL_AMFLAGS = -I m4
-
 # C code for programs used only in testing is in 'test-code'. Other subdirs
 # are only there to ensure DejaGNU code is distributed.
-SUBDIRS = config        \
-	  lib           \
-	  or1ksim.tests \
-	  test-code
+SUBDIRS = config         \
+	  lib            \
+	  libsim.tests   \
+	  or1ksim.tests  \
+	  test-code      \
+	  test-code-or1k
 
 EXTRA_DIST = default-global-conf.exp
 
@@ -44,10 +43,11 @@ AUTOMAKE_OPTIONS    = dejagnu
 
 export DEJAGNU
 
-DEJATOOL            = or1ksim
+DEJATOOL            = libsim  \
+		      or1ksim
 
-RUNTESTDEFAULTFLAGS = --tool $$tool          \
-	              --srcdir $(top_srcdir) \
+RUNTESTDEFAULTFLAGS = --tool $$tool        \
+	              --srcdir $(srcdir)   \
 		      --outdir $(builddir)
 
 # Clean up the junk left by the tests

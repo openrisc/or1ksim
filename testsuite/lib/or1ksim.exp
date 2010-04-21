@@ -45,7 +45,7 @@ proc run_or1ksim { testname match_list config_file progname } {
 	set config_full_file "$env(srcdir)/or1ksim.tests/$config_file";
     }
 
-    set prog_full_name "./test-code/$progname"
+    set prog_full_name "./test-code-or1k/$progname"
     set command_line "../sim -f $config_full_file $prog_full_name"
 
     if { $verbose > 1 } {

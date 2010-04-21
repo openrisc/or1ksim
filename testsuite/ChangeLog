@@ -1,3 +1,8 @@
+2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* test-code-or1k: Renamed from test-code.
+	* configure.ac, configure: Moved to test-code-or1k.
+	* AUTHORS, NEWS, INSTALL, COPYING: Moved to test-code-or1k.
+
 2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* test-code/support/spr-defs.h: NOP_PRINTF definition removed.
 	* test-code/except-test/except-test.c (illegal_insn_test):

@@ -24,45 +24,6 @@
 # -----------------------------------------------------------------------------
 
 
-# Subdirs for each test program. Support, exception and common machine code
-# handling libraries must be first.
+# Subdirs for each test program.
 
-# The following test will not build without warning, so its Makefile does
-# nothing, unless the --enable-all-tests flag is used with configure.
-# - inst-set-test
-
-EXTRA_DIST = default.ld   \
-	     except-mc.ld
-
-SUBDIRS = support       \
-	  except        \
-	  mc-common     \
-	  acv-gpio      \
-	  acv-uart      \
-	  basic         \
-	  cache         \
-	  cbasic        \
-	  cfg           \
-	  dhry          \
-	  dmatest       \
-	  eth           \
-	  except-test   \
-	  exit          \
-	  ext           \
-	  fbtest        \
-	  functest      \
-	  flag          \
-	  inst-set-test \
-	  int-test      \
-	  kbdtest       \
-	  local-global  \
-	  mc-async      \
-	  mc-dram       \
-	  mc-ssram      \
-	  mc-sync       \
-	  mem-test      \
-	  mmu           \
-	  mul           \
-	  mycompress    \
-	  tick          \
-	  uos
+SUBDIRS = lib-iftest

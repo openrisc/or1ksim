@@ -1,0 +1,9 @@
+		    Or1ksim Test Suite: OR1K Specific Code
+		    ======================================
+
+This directory contains OpenRISC specific code, which requires its own
+configuration file to select the correct tool chain.
+
+
+Upated by Jeremy Bennett (jeremy@jeremybennett.com)
+21 April 2010

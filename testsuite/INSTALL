@@ -1,6 +1,0 @@
-This is the INSTALL file for the Or1ksim testsuite. The testsuite has its own
-configuration script, and for GNU consistency, this means it must have its own
-INSTALL file. However it cannot be installed on its own, so for all the real
-installation instructions see the file in the parent directory.
-
-../INSTALL

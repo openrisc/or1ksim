@@ -1,0 +1,172 @@
+2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* AUTHORS: Moved from parent directory
+	* configure: Regenerated.
+	* configure.ac: Moved from parent directory and updated.
+	* COPYING: Moved from parent directory.
+	* INSTALL: Moved from parent directory.
+	* NEWS: Moved from parent directory
+	* README: Updated for new structure.
+
+2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* support/spr-defs.h: NOP_PRINTF definition removed.
+	* except-test/except-test.c (illegal_insn_test):
+  	  Generate and check a correct sequence for illegal instruction.
+	* except-test/except-test.c (except_priority_test):
+	  Generate a properly illegal instruction.
+
+2010-04-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* acv-gpio: New directory.
+	* acv-gpio/acv-gpio.c: Created.
+	* acv-gpio/Makefile.am: Created.
+	* acv-gpio/Makefile.in: Regenerated.
+	* acv-uart: New directory.
+	* acv-uart/acv-uart.c: Created.
+	* acv-uart/Makefile.am: Created.
+	* acv-uart/Makefile.in: Regenerated.
+	* basic: New directory.
+	* basic/basic.S: Created.
+	* basic/Makefile.am: Created.
+	* basic/Makefile.in: Regenerated.
+	* board.h: Created.
+	* cache: New directory.
+	* cache/cache-asm.S: Created.
+	* cache/cache.c: Created.
+	* cache/cache.ld: Updated from old test directory.
+	* cache/Makefile.am: Created.
+	* cache/Makefile.in: Regenerated.
+	* cbasic: New directory.
+	* cbasic/cbasic.c: Created.
+	* cbasic/Makefile.am: Created.
+	* cbasic/Makefile.in: Regenerated.
+	* cfg: New directory.
+	* cfg/cfg.S: Created.
+	* cfg/Makefile.am: Created.
+	* cfg/Makefile.in: Regenerated.
+	* default.ld: Updated from old test directory.
+	* dhry: New directory.
+	* dhry/dhry.c: Created.
+	* dhry/dhry.h: Created.
+	* dhry/Makefile.am: Created.
+	* dhry/Makefile.in: Regenerated.
+	* dmatest: New directory.
+	* dmatest/dmatest.c: Created.
+	* dmatest/Makefile.am: Created.
+	* dmatest/Makefile.in: Regenerated.
+	* eth: New directory.
+	* eth/eth.c: Created.
+	* eth/Makefile.am: Created.
+	* eth/Makefile.in: Regenerated.
+	* except: New directory.
+	* except/except.S: Created.
+	* except/Makefile.am: Created.
+	* except/Makefile.in: Regenerated.
+	* except-mc.ld: Updated from old test directory.
+	* except-test: New directory.
+	* except-test/except-test.c: Created.
+	* except-test/except-test-s.S: Created.
+	* except-test/Makefile.am: Created.
+	* except-test/Makefile.in: Regenerated.
+	* exit: New directory.
+	* exit/exit.c: Created.
+	* exit/Makefile.am: Created.
+	* exit/Makefile.in: Regenerated.
+	* ext: New directory.
+	* ext/ext.S: Created.
+	* ext/Makefile.am: Created.
+	* ext/Makefile.in: Regenerated.
+	* fbtest: New directory.
+	* fbtest/fbtest.c: Created.
+	* fbtest/Makefile.am: Created.
+	* fbtest/Makefile.in: Regenerated.
+	* flag: New directory.
+	* flag/flag.S: Created.
+	* flag/Makefile.am: Created.
+	* flag/Makefile.in: Regenerated.
+	* functest: New directory.
+	* functest/functest.c: Created.
+	* functest/Makefile.am: Created.
+	* functest/Makefile.in: Regenerated.
+	* inst-set-test: New directory.
+	* inst-set-test/inst-set-test.c: Created.
+	* inst-set-test/Makefile.am: Created.
+	* inst-set-test/Makefile.in: Regenerated.
+	* int-test: New directory.
+	* int-test/int-test.ld: Updated from old test directory.
+	* int-test/int-test.S: Created.
+	* int-test/Makefile.am: Created.
+	* int-test/Makefile.in: Regenerated.
+	* kbdtest: New directory.
+	* kbdtest/kbdtest.c: Created.
+	* kbdtest/Makefile.am: Created.
+	* kbdtest/Makefile.in: Regenerated.
+	* local-global: New directory.
+	* local-global/local-global.c: Created.
+	* local-global/Makefile.am: Created.
+	* local-global/Makefile.in: Regenerated.
+	* Makefile.am: Created.
+	* Makefile.in: Regenerated.
+	* mc-async: New directory.
+	* mc-async/Makefile.am: Created.
+	* mc-async/Makefile.in: Regenerated.
+	* mc-async/mc-async.c: Created.
+	* mc-async/mc-async.h: Created.
+	* mc-common: New directory.
+	* mc-common/except-mc.S: Created.
+	* mc-common/Makefile.am: Created.
+	* mc-common/Makefile.in: Regenerated.
+	* mc-common/mc-common.c: Created.
+	* mc-common/mc-common.h: Created.
+	* mc-dram: New directory.
+	* mc-dram/Makefile.am: Created.
+	* mc-dram/Makefile.in: Regenerated.
+	* mc-dram/mc-dram.c: Created.
+	* mc-dram/mc-dram.h: Created.
+	* mc-ssram: New directory.
+	* mc-ssram/Makefile.am: Created.
+	* mc-ssram/Makefile.in: Regenerated.
+	* mc-ssram/mc-ssram.c: Created.
+	* mc-ssram/mc-ssram.h: Created.
+	* mc-sync: New directory.
+	* mc-sync/Makefile.am: Created.
+	* mc-sync/Makefile.in: Regenerated.
+	* mc-sync/mc-sync.c: Created.
+	* mc-sync/mc-sync.h: Created.
+	* mem-test: New directory.
+	* mem-test/Makefile.am: Created.
+	* mem-test/Makefile.in: Regenerated.
+	* mem-test/mem-test.c: Created.
+	* mmu: New directory.
+	* mmu/Makefile.am: Created.
+	* mmu/Makefile.in: Regenerated.
+	* mmu/mmu-asm.S: Created.
+	* mmu/mmu.c: Created.
+	* mul: New directory.
+	* mul/Makefile.am: Created.
+	* mul/Makefile.in: Regenerated.
+	* mul/mul.c: Created.
+	* mycompress: New directory.
+	* mycompress/Makefile.am: Created.
+	* mycompress/Makefile.in: Regenerated.
+	* mycompress/mycompress.c: Created.
+	* support: New directory.
+	* support/int.c: Created.
+	* support/int.h: Created.
+	* support/Makefile.am: Created.
+	* support/Makefile.in: Regenerated.
+	* support/spr-defs.h: Created.
+	* support/support.c: Created.
+	* support/support.h: Created.
+	* tick: New directory.
+	* tick/Makefile.am: Created.
+	* tick/Makefile.in: Regenerated.
+	* tick/tick.c: Created.
+	* uos: New directory.
+	* uos/except-or32.S: Created.
+	* uos/ipc.h: Created.
+	* uos/Makefile.am: Created.
+	* uos/Makefile.in: Regenerated.
+	* uos/README: Created.
+	* uos/task.c: Created.
+	* uos/tick.c: Created.
+	* uos/uos.c: Created.
+	* uos/uos.h: Created.

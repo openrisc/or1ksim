@@ -5,10 +5,15 @@ This is the Or1ksim test suite, which is now integrated with the main Or1ksim
 development package. It operates using a standard DejaGNU framework within the
 GNU autoconf/automake/libtool structure.
 
-A separate configuration file is needed for the test suite, since it uses the
-OR1K tool chain, rather than the host tool chain.
+A separate configuration file is needed for the OpenRISC programs used in
+testing, since these use the OR1K tool chain, rather than the host tool
+chain. This can be found in the "test-code-or1k" directory.
 
-At the time of writing a total of 21 tests compile run and pass.
+Tests are provided for the standalone simulator (or1ksim) and for the library
+(libsim.a).
+
+At the time of writing a total of 21 tests of the standalone simulator compile
+run and pass and 1 test of the library.
 
 Configuration and make files are provided for further test programs. These
 come in three categories.
@@ -19,12 +24,14 @@ come in three categories.
 File Organization
 =================
 
-Each test program has its own directory under test-code. This builds the test
-program. If necessary it copies data files to the main build/testsuite
-directory.
+Each test program has its own directory under test-code (for native tests,
+typically of the library) or test-code-or1k (for OpenRISC code, which must use
+the OpenRISC tool chain). This builds the test program. If necessary it copies
+data files to the main build/testsuite directory.
 
-Each test then has a DejaGNU expect script in or1ksim.tests, which loads and
-runs the test. Support script procedures are in lib/or1ksim.exp.
+Each test then has a DejaGNU expect script in or1ksim.tests (for standalone
+tests) and libsim.tests (for library tests), which loads and runs the
+test. Support script procedures are in lib/or1ksim.exp and lib/libsim.exp.
 
 Libraries
 =========
