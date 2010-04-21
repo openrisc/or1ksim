@@ -264,12 +264,14 @@ main_mprofiler (int argc, char *argv[], int just_help)
 
   int mode = MODE_DETAIL;
 
-  /* Specify each argument, with fallback values */
+  /* Specify each argument, with fallback values.
+
+     Bug 1710 (Vinay Patil) fixed. mode should allow REG_EXTENDED. */
   vercop = arg_lit0 ("v", "version", "version and copyright notice");
   help = arg_lit0 ("h", "help", "print this help message");
   mode_arg = arg_rex0 ("m", "mode",
 		       "(detailed|d)|(pretty|p)|(access|a)|"
-		       "(width|w)", "<m>", REG_ICASE,
+		       "(width|w)", "<m>", REG_ICASE | REG_EXTENDED,
 		       "Output mode (detailed, pretty, access " "or width)");
   mode_arg->sval[0] = "detailed";
   group = arg_int0 ("g", "group", "<n>",
@@ -339,8 +341,11 @@ main_mprofiler (int argc, char *argv[], int just_help)
       return 1;
     }
 
-  /* If version or help is requested, that is all that is printed out */
-  /* Sort out the mode */
+  /* If version or help is requested, that is all that is printed out
+     Sort out the mode.
+
+     Bug 1710 fixed (Vinay Patil). Modes now set correctly (were all set to
+     detail). */
   if ((0 == strcmp (mode_arg->sval[0], "detail")) ||
       (0 == strcmp (mode_arg->sval[0], "d")))
     {
@@ -349,17 +354,17 @@ main_mprofiler (int argc, char *argv[], int just_help)
   else if ((0 == strcmp (mode_arg->sval[0], "pretty")) ||
 	   (0 == strcmp (mode_arg->sval[0], "p")))
     {
-      mode = MODE_DETAIL;
+      mode = MODE_PRETTY;
     }
   else if ((0 == strcmp (mode_arg->sval[0], "access")) ||
 	   (0 == strcmp (mode_arg->sval[0], "a")))
     {
-      mode = MODE_DETAIL;
+      mode = MODE_ACCESS;
     }
   else if ((0 == strcmp (mode_arg->sval[0], "width")) ||
 	   (0 == strcmp (mode_arg->sval[0], "w")))
     {
-      mode = MODE_DETAIL;
+      mode = MODE_WIDTH;
     }
   else
     {

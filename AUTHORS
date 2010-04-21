@@ -30,17 +30,20 @@ Johan Rydberg, <johan.rydberg@netinsight.se>
   it to GNU autoconf and automake.
 
 
-Bug reporters and fixers
-========================
+Feature and Bug reporters and fixers
+====================================
 
 John Alfredo
-  Icache initialization
+  Feature 469: Icache initialization
 
 Julius Baxter
-  Use of RSP with pre-loaded image.
+  Bug 1773: Use of RSP with pre-loaded image.
 
 Mark Jarvin
-  MAC OS X support
+  Feature 1673: MAC OS X support
+
+Vinay Patil
+  Bug 1710: mprofile argument handling
 
 
 Authors of the argtable2 library

@@ -26,6 +26,7 @@ The following feature requests have been rejected.
 The following bugs are fixed:
 * Bug 1773: Or1ksim now accepts ELF image when working through RSP.
 * Bug 1723: PS2 keyboard error message clearer if RX file won't open.
+* Bug 1710: mprofile now handles mode args correctly.
 
 New in release 0.3.0
 ====================

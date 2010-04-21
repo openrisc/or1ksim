@@ -1,5 +1,9 @@
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* NEWS: updated
+	* mprofile.c (main_mprofiler): Bug 1710 fixed.
+
+2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* NEWS: updated
 	* peripheral/ps2kbd.c (kbd_reset): Bug 1723 fixed.
 
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
