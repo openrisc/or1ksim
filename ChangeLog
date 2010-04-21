@@ -1,4 +1,8 @@
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* NEWS: updated
+	* peripheral/ps2kbd.c (kbd_reset): Bug 1723 fixed.
+
+2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* AUTHORS: Corrected spelling of Mark Jarvin.
 	* debug/rsp-server.c (rsp_get_client): Set len before calling
 	  accept ().

@@ -614,7 +614,9 @@ kbd_reset (void *dat)
   if (!(kbd->rxfs = fopen (kbd->rxfile, "r"))
       && !(kbd->rxfs = fopen (kbd->rxfile, "r+")))
     {
-      fprintf (stderr, "WARNING: Unable to open RX file stream.\n");
+      /* Bug 1723 fixed: Clearer message */
+      fprintf (stderr,
+	       "WARNING: PS2 keyboard unable to open RX file stream.\n");
       return;
     }
   kbd->slowdown = (long) ((system_kfreq * 1000.0) / KBD_BAUD_RATE);
