@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-04-21], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-04-28], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -352,31 +352,33 @@ INCLUDES="$INCLUDES -I\${top_srcdir} -I\${top_srcdir}/cpu/common \
 -I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2"
 AC_SUBST(INCLUDES)
 
-AC_CONFIG_FILES([Makefile                                \
-                 argtable2/Makefile                      \
-                 bpb/Makefile                            \
-                 cache/Makefile                          \
-                 cpu/Makefile                            \
-                 cpu/common/Makefile                     \
-                 cpu/or1k/Makefile                       \
-                 cuc/Makefile                            \
-                 debug/Makefile                          \
-                 doc/Makefile                            \
-                 mmu/Makefile                            \
-                 peripheral/Makefile                     \
-                 peripheral/channels/Makefile            \
-                 pm/Makefile                             \
-                 pic/Makefile                            \
-                 port/Makefile                           \
-                 support/Makefile                        \
-                 testsuite/Makefile                      \
-		 testsuite/config/Makefile               \
-		 testsuite/lib/Makefile                  \
-		 testsuite/libsim.tests/Makefile         \
-		 testsuite/or1ksim.tests/Makefile        \
-		 testsuite/test-code/Makefile            \
-		 testsuite/test-code/lib-iftest/Makefile \
-                 tick/Makefile                           \
+AC_CONFIG_FILES([Makefile                                 \
+                 argtable2/Makefile                       \
+                 bpb/Makefile                             \
+                 cache/Makefile                           \
+                 cpu/Makefile                             \
+                 cpu/common/Makefile                      \
+                 cpu/or1k/Makefile                        \
+                 cuc/Makefile                             \
+                 debug/Makefile                           \
+                 doc/Makefile                             \
+                 mmu/Makefile                             \
+                 peripheral/Makefile                      \
+                 peripheral/channels/Makefile             \
+                 pm/Makefile                              \
+                 pic/Makefile                             \
+                 port/Makefile                            \
+                 support/Makefile                         \
+                 testsuite/Makefile                       \
+		 testsuite/config/Makefile                \
+		 testsuite/lib/Makefile                   \
+		 testsuite/libsim.tests/Makefile          \
+		 testsuite/or1ksim.tests/Makefile         \
+		 testsuite/test-code/Makefile             \
+		 testsuite/test-code/lib-iftest/Makefile  \
+		 testsuite/test-code/lib-inttest/Makefile \
+		 testsuite/test-code/lib-upcalls/Makefile \
+                 tick/Makefile                            \
                  vapi/Makefile])
 
 # yuck. I don't know why I cannot just substitute $CPU_ARCH in the above

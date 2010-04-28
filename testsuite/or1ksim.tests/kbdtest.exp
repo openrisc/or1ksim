@@ -26,10 +26,34 @@
 
 # Run the keyboard test. Note the need for double quoting of "backslash"
 # characters.
-run_or1ksim "kbdtest"                         \
-    [list "Reading from keyboard."            \
-	  "Enabling interrupts."              \
-	  "Te3+=-</.\\\\|\\\"'`}]\\\t !%^&)*" \
-	  "report(0xdeaddead);"               \
-	  "exit(0)"]                          \
+run_or1ksim "kbdtest"              \
+    [list "Reading from keyboard." \
+	  "Enabling interrupts."   \
+          "Received 'T'"           \
+          "Received 'e'"           \
+          "Received '3'"           \
+          "Received '+'"           \
+          "Received '='"           \
+          "Received '-'"           \
+          "Received '<'"           \
+          "Received '/'"           \
+          "Received '.'"           \
+          "Received '\\\\'"        \
+          "Received '|'"           \
+          "Received '\"'"          \
+          "Received '\\\''"        \
+          "Received '`'"           \
+          "Received '}'"           \
+          "Received ']'"           \
+          "Received: TAB"          \
+          "Received: SPACE"        \
+          "Received '!'"           \
+          "Received '%'"           \
+          "Received '^'"           \
+          "Received '&'"           \
+          "Received ')'"           \
+          "Received '*'"           \
+          "Received: ENTER"        \
+	  "report(0xdeaddead);"    \
+	  "exit(0)"]               \
     "kbdtest.cfg" "kbdtest/kbdtest"

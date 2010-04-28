@@ -1,4 +1,4 @@
-# Or1ksim expect test functiosn for use with DejaGNU under automake
+# Or1ksim library expect test functions for use with DejaGNU under automake
 
 # Copyright (C) 2010 Embecosm Limited
 
@@ -25,28 +25,31 @@
 
 
 # -----------------------------------------------------------------------------
-#! Run a program on Or1ksim with the supplied config_file
+#! Run a libor1ksim program with the supplied config_file and target program.
 #
 #! @param[in] testname    The name of the test
 #! @param[in] match_list  A list of expected responses
-#! @param[in] config_file The or1ksim config file to use
-# !@param[in] progname    The program image to use on Or1ksim
+#! @param[in] libprog     The libor1ksim program
+#! @param[in] config      The or1ksim config file to use
+#! @param[in] or1kprog    The program image to use on libprog
+#! @param[in] args        Any other arguments
 # -----------------------------------------------------------------------------
-proc run_or1ksim { testname match_list config_file progname } {
+proc run_libsim { testname match_list libprog config or1kprog args } {
     global error_spawn_id
     global spawn_id
     global verbose
     global env
 
-    # Construct the filename
-    if {0 == [string length $config_file]} {
-	set config_full_file "$env(srcdir)/or1ksim.tests/default.cfg";
-    } else {
-	set config_full_file "$env(srcdir)/or1ksim.tests/$config_file";
+    # Construct the config filename or use the default
+    if {0 == [string length $config]} {
+	set config "default.cfg";
     }
 
-    set prog_full_name "./test-code-or1k/$progname"
-    set command_line "../sim -f $config_full_file $prog_full_name"
+    set libprog_name  "./test-code/$libprog"
+    set config_name   "$env(srcdir)/libsim.tests/$config";
+    set or1kprog_name "./test-code-or1k/$or1kprog"
+
+    set command_line "$libprog_name $config_name $or1kprog_name $args"
 
     if { $verbose > 1 } {
 	send_user "starting $command_line\n"
@@ -62,7 +65,9 @@ proc run_or1ksim { testname match_list config_file progname } {
 
 	set match_line [expr {$match_line + 1}];
 
-#	send_user "matching |$matchstr|\n";
+	if { $verbose > 2 } {
+	    send_user "matching |$matchstr|\n";
+	}
 
 	expect {
 

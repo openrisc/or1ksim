@@ -26,4 +26,6 @@
 
 # Subdirs for each test program.
 
-SUBDIRS = lib-iftest
+SUBDIRS = lib-iftest  \
+	  lib-inttest \
+	  lib-upcalls

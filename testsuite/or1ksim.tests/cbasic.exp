@@ -44,7 +44,7 @@ run_or1ksim "cbasic"              \
           "report(0xffffffff);" \
           "report(0x00000d7a);" \
           "report(0x00000d7a);" \
-          "RESULT: 0x21522153"  \
+          "RESULT: 0xdeaddead"  \
           "report(0xdeaddead);" \
 	  "exit(0)"]            \
     "" "cbasic/cbasic"

@@ -1,3 +1,22 @@
+2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.h <or1ksim_init>: Upcall arguments redefined.
+	* libtoplevel.c (or1ksim_init): Upcall arguments redefined.
+	* sim-config.h <struct config.ext>: definition of read_up and
+	write_up changed.
+	* generic.c (ext_read_word, ext_write_word): Deleted.
+	(mtohl, htoml, mtohs, htoms): Deleted.
+	(generic_read_byte, generic_write_byte, generic_read_hw)
+	(generic_write_hw, generic_read_word, generic_write_word): Changed
+	to use new upcall interface.
+
+2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* sim-config.c (read_script_file): Check cur_section is defined
+	before dereferencing to identify parameter.
+	* peripheral/generic.c (generic_read_byte, generic_write_byte)
+	(generic_read_half_word, generic_write_half_word)
+	(generic_read_word, generic_write_word): Use upcall availability
+	as test for upcall.
+
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* NEWS: updated
 	* mprofile.c (main_mprofiler): Bug 1710 fixed.
@@ -19,7 +38,7 @@
 	* README: Updated.
 	* configure.ac: Check for rl_event_hook declaration.
 	* sim-cmd.c (initialize_readline): Only use rl_event_hook if it's
-	  available.
+	available.
 	* peripheral/atadevice.c: Added conditional includes for Apple	MAC.
 	* port/strndup.c: Include stddef.h to define size_t.
 
@@ -29,7 +48,7 @@
 	* support/dbchs.h: simprintf channel removed.
 	* support/Makefile.am: References to simprintf.* removed.
 	* cpu/or32/generate.c (generate_body): Generate exception for
-	  illegal instructions.
+	illegal instructions.
 	* cpu/or32/insnset.c: NOP_PRINTF and stackaddr removed.
 	* cpu/or32/execute.c (evalsim_reg): Remove simprintf reference.
 	* peripheral/channels/xterm.c (xterm_open): write result used.

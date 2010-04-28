@@ -958,14 +958,21 @@ read_script_file (const char *filename)
 	    }
 	  else
 	    {
-	      struct config_param *cur_param;
+	      struct config_param *cur_param = NULL;
 	      char *cur_p;
-	      for (cur_param = cur_section->params; cur_param;
-		   cur_param = cur_param->next)
-		if (strcmp (cur_param->name, param) == 0)
-		  {
-		    break;
-		  }
+	      /* If we have a corrupt file, this could be encountered outside
+		 a section. So make sure cur_section is defined. */
+	      if (cur_section)
+		{
+		  for (cur_param = cur_section->params; cur_param;
+		       cur_param = cur_param->next)
+		    {
+		      if (strcmp (cur_param->name, param) == 0)
+			{
+			  break;
+			}
+		    }
+		}
 	      if (!cur_param)
 		{
 		  fprintf (stderr, "Warning: Invalid parameter: %s; ignored\n",

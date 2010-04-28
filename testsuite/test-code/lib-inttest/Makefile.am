@@ -1,6 +1,6 @@
-# cbasic.exp. Test of multiplication using DejaGNU under automake
+# Makefile.am for libor1ksim test program: lib-inttest
 
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) Embecosm Limited, 2010
 
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
@@ -24,14 +24,17 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the multiplication test
-run_or1ksim "mul"                       \
-    [list "x00000034"                   \
-          "00000000"                    \
-          "70a2588c"                    \
-          "a6312f33, expected a6312f33" \
-          "0d4de375, expected 0d4de375" \
-          "61ab48dc, expected 61ab48dc" \
-          "report(0xdeaddead);"         \
-	  "exit(0)"]                    \
-    "" "mul/mul"
+# Test programs of the library interrupt driving functions. Two versions, one
+# to drive edge based interrupts, one to drive level based interrupts.
+check_PROGRAMS            = lib-inttest-edge  \
+			    lib-inttest-level
+
+# Edge based interrupt
+lib_inttest_edge_SOURCES  = lib-inttest-edge.c
+
+lib_inttest_edge_LDADD    = $(top_builddir)/libsim.la
+
+# Level based interrupt
+lib_inttest_level_SOURCES = lib-inttest-level.c
+
+lib_inttest_level_LDADD   = $(top_builddir)/libsim.la

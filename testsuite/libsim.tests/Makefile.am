@@ -28,5 +28,10 @@
 
 
 # Just distribute this stuff
-EXTRA_DIST = default.cfg    \
-	     lib-iftest.exp
+EXTRA_DIST = default.cfg      \
+	     int-edge.cfg     \
+	     int-edge.exp     \
+	     int-level.cfg    \
+	     int-level.exp    \
+	     lib-iftest.exp   \
+	     upcalls.cfg

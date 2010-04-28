@@ -1,4 +1,4 @@
-# int-test.exp. Interrupt controller test using DejaGNU under automake
+# int-test.exp. Interrupt test using DejaGNU under automake
 
 # Copyright (C) 2010 Embecosm Limited
 
@@ -24,7 +24,8 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the Interrupt controller test
+# Run the Interrupt test. Note this is not a test of the Programmable
+# Interrupt Controller.
 run_or1ksim "int-test"          \
     [list "report(0x00000628);" \
           "report(0x00000000);" \

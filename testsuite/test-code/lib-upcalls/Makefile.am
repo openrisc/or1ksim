@@ -1,6 +1,6 @@
-# cbasic.exp. Test of multiplication using DejaGNU under automake
+# Makefile.am for libor1ksim test program: lib-upcalls
 
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) Embecosm Limited, 2010
 
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
@@ -24,14 +24,10 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the multiplication test
-run_or1ksim "mul"                       \
-    [list "x00000034"                   \
-          "00000000"                    \
-          "70a2588c"                    \
-          "a6312f33, expected a6312f33" \
-          "0d4de375, expected 0d4de375" \
-          "61ab48dc, expected 61ab48dc" \
-          "report(0xdeaddead);"         \
-	  "exit(0)"]                    \
-    "" "mul/mul"
+# A generic program to handle upcalls.
+check_PROGRAMS      = lib-upcalls
+
+# Edge based interrupt
+lib_upcalls_SOURCES = lib-upcalls.c
+
+lib_upcalls_LDADD   = $(top_builddir)/libsim.la

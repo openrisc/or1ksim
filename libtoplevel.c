@@ -61,12 +61,16 @@ int
 or1ksim_init (const char *config_file,
 	      const char *image_file,
 	      void       *class_ptr,
-	      unsigned long int (*upr) (void *class_ptr,
-					unsigned long int addr,
-					unsigned long int mask),
-	      void (*upw) (void *class_ptr,
-			   unsigned long int addr,
-			   unsigned long int mask, unsigned long int wdata))
+	      int       (*upr) (void              *class_ptr,
+				unsigned long int  addr,
+				unsigned char      mask[],
+				unsigned char      rdata[],
+				int                data_len),
+	      int       (*upw) (void              *class_ptr,
+				unsigned long int  addr,
+				unsigned char      mask[],
+				unsigned char      wdata[],
+				int                data_len))
 {
   int   dummy_argc;
   char *dummy_argv[4];
@@ -322,7 +326,7 @@ or1ksim_interrupt (int i)
   if (!config.pic.edge_trigger)
     {
       fprintf (stderr, "Warning: or1ksim_interrupt should not be used for "
-	       "edge triggered interrupts. Ignored\n");
+	       "level triggered interrupts. Ignored\n");
     }
   else
     {
@@ -349,7 +353,7 @@ or1ksim_interrupt_set (int i)
   if (config.pic.edge_trigger)
     {
       fprintf (stderr, "Warning: or1ksim_interrupt_set should not be used for "
-	       "level triggered interrupts. Ignored\n");
+	       "edge triggered interrupts. Ignored\n");
     }
   else
     {
@@ -375,7 +379,7 @@ or1ksim_interrupt_clear (int i)
   if (config.pic.edge_trigger)
     {
       fprintf (stderr, "Warning: or1ksim_interrupt_clear should not be used "
-	       "for level triggered interrupts. Ignored\n");
+	       "for edge triggered interrupts. Ignored\n");
     }
   else
     {

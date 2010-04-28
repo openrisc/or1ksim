@@ -43,6 +43,7 @@
 #define KBD_BASE_ADD    0x94000000
 #define KBD_IRQ         5
 #define MC_BASE_ADDR    0x93000000
+#define GENERIC_BASE    0x98000000
 #define DMA_BASE        0xb8000000
 
 #endif

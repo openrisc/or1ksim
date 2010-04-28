@@ -132,6 +132,7 @@ AC_CONFIG_FILES([Makefile               \
 		 functest/Makefile      \
 		 flag/Makefile          \
 		 int-test/Makefile      \
+		 int-logger/Makefile    \
 		 inst-set-test/Makefile \
 		 kbdtest/Makefile       \
 		 local-global/Makefile  \
@@ -147,6 +148,7 @@ AC_CONFIG_FILES([Makefile               \
 		 mycompress/Makefile    \
 		 support/Makefile       \
 		 tick/Makefile          \
-		 uos/Makefile])
+		 uos/Makefile           \
+		 upcalls/Makefile])
 
 AC_OUTPUT

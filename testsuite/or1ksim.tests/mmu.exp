@@ -70,9 +70,9 @@ run_or1ksim "mmu"                                \
           "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
           "ea = 4007e000 set = 63 way = 0"       \
           "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 7ff84004 set = 61 way = 0"       \
+          "ea = 8007bffc set = 61 way = 0"       \
           "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 7ff82000 set = 63 way = 0"       \
+          "ea = 8007e000 set = 63 way = 0"       \
           "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
           "ea = 0027c000 set = 62 way = 0"       \
           "tlbtr = 0017c3c0 dtlb_val = 000003c0" \
@@ -126,9 +126,9 @@ run_or1ksim "mmu"                                \
           "ta = 0017bff8"                        \
           "ea = 4007e000 set = 63 way = 0"       \
           "ta = 0017e000"                        \
-          "ea = 7ff84008 set = 61 way = 0"       \
+          "ea = 8007bff8 set = 61 way = 0"       \
           "ta = 0017bff8"                        \
-          "ea = 7ff82000 set = 63 way = 0"       \
+          "ea = 8007e000 set = 63 way = 0"       \
           "ta = 0017e000"                        \
           "ea = 0027e000 set = 63 way = 0"       \
           "ta = 0017e000"                        \

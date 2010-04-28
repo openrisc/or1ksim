@@ -81,129 +81,30 @@ struct dev_generic
 };
 
 
-/* Convert a 32-bit value from host to model endianess */
-static unsigned long int
-htoml (unsigned long int  host_val)
-{
-  unsigned char  model_array[4];
+/* --------------------------------------------------------------------------*/
+/*!Read a byte from an external device
 
-#ifdef OR32_BIG_ENDIAN
-  model_array[0] = (host_val >> 24) & 0xff;
-  model_array[1] = (host_val >> 16) & 0xff;
-  model_array[2] = (host_val >>  8) & 0xff;
-  model_array[3] = (host_val      ) & 0xff;
-#else
-  model_array[0] = (host_val      ) & 0xff;
-  model_array[1] = (host_val >>  8) & 0xff;
-  model_array[2] = (host_val >> 16) & 0xff;
-  model_array[3] = (host_val >> 24) & 0xff;
-#endif
+   To model Wishbone accurately, we always do this as a 4-byte access, with a
+   mask for the bytes we don't want.
 
-  unsigned long int *res = (unsigned long int *) model_array;
-  return *res;
+   Since this is only a byte, the endianess of the result is irrelevant.
 
-}	/* htoml () */
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
 
+   @param[in] addr  The device address to read from (host endian).
+   @param[in] dat   The device data structure
 
-/* Convert a 16-bit value from host to model endianess */
-static unsigned short int
-htoms (unsigned short int  host_val)
-{
-  unsigned char  model_array[2];
-
-#ifdef OR32_BIG_ENDIAN
-  model_array[0] = (host_val >>  8) & 0xff;
-  model_array[1] = (host_val      ) & 0xff;
-#else
-  model_array[0] = (host_val      ) & 0xff;
-  model_array[1] = (host_val >>  8) & 0xff;
-#endif
-
-  unsigned short int *res = (unsigned short int *) model_array;
-  return *res;
-
-}	/* htoms () */
-
-
-/* Convert a 32-bit value from model to host endianess */
-static unsigned long int
-mtohl (unsigned long int  model_val)
-{
-  unsigned char     *model_array = (unsigned char *)(&model_val);
-  unsigned long int  host_val;
-
-#ifdef OR32_BIG_ENDIAN
-  host_val =                   model_array[0];
-  host_val = (host_val << 8) | model_array[1];
-  host_val = (host_val << 8) | model_array[2];
-  host_val = (host_val << 8) | model_array[3];
-#else
-  host_val =                   model_array[3];
-  host_val = (host_val << 8) | model_array[2];
-  host_val = (host_val << 8) | model_array[1];
-  host_val = (host_val << 8) | model_array[0];
-#endif
-
-  return  host_val;
-
-}	/* mtohl () */
-
-
-/* Convert a 32-bit value from model to host endianess */
-static unsigned short int
-mtohs (unsigned short int  model_val)
-{
-  unsigned char      *model_array = (unsigned char *)(&model_val);
-  unsigned short int  host_val;
-
-#ifdef OR32_BIG_ENDIAN
-  host_val =                   model_array[0];
-  host_val = (host_val << 8) | model_array[1];
-#else
-  host_val =                   model_array[1];
-  host_val = (host_val << 8) | model_array[0];
-#endif
-
-  return  host_val;
-
-}	/* mtohs () */
-
-
-/* Generic read and write upcall routines. Note the address here is absolute,
-   not relative to the device. The mask uses host endianess, not Or1ksim
-   endianess. */
-
-static unsigned long int
-ext_read (unsigned long int  addr,
-	  unsigned long int  mask)
-{
-  return config.ext.read_up (config.ext.class_ptr, addr, mask);
-
-}				/* ext_callback() */
-
-
-/* Generic read and write upcall routines. Note the address here is absolute,
-   not relative to the device. The mask and value use host endianess, not
-   Or1ksim endianess. */
-
-static void
-ext_write (unsigned long int  addr,
-	   unsigned long int  mask,
-	   unsigned long int  value)
-{
-  config.ext.write_up (config.ext.class_ptr, addr, mask, value);
-
-}				/* ext_callback() */
-
-
-/* I/O routines. Note that address is relative to start of address space. */
-
+   @return  The byte read.                                                   */
+/* --------------------------------------------------------------------------*/
 static uint8_t
-generic_read_byte (oraddr_t addr, void *dat)
+generic_read_byte (oraddr_t  addr,
+		   void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.read_up)
     {
       fprintf (stderr, "Byte read from disabled generic device\n");
       return 0;
@@ -216,33 +117,52 @@ generic_read_byte (oraddr_t addr, void *dat)
     }
   else
     {
-      unsigned long  fulladdr = (unsigned long int) (addr + dev->baseaddr);
-      unsigned long  wordaddr = fulladdr & 0xfffffffc;
-      unsigned long  bytenum  = fulladdr & 0x00000003;
+      unsigned long int  fulladdr = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = fulladdr & 0xfffffffc;
+      int                bytenum  = fulladdr & 0x00000003;
 
-      uint8_t        mask_array[4];
-      unsigned long  res;
-      uint8_t       *res_array;
+      unsigned char      mask[4];
+      unsigned char      res[4];
 
-      /* This works whatever the host endianess */
-      memset (mask_array, 0, 4);
-      mask_array[bytenum] = 0xff;
+      /* Set the mask, read and get the result */
+      memset (mask, 0, sizeof (mask));
+      mask[bytenum] = 0xff;
 
-      unsigned int *arg_ptr = (unsigned int *) mask_array;
-      res       = ext_read (wordaddr, *arg_ptr);
-      res_array = (uint8_t *)(&res);
+      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+	{
+	  fprintf (stderr, "Warning: external byte read failed.\n");
+	  return  0;
+	}
 
-      return  res_array[bytenum];
+      return  res[bytenum];
     }
-}				/* generic_read_byte() */
+}	/* generic_read_byte() */
 
 
+/* --------------------------------------------------------------------------*/
+/*!Write a byte to an external device
+
+   To model Wishbone accurately, we always do this as a 4-byte access, with a
+   mask for the bytes we don't want.
+
+   Since this is only a byte, the endianess of the value is irrelevant.
+
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
+
+   @param[in] addr  The device address to write to (host endian)
+   @param[in] value The byte value to write
+   @param[in] dat   The device data structure                                */
+/* --------------------------------------------------------------------------*/
 static void
-generic_write_byte (oraddr_t addr, uint8_t value, void *dat)
+generic_write_byte (oraddr_t  addr,
+		    uint8_t   value,
+		    void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.write_up)
     {
       fprintf (stderr, "Byte write to disabled generic device\n");
     }
@@ -253,33 +173,50 @@ generic_write_byte (oraddr_t addr, uint8_t value, void *dat)
     }
   else
     {
-      unsigned long  fulladdr = (unsigned long int) (addr + dev->baseaddr);
-      unsigned long  wordaddr = fulladdr & 0xfffffffc;
+      unsigned long int  fulladdr = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = fulladdr & 0xfffffffc;
+      int                bytenum  = fulladdr & 0x00000003;
 
-      unsigned long  bytenum  = fulladdr & 0x00000003;
-      uint8_t        mask_array[4];
-      uint8_t        value_array[4];
+      unsigned char      mask[4];
+      unsigned char      val[4];
 
-      /* This works whatever the host endianess */
-      memset (mask_array, 0, 4);
-      mask_array[bytenum] = 0xff;
-      memset (value_array, 0, 4);
-      value_array[bytenum] = value;
+      /* Set the mask and write data do the write. */
+      memset (mask, 0, sizeof (mask));
+      mask[bytenum] = 0xff;
+      val[bytenum]  = value;
 
-      unsigned long int *arg1_ptr = (unsigned long int *)mask_array;
-      unsigned long int *arg2_ptr = (unsigned long int *)value_array;
-      ext_write (wordaddr, *arg1_ptr, *arg2_ptr);
+      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+	{
+	  fprintf (stderr, "Warning: external byte write failed.\n");
+	}
     }
-}				/* generic_write_byte() */
+}	/* generic_write_byte() */
 
 
-/* Result is in model endianess */
+/* --------------------------------------------------------------------------*/
+/*!Read a half word from an external device
+
+   To model Wishbone accurately, we always do this as a 4-byte access, with a
+   mask for the bytes we don't want.
+
+   Since this is a half word, the result must be converted to host endianess.
+
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
+
+   @param[in] addr  The device address to read from (host endian).
+   @param[in] dat   The device data structure.
+
+   @return  The half word read (host endian).                                */
+/* --------------------------------------------------------------------------*/
 static uint16_t
-generic_read_hw (oraddr_t addr, void *dat)
+generic_read_hw (oraddr_t  addr,
+		 void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.read_up)
     {
       fprintf (stderr, "Half word read from disabled generic device\n");
       return 0;
@@ -292,6 +229,7 @@ generic_read_hw (oraddr_t addr, void *dat)
     }
   else if (addr & 0x1)
     {
+      /* This should be trapped elsewhere - here for safety. */
       fprintf (stderr,
 	       "Unaligned half word read from 0x%" PRIxADDR " ignored\n",
 	       addr);
@@ -299,40 +237,60 @@ generic_read_hw (oraddr_t addr, void *dat)
     }
   else
     {
-      unsigned long   fulladdr = (unsigned long int) (addr + dev->baseaddr);
-      unsigned long   wordaddr = fulladdr & 0xfffffffc;
-      unsigned long   bytenum  = fulladdr & 0x00000002;
+      unsigned long int  fulladdr = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = fulladdr & 0xfffffffc;
+      int                hwnum    = fulladdr & 0x00000002;
 
-      uint8_t         mask_array[4];
-      unsigned long   res;
-      uint8_t        *res_array;
-      uint8_t         hwres_array[2];
+      unsigned char      mask[4];
+      unsigned char      res[4];
 
-      /* This works whatever the host endianess */
-      memset (mask_array, 0, 4);
-      mask_array[bytenum]     = 0xff;
-      mask_array[bytenum + 1] = 0xff;
+      /* Set the mask, read and get the result */
+      memset (mask, 0, sizeof (mask));
+      mask[hwnum    ] = 0xff;
+      mask[hwnum + 1] = 0xff;
 
-      unsigned int *arg_ptr = (unsigned int *) mask_array;
-      res       = ext_read (wordaddr, *arg_ptr);
-      res_array = (uint8_t *)(&res);
+      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+	{
+	  fprintf (stderr, "Warning: external half word read failed.\n");
+	  return  0;
+	}
 
-      hwres_array[0] = res_array[bytenum];
-      hwres_array[1] = res_array[bytenum + 1];
-
-      uint16_t *hwres_ptr = (uint16_t *) hwres_array;
-      return htoms (*hwres_ptr);
+      /* Result converted according to endianess */
+#ifdef OR32_BIG_ENDIAN
+      return  (unsigned short int) res[hwnum    ] << 8 |
+	      (unsigned short int) res[hwnum + 1];
+#else
+      return  (unsigned short int) res[hwnum + 1] << 8 |
+	      (unsigned short int) res[hwnum    ];
+#endif
     }
-}				/* generic_read_hw() */
+}	/* generic_read_hw() */
 
 
-/* Value is in model endianness */
+/* --------------------------------------------------------------------------*/
+/*!Write a half word to an external device
+
+   To model Wishbone accurately, we always do this as a 4-byte access, with a
+   mask for the bytes we don't want.
+
+   Since this is a half word, the value must be converted from host endianess.
+
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
+
+   @param[in] addr  The device address to write to (host endian).
+   @param[in] value The half word value to write (model endian).
+   @param[in] dat   The device data structure.                               */
+/* --------------------------------------------------------------------------*/
 static void
-generic_write_hw (oraddr_t addr, uint16_t value, void *dat)
+generic_write_hw (oraddr_t  addr,
+		  uint16_t  value,
+		  void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.write_up)
     {
       fprintf (stderr, "Half word write to disabled generic device\n");
     }
@@ -348,39 +306,56 @@ generic_write_hw (oraddr_t addr, uint16_t value, void *dat)
     }
   else
     {
-      uint16_t       host_value = mtohs (value);
+      unsigned long int  fulladdr = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = fulladdr & 0xfffffffc;
+      int                hwnum    = fulladdr & 0x00000002;
 
-      unsigned long  fulladdr = (unsigned long int) (addr + dev->baseaddr);
-      unsigned long  wordaddr = fulladdr & 0xfffffffc;
-      unsigned long  bytenum  = fulladdr & 0x00000002;
+      unsigned char      mask[4];
+      unsigned char      val[4];
 
-      uint8_t        mask_array[4];
-      uint8_t        value_array[4];
-      uint8_t       *hw_value_array;
+      /* Set the mask and write data do the write. */
+      memset (mask, 0, sizeof (mask));
+      mask[hwnum    ] = 0xff;
+      mask[hwnum + 1] = 0xff;
 
-      /* This works whatever the host endianess */
-      memset (mask_array, 0, 4);
-      mask_array[bytenum]     = 0xff;
-      mask_array[bytenum + 1] = 0xff;
+      /* Value converted according to endianess */
+#ifdef OR32_BIG_ENDIAN
+      val[hwnum    ] = (unsigned char) (value >> 8);
+      val[hwnum + 1] = (unsigned char) (value     );
+#else
+      val[hwnum + 1] = (unsigned char) (value >> 8);
+      val[hwnum    ] = (unsigned char) (value     );
+#endif
 
-      memset (value_array, 0, 4);
-      hw_value_array           = (uint8_t *)(&host_value);
-      value_array[bytenum]     = hw_value_array[0];
-      value_array[bytenum + 1] = hw_value_array[1];
-
-      unsigned long int *arg1_ptr = (unsigned long int *)mask_array;
-      unsigned long int *arg2_ptr = (unsigned long int *)value_array;
-      ext_write (wordaddr, *arg1_ptr, *arg2_ptr);
+      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+	{
+	  fprintf (stderr, "Warning: external half word write failed.\n");
+	}
     }
-}				/* generic_write_hw() */
+}	/* generic_write_hw() */
 
 
+/* --------------------------------------------------------------------------*/
+/*!Read a full word from an external device
+
+   Since this is a full word, the result must be converted to host endianess.
+
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
+
+   @param[in] addr  The device address to read from (host endian).
+   @param[in] dat   The device data structure.
+
+   @return  The full word read (host endian).                                */
+/* --------------------------------------------------------------------------*/
 static uint32_t
-generic_read_word (oraddr_t addr, void *dat)
+generic_read_word (oraddr_t  addr,
+		   void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.read_up)
     {
       fprintf (stderr, "Full word read from disabled generic device\n");
       return 0;
@@ -400,19 +375,57 @@ generic_read_word (oraddr_t addr, void *dat)
     }
   else
     {
-      unsigned long wordaddr = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = (unsigned long int) (addr + dev->baseaddr);
 
-      return (uint32_t) htoml (ext_read (wordaddr, 0xffffffff));
+      unsigned char      mask[4];
+      unsigned char      res[4];
+
+      /* Set the mask, read and get the result */
+      memset (mask, 0xff, sizeof (mask));
+
+      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+	{
+	  fprintf (stderr, "Warning: external full word read failed.\n");
+	  return  0;
+	}
+
+      /* Result converted according to endianess */
+#ifdef OR32_BIG_ENDIAN
+      return  (unsigned long int) res[0] << 24 |
+	      (unsigned long int) res[1] << 16 |
+	      (unsigned long int) res[2] <<  8 |
+	      (unsigned long int) res[3];
+#else
+      return  (unsigned long int) res[3] << 24 |
+	      (unsigned long int) res[2] << 16 |
+	      (unsigned long int) res[1] <<  8 |
+	      (unsigned long int) res[0];
+#endif
     }
-}				/* generic_read_word() */
+}	/* generic_read_word() */
 
 
+/* --------------------------------------------------------------------------*/
+/*!Write a full word to an external device
+
+   Since this is a half word, the value must be converted from host endianess.
+
+   @note We are passed the device address, but we must convert it to a full
+         address for external use, to allow the single upcall handler to
+         decode multiple generic devices.
+
+   @param[in] addr  The device address to write to (host endian).
+   @param[in] value The full word value to write (host endian).
+   @param[in] dat   The device data structure.                               */
+/* --------------------------------------------------------------------------*/
 static void
-generic_write_word (oraddr_t addr, uint32_t value, void *dat)
+generic_write_word (oraddr_t  addr,
+		    uint32_t  value,
+		    void     *dat)
 {
   struct dev_generic *dev = (struct dev_generic *) dat;
 
-  if (!config.ext.class_ptr)
+  if (!config.ext.write_up)
     {
       fprintf (stderr, "Full word write to disabled generic device\n");
     }
@@ -428,12 +441,33 @@ generic_write_word (oraddr_t addr, uint32_t value, void *dat)
     }
   else
     {
-      unsigned long host_value = mtohl (value);
-      unsigned long wordaddr   = (unsigned long int) (addr + dev->baseaddr);
+      unsigned long int  wordaddr = (unsigned long int) (addr + dev->baseaddr);
 
-      ext_write (wordaddr, 0xffffffff, host_value);
+      unsigned char      mask[4];
+      unsigned char      val[4];
+
+      /* Set the mask and write data do the write. */
+      memset (mask, 0xff, sizeof (mask));
+
+      /* Value converted according to endianess */
+#ifdef OR32_BIG_ENDIAN
+      val[0] = (unsigned char) (value >> 24);
+      val[1] = (unsigned char) (value >> 16);
+      val[2] = (unsigned char) (value >>  8);
+      val[3] = (unsigned char) (value      );
+#else
+      val[3] = (unsigned char) (value >> 24);
+      val[2] = (unsigned char) (value >> 16);
+      val[1] = (unsigned char) (value >>  8);
+      val[0] = (unsigned char) (value      );
+#endif
+
+      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+	{
+	  fprintf (stderr, "Warning: external full word write failed.\n");
+	}
     }
-}				/* generic_write_word() */
+}	/* generic_write_word() */
 
 
 /* Reset is a null operation */

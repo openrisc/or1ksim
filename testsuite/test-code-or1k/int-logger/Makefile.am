@@ -1,6 +1,6 @@
-# cbasic.exp. Test of multiplication using DejaGNU under automake
+# Makefile.am for or1ksim OR1K test programs: int-logger-{edge,level}
 
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) Embecosm Limited, 2010
 
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
@@ -24,14 +24,21 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the multiplication test
-run_or1ksim "mul"                       \
-    [list "x00000034"                   \
-          "00000000"                    \
-          "70a2588c"                    \
-          "a6312f33, expected a6312f33" \
-          "0d4de375, expected 0d4de375" \
-          "61ab48dc, expected 61ab48dc" \
-          "report(0xdeaddead);"         \
-	  "exit(0)"]                    \
-    "" "mul/mul"
+# Test programs which report on interrupts received. One for edge triggered,
+# one for level triggered.
+check_PROGRAMS = int-logger-edge  \
+		 int-logger-level
+
+int_logger_edge_SOURCES  = int-logger-edge.c
+
+int_logger_edge_LDFLAGS  = -T$(srcdir)/../default.ld
+
+int_logger_edge_LDADD    = ../except/except.lo      \
+	         	   ../support/libsupport.la
+
+int_logger_level_SOURCES = int-logger-level.c
+
+int_logger_level_LDFLAGS = -T$(srcdir)/../default.ld
+
+int_logger_level_LDADD   = ../except/except.lo      \
+	         	   ../support/libsupport.la

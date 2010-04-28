@@ -69,6 +69,44 @@ void fail (char *msg)
 
 
 /* --------------------------------------------------------------------------*/
+/*!Print an escaped character
+   Non-printable characters use their name:
+   '\n' - ENTER
+   ' '  - SPACE
+   '\t' - TAB
+
+   Any char > 127 (0x7f) is an error.
+
+   Any other char less than 0x20 appears as ^<char>.                         */
+/* --------------------------------------------------------------------------*/
+static void
+print_escaped_char (unsigned char  c)
+{
+  switch (c)
+    {
+    case '\n': printf ("Received: ENTER.\n"); return;
+    case ' ':  printf ("Received: SPACE.\n"); return;
+    case '\t': printf ("Received: TAB.\n");   return;
+
+    default:
+      if (c > 0x7f)
+	{
+	  printf ("\nWarning: received erroneous character 0x%02x.\n",
+		  (unsigned int) c);
+	}
+      else if (c < 0x20)
+	{
+	  printf ("Received '^%c'.\n", '@' + c);
+	}
+      else
+	{
+	  printf ("Received '%c'.\n", c);
+	}
+    }
+}	/* print_escaped_char () */
+
+
+/* --------------------------------------------------------------------------*/
 /*!Utility to read a 32 bit memory mapped register
 
    @param[in] addr  The address to read from
@@ -205,7 +243,7 @@ interrupt_handler ()
 		}
 	      else
 		{
-		  printf ("%c", c);
+		  print_escaped_char (c);
 		  char_scan_made = x;
 		}
 	    }
@@ -225,7 +263,7 @@ interrupt_handler ()
 	    }
 	  else
 	    {
-	      printf ("%c", c);
+	      print_escaped_char (c);
 	      char_scan_made = x;
 	    }
 
@@ -307,7 +345,7 @@ main ()
   mtspr (SPR_SR, mfspr(SPR_SR) | SPR_SR_IEE);
   mtspr (SPR_PICMR, mfspr(SPR_PICMR) | (0x00000001L << KBD_IRQ));
 
-  /* Wait until the interrupt handler is finished */
+  /* Wait until the interrupt handler is finished. */
   while (num_chars_done < MAX_CHARS_TO_READ)
     {
     }

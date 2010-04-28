@@ -1,4 +1,4 @@
-/* int-test.S. Test of Or1ksim interrupt controller
+/* int-test.S. Test of Or1ksim interrupt handling
 
    Copyright (C) 1999-2006 OpenCores
    Copyright (C) 2010 Embecosm Limited
@@ -25,7 +25,9 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
-/* Within the test we'll use following global variables:
+/* NOTE. This is not a test of the Programmable Interrupt Controller.
+
+   Within the test we'll use following global variables:
    
    r16 interrupt counter
    r17 current tick timer comparison counter
@@ -38,10 +40,11 @@
    r25-r31 used by int handler
    
    The test do the following:
-   We set up the tick timer to trigger once and then we trigger interrupts incrementally
-   on every cycle in the specified test program; on interrupt handler we check if data computed
-   so far exactly matches precalculated values. If interrupt has returned incorreclty, we can
-   detect this using assertion routine at the end.
+   We set up the tick timer to trigger once and then we trigger interrupts
+   incrementally on every cycle in the specified test program; on interrupt
+   handler we check if data computed so far exactly matches precalculated
+   values. If interrupt has returned incorreclty, we can detect this using
+   assertion routine at the end.
 */
 
 #include "spr-defs.h"

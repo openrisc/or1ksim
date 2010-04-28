@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-04-21.tar.bz2
+     tar jxf or1ksim-2010-04-28.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-04-21/configure --target=or32-uclinux ...
+     ../or1ksim-2010-04-28/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -243,7 +243,7 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 =============================
 
 The following problems and issues are known about with Or1ksim
-2010-04-21.  The OpenRISC tracker may be used to see the current state
+2010-04-28.  The OpenRISC tracker may be used to see the current state
 of these issues and to raise new problems and feature requests.  It may
 be found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
@@ -487,11 +487,13 @@ should be added to the link command.
 The header file `or1ksim.h' contains appropriate declarations of the
 functions exported by the Or1ksim library.  These are:
 
- -- `or1ksim.h': int or1ksim_init (const char *CONFIG_FILE, const char
-          *IMAGE_FILE, void *CLASS_PTR, unsigned long int (*UPR)(void
-          *CLASS_PTR, unsigned long int ADDR, unsigned long int MASK),
-          void (*UPW)(void *CLASS_PTR, unsigned long int ADDR, unsigned
-          long int MASK, unsigned long int WDATA))
+ -- `or1ksim.h': int or1ksim_init (const char
+     *CONFIG_FILE, const char *IMAGE_FILE, void *CLASS_PTR, int
+     (*UPR)(void *CLASS_PTR, unsigned long int ADDR, unsigned char
+     MASK[], unsigned char RDATA[], int DATA_LEN), int (*UPW)(void
+     *CLASS_PTR, unsigned long int ADDR, unsigned char MASK[], unsigned
+     char WDATA[], int DATA_LEN))
+
      The initialization function is supplied with the name of a
      configuration file, CONFIG_FILE, an executable image, IMAGE_FILE,
      a pointer to the calling class, CLASS_PTR (since the library may
@@ -506,15 +508,26 @@ functions exported by the Or1ksim library.  These are:
      UPR is called for any reads to an external address.  The CLASS_PTR
      is passed back with these upcalls, allowing the function to
      associate the call with the class which originally initialized the
-     library.
+     library.  Both UPW and UPR should return zero on success and
+     non-zero otherwise.  At the present time the meaning of non-zero
+     values is not defined but this may change in the future.
 
-     MASK indicates which bytes in the word are to be written or read.
+     MASK indicates which bytes in the data are to be written or read.
      Bytes to be read/written should have 0xff set in MASK.  Otherwise
-     the byte should be zero.
+     the byte should be zero.  The adddress, ADDR, is the _full_
+     address, since the upcall function must handle all generic
+     devices, using the full address for decoding.
 
-     ADDR, MASK, WDATA and the result from UPR all use host-endianess,
-     _not_ model-endianess.  The internal Or1ksim routines manage all
-     the conversion.
+     Endianness is not completely transparent, since Or1ksim is
+     transferring byte vectors, not multi-byte values.
+
+          Caution: This is a change from version 0.3.0. It simplifies
+          the interface, and makes Or1ksim more consistent with payload
+          representation in SystemC TLM 2.0.
+
+          Note: The current implementation of Or1ksim always transfers
+          single words (4 bytes), using masks if smaller values are
+          required.  In this it mimcs the behavior of the WishBone bus.
 
 
  -- `or1ksim.h': int or1ksim_run (double DURATION)
@@ -3667,7 +3680,7 @@ Index
                                                               (line 122)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
-* long:                                  Simulator Library.   (line  74)
+* long:                                  Simulator Library.   (line  87)
 * mc (memory configuration):             Memory Configuration.
                                                               (line 100)
 * memory configuration:                  Memory Configuration.
@@ -3724,15 +3737,15 @@ Index
 * nways (cache configuration):           Cache Configuration. (line  22)
 * nways (MMU configuration):             Memory Management Configuration.
                                                               (line  22)
-* or1ksim_get_time_period:               Simulator Library.   (line  64)
-* or1ksim_init:                          Simulator Library.   (line  18)
-* or1ksim_interrupt:                     Simulator Library.   (line  79)
-* or1ksim_interrupt_clear:               Simulator Library.   (line  97)
-* or1ksim_interrupt_set:                 Simulator Library.   (line  88)
-* or1ksim_is_le:                         Simulator Library.   (line  69)
-* or1ksim_reset_duration:                Simulator Library.   (line  49)
-* or1ksim_run:                           Simulator Library.   (line  44)
-* or1ksim_set_time_point:                Simulator Library.   (line  60)
+* or1ksim_get_time_period:               Simulator Library.   (line  77)
+* or1ksim_init:                          Simulator Library.   (line  14)
+* or1ksim_interrupt:                     Simulator Library.   (line  92)
+* or1ksim_interrupt_clear:               Simulator Library.   (line 110)
+* or1ksim_interrupt_set:                 Simulator Library.   (line 101)
+* or1ksim_is_le:                         Simulator Library.   (line  82)
+* or1ksim_reset_duration:                Simulator Library.   (line  62)
+* or1ksim_run:                           Simulator Library.   (line  57)
+* or1ksim_set_time_point:                Simulator Library.   (line  73)
 * output rediretion:                     Concepts.            (line   7)
 * overflow flag setting by instructions: Configuring the Build.
                                                               (line  70)
@@ -4071,43 +4084,43 @@ Node: Standalone Simulator10446
 Node: Profiling Utility13349
 Node: Memory Profiling Utility14259
 Node: Simulator Library15624
-Node: Configuration21109
-Node: Configuration File Format21718
-Node: Configuration File Preprocessing22010
-Node: Configuration File Syntax22381
-Node: Simulator Configuration25166
-Node: Simulator Behavior25457
-Node: Verification API Configuration29501
-Node: CUC Configuration31441
-Node: Core OpenRISC Configuration33358
-Node: CPU Configuration33860
-Node: Memory Configuration37665
-Node: Memory Management Configuration42978
-Node: Cache Configuration45355
-Node: Interrupt Configuration47741
-Node: Power Management Configuration48477
-Node: Branch Prediction Configuration49754
-Node: Debug Interface Configuration51114
-Node: Peripheral Configuration55334
-Node: Memory Controller Configuration55960
-Node: UART Configuration58565
-Node: DMA Configuration62084
-Node: Ethernet Configuration63951
-Node: GPIO Configuration67929
-Node: Display Interface Configuration69562
-Node: Frame Buffer Configuration71871
-Node: Keyboard Configuration73735
-Node: Disc Interface Configuration75973
-Node: Generic Peripheral Configuration80916
-Node: Interactive Command Line83211
-Node: Verification API90185
-Node: Code Internals94615
-Node: Coding Conventions95175
-Node: Global Data Structures99602
-Node: Concepts102259
-Ref: Output Redirection102404
-Node: Internal Debugging102943
-Node: GNU Free Documentation License103440
-Node: Index125847
+Node: Configuration21816
+Node: Configuration File Format22425
+Node: Configuration File Preprocessing22717
+Node: Configuration File Syntax23088
+Node: Simulator Configuration25873
+Node: Simulator Behavior26164
+Node: Verification API Configuration30208
+Node: CUC Configuration32148
+Node: Core OpenRISC Configuration34065
+Node: CPU Configuration34567
+Node: Memory Configuration38372
+Node: Memory Management Configuration43685
+Node: Cache Configuration46062
+Node: Interrupt Configuration48448
+Node: Power Management Configuration49184
+Node: Branch Prediction Configuration50461
+Node: Debug Interface Configuration51821
+Node: Peripheral Configuration56041
+Node: Memory Controller Configuration56667
+Node: UART Configuration59272
+Node: DMA Configuration62791
+Node: Ethernet Configuration64658
+Node: GPIO Configuration68636
+Node: Display Interface Configuration70269
+Node: Frame Buffer Configuration72578
+Node: Keyboard Configuration74442
+Node: Disc Interface Configuration76680
+Node: Generic Peripheral Configuration81623
+Node: Interactive Command Line83918
+Node: Verification API90892
+Node: Code Internals95322
+Node: Coding Conventions95882
+Node: Global Data Structures100309
+Node: Concepts102966
+Ref: Output Redirection103111
+Node: Internal Debugging103650
+Node: GNU Free Documentation License104147
+Node: Index126554
 
 End Tag Table

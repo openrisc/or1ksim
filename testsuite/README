@@ -12,8 +12,8 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 21 tests of the standalone simulator compile
-run and pass and 1 test of the library.
+At the time of writing a total of 21 tests of the standalone simulator and 14
+tests of the library compile, run and pass.
 
 Configuration and make files are provided for further test programs. These
 come in three categories.
@@ -45,7 +45,14 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 21 tests:
+A total of 14 tests of the libsim library:
+
+int-edge:    6 tests of edge triggered interrupts.
+int-level:   5 tests of level triggered interrupts. 
+lib-iftest:  A test of the basic library interface functions.
+upcalls:     2 tests of the upcall interface.
+
+A total of 21 tests of standalone Or1ksim:
 
 basic:        A test or a wide range of instructions and registers.
 cache:	      A test of the Or1ksim cache modeling
@@ -72,8 +79,8 @@ tick:         A test of the OR1K tick timer.
 Tests which build, but do not run to completion
 ===============================================
 
-The following tests rely on VAPI in Or1ksim, so need a client to provide test
-data over TCP/IP.
+The following tests of standalone Or1ksim rely on VAPI in Or1ksim, so need a
+client to provide test data over TCP/IP.
 
 acv-gpio:  a test of the GPIO.
 acv-uart:  a test of the UART
@@ -81,8 +88,9 @@ acv-uart:  a test of the UART
 Tests which build, but do not run at all
 ========================================
 
-These tests (which are built by the make file), do not appear to run at
-all. The problem is in the linker script and/or the configuration for Or1ksim.
+These tests of standalone Or1ksim (which are built by the make file), do not
+appear to run at all. The problem is in the linker script and/or the
+configuration for Or1ksim.
 
 mc-async:  a test of the memory controller with asynchronous memory.
 mc-dram:   a test of the memory controller with DRAM.
@@ -93,10 +101,10 @@ uOS:       a microKernel.
 Tests which do not build
 ========================
 
-The following test builds with a myriad of warnings.
+The following test of standalone Or1ksim builds with a myriad of warnings.
 
 inst-set-test:  a comprehensive test of the instruction set using C.
 
 
-Upated by Jeremy Bennett (jeremy@jeremybennett.com)
-19 April 2010
+Updated by Jeremy Bennett (jeremy@jeremybennett.com)
+28 April 2010

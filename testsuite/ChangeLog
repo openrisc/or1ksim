@@ -1,3 +1,32 @@
+2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/upcalls.exp: Created.
+	* libsim.tests/upcalls.cfg: Created.
+	* test-code/lib-upcalls/lib-upcalls.c: Changed to use new upcall
+	interface.
+	* test-code/lib-inttest/lib-inttest-edge.c: Created.
+	* test-code/lib-inttest/lib-inttest-level.c: Changed to use new
+	upcall interface.
+
+2010-04-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/int-level.exp: Created.
+	* test-code/lib-upcalls: Created.
+	* test-code/lib-upcalls/lib-upcalls.c: Created.
+	* test-code/lib-upcalls/Makefile.am: Created.
+	* test-code/lib-upcalls/Makefile.in: Regenerated.
+	function to print chars more clearly.
+	* or1ksim.tests/kbd.exp: Updated for new test output format.
+
+2010-04-23  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* test-code/lib-inttest/lib-inttest-level.c: Created.
+	* Makefile.am: Updated for new tests
+	* Makefile.in: Regenerated.
+	* README: Updated for new library test results.
+
+2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/cbasic.exp: Errors due to buggy printf fixed.
+	* or1ksim.tests/mmu.exp: Errors due to buggy printf fixed.
+	* or1ksim.tests/mul.exp: Errors due to buggy printf fixed.
+
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* test-code-or1k: Renamed from test-code.
 	* configure.ac, configure: Moved to test-code-or1k.

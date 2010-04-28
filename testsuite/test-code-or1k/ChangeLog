@@ -1,3 +1,28 @@
+2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* int-logger/int-logger-edge.c: Created.
+	* int-logger/Makefile.am: Added int-logger-edge.
+	* int-logger/Makefile.in: Regenerated.
+	* upcalls/upcall-basic.c: Created.
+	* upcalls/upcall-misaligned.c: Created.
+	* upcalls/Makefile.am: Created.
+	* upcalls/Makefile.in: Regenerated.
+
+2010-04-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* kbdtest/kbdtest.c (print_escaped_char): Added	function to print
+	chars more clearly.
+
+2010-04-23  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure.ac: Added new interrupt test make files.
+	* configure: Regenerated.
+	* int-logger/int-logger-level.c: Created.
+	* int-logger/Makefile.am: Created.
+	* int-logger/Makefile.in: Regenerated.
+
+2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* support/support.c (print_base, printf_unsigned_base): Value and
+	base made unsigned.
+	(print_decimal): cast value to unsigned for call to print_base.
+
 2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* AUTHORS: Moved from parent directory
 	* configure: Regenerated.

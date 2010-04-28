@@ -46,16 +46,19 @@ enum  or1ksim_rc {
 extern "C" {
 #endif
 
-int  or1ksim_init (const char         *config_file,
-		   const char         *image_file,
-		   void               *class_ptr,
-		   unsigned long int (*upr) (void              *class_ptr,
-					     unsigned long int  addr,
-					     unsigned long int  mask),
-		   void              (*upw) (void              *class_ptr,
-					     unsigned long int  addr,
-					     unsigned long int  mask,
-					     unsigned long int  wdata));
+int  or1ksim_init (const char *config_file,
+		   const char *image_file,
+		   void       *class_ptr,
+		   int       (*upr) (void              *class_ptr,
+				     unsigned long int  addr,
+				     unsigned char      mask[],
+				     unsigned char      rdata[],
+				     int                data_len),
+		   int       (*upw) (void              *class_ptr,
+				     unsigned long int  addr,
+				     unsigned char      mask[],
+				     unsigned char      wdata[],
+				     int                data_len));
 
 int  or1ksim_run (double  duration);
 

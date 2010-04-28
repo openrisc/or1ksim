@@ -128,9 +128,9 @@ dig2char (int  d)
    @return  the length of the string created.                                */
 /* --------------------------------------------------------------------------*/
 static int
-print_base (long int   uval,
-	    char       buf[],
-	    int        base)
+print_base (long unsigned int  uval,
+	    char               buf[],
+	    unsigned int       base)
 {
   /* Initially print backwards. Always have at least a zero. */
   int  i = 0;
@@ -271,7 +271,7 @@ printf_decimal (long int  val,
      digits. Allow for end of string marker */
   char  num_array[11];
 
-  int  num_width = print_base (val, num_array, 10);
+  int  num_width = print_base ((unsigned long int) val, num_array, 10);
 
   /* Now print out the number. */
   num_width += is_signed_p ? 1 : 0;
@@ -326,10 +326,10 @@ printf_decimal (long int  val,
    @return  The number of chars printed                                      */
 /* --------------------------------------------------------------------------*/
 static int
-printf_unsigned_base (long int  val,
-		      int       width,
-		      int       leading_zeros_p,
-		      int       base)
+printf_unsigned_base (unsigned long int  val,
+		      int                width,
+		      int                leading_zeros_p,
+		      unsigned int       base)
 {
   int  is_signed_p = 0;
 

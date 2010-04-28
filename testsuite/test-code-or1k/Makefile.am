@@ -56,6 +56,7 @@ SUBDIRS = support       \
 	  functest      \
 	  flag          \
 	  inst-set-test \
+	  int-logger    \
 	  int-test      \
 	  kbdtest       \
 	  local-global  \
@@ -69,4 +70,5 @@ SUBDIRS = support       \
 	  mul           \
 	  mycompress    \
 	  tick          \
-	  uos
+	  uos           \
+	  upcalls

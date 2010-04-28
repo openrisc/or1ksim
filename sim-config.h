@@ -53,13 +53,17 @@ struct config
 {
   struct
   {				/* External linkage for SystemC */
-    void *class_ptr;
-    unsigned long int (*read_up) (void *class_ptr,
-				  unsigned long int addr,
-				  unsigned long int mask);
-    void (*write_up) (void *class_ptr,
-		      unsigned long int addr,
-		      unsigned long int mask, unsigned long int wdata);
+    void  *class_ptr;
+    int  (*read_up) (void              *class_ptr,
+		     unsigned long int  addr,
+		     unsigned char      mask[],
+		     unsigned char      rdata[],
+		     int                data_len);
+    int  (*write_up) (void              *class_ptr,
+		      unsigned long int  addr,
+		      unsigned char      mask[],
+		      unsigned char      wdata[],
+		      int                data_len);
   } ext;
 
   struct

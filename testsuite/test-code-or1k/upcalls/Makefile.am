@@ -1,6 +1,6 @@
-# cbasic.exp. Test of multiplication using DejaGNU under automake
+# Makefile.am for or1ksim OR1K test program: upcalls
 
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) Embecosm Limited, 2010
 
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
@@ -24,14 +24,22 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the multiplication test
-run_or1ksim "mul"                       \
-    [list "x00000034"                   \
-          "00000000"                    \
-          "70a2588c"                    \
-          "a6312f33, expected a6312f33" \
-          "0d4de375, expected 0d4de375" \
-          "61ab48dc, expected 61ab48dc" \
-          "report(0xdeaddead);"         \
-	  "exit(0)"]                    \
-    "" "mul/mul"
+# Test programs for upcalls
+check_PROGRAMS       = upcall-basic      \
+		       upcall-misaligned
+
+# Basic test
+upcall_basic_SOURCES = upcall-basic.c
+
+upcall_basic_LDFLAGS = -T$(srcdir)/../default.ld
+
+upcall_basic_LDADD   = ../except/except.lo      \
+	               ../support/libsupport.la
+
+# Test for misaligned calls
+upcall_misaligned_SOURCES = upcall-misaligned.c
+
+upcall_misaligned_LDFLAGS = -T$(srcdir)/../default.ld
+
+upcall_misaligned_LDADD   = ../except/except.lo      \
+	                    ../support/libsupport.la

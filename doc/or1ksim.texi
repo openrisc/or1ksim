@@ -599,7 +599,13 @@ library, the flag, @code{-lsim} should be added to the link command.
 The header file @file{or1ksim.h} contains appropriate declarations of
 the functions exported by the @value{OR1KSIM} library.  These are:
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_init (const char *@var{config_file}, const char *@var{image_file}, void *@var{class_ptr}, unsigned long int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr}, unsigned long int @var{mask}), void (*@var{upw})(void *@var{class_ptr}, unsigned long int @var{addr}, unsigned long int @var{mask}, unsigned long int @var{wdata}))
+@deftypefn {@file{or1ksim.h}} int or1ksim_init (const char
+*@var{config_file}, const char *@var{image_file}, void *@var{class_ptr},
+int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr},
+unsigned char @var{mask}[], unsigned char @var{rdata}[], int
+@var{data_len}), int (*@var{upw})(void *@var{class_ptr}, unsigned long
+int @var{addr}, unsigned char @var{mask}[], unsigned char @var{wdata}[],
+int @var{data_len}))
 
 The initialization function is supplied with the name of a
 configuration file, @var{config_file}, an executable image, @var{image_file}, a pointer to the calling
@@ -615,15 +621,30 @@ configuring @value{OR1KSIM} and the format of the configuration file.
 file).  @var{upr} is called for any reads to an external address.  The
 @var{class_ptr} is passed back with these upcalls, allowing the
 function to associate the call with the class which originally
-initialized the library.
+initialized the library.  Both @var{upw} and @var{upr} should return
+zero on success and non-zero otherwise.  At the present time the meaning
+of non-zero values is not defined but this may change in the future.
 
-@var{mask} indicates which bytes in the word are to be written or
+@var{mask} indicates which bytes in the data are to be written or
 read.  Bytes to be read/written should have 0xff set in
-@var{mask}.  Otherwise the byte should be zero.
+@var{mask}.  Otherwise the byte should be zero.  The adddress,
+@var{addr}, is the @emph{full} address, since the upcall function must
+handle all generic devices, using the full address for decoding.
 
-@var{addr}, @var{mask}, @var{wdata} and the result from @var{upr} all
-use host-endianess, @emph{not} model-endianess.  The internal
-@value{OR1KSIM} routines manage all the conversion.
+Endianness is not completely transparent, since @value{OR1KSIM} is
+transferring byte vectors, not multi-byte values.
+
+@quotation Caution
+This is a change from version 0.3.0. It simplifies the interface, and
+makes @value{OR1KSIM} more consistent with payload representation in
+SystemC TLM 2.0.
+@end quotation
+
+@quotation Note
+The current implementation of Or1ksim always transfers single words (4
+bytes), using masks if smaller values are required.  In this it mimcs the
+behavior of the WishBone bus.
+@end quotation
 
 @end deftypefn
 
