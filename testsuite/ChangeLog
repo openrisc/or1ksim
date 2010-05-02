@@ -1,3 +1,19 @@
+2010-05-02  Mark Jarvin <mark.jarvin@opencores.org>
+
+2010-05-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* global-conf.exp: Renamed from default-global-conf.exp.
+	* lib/or1ksim.exp (run_or1ksim): Use $srcdir instead of
+	environment variable and use $objdir.
+	* lib/or1ksim.exp (run_libsim): Use $srcdir instead of
+	environment variable and use $objdir.
+
+2010-04-30  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* lib/or1ksim.exp (run_or1ksim): Make timeout return UNRESOLVED
+	rather than FAIL.
+	* lib/libsim.exp (run libsim): Make timeout return UNRESOLVED
+	rather than FAIL.
+	* or1ksim.tests/fbtest.exp: Restore timeout correctly.
+
 2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* libsim.tests/upcalls.exp: Created.
 	* libsim.tests/upcalls.cfg: Created.

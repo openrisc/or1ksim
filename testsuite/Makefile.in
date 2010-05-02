@@ -183,10 +183,12 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
+RUNTESTDEFAULTFLAGS = @RUNTESTDEFAULTFLAGS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -261,16 +263,12 @@ SUBDIRS = config         \
 	  test-code      \
 	  test-code-or1k
 
-EXTRA_DIST = default-global-conf.exp
+EXTRA_DIST = global-conf.exp
 
 # Setup for DejaGNU
 AUTOMAKE_OPTIONS = dejagnu
 DEJATOOL = libsim  \
 		      or1ksim
-
-RUNTESTDEFAULTFLAGS = --tool $$tool        \
-	              --srcdir $(srcdir)   \
-		      --outdir $(builddir)
 
 all: all-recursive
 

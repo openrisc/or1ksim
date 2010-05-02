@@ -33,20 +33,19 @@
 # !@param[in] progname    The program image to use on Or1ksim
 # -----------------------------------------------------------------------------
 proc run_or1ksim { testname match_list config_file progname } {
-    global error_spawn_id
-    global spawn_id
     global verbose
-    global env
+    global srcdir
+    global objdir
 
     # Construct the filename
     if {0 == [string length $config_file]} {
-	set config_full_file "$env(srcdir)/or1ksim.tests/default.cfg";
+	set config_full_file "$srcdir/or1ksim.tests/default.cfg";
     } else {
-	set config_full_file "$env(srcdir)/or1ksim.tests/$config_file";
+	set config_full_file "$srcdir/or1ksim.tests/$config_file";
     }
 
-    set prog_full_name "./test-code-or1k/$progname"
-    set command_line "../sim -f $config_full_file $prog_full_name"
+    set prog_full_name "$objdir/test-code-or1k/$progname"
+    set command_line "$objdir/../sim -f $config_full_file $prog_full_name"
 
     if { $verbose > 1 } {
 	send_user "starting $command_line\n"
@@ -87,8 +86,7 @@ proc run_or1ksim { testname match_list config_file progname } {
 	    }
 	    
 	    timeout {
-		perror "Timeout";
-		fail "$testname: timeout";
+		unresolved "$testname: timeout";
 		return
 	    }
 	}

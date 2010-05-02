@@ -25,6 +25,7 @@
 
 
 # This takes time. Timeout 30 seconds is more suitable than the default
+set old_timeout $timeout
 set timeout 30
 
 # Run the Frame buffer test
@@ -32,3 +33,5 @@ run_or1ksim "fbtest"                  \
     [list "report(0xdeaddead);"    \
 	  "exit(0)"]               \
     "" "fbtest/fbtest"
+
+set timeout $old_timeout

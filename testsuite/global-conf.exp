@@ -1,4 +1,4 @@
-# Makefile.am for or1ksim testsuite
+# global-conf.exp DejaGnu global config file for Or1ksim testing
 
 # Copyright (C) Marko Mlinar, 2001
 # Copyright (C) Embecosm Limited, 2010
@@ -22,32 +22,5 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
 
-# -----------------------------------------------------------------------------
-# This code is commented throughout for use with Doxygen.
-# -----------------------------------------------------------------------------
-
-
-# C code for programs used only in testing is in 'test-code'. Other subdirs
-# are only there to ensure DejaGNU code is distributed.
-SUBDIRS = config         \
-	  lib            \
-	  libsim.tests   \
-	  or1ksim.tests  \
-	  test-code      \
-	  test-code-or1k
-
-EXTRA_DIST = global-conf.exp
-
-# Setup for DejaGNU
-AUTOMAKE_OPTIONS    = dejagnu
-
-export DEJAGNU
-
-DEJATOOL            = libsim  \
-		      or1ksim
-
-# Clean up the junk left by the tests
-clean-local:
-	@$(RM) eth0.tx eth0.rx
-	@$(RM) kbdtest.rx
-	@$(RM) primary????.bmp
+# Specify out boards directory
+lappend boards_dir "$srcdir/config"

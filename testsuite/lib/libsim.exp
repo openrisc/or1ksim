@@ -35,19 +35,18 @@
 #! @param[in] args        Any other arguments
 # -----------------------------------------------------------------------------
 proc run_libsim { testname match_list libprog config or1kprog args } {
-    global error_spawn_id
-    global spawn_id
     global verbose
-    global env
+    global srcdir
+    global objdir
 
     # Construct the config filename or use the default
     if {0 == [string length $config]} {
 	set config "default.cfg";
     }
 
-    set libprog_name  "./test-code/$libprog"
-    set config_name   "$env(srcdir)/libsim.tests/$config";
-    set or1kprog_name "./test-code-or1k/$or1kprog"
+    set libprog_name  "$objdir/test-code/$libprog"
+    set config_name   "$srcdir/libsim.tests/$config";
+    set or1kprog_name "$objdir/test-code-or1k/$or1kprog"
 
     set command_line "$libprog_name $config_name $or1kprog_name $args"
 
@@ -93,7 +92,7 @@ proc run_libsim { testname match_list libprog config or1kprog args } {
 	    
 	    timeout {
 		perror "Timeout";
-		fail "$testname: timeout";
+		unresolved "$testname: timeout";
 		return
 	    }
 	}
