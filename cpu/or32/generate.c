@@ -81,6 +81,7 @@ int output_function (FILE *fo, const char *func_name, int level)
 
     if (NULL == res)
       {
+	fclose (fi);			/* Mark Jarvin patch */
 	return  1;
       }
 
@@ -112,6 +113,7 @@ int output_function (FILE *fo, const char *func_name, int level)
 
 	  if (NULL == res)
 	    {
+	      fclose (fi);
 	      return  1;
 	    }
 

@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-04-28], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-05-02], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -147,7 +147,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_CTYPE_H
 	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])
 
 # Checks for typedefs, structures, and compiler characteristics (for argtable2)
-AC_C_CONST
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
 
@@ -319,9 +318,15 @@ test -n "$profile"  && CFLAGS="$CFLAGS $profile" LDFLAGS="$LDFLAGS $profile"
 # ourselves. This stops runtest complaining
 if test x"$DEJAGNU" = x
 then
-  DEJAGNU="\$(top_srcdir)/testsuite/default-global-conf.exp"
-  AC_SUBST(DEJAGNU)
+  DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
 fi
+
+AC_SUBST(DEJAGNU)
+
+# The following line will override the default definition of the srcdir, and
+# ensure that short names are used for the test names.
+RUNTESTDEFAULTFLAGS="--tool \$\$tool"
+AC_SUBST(RUNTESTDEFAULTFLAGS)
 
 BUILD_DIR=`pwd`
 AC_SUBST(BUILD_DIR)

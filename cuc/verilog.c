@@ -757,8 +757,8 @@ output_verilog (cuc_func * f, char *filename, char *funcname)
   /* Generate state generator machine */
   for (j = 0; j < 2; j++)
     {
-      char c;
-      char *s;
+      char c = 0;		/* Mark Jarvin patch to initialize values. */
+      char *s = NULL;
 
       switch (j)
 	{

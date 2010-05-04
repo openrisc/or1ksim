@@ -1,3 +1,13 @@
+2010-05-02  Mark Jarvin <mark.jarvin@opencores.org>
+	* debug/jtag.c (go_command_read): Initialize crc_out at
+	declaration.
+	* cpu/or32/generate.c (output_function): Close file if fgets ()
+	fails (2 places).
+	* configure.ac <AC_CONST>: Deleted (obsolescent, breaks MacOS X).
+	* cuc/verilog.c (output_verilog): Init vars when generating state
+	generator machine.
+	* port/strndup.c: also include stdlib.h and string.h.
+
 2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.h <or1ksim_init>: Upcall arguments redefined.
 	* libtoplevel.c (or1ksim_init): Upcall arguments redefined.

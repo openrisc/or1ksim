@@ -732,7 +732,7 @@ go_command_read (unsigned char *jreg)
   enum jtag_status  status = JS_OK;
 
   /* CRC to go out */
-  uint32_t  crc_out;
+  uint32_t  crc_out = 0;
 
   /* Validate the CRC */
   if (crc_computed == crc_in)

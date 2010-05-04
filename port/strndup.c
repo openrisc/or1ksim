@@ -30,9 +30,12 @@
 
 #ifndef HAVE_STRNDUP
 
-/* the definition of size_t is provided in stddef.h */
-#include <stddef.h>
+/* the definition of size_t is provided in stddef.h.
 
+   Mark Jarvin patch notes that stdlib.h and string.h are also needed. */
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Taken from glibc */
 char *
