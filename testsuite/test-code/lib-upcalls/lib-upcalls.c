@@ -213,10 +213,6 @@ write_upcall (void              *class_ptr,
    which are satisfied using the register memory. The program exits
    successfully when <upcall_count> upcalls have been made.
 
-   @note The endianness is specified on the command line, rather than being
-         read from the or1ksim library, to allow tests for mismatched
-         assumptions when using the library.
-
    @param[in] argc  Number of elements in argv
    @param[in] argv  Vector of program name and arguments
 

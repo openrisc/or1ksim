@@ -1,3 +1,22 @@
+2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (module_select): Corrected parenthesis for
+	computation of crc_in.
+	(construct_response): Corrected parenthesis for computation of
+	skip_bytes and bit_off.
+	(go_command_read): Do not abort if the module is not valid.
+	(go_command_write): Reverse each byte of data broken out. Do not
+	abort if the module is not valid.
+	(read_command): Returns valid zero data if no prior WRITE_COMMAND.
+	(spr_read): Use zero as the value if validation fails.
+	(spr_write): Do not write if validation fails.
+	(validate_spr_fields): Returns a boolean response. Fails if no
+	access type is specified. Add break after each switch entry for
+	access type.
+	(write_command): Corrected calculation of acc_type.
+	(wishbone_read): reverse the value of byte before inserting.
+	(wishbone_write); Correctly compute value of byte when bit-off is
+	not zero (shift MS bits left not right).
+
 2010-05-02  Mark Jarvin <mark.jarvin@opencores.org>
 	* debug/jtag.c (go_command_read): Initialize crc_out at
 	declaration.

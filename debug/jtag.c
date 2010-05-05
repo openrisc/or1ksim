@@ -207,8 +207,8 @@ construct_response (unsigned char *jreg,
   jreg[zero_bytes] <<= zero_off;
 
   /* Determine how much to skip in total */
-  unsigned int  skip_bytes = ign_bits + zero_bits / 8;
-  unsigned int  bit_off    = ign_bits + zero_bits % 8;
+  unsigned int  skip_bytes = (ign_bits + zero_bits) / 8;
+  unsigned int  bit_off    = (ign_bits + zero_bits) % 8;
 
   /* Simplify by dealing separately with two cases:
      - the bit offset is less than or equal to 4, so the status goes in the
@@ -290,7 +290,7 @@ module_select (unsigned char *jreg)
 {
   /* Break out the fields */
   uint8_t   mod_id = reverse_bits ((jreg[0] >> 1) & 0xf, 4);
-  uint32_t  crc_in = reverse_bits (((uint32_t )  jreg[0] & 0xe0  >>  5) |
+  uint32_t  crc_in = reverse_bits (((uint32_t ) (jreg[0] & 0xe0) >>  5) |
 	  		           ((uint32_t )  jreg[1]         <<  3) |
 			           ((uint32_t )  jreg[2]         << 11) |
 			           ((uint32_t )  jreg[3]         << 19) |
@@ -386,9 +386,9 @@ validate_wb_fields ()
       break;
 
     default:
-      fprintf (stderr, "*** ABORT ***: validate_wb_fields: unknown access "
+      fprintf (stderr, "Warning: validate_wb_fields: unknown access "
 	       "type %u\n", runtime.debug.acc_type);
-      abort ();
+      return  0;
     }
 
   /* Check for validity. This works for 8-bit, although the tests will always
@@ -476,8 +476,10 @@ wishbone_read (unsigned char    *jreg,
       unsigned char  byte = eval_direct8 (runtime.debug.addr + i, 0, 0);
       crc_out = crc32 (byte, 8, crc_out);
 
-      /* Store the byte in the register, without trampling adjacent
-	 bits. Simplified version when the bit offset is zero. */
+      /* Reverse, then store the byte in the register, without trampling
+	 adjacent bits. Simplified version when the bit offset is zero. */
+      byte = reverse_byte (byte);
+
       if (0 == bit_off)
 	{
 	  jreg[byte_off + i] = byte;
@@ -530,9 +532,12 @@ wishbone_read (unsigned char    *jreg,
    @todo Should multiple SPR accesses be allowed in a single access?
 
    @note The size of the data is one greater than the length specified in the
-         original WRITE_COMMAND.                                             */
+         original WRITE_COMMAND.                                             
+
+   @return  1 (TRUE) if we could validate, even if we had to modify a field
+            with a warning. 0 (FALSE) otherwise.                             */
 /*---------------------------------------------------------------------------*/
-static void
+static int
 validate_spr_fields ()
 {
   int  access_bits;
@@ -540,17 +545,17 @@ validate_spr_fields ()
 
   switch (runtime.debug.acc_type)
     {
-    case JAT_WRITE8:  access_bits =  8; is_read_p = 0;
-    case JAT_READ8:   access_bits =  8; is_read_p = 1;
-    case JAT_WRITE16: access_bits = 16; is_read_p = 0;
-    case JAT_READ16:  access_bits = 16; is_read_p = 1;
-    case JAT_WRITE32: access_bits = 32; is_read_p = 0;
-    case JAT_READ32:  access_bits = 32; is_read_p = 1;
+    case JAT_WRITE8:  access_bits =  8; is_read_p = 0; break;
+    case JAT_READ8:   access_bits =  8; is_read_p = 1; break;
+    case JAT_WRITE16: access_bits = 16; is_read_p = 0; break;
+    case JAT_READ16:  access_bits = 16; is_read_p = 1; break;
+    case JAT_WRITE32: access_bits = 32; is_read_p = 0; break;
+    case JAT_READ32:  access_bits = 32; is_read_p = 1; break;
 
     default:
-      fprintf (stderr, "*** ABORT ***: validate_spr_fields: unknown access "
+      fprintf (stderr, "Warning: validate_spr_fields: unknown access "
 	       "type %u\n", runtime.debug.acc_type);
-      abort ();
+      return  0;
     }
 
   /* Validate and correct if necessary access width */
@@ -564,17 +569,21 @@ validate_spr_fields ()
   /* Validate and correct if necessary access size */
   if (1 != runtime.debug.size)
     {
-      fprintf (stderr, "warning: JTAG SPR access must be 1 word in length: "
+      fprintf (stderr, "Warning: JTAG SPR access must be 1 word in length: "
 	       "corrected\n");
       runtime.debug.size = 1;
     }
+
   /* Validate and correct if necessary access size */
   if (runtime.debug.addr >= MAX_SPRS)
     {
-      fprintf (stderr, "warning: JTAG SPR address exceeds MAX_SPRS: "
+      fprintf (stderr, "Warning: JTAG SPR address exceeds MAX_SPRS: "
 	       "truncated\n");
       runtime.debug.addr %= MAX_SPRS;
     }
+
+  return  0;			/* Success */
+
 }	/* validate_spr_fields () */
 
 
@@ -612,12 +621,20 @@ spr_read (unsigned char *jreg,
   /* Compute the CRC as we go */
   uint32_t  crc_out  = 0xffffffff;
 
-  /* Validate the fields for the SPR read. This doesn't stop us - just prints
-     out warnings and corrects the problems. */
-  validate_spr_fields();
-      
-  /* Transfer the SPR */
-  uint32_t  spr = mfspr (runtime.debug.addr);
+  /* Validate the fields for the SPR read. This mostly just prints
+     out warnings and corrects the problems. However if the access type
+     cannot be worked out, we must use empty data. */
+  uint32_t  spr;
+
+  if (validate_spr_fields())
+    {
+      /* Transfer the SPR */
+      spr = mfspr (runtime.debug.addr);
+    }
+  else
+    {
+      spr = 0;
+    }
 
   runtime.debug.addr++;
 
@@ -754,9 +771,9 @@ go_command_read (unsigned char *jreg)
 	  break;
 	  
 	default:
-	  fprintf (stderr, "*** ABORT ***: go_command_read: invalid "
-		   "module\n");
-	  abort ();
+	  fprintf (stderr, "Warning: go_command_read: invalid module 0x%lx\n",
+		   runtime.debug.mod_id);
+	  break;
 	}
     }
   else
@@ -824,20 +841,20 @@ wishbone_write (unsigned char   *jreg,
 
       /* Extract the byte from the register. Simplified version when the bit
 	 offset is zero. */
-      unsigned char  byte_r;
+      unsigned char  byte;
 
       if (0 == bit_off)
 	{
-	  byte_r = jreg[byte_off + i];
+	  byte = jreg[byte_off + i];
 	}
       else
 	{
-	  byte_r = jreg[byte_off + i]     >>      bit_off  |
-	           jreg[byte_off + i + 1] >> (8 - bit_off);
+	  byte = jreg[byte_off + i]     >>      bit_off  |
+	         jreg[byte_off + i + 1] << (8 - bit_off);
 	}
 
       /* Circumvent the read-only check usually done for mem accesses. */
-      set_program8 (runtime.debug.addr + i, reverse_byte (byte_r));
+      set_program8 (runtime.debug.addr + i, reverse_byte (byte));
     }
 
   runtime.debug.addr += runtime.debug.size;
@@ -872,9 +889,13 @@ static void
 spr_write (unsigned char *jreg,
 	  unsigned int   skip_bits)
 {
-  /* Validate the fields for the SPR write. This doesn't stop us - just prints
-     out warnings and corrects the problems. */
-  validate_spr_fields ();
+  /* Validate the fields for the SPR write. This doesn't stop us most of the
+     time, just prints out warnings and corrects the problems. However if we
+     don't know the access type, then it will fail and we do nothing. */
+  if (!validate_spr_fields ())
+    {
+      return;
+    }
       
   /* Construct the SPR value one byte at a time. */
   uint32_t  spr = 0;
@@ -976,7 +997,8 @@ go_command_write (unsigned char *jreg)
 
   for (i = 0; i < runtime.debug.size; i++)
     {
-      uint8_t  byte = ((jreg[i] & 0xe0) >> 5) | ((jreg[i + 1] & 0x1f) << 3);
+      uint8_t  byte = reverse_bits (((jreg[i] & 0xe0) >> 5) |
+		      ((jreg[i + 1] & 0x1f) << 3), 8);
       crc_computed = crc32 (byte, 8, crc_computed);
     }
 
@@ -1003,9 +1025,9 @@ go_command_write (unsigned char *jreg)
 	  break;
 	  
 	default:
-	  fprintf (stderr, "*** ABORT ***: go_command_write: invalid "
-		   "module\n");
-	  abort ();
+	  fprintf (stderr, "Warning: go_command_write: invalid module 0x%lx\n",
+		   runtime.debug.mod_id);
+	  break;
 	}
     }
   else
@@ -1131,35 +1153,53 @@ read_command (unsigned char *jreg)
       /* Mismatch: record the error */
       status |= JS_CRC_IN_ERROR;
     }
-  else if (runtime.debug.write_defined_p)
+
+  /* If we haven't had a previous WRITE_COMMAND, then we return empty
+     data. There is no valid status flag we can use, but we print a rude
+     message. */
+  uint8_t   acc_type_r;
+  uint32_t  addr_r;
+  uint16_t  len_r;
+
+  if (runtime.debug.write_defined_p)
     {
       /* Compute the CRC */
       crc_out = crc32 (runtime.debug.acc_type,  4, crc_out);
       crc_out = crc32 (runtime.debug.addr,     32, crc_out);
       crc_out = crc32 (runtime.debug.size - 1, 16, crc_out);
 
-      /* Construct the outgoing register. Fields can only be written if they
-	 are available */
-      uint8_t   acc_type_r = reverse_bits (runtime.debug.acc_type,  4);
-      uint32_t  addr_r     = reverse_bits (runtime.debug.addr,     32);
-      uint16_t  len_r      = reverse_bits (runtime.debug.size - 1, 16);
-
-      jreg[ 4] |= (acc_type_r <<  5) & 0xf8;
-      jreg[ 5] |= (acc_type_r >>  3) & 0x07;
-      jreg[ 5] |= (addr_r     <<  1) & 0xfe;
-      jreg[ 6] |= (addr_r     >>  7) & 0xff;
-      jreg[ 7] |= (addr_r     >> 15) & 0xff;
-      jreg[ 8] |= (addr_r     >> 23) & 0xff;
-      jreg[ 9] |= (addr_r     >> 31) & 0x01;
-      jreg[ 9] |= (len_r      <<  1) & 0xfe;
-      jreg[10] |= (len_r      >>  7) & 0xff;
-      jreg[11] |= (len_r      >> 15) & 0x01;
+      /* Reverse the bit fields */
+      acc_type_r = reverse_bits (runtime.debug.acc_type,  4);
+      addr_r     = reverse_bits (runtime.debug.addr,     32);
+      len_r      = reverse_bits (runtime.debug.size - 1, 16);
     }
   else
     {
-      fprintf (stderr, "Warning: JTAG attempt to READ_COMMAND without prior "
-	       "WRITE_COMMAND: no data returned\n");
+      fprintf (stderr, "Warning: JTAG READ_COMMAND finds no data\n");
+
+      /* Compute the CRC */
+      crc_out = crc32 (0,  4, crc_out);
+      crc_out = crc32 (0, 32, crc_out);
+      crc_out = crc32 (0, 16, crc_out);
+
+      /* Empty data */
+      acc_type_r = 0;
+      addr_r     = 0;
+      len_r      = 0;
     }
+
+  /* Construct the outgoing register. Fields can only be written if they
+     are available */
+  jreg[ 4] |= (acc_type_r <<  5) & 0xf8;
+  jreg[ 5] |= (acc_type_r >>  3) & 0x07;
+  jreg[ 5] |= (addr_r     <<  1) & 0xfe;
+  jreg[ 6] |= (addr_r     >>  7) & 0xff;
+  jreg[ 7] |= (addr_r     >> 15) & 0xff;
+  jreg[ 8] |= (addr_r     >> 23) & 0xff;
+  jreg[ 9] |= (addr_r     >> 31) & 0x01;
+  jreg[ 9] |= (len_r      <<  1) & 0xfe;
+  jreg[10] |= (len_r      >>  7) & 0xff;
+  jreg[11] |= (len_r      >> 15) & 0x01;
 
   /* Construct the final response with the status, skipping the fields we've
      just (possibly) written. */
@@ -1205,8 +1245,8 @@ static int
 write_command (unsigned char *jreg)
 {
   /* Break out the fields */
-  uint8_t   acc_type = reverse_bits (((jreg[0] & 0x0e) >> 5) |
-                                      (jreg[1] & 0x01), 4);
+  uint8_t   acc_type = reverse_bits (((jreg[0] & 0xe0) >> 5) |
+				     ((jreg[1] & 0x01) << 3) , 4);
   uint32_t  addr     = reverse_bits (((uint32_t) (jreg[ 1] & 0xfe) >>  1) |
                                      ((uint32_t)  jreg[ 2]         <<  7) |
                                      ((uint32_t)  jreg[ 3]         << 15) |
@@ -1542,7 +1582,7 @@ jtag_shift_ir (unsigned char *jreg)
       break;
 
     default:
-      fprintf (stderr, "Warning: Unknown JTAG instruction %04x shifted\n",
+      fprintf (stderr, "Warning: Unknown JTAG instruction 0x%1x shifted\n",
 	       runtime.debug.instr);
       break;
     }

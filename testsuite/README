@@ -45,11 +45,13 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 14 tests of the libsim library:
+A total of 63 tests of the libsim library:
 
 int-edge:    6 tests of edge triggered interrupts.
 int-level:   5 tests of level triggered interrupts. 
 lib-iftest:  A test of the basic library interface functions.
+jtag-basic:  17 tests of JTAG reset and instruction selection
+jtag-full:   32 tests of higher level JTAG functions
 upcalls:     2 tests of the upcall interface.
 
 A total of 21 tests of standalone Or1ksim:

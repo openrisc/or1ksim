@@ -33,5 +33,7 @@ EXTRA_DIST = default.cfg      \
 	     int-edge.exp     \
 	     int-level.cfg    \
 	     int-level.exp    \
+	     jtag-basic.exp   \
+	     jtag-full.exp    \
 	     lib-iftest.exp   \
 	     upcalls.cfg

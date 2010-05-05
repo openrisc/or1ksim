@@ -126,6 +126,15 @@ or1ksim_init (const char *config_file,
    The argument is a time in seconds, which is converted to a number of
    cycles, if positive. A negative value means "run for ever".
 
+   With the JTAG interface, it is possible to stall the processor between
+   calls of this function (but not during upcalls). In which case we return
+   immediately.
+
+   @todo Is it possible (or desirable) to permit JTAG activity during upcalls,
+         in which case we could stall mid-run.
+
+   @todo Should the JTAG functionality require enabling?
+
    The semantics are that the duration for which the run may occur may be
    changed mid-run by a call to or1ksim_reset_duration(). This is to allow for
    the upcalls to generic components adding time, and reducing the time
@@ -148,6 +157,14 @@ or1ksim_run (double duration)
 {
   const int  num_ints = sizeof (runtime.sim.ext_int_set) * 8;
 
+  /* If we are stalled we can't do anything. We treat this as hitting a
+     breakpoint. */
+  if(runtime.cpu.stalled)
+    {
+      return  OR1KSIM_RC_BRKPT;
+    }
+
+  /* Reset the duration */
   or1ksim_reset_duration (duration);
 
   /* Loop until we have done enough cycles (or forever if we had a negative

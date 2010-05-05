@@ -1,4 +1,23 @@
-2010-05-02  Mark Jarvin <mark.jarvin@opencores.org>
+2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure.ac: lib-jtag/Makefile.am added as output
+	* configure: Regenerated
+	* libsim.tests/jtag-basic.exp: Created for low level JTAG tests.
+	* libsim.tests/jtag-full.exp: Created for high level JTAG tests.
+	* libsim.tests/Makefile.am: Added jtag-basic.exp and
+	jtag-full.exp.
+	* libsim.tests/Makefile.in: Regenerated.
+	* test-code/lib-jtag: New directory for JTAG test code
+	* test-code/lib-jtag/lib-jtag.c: Created for low level tests of
+	JTAG functions.
+	* test-code/lib-jtag/lib-jtag-full.c: Created for high level tests
+	of JTAG functions.
+	* test-code/lib-jtag/Makefile.am: Created.
+	* test-code/lib-jtag/Makefile.am: Generated.
+	* test-code/Makefile.am: lib-jtag added as subdir
+	* test-code/Makefile.in: Regenerated.
+
+2010-05-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* test-code/lib-upcalls/lib-upcalls.c (main): Commenting corrected.
 
 2010-05-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* global-conf.exp: Renamed from default-global-conf.exp.

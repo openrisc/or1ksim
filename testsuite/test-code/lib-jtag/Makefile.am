@@ -1,4 +1,4 @@
-# Makefile.am for or1ksim testsuite test-code
+# Makefile.am for libor1ksim test programs for JTAG
 
 # Copyright (C) Embecosm Limited, 2010
 
@@ -24,9 +24,16 @@
 # -----------------------------------------------------------------------------
 
 
-# Subdirs for each test program.
+# Programs to handle the JTAG interface
+check_PROGRAMS   = lib-jtag      \
+		   lib-jtag-full
 
-SUBDIRS = lib-iftest  \
-	  lib-inttest \
-	  lib-jtag    \
-	  lib-upcalls
+# Simple JTAG handling
+lib_jtag_SOURCES = lib-jtag.c
+
+lib_jtag_LDADD   = $(top_builddir)/libsim.la
+
+# Simple JTAG handling
+lib_jtag_full_SOURCES = lib-jtag-full.c
+
+lib_jtag_full_LDADD   = $(top_builddir)/libsim.la

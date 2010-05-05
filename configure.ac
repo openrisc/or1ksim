@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-05-02], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-05-05], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -382,6 +382,7 @@ AC_CONFIG_FILES([Makefile                                 \
 		 testsuite/test-code/Makefile             \
 		 testsuite/test-code/lib-iftest/Makefile  \
 		 testsuite/test-code/lib-inttest/Makefile \
+		 testsuite/test-code/lib-jtag/Makefile    \
 		 testsuite/test-code/lib-upcalls/Makefile \
                  tick/Makefile                            \
                  vapi/Makefile])

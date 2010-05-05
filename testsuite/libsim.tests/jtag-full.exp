@@ -1,0 +1,807 @@
+# jtag-full.exp. High level tests of the library JTAG interface functions.
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# These are the tests based on feeding in plain instruction or data registers
+# to the JTAG interface.
+
+# NOTE. All these tests return timing information, but we ignore it, since in
+#       general it will not be repeatable.
+
+# Just check if we can reset
+run_libsim "lib-jtag-full reset"                \
+    [list "Initalization succeeded."       \
+          "Execution step completed OK."   \
+          "Resetting JTAG."                \
+          "Execution step completed OK."   \
+          "Test completed successfully."]  \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET"
+
+# Check instruction selection. Just a partial test. Comprehensive testing of
+# this is in jtag-basic.exp
+run_libsim "lib-jtag-full EXTEST instr"    \
+    [list "Initalization succeeded."       \
+          "Execution step completed OK."   \
+          "Resetting JTAG."                \
+          "Execution step completed OK."   \
+          "Shifting instruction."          \
+          "  shifting in:  0x00"           \
+          "Warning: JTAG EXTEST shifted"   \
+          "  shifted out:  0x00"           \
+          "  time taken: "                 \
+          "Execution step completed OK."   \
+          "Test completed successfully."]  \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "0"
+
+run_libsim "lib-jtag-full invalid instr"                  \
+    [list "Initalization succeeded."                      \
+          "Execution step completed OK."                  \
+          "Resetting JTAG."                               \
+          "Execution step completed OK."                  \
+          "Shifting instruction."                         \
+          "  shifting in:  0x0c"                          \
+          "Warning: Unknown JTAG instruction 0x3 shifted" \
+          "  shifted out:  0x0c"                          \
+          "  time taken: "                                \
+          "Execution step completed OK."                  \
+          "Test completed successfully."]                 \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "3"
+
+run_libsim "lib-jtag-full DEBUG instr"    \
+    [list "Initalization succeeded."      \
+          "Execution step completed OK."  \
+          "Resetting JTAG."               \
+          "Execution step completed OK."  \
+          "Shifting instruction."         \
+          "  shifting in:  0x01"          \
+          "  shifted out:  0x01"          \
+          "  time taken: "                \
+          "Execution step completed OK."  \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8"
+
+# Comprehensive test of selecting all possible modules. Only Wishbone (0),
+# CPU0 (1) and CPU1 (2) should work silently (although CPU1 will prompt
+# warnings if subsequent GO commands are used). All other values will fail by
+# setting the status field on response.
+
+# Wishbone module select (0)
+run_libsim "lib-jtag-full SELECT_MODULE WB (0)"    \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x0000000000174841bc61" \
+          "  shifted out:  0x0164841bc60000000000" \
+          "  status:       0x0"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0"
+
+# CPU0 module select (1)
+run_libsim "lib-jtag-full SELECT_MODULE CPU0 (1)"  \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000000aff51d871" \
+          "  shifted out:  0x0164841bc60000000000" \
+          "  status:       0x0"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "1"
+
+# CPU1 module select (2)
+run_libsim "lib-jtag-full SELECT_MODULE CPU1 (2)"  \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000001993c98e69" \
+          "  shifted out:  0x0164841bc60000000000" \
+          "  status:       0x0"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "2"
+
+# All remaining modules should fail
+run_libsim "lib-jtag-full SELECT_MODULE 3"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000000424d9ea79" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "3"
+
+run_libsim "lib-jtag-full SELECT_MODULE 4"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x0000000000102585a565" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "4"
+
+run_libsim "lib-jtag-full SELECT_MODULE 5"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000000d9295c175" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "5"
+
+run_libsim "lib-jtag-full SELECT_MODULE 6"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000001efe0d976d" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "6"
+
+run_libsim "lib-jtag-full SELECT_MODULE 7"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x000000000003491df37d" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "7"
+
+run_libsim "lib-jtag-full SELECT_MODULE 8"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x000000000014fea3b0e3" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "8"
+
+run_libsim "lib-jtag-full SELECT_MODULE 9"         \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000000949b3d4f3" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "9"
+
+run_libsim "lib-jtag-full SELECT_MODULE 10"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000001a252b82eb" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "a"
+
+run_libsim "lib-jtag-full SELECT_MODULE 11"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x000000000007923be6fb" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "b"
+
+run_libsim "lib-jtag-full SELECT_MODULE 12"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x0000000000139367a9e7" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "c"
+
+run_libsim "lib-jtag-full SELECT_MODULE 13"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000000e2477cdf7" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "d"
+
+run_libsim "lib-jtag-full SELECT_MODULE 14"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x00000000001d48ef9bef" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "e"
+
+run_libsim "lib-jtag-full SELECT_MODULE 15"        \
+    [list "Initalization succeeded."               \
+          "Execution step completed OK."           \
+          "Resetting JTAG."                        \
+          "Execution step completed OK."           \
+          "Shifting instruction."                  \
+          "  shifting in:  0x01"                   \
+          "  shifted out:  0x01"                   \
+          "  time taken: "                         \
+          "Execution step completed OK."           \
+          "Selecting module."                      \
+          "  shifting in:  0x000000000000ffffffff" \
+          "  shifted out:  0x01893c98e68000000000" \
+          "  status:       0x2"                    \
+          "  time taken:"                          \
+          "Execution step completed OK."           \
+          "Test completed successfully."] \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "f"
+
+# Test of WRITE_COMMAND for each module. All modules should permit this (only
+# test WB, CPU0, CPU1, 3 and 15. All tests use access type 2 (write word),
+# which is valid on all modules.
+
+# WRITE_COMMAND for Wishbone
+run_libsim "lib-jtag-full WRITE_COMMAND WB"                    \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "1"
+
+# WRITE_COMMAND for CPU0
+run_libsim "lib-jtag-full WRITE_COMMAND CPU0"                  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "100000" "1"
+
+# WRITE_COMMAND for CPU1
+run_libsim "lib-jtag-full WRITE_COMMAND CPU1"                  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001993c98e69"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "2" "WRITE_COMMAND" "2" "100000" "1"
+
+# WRITE_COMMAND for module 3
+run_libsim "lib-jtag-full WRITE_COMMAND module 3"              \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000424d9ea79"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "3" "WRITE_COMMAND" "2" "100000" "1"
+
+# WRITE_COMMAND for module 15
+run_libsim "lib-jtag-full WRITE_COMMAND module 15"              \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x000000000000ffffffff"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "f" "WRITE_COMMAND" "2" "100000" "1"
+
+# Test of READ_COMMAND with no prior WRITE_COMMAND
+run_libsim "lib-jtag-full WRITE_COMMAND module 15"              \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x000000000000ffffffff"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "Warning: JTAG READ_COMMAND finds no data"           \
+          "  shifted out:  0x0c526410200000000000000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x0"                                \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "f" "READ_COMMAND"
+
+# Tests of READ_COMMAND with WRITE_COMMANDS to different modules. Should work
+# whether the module is good or bad. Just test WB, CPU0, CPU1, 4 and 15.
+
+# READ_COMMAND for Wishbone
+run_libsim "lib-jtag-full READ_COMMAND WB"                     \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x110d8209400000000010008000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100000"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "1" "READ_COMMAND"
+
+# READ_COMMAND for CPU0
+run_libsim "lib-jtag-full READ_COMMAND CPU0"                   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x110d8209400000000010008000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100000"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "100000" "1" "READ_COMMAND"
+
+# READ_COMMAND for CPU1
+run_libsim "lib-jtag-full READ_COMMAND CPU1"                   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001993c98e69"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x110d8209400000000010008000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100000"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "2" "WRITE_COMMAND" "2" "100000" "1" "READ_COMMAND"
+
+# READ_COMMAND for module 4
+run_libsim "lib-jtag-full READ_COMMAND module 4"               \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000102585a565"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x110d8209400000000010008000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100000"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "4" "WRITE_COMMAND" "2" "100000" "1" "READ_COMMAND"
+
+# READ_COMMAND for module 14
+run_libsim "lib-jtag-full READ_COMMAND module 14"              \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001d48ef9bef"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000b98a139600000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x110d8209400000000010008000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100000"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "e" "WRITE_COMMAND" "2" "100000" "1" "READ_COMMAND"
+
+# Test of the GO_COMMAND for writing to different modules. This should work
+# fine for Wishbone and CPU0, but provoke a warning for CPU1 and different
+# warnings for other module values. Test with modules WB, CPU0, CPU1, 5 and
+# 13. Use access type 2 (write word), since that is supported by both Wishbone
+# and CPU modules. Address will vary, since different ranges are writeable for
+# Wishbone and CPU. We must specify 4 bytes to write each time.
+
+# GO_COMMAND writing for Wishbone (address 0x100000).
+run_libsim "lib-jtag-full GO_COMMAND (write) WB"               \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x0000000000018c8cc0af76afbee0"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"         \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND writing for CPU0 (address 0x10, NPC).
