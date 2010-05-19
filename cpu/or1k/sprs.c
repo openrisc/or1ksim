@@ -50,10 +50,6 @@
 
 DECLARE_DEBUG_CHANNEL(immu);
 
-static int audio_cnt = 0;
-
-static FILE *fo = 0;
-
 /* Set a specific SPR with a value. */
 void mtspr(uint16_t regno, const uorreg_t value)
 {
@@ -163,23 +159,6 @@ void mtspr(uint16_t regno, const uorreg_t value)
   case SPR_PICMR:
     if(cpu_state.sprs[SPR_SR] & SPR_SR_IEE)
       pic_ints_en();
-    break;
-  case 0xFFFD:
-    fo = fopen ("audiosim.pcm", "wb+");
-    if (!fo) PRINTF("Cannot open audiosim.pcm\n");
-    PRINTF("Audio opened.\n");
-    break;
-  case 0xFFFE:
-    if (!fo) PRINTF("audiosim.pcm not opened\n");
-    fputc (value & 0xFF, fo);
-    if ((audio_cnt % 1024) == 0)
-      PRINTF("%i\n", audio_cnt);
-    audio_cnt++;
-    break;
-  case 0xFFFF:
-    fclose(fo);
-    PRINTF("Audio closed.\n");
-    sim_done();
     break;
   case SPR_PMR:
     /* PMR[SDF] and PMR[DCGE] are ignored completely. */

@@ -82,9 +82,11 @@ void  or1ksim_interrupt_clear (int  i);
 /* JTAG interface */
 double  or1ksim_jtag_reset ();
 
-double  or1ksim_jtag_shift_ir (unsigned char *jreg);
+double  or1ksim_jtag_shift_ir (unsigned char *jreg,
+			       int            num_bits);
 
-double  or1ksim_jtag_shift_dr (unsigned char *jreg);
+double  or1ksim_jtag_shift_dr (unsigned char *jreg,
+			       int            num_bits);
 
 
 #ifdef __cplusplus

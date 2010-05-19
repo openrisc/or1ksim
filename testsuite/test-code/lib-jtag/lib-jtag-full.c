@@ -201,7 +201,7 @@ process_instruction (int   next_jreg,
 
   dump_jreg ("  shifting in", jreg, 1);
 
-  double  t = or1ksim_jtag_shift_ir (jreg);
+  double  t = or1ksim_jtag_shift_ir (jreg, 4);
 
   dump_jreg ("  shifted out", jreg, 1);
   printf ("  time taken:   %.12fs\n", t);
@@ -295,7 +295,7 @@ process_select_module (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg, 32 + 4 + 32 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -397,9 +397,14 @@ process_write_command (int   next_jreg,
       return  0;
     }
 
-  if (len > 0xffff)
+  if ((len + 1) < 0x1)
     {
-      printf ("ERROR: WRITE_COMMAND length 0x%lx too large\n", len);
+      printf ("ERROR: WRITE_COMMAND length 0x%lx too small\n", len + 1);
+      return  0;
+    }
+  else if ((len + 1) > 0x10000)
+    {
+      printf ("ERROR: WRITE_COMMAND length 0x%lx too large\n", len + 1);
       return  0;
     }
 
@@ -466,7 +471,7 @@ process_write_command (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg, 32 + 4 + 32 + 16 + 32 + 4 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -581,7 +586,7 @@ process_read_command (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg, 32 + 4 + 16 + 32 + 4 + 32 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -594,7 +599,6 @@ process_read_command (int   next_jreg,
   unsigned long int  crc_out;
 
   access_type = ((jreg[4] >> 5) | (jreg[5] << 3)) & 0xf ;
-
   addr        = ((unsigned long int) jreg[ 5] >>  1) |
                 ((unsigned long int) jreg[ 6] <<  7) |
                 ((unsigned long int) jreg[ 7] << 15) |
@@ -631,7 +635,7 @@ process_read_command (int   next_jreg,
 
   /* Log the results. Remember the length is 1 greater than the value
      returned. */
-  printf ("  access_type:  0x%x\n",    status);
+  printf ("  access_type:  0x%x\n",    access_type);
   printf ("  address:      0x%lx\n",   addr);
   printf ("  length:       0x%lx\n",   len + 1);
   printf ("  status:       0x%x\n",    status);
@@ -658,7 +662,7 @@ process_read_command (int   next_jreg,
 
      GO_COMMAND_WRITE <data>
 
-   The one argument is a string of bytes to be written, MS byte first.
+   The one argument is a string of bytes to be written, LS byte first.
 
    Like all the JTAG fields, each data byte must be reversed, so it is shifted
    MS bit first. It also requires a 32-bit CRC.
@@ -691,7 +695,7 @@ process_go_command_write (int   next_jreg,
 
   char              *data_str   = argv[next_jreg];
   int                data_len   = strlen (data_str);
-  int                data_bytes = (data_len + 1) / 2;
+  int                data_bytes = data_len / 2;
   unsigned char     *data       = malloc (data_bytes);
 
   if (NULL == data)
@@ -700,17 +704,23 @@ process_go_command_write (int   next_jreg,
       return  0;
     }
 
+  if (1 == (data_len % 2))
+    {
+      printf ("Warning: GO_COMMAND_WRITE odd char ignored\n");
+    }
+
   int  i;
 
   for (i = 0; i < data_bytes; i++)
     {
-      int            ch_off_ls = data_len - (i * 2) - 1;
-      int            ch_off_ms = (0 == ch_off_ls) ? 0 : ch_off_ls - 1;
-      int            j;
+      int            ch_off_ms = i * 2;
+      int            ch_off_ls = i * 2 + 1;
 
       /* Get each nybble in turn, remembering that we may not have a MS nybble
 	 if the data string has an odd number of chars. */
       data[i] = 0;
+
+      int  j;
 
       for (j = ch_off_ms; j <= ch_off_ls; j++)
 	{
@@ -792,7 +802,8 @@ process_go_command_write (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg,
+				     32 + 4 + 32 + data_bytes * 8 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -877,7 +888,12 @@ process_go_command_read (int   next_jreg,
   unsigned long int  cmd        = 0;	/* GO_COMMAND */
   unsigned long int  data_bytes = strtoul (argv[next_jreg], NULL, 16);
 
-  if (data_bytes > 0x10000)
+  if (data_bytes < 0)
+    {
+      printf ("ERROR: GO_COMMAND_READ length 0x%lx too small\n", data_bytes);
+      return  0;
+    }
+  else if (data_bytes > 0x10000)
     {
       printf ("ERROR: GO_COMMAND_READ length 0x%lx too large\n", data_bytes);
       return  0;
@@ -924,7 +940,8 @@ process_go_command_read (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg,
+				     32 + 4 + data_bytes * 8 + 32 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -936,7 +953,7 @@ process_go_command_read (int   next_jreg,
 
   if (NULL == data)
     {
-      printf ("ERROR: data malloc for GO_COMMAND_WRITE register failed.\n");
+      printf ("ERROR: data malloc for GO_COMMAND_READ register failed.\n");
       free (jreg);
       return  0;
     }
@@ -975,10 +992,12 @@ process_go_command_read (int   next_jreg,
   
   crc_computed = crc32 (status, 4, crc_computed);
 
-  /* Log the results, ignoring a leading zero on the MS byte */
-  printf ("  data:         0x%x", data[data_bytes - 1]);
+  /* Log the results, remembering these are bytes, so endianness is not a
+     factor here. Since the OR1K is big endian, the lowest numbered byte will
+     be the least significant, and the first printed */
+  printf ("  data:         ");
 
-  for (i = data_bytes - 2; i >= 0; i--)
+  for (i = 0; i < data_bytes; i++)
     {
       printf ("%02x", data[i]);
     }
@@ -1113,7 +1132,7 @@ process_write_control (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg, 32 + 4 + 32 + 52 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -1228,7 +1247,7 @@ process_read_control (int   next_jreg,
 
   /* Note what we are shifting in and shift it. */
   dump_jreg ("  shifting in", jreg, num_bytes);
-  double  t = or1ksim_jtag_shift_dr (jreg);
+  double  t = or1ksim_jtag_shift_dr (jreg, 32 + 4 + 52 + 32 + 4 + 1);
 
   /* Diagnose what we are shifting out. */
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -1320,6 +1339,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  const double  QUANTUM = 5.0e-3;	/* Time in sec for each step. */
+
   /* Check we have minimum number of args. */
   if (argc < 4)
     {
@@ -1340,13 +1361,13 @@ main (int   argc,
       return  1;
     }
 
-  /* Run repeatedly for 1 millisecond until we have processed all JTAG
+  /* Run repeatedly for 10 milliseconds until we have processed all JTAG
      registers */
   int  next_jreg = 3;			/* Offset to next JTAG register */
 
   do
     {
-      switch (or1ksim_run (1.0e-3))
+      switch (or1ksim_run (QUANTUM))
 	{
 	case OR1KSIM_RC_OK:
 	  printf ("Execution step completed OK.\n");
@@ -1467,7 +1488,7 @@ main (int   argc,
   while (next_jreg < argc);
 
   /* A little longer to allow response to last upcall to be handled. */
-  switch (or1ksim_run (1.0e-3))
+  switch (or1ksim_run (QUANTUM))
     {
     case OR1KSIM_RC_OK:
       printf ("Execution step completed OK.\n");

@@ -15,7 +15,7 @@
 
 @SET_MAKE@
 
-# Makefile.am for or1ksim OR1K test program: loop
+# Makefile.am for or1ksim OR1K various loop test programs.
 
 # Copyright (C) Embecosm Limited, 2010
 
@@ -58,7 +58,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = loop$(EXEEXT)
+check_PROGRAMS = loop$(EXEEXT) loop-init$(EXEEXT) loop-report$(EXEEXT)
 subdir = loop
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -78,6 +78,19 @@ loop_DEPENDENCIES = ../except/except.lo ../support/libsupport.la
 loop_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(loop_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_loop_init_OBJECTS = loop-init.$(OBJEXT)
+loop_init_OBJECTS = $(am_loop_init_OBJECTS)
+loop_init_DEPENDENCIES = ../except/except.lo ../support/libsupport.la
+loop_init_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(loop_init_LDFLAGS) $(LDFLAGS) -o $@
+am_loop_report_OBJECTS = loop-report.$(OBJEXT)
+loop_report_OBJECTS = $(am_loop_report_OBJECTS)
+loop_report_DEPENDENCIES = ../except/except.lo \
+	../support/libsupport.la
+loop_report_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(loop_report_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__depfiles_maybe = depfiles
@@ -91,8 +104,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(loop_SOURCES)
-DIST_SOURCES = $(loop_SOURCES)
+SOURCES = $(loop_SOURCES) $(loop_init_SOURCES) $(loop_report_SOURCES)
+DIST_SOURCES = $(loop_SOURCES) $(loop_init_SOURCES) \
+	$(loop_report_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -149,6 +163,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -210,10 +225,26 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+# Simple loop
 loop_SOURCES = loop.c
 loop_LDFLAGS = -T$(srcdir)/../default.ld
 loop_LDADD = ../except/except.lo      \
 	         ../support/libsupport.la
+
+
+# Loop with initialization
+loop_init_SOURCES = loop-init.c
+loop_init_LDFLAGS = -T$(srcdir)/../default.ld
+loop_init_LDADD = ../except/except.lo      \
+	            ../support/libsupport.la
+
+
+# Loop with reporting
+loop_report_SOURCES = loop-report.c
+loop_report_LDFLAGS = -T$(srcdir)/../default.ld
+loop_report_LDADD = ../except/except.lo      \
+	              ../support/libsupport.la
 
 all: all-am
 
@@ -261,6 +292,12 @@ clean-checkPROGRAMS:
 loop$(EXEEXT): $(loop_OBJECTS) $(loop_DEPENDENCIES) 
 	@rm -f loop$(EXEEXT)
 	$(loop_LINK) $(loop_OBJECTS) $(loop_LDADD) $(LIBS)
+loop-init$(EXEEXT): $(loop_init_OBJECTS) $(loop_init_DEPENDENCIES) 
+	@rm -f loop-init$(EXEEXT)
+	$(loop_init_LINK) $(loop_init_OBJECTS) $(loop_init_LDADD) $(LIBS)
+loop-report$(EXEEXT): $(loop_report_OBJECTS) $(loop_report_DEPENDENCIES) 
+	@rm -f loop-report$(EXEEXT)
+	$(loop_report_LINK) $(loop_report_OBJECTS) $(loop_report_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -268,6 +305,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-init.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-report.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop.Po@am__quote@
 
 .c.o:

@@ -418,7 +418,12 @@ or1ksim_interrupt_clear (int i)
 double
 or1ksim_jtag_reset ()
 {
-  return  (double) jtag_reset () * (double) config.debug.jtagcycle_ps / 1.0e12;
+  /* Number of JTAG clock cycles a reset sequence takes */
+  const double  JTAG_RESET_CYCLES = 5.0;
+
+  jtag_reset ();
+
+  return  JTAG_RESET_CYCLES  * (double) config.debug.jtagcycle_ps / 1.0e12;
 
 }	/* or1ksim_jtag_reset () */
 
@@ -440,16 +445,20 @@ or1ksim_jtag_reset ()
    this model is DEBUG. For completeness the register is parsed and a warning
    given if any register other than DEBUG is shifted.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits in the register. Just for
+                            sanity check (it should always be 4).
 
    @return  The time in seconds which the shift took.                        */
 /*---------------------------------------------------------------------------*/
 double
-or1ksim_jtag_shift_ir (unsigned char *jreg)
+or1ksim_jtag_shift_ir (unsigned char *jreg,
+		       int            num_bits)
 {
-  return  (double) jtag_shift_ir (jreg) * (double) config.debug.jtagcycle_ps /
-          1.0e12;
+  jtag_shift_ir (jreg, num_bits);
+
+  return  (double) num_bits * (double) config.debug.jtagcycle_ps / 1.0e12;
 
 }	/* or1ksim_jtag_shift_ir () */
 
@@ -479,15 +488,20 @@ or1ksim_jtag_shift_ir (unsigned char *jreg)
    @note In practice READ_COMMAND is not used. However the functionality is
          provided for future compatibility.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits in the register. This is
+                            essential to prevent bugs where the size of
+                            register supplied is incorrect.
 
    @return  The time in seconds which the shift took.                        */
 /*---------------------------------------------------------------------------*/
 double
-or1ksim_jtag_shift_dr (unsigned char *jreg)
+or1ksim_jtag_shift_dr (unsigned char *jreg,
+		       int            num_bits)
 {
-  return  (double) jtag_shift_dr (jreg) * (double) config.debug.jtagcycle_ps /
-          1.0e12;
+  jtag_shift_dr (jreg, num_bits);
+
+  return  (double) num_bits * (double) config.debug.jtagcycle_ps / 1.0e12;
 
 }	/* or1ksim_jtag_shift_dr () */

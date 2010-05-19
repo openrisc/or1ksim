@@ -1253,6 +1253,12 @@ Sets the supervision register Special Purpose Register (SPR 0x11) to
 @var{value}.  Default value is 0x00008001, i.e.  start in supervision
 mode (0x00000001) and set the ``Fixed One'' bit (0x00008000).
 
+@quotation Note
+This is particularly useful when an image is held in Flash at high
+memory (0xf0000000).  The EPH  bit can be set, so that interrupt
+vectors are basedf at 0xf0000000, rather than 0x0.
+@end quotation
+
 @item superscalar = 0|1
 @cindex @code{superscalar} (CPU configuration)
 If 1, the processor operates in superscalar mode.  Default value is
@@ -1318,7 +1324,38 @@ when I/O is idle.
 @cindex @code{section memory}
 Memory configuration is described in @code{section memory}.  This
 section may appear multiple times, specifying multiple blocks of
-memory.  The following parameters may be specified.
+memory.
+
+@quotation Caution
+The user may choose whether or not to enable a memory controller. If a
+memory controller is enabled, then the standard OpenRISC C libraries
+will initialize it to expect 64MB memory blocks, and any memory
+declarations @emph{must} reflect this.  The section describing memory
+controller configuration describes the steps necessary for using
+smaller or larger memory sections (@pxref{Memory Controller
+Configuration, , Memory Controller Configuration}).
+
+If a memory controller is @emph{not} enabled, then the standard C
+library code will generate memory access errors.  The solution is to
+declare an additional writable memory block, mimicing the memory
+controller's register bank as follows.
+
+@example
+section memory
+  pattern = 0x00
+  type = unknown
+  name = "MC shadow"
+  baseaddr = 0x93000000
+  size     = 0x00000080
+  delayr = 2
+  delayw = 4
+end
+@end example
+
+@end quotation
+
+
+The following parameters may be specified.
 
 @table @code
 
@@ -1429,7 +1466,8 @@ should have a unique chip enable index, which should be greater
 than or equal to zero.  This is used by the memory controller when
 identifying different memory instances.
 
-The default value is -1 (invalid).
+There is no requirement to set  @code{ce} if a memory controller is
+not enabled. The default value is -1 (invalid).
 
 @item mc = @var{value}
 @cindex @code{mc} (memory configuration)
@@ -1438,7 +1476,8 @@ correspond to the @code{index} field specified in a @code{@w{section
 mc}} for a memory controller (@pxref{Memory Controller Configuration,
 , Memory Controller Configuration}).
 
-Default value is 0, which is also the default value of a memory
+There is no requirement to set  @code{mc} if a memory controller is
+not enabled. Default value is 0, which is also the default value of a memory
 controller @code{index} field.  This is suitable therefore for designs
 with just one memory controller.
 
@@ -1896,7 +1935,7 @@ All peripheral components are optional.  If they are specified, then
 @cindex memory controller configuration
 @cindex @code{section mc}
 The memory controller used in @value{OR1KSIM} is the component
-implemented at OpenCores, and found in the top level CVS directory,
+implemented at OpenCores, and found in the top level SVN directory,
 @file{mem_ctrl}.  It is described in the document @cite{Memory
 Controller IP Core} by Rudolf Usselmann, which can be found in the
 @file{doc} subdirectory.  It is a memory mapped component, which
@@ -1904,7 +1943,26 @@ resides on the main OpenRISC Wishbone data bus.
 
 The memory controller configuration is described in @code{@w{section
 mc}}.  This section may appear multiple times, specifying multiple
-memory controllers.  The following parameters may be specified.
+memory controllers.
+
+@quotation Caution
+The standard OpenRISC C libraries will initialize the memory
+controller to expect 64MB memory blocks, and any memory declarations
+@emph{must} reflect this.
+
+If smaller memory blocks are declared with a memory controller, then
+sufficient memory will not be allocated by @value{OR1KSIM}, but out of
+range memory accesses will not be trapped. For example declaring a
+memory section from 0-4MB with a memory controller enabled would mean
+that accesses between 4MB and 64MB would be permitted, but having no
+allocated memory would likely cause a segmentation fault.
+
+If the user is determined to use smaller memories with the memory
+controller, then custom initialization code must be provided, to
+ensure the memory controller traps out-of-memory accesses.
+@end quotation
+
+The following parameters may be specified.
 
 @table @code
 
@@ -2075,7 +2133,7 @@ with the UART.
 @cindex DMA configuration
 @cindex @code{section dma}
 The DMA controller used in @value{OR1KSIM} is the component
-implemented at OpenCores, and found in the top level CVS directory,
+implemented at OpenCores, and found in the top level SVN directory,
 @file{wb_dma}.  It is described in the document @cite{Wishbone
 DMA/Bridge IP Core} by Rudolf Usselmann, which can be found in the
 @file{doc} subdirectory.  It is a memory mapped component, which
@@ -2125,12 +2183,12 @@ with the DMA controller.
 @cindex Ethernet configuration
 @cindex @code{section ethernet}
 The Ethernet MAC used in @value{OR1KSIM} is the component implemented
-at OpenCores, and found in the top level CVS directory,
-@file{ethernet}.  It also forms part of the OpenRISC SoC, ORPSoC.  It is
-described in the document @cite{Ethernet IP Core Specification} by
-Igor Mohor, which can be found in the @file{doc} subdirectory.  It is a
-memory mapped component, which resides on the main OpenRISC Wishbone
-data bus.
+at OpenCores, and found in the top level SVN directory, @file{ethmac}.
+It also forms part of the OpenRISC SoC, ORPSoC.  It is described in
+the document @cite{Ethernet IP Core Specification} by Igor Mohor,
+which can be found in the @file{doc} subdirectory.  It is a memory
+mapped component, which resides on the main OpenRISC Wishbone data
+bus.
 
 Ethernet configuration is described in @code{section ethernet}.  This
 section may appear multiple times, specifying multiple Ethernet
@@ -2242,7 +2300,7 @@ with the DMA controller.
 @cindex GPIO configuration
 @cindex @code{section cpio}
 The GPIO used in @value{OR1KSIM} is the component implemented at
-OpenCores, and found in the top level CVS directory, @file{gpio}.  It
+OpenCores, and found in the top level SVN directory, @file{gpio}.  It
 is described in the document @cite{GPIO IP Core Specification} by
 Damjan Lampret and Goran Djakovic, which can be found in the
 @file{doc} subdirectory.  It is a memory mapped component, which
@@ -2292,7 +2350,7 @@ but deprecated.
 @cindex @code{section vga}
 @value{OR1KSIM} models a VGA interface to an external monitor.  The
 VGA controller used in @value{OR1KSIM} is the component implemented at
-OpenCores, and found in the top level CVS directory, @file{vga_lcd},
+OpenCores, and found in the top level SVN directory, @file{vga_lcd},
 with no support for the optional hardware cursors.  It is described in
 the document @cite{VGA/LCD Core v2.0 Specifications} by Richard
 Herveille, which can be found in the @file{doc} subdirectory.  It is a
@@ -2409,7 +2467,7 @@ but deprecated.
 @cindex @code{section kb}
 The PS2 interface provided by @value{OR1KSIM} is not documented.  It
 may be based on the PS2 project at OpenCores, and found in
-the top level CVS directory, @file{ps2}.  However this project lacks
+the top level SVN directory, @file{ps2}.  However this project lacks
 any documentation beyond its project webpage.  Since most PS2
 interfaces follow the Intel i8042 standard, this is presumably what is
 expected with this device.
@@ -2476,7 +2534,7 @@ models the input from a physical keyboard.  The default value is
 @cindex @code{section ata}
 The ATA/ATAPI disc controller used in @value{OR1KSIM} is the OCIDEC
 (OpenCores IDE Controller) component implemented at OpenCores, and
-found in the top level CVS directory, @file{ata}.  It is described in
+found in the top level SVN directory, @file{ata}.  It is described in
 the document @cite{ATA/ATAPI-5 Core Specification} by Richard
 Herveille, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone

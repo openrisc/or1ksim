@@ -1,3 +1,16 @@
+2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* loop/loop-init.c (main): Initialize top of each memory block.
+	* loop/loop-report.c (main): Rewritten to ensure reliable
+	reporting of results.
+
+2010-05-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* loop/loop-init.c: Looping program with SPR and memory
+	initialization.
+	* loop/loop-report.c: Looping program which reports changes to SPR
+	and memory.
+	* loop/Makefile.am: Update for new programs.
+	* loop/Makefile.in: Regenerated.
+
 2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* int-logger/int-logger-edge.c: Created.
 	* int-logger/Makefile.am: Added int-logger-edge.

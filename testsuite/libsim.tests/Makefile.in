@@ -140,6 +140,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -211,14 +212,21 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Just distribute this stuff
-EXTRA_DIST = default.cfg      \
-	     int-edge.cfg     \
-	     int-edge.exp     \
-	     int-level.cfg    \
-	     int-level.exp    \
-	     jtag-basic.exp   \
-	     jtag-full.exp    \
-	     lib-iftest.exp   \
+EXTRA_DIST = default.cfg               \
+	     int-edge.cfg              \
+	     int-edge.exp              \
+	     int-level.cfg             \
+	     int-level.exp             \
+	     jtag-basic.exp            \
+	     jtag-go-command-read.exp  \
+	     jtag-go-command-write.exp \
+	     jtag-read-command.exp     \
+	     jtag-read-control.exp     \
+	     jtag-select-module.exp    \
+	     jtag-write-control.exp    \
+	     jtag-write-command.exp    \
+	     lib-iftest.exp            \
+	     upcalls.exp               \
 	     upcalls.cfg
 
 all: all-am

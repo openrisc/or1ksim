@@ -1,3 +1,107 @@
+2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (wishbone_write): Corrected writing when invalid
+	address.
+
+2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (go_command_read): Change in calling convention to
+	spr_read and wishbone_read.
+	(go_command_write): Change in calling convention to spr_write () and
+	wishbone_write ().
+	(spr_read): Status passed as argument. Correcly handle
+	under- and over-run.
+	(spr_write): Status passed as argument. Correcly handle	under- and
+	over-run.
+	(wishbone_read): Correcly handle under- and over-run.
+	(wishbone_write): Correcly handle under- and over-run.
+	
+2010-05-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (construct_response): Return type changed to void.
+	(go_command): Number of bits passed as arg and on to subsidiary
+	functions. Return type changed to void. Error message with invalid
+	access type removed.
+	(go_command_read): Number of bits passed as arg. Return	type changed
+	to void. Size validated against prior WRITE_COMMAND. Error message due
+	to invalid modules removed. Over/under-run allowed.
+	(go_command_write): Number of bits passed as arg. Return type changed
+	to void. Size validated against prior WRITE_COMMAND. Error message due
+	to invalid modules removed. Over/under-run allowed for.
+	(jtag_reset): Return type changed to void.
+	(jtag_shift_dr): Number of bits passed as arg and passed to subsidiary
+	functions. Return type changed to void.
+	(jtag_shift_ir): Number of bits passed as arg and checked. Return type
+	changed to void.
+	(null_read): No longer takes bit offset as argument, takes actual data
+	size as argument. Internal logic simplied and works with
+	under/over-run.
+	(read_command): Number of bits passed as arg and checked. Return type
+	changed to void.
+	(read_control): Number of bits passed as arg and checked. Return type
+	changed to void. Duplicate error messages eliminated.
+	(select_module): Renamed from module_select. Number of bits passed as
+	arg and checked. Return type changed to void.
+	(spr_read): No longer takes bit offset as argument, takes actual data
+	size as argument. Internal logic simplied and works with
+	under/over-run.
+	(spr_write): No longer takes bit offset as argument, takes actual data
+	size as argument. Internal logic simplied and works with
+	under/over-run.
+	(validate_spr_fields): Takes access type, address and data size as
+	arguments. No correction, just report errors/warnings.
+	(validate_wb_fields): Takes access type, address and data size as
+	arguments. No correction, just report errors.
+	(wishbone_read): No longer takes bit offset as argument, takes actual
+	data size as argument. Internal logic simplied and works with
+	under/over-run.
+	(wishbone_write): No longer takes bit offset as	argument, takes actual
+	data size as argument. Internal logic simplied and works with
+	under/over-run.
+	(write_command). Number of bits passed as arg and checked. Return type
+	changed to void. Fields validated.
+	(write_control). Number of bits passed as arg and checked. Return type
+	changed to void. Duplicate error messages eliminated.
+	* debug/jtag.h: Proforma for jtag_shift_dr and jtag_shift_ir
+	changed to include number of bits and return type void.
+	* libtoplevel.c (or1ksim_jtag_reset): Number of JTAG reset cycles
+	defined locally here.
+	* libtoplevel.c (or1ksim_jtag_shift_dr): Number of bits added as
+	function argument and passed on to internal function.
+	* libtoplevel.c (or1ksim_jtag_shift_ir): Number of bits added as
+	function argument and passed on to internal function.
+	* or1ksim.h: Proforma for or1ksim_jtag_shift_ir and
+	or1ksim_jtag_shift_ir changed to include number of bits in reg.
+
+2010-05-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (validate_spr_fields): More concise warnings,
+	corrected length to 4, not 1.
+	(reverse_bits): Fixed typo in one constant.
+	* cpu/or1k/sprs.c (mtspr): Undocumented audio SPRs 0xfffd-0xffff
+	and associated static vars "fo" and "audio_cnt" removed.
+
+2010-05-12  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (go_command_read): Ensure null bytes set if no data
+	due to error and correct CRC calcuated. Give warning for length of
+	zero as well as too long.
+	(wishbone_read): Set null bytes if there is a validation error.
+	(null_read); New function set null bytes if erroneous read.
+	(validate_spr_fields): Correctly return success when fields valid.
+	(spr_read): Bytes reversed correctly.
+	(read_control, write_control): Add separate message if no module
+	selected.
+	(read_control): Clear data and set CRC if error.
+	(construct_response): Correctly compute number of bits.
+	(go_command): Compute correct length in bits when access type is
+	invalid.
+	(write_command): Warnings in terms of bytes requested, not actual
+	field. Separate warning for zero.
+
+2010-05-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* debug/jtag.c (validate_spr_fields): Check for length changed to
+	4 bytes (was 1 word).
+	(module_select): Save module ID, even if invalid.
+	(go_command_read, go_command_write): Separate error message if
+	module undefined.
+	(wishbone_read): Corrected shifts by bit-off for JTAG bytes.
+
 2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* debug/jtag.c (module_select): Corrected parenthesis for
 	computation of crc_in.

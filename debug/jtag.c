@@ -123,7 +123,7 @@ reverse_bits (uint64_t  val,
   val = (((val & 0xff00ff00ff00ff00ULL) >>  8) |
 	 ((val & 0x00ff00ff00ff00ffULL) <<  8));
   val = (((val & 0xffff0000ffff0000ULL) >> 16) |
-	 ((val & 0x00000fff0000ffffULL) << 16));
+	 ((val & 0x0000ffff0000ffffULL) << 16));
   val = ((val >> 32) | (val << 32));
 
   return  val >> (64 - numBits);	/* Only the bits we want */
@@ -175,11 +175,9 @@ reverse_byte (uint8_t  byte)
    @param[in]  status     The status bits
    @param[in]  crc_in     CRC computed so far (set to 0xffffffff if none)
    @param[in]  ign_bits   The number of bits to ignore
-   @param[in]  zero_bits  The number of bits to zero
-
-   @return  The register length in bits                                      */
+   @param[in]  zero_bits  The number of bits to zero                         */
 /*---------------------------------------------------------------------------*/
-static int
+static void
 construct_response (unsigned char *jreg,
 		    uint8_t        status,
 		    uint32_t       crc_in,
@@ -242,13 +240,9 @@ construct_response (unsigned char *jreg,
   else
     {
       fprintf (stderr, "*** ABORT ***: construct_response: impossible bit "
-	       "offset: %u\n", bit_off);
+	       "offset: %u.\n", bit_off);
       abort ();
     }
-
-  /* Result is the register length in bits */
-  return  32 + 4 + skip_bytes;
-
 }	/* construct_response () */
 
 
@@ -279,15 +273,30 @@ construct_response (unsigned char *jreg,
    Fields are always shifted in MS bit first, so must be reversed. The CRC in
    is computed on the first 5 bits, the CRC out on the 4 status bits.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   This is a register of a fixed size, which we verify initially.
+
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.
 
    @return  The number of cycles the shift took, which in turn is the number
             of bits in the register                                          */
 /*---------------------------------------------------------------------------*/
-static int
-module_select (unsigned char *jreg)
+static void
+select_module (unsigned char *jreg,
+	       int            num_bits)
 {
+  /* Validate register size, which is fixed */
+  const int  REG_BITS = 36 + 32 + 4 + 1;
+
+  if (REG_BITS != num_bits)
+    {
+      fprintf (stderr,
+	       "ERROR: JTAG module select %d bits, when %d bits expected.\n",
+	      num_bits, REG_BITS);
+      return;
+    }
+
   /* Break out the fields */
   uint8_t   mod_id = reverse_bits ((jreg[0] >> 1) & 0xf, 4);
   uint32_t  crc_in = reverse_bits (((uint32_t ) (jreg[0] & 0xe0) >>  5) |
@@ -306,12 +315,7 @@ module_select (unsigned char *jreg)
   enum jtag_status  status = JS_OK;
 
   /* Validate the CRC */
-  if (crc_computed != crc_in)
-    {
-      /* Mismatch: record the error */
-      status |= JS_CRC_IN_ERROR;
-    }
-  else
+  if (crc_computed == crc_in)
     {
       /* Is it a valid module? */
       switch (mod_id)
@@ -325,93 +329,26 @@ module_select (unsigned char *jreg)
 	  break;
 	  
 	default:
-	  /* Bad module: record the error */
+	  /* Bad module: record the error. Set the module to JM_UNDEFINED,
+	     which will trigger more errors in the future, rather than
+	     leaving the module unchanged, which might allow such errors to
+	     slip by undetected. */
 	  status |= JS_MODULE_MISSING;
+	  runtime.debug.mod_id = JM_UNDEFINED;
 	  break;
 	}
+    }
+  else
+    {
+      /* CRC Mismatch: record the error */
+      status |= JS_CRC_IN_ERROR;
     }
 
   /* Construct the outgoing register and return the JTAG cycles taken (the
      register length) */
   return  construct_response (jreg, status, 0xffffffff, 0, 37);
 
-}	/* module_select */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Validate WRITE_COMMAND fields for WishBone
-
-   Check that a WRITE_COMMAND's fields are valid for WishBone access.
-
-   - 16 and 32-bit access must be correctly aligned. If not a warning is
-     printed and validation fails.
-
-   - size must be a multiple of 2 for 16-bit access, and a multiple of 4 for
-     32-bit access
-
-   Validation is carried out when executing a GO_COMMAND, rather than when
-   setting the WRITE_COMMAND, because only the GO_COMMAND can set the status
-   error if there is a problem.
-
-   Warning messages are printed to explain any validation problems.
-
-   @todo Should multiple SPR accesses be allowed in a single access?
-
-   @note The size of the data is one greater than the length specified in the
-         original WRITE_COMMAND.
-
-   @return  1 (TRUE) if validation is OK, 0 (FALSE) if validation fails.     */
-/*---------------------------------------------------------------------------*/
-static int
-validate_wb_fields ()
-{
-  /* Determine the size of the access */
-  uint32_t  access_bits;
-
-  switch (runtime.debug.acc_type)
-    {
-    case JAT_WRITE8:
-    case JAT_READ8:
-      access_bits =  8;
-      break;
-
-    case JAT_WRITE16:
-    case JAT_READ16:
-      access_bits = 16;
-      break;
-
-    case JAT_WRITE32:
-    case JAT_READ32:
-      access_bits = 32;
-      break;
-
-    default:
-      fprintf (stderr, "Warning: validate_wb_fields: unknown access "
-	       "type %u\n", runtime.debug.acc_type);
-      return  0;
-    }
-
-  /* Check for validity. This works for 8-bit, although the tests will always
-     pass. */
-  uint32_t  access_bytes = access_bits / 8;
-
-  if (0 != (runtime.debug.addr % access_bytes))
-    {
-      fprintf (stderr, "Warning: JTAG WishBone %d-bit access must be %d-byte "
-	       "aligned\n", access_bits, access_bytes);
-      return  0;
-    }
-  else if (0 != (runtime.debug.size % access_bytes))
-    {
-      fprintf (stderr, "Warning: JTAG %d-bit WishBone access must be multiple "
-	       "of %d bytes in length\n", access_bits, access_bytes);
-      return  0;
-    }
-  else
-    {
-      return  1;			/* No problems */
-    }
-}	/* validate_wb_fields () */
+}	/* select_module */
 
 
 /*---------------------------------------------------------------------------*/
@@ -419,6 +356,11 @@ validate_wb_fields ()
 
    Read memory from WishBone. The WRITE_COMMAND address is updated to reflect
    the completed read if successful.
+
+   The data follows an initial 37 bits corresponding to the incoming command
+   and CRC. We use the smaller of the data size in the original WRITE_COMMAND
+   and the size of the data in the GO_COMMAND_WRITE packet, so we can handle
+   over/under-run.
 
    The result is the CRC of the data read. The status flag is supplied as a
    pointer, since this can also be updated if there is a problem reading the
@@ -436,69 +378,67 @@ validate_wb_fields ()
 
    @param[out] jreg        The JTAG register buffer where data is to be
                            stored.
-   @param[in]  skip_bits   Bits to skip before storing data in jreg.
+   @param[in]  jreg_bytes   The number of bytes expected in the JTAG register
+                           (may be different to that in the prior READ/WRITE
+                           if we have over- or under-run).
    @param[in]  status_ptr  Pointer to the status register.
 
    @return  The CRC of the data read                                         */
 /*---------------------------------------------------------------------------*/
 static uint32_t
-wishbone_read (unsigned char    *jreg,
-	       unsigned int      skip_bits,
-	       enum jtag_status *status_ptr)
+wishbone_read (unsigned char     *jreg,
+	       unsigned long int  jreg_bytes,
+	       enum jtag_status  *status_ptr)
 {
-  /* Compute the CRC as we go */
-  uint32_t  crc_out  = 0xffffffff;
+  const unsigned int  BIT_OFF  = 37 % 8;	/* Skip initial fields */
+  const unsigned int  BYTE_OFF = 37 / 8;
 
-  /* Validate the fields for the wishbone read. If this fails we stop here,
-     setting an error in the status_ptr. */
-  if (!validate_wb_fields())
+  /* Transfer each byte in turn, computing the CRC as we go. We must supply
+     jreg_bytes. If there is overrun, we use zero for the remaining bytes. */
+  uint32_t           crc_out  = 0xffffffff;
+  unsigned long int  i;
+
+  for (i = 0; i < jreg_bytes; i++)
     {
-      *status_ptr |= JS_WISHBONE_ERROR;
-      return  crc_out;
-    }
-      
-  /* Transfer each byte in turn, computing the CRC as we go */
-  unsigned  byte_off = skip_bits / 8;
-  unsigned  bit_off  = skip_bits % 8;
+      unsigned char  byte = 0;
 
-  uint32_t  i;				/* Index into the data being read */
-
-  for (i = 0; i < runtime.debug.size; i++)
-    {
-      /* Error if we can't access this byte */
-      if (NULL == verify_memoryarea (runtime.debug.addr + i))
+      /* Get a byte if available */
+      if (i < runtime.debug.size)
 	{
-	  *status_ptr |= JS_WISHBONE_ERROR;
-	  return  crc_out;
+	  /* Error if we can't access this byte */
+	  if (NULL == verify_memoryarea (runtime.debug.addr + i))
+	    {
+	      *status_ptr |= JS_WISHBONE_ERROR;
+	    }
+	  else
+	    {
+	      /* Get the data with no cache or VM translation */
+	      byte = eval_direct8 (runtime.debug.addr + i, 0, 0);
+	    }
 	}
 
-      /* Get the data with no cache or VM translation and update the CRC */
-      unsigned char  byte = eval_direct8 (runtime.debug.addr + i, 0, 0);
+      /* Update the CRC, reverse, then store the byte in the register, without
+	 trampling adjacent bits. Simplified version when the bit offset is
+	 zero. */
       crc_out = crc32 (byte, 8, crc_out);
+      byte    = reverse_byte (byte);
 
-      /* Reverse, then store the byte in the register, without trampling
-	 adjacent bits. Simplified version when the bit offset is zero. */
-      byte = reverse_byte (byte);
+      /* Clear the bits (only) we are setting */
+      jreg[BYTE_OFF + i]     <<= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i]     >>= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i + 1] >>= BIT_OFF;
+      jreg[BYTE_OFF + i + 1] <<= BIT_OFF;
 
-      if (0 == bit_off)
-	{
-	  jreg[byte_off + i] = byte;
-	}
-      else
-	{
-	  /* Clear the bits (only) we are setting */
-	  jreg[byte_off + i]     <<= bit_off;
-	  jreg[byte_off + i]     >>= bit_off;
-	  jreg[byte_off + i + 1] >>= 8 - bit_off;
-	  jreg[byte_off + i + 1] <<= 8 - bit_off;
-
-	  /* OR in the bits */
-	  jreg[byte_off + i]     |= (byte <<      bit_off)  & 0xff;
-	  jreg[byte_off + i + 1] |= (byte >> (8 - bit_off)) & 0xff;
-	}
+      /* OR in the bits */
+      jreg[BYTE_OFF + i]     |= (byte <<      BIT_OFF)  & 0xff;
+      jreg[BYTE_OFF + i + 1] |= (byte >> (8 - BIT_OFF)) & 0xff;
     }
 
-    runtime.debug.addr += runtime.debug.size;
+  /* Only advance if there we no errors (including over/under-run. */
+  if (JS_OK == *status_ptr)
+    {
+      runtime.debug.addr += runtime.debug.size;
+    }
 
   return  crc_out;
 
@@ -506,92 +446,15 @@ wishbone_read (unsigned char    *jreg,
 
 
 /*---------------------------------------------------------------------------*/
-/*!Validate WRITE_COMMAND fields for SPR
-
-   Check that a WRITE_COMMAND's fields are valid for SPR access. Only prints
-   messages, since the protocol does not allow for any errors.
-
-   - 8 and 16-bit access is only permitted for WishBone. If they are specified
-     for SPR, they are treated as their 32 bit equivalent. A warning is
-     printed.
-
-   - size must be 1 word. If a larger value is specified that is treated as 1
-     with a warning.
-
-   - address must be less than MAX_SPRS. If a larger value is specified, it is
-     reduced module MAX_SPRS (which is hopefully a power of 2).
-
-   Where errors are found, the data is updated.
-
-   Validation is carried out with the GO_COMMAND, rather than with the
-   WRITE_COMMAND, for consistency with WishBone error checking, for which
-   only the GO_COMMAND can set the status error if there is a problem.
-
-   Warning messages are printed to explain any validation problems.
-
-   @todo Should multiple SPR accesses be allowed in a single access?
-
-   @note The size of the data is one greater than the length specified in the
-         original WRITE_COMMAND.                                             
-
-   @return  1 (TRUE) if we could validate, even if we had to modify a field
-            with a warning. 0 (FALSE) otherwise.                             */
-/*---------------------------------------------------------------------------*/
-static int
-validate_spr_fields ()
-{
-  int  access_bits;
-  int  is_read_p;
-
-  switch (runtime.debug.acc_type)
-    {
-    case JAT_WRITE8:  access_bits =  8; is_read_p = 0; break;
-    case JAT_READ8:   access_bits =  8; is_read_p = 1; break;
-    case JAT_WRITE16: access_bits = 16; is_read_p = 0; break;
-    case JAT_READ16:  access_bits = 16; is_read_p = 1; break;
-    case JAT_WRITE32: access_bits = 32; is_read_p = 0; break;
-    case JAT_READ32:  access_bits = 32; is_read_p = 1; break;
-
-    default:
-      fprintf (stderr, "Warning: validate_spr_fields: unknown access "
-	       "type %u\n", runtime.debug.acc_type);
-      return  0;
-    }
-
-  /* Validate and correct if necessary access width */
-  if (32 != access_bits)
-    {
-      fprintf (stderr, "Warning: JTAG %d-bit access not permitted for SPR: "
-	       "corrected\n", access_bits);
-      runtime.debug.acc_type = is_read_p ? JAT_READ32 : JAT_WRITE32;
-    }
-
-  /* Validate and correct if necessary access size */
-  if (1 != runtime.debug.size)
-    {
-      fprintf (stderr, "Warning: JTAG SPR access must be 1 word in length: "
-	       "corrected\n");
-      runtime.debug.size = 1;
-    }
-
-  /* Validate and correct if necessary access size */
-  if (runtime.debug.addr >= MAX_SPRS)
-    {
-      fprintf (stderr, "Warning: JTAG SPR address exceeds MAX_SPRS: "
-	       "truncated\n");
-      runtime.debug.addr %= MAX_SPRS;
-    }
-
-  return  0;			/* Success */
-
-}	/* validate_spr_fields () */
-
-
-/*---------------------------------------------------------------------------*/
 /*!Read SPR data
 
-   Read memory from WishBone. The WRITE_COMMAND address is updated to reflect
-   the completed read if successful.
+   Read memory from a SPR. The WRITE_COMMAND address is updated to reflect the
+   completed read if successful.
+
+   The data follows an initial 37 bits corresponding to the incoming command
+   and CRC. We use the smaller of the data size in the original WRITE_COMMAND
+   and the size of the data in the GO_COMMAND_WRITE packet, so we can handle
+   over/under-run.
 
    The result is the CRC of the data read.
 
@@ -610,87 +473,115 @@ validate_spr_fields ()
          transfer the bytes in the endianness of the OR1K.
 
    @param[out] jreg       The JTAG register buffer where data is to be stored.
-   @param[in]  skip_bits  Bits to skip before storing data in jreg.
+   @param[in]  jreg_bytes   The number of bytes expected in the JTAG register
+                           (may be different to that in the prior READ/WRITE
+                           if we have over- or under-run).
+   @param[in]  status_ptr  Pointer to the status register.
 
    @return  The CRC of the data read                                         */
 /*---------------------------------------------------------------------------*/
 static uint32_t
-spr_read (unsigned char *jreg,
-	  unsigned int   skip_bits)
+spr_read (unsigned char     *jreg,
+	  unsigned long int  jreg_bytes,
+	  enum jtag_status  *status_ptr)
 {
-  /* Compute the CRC as we go */
-  uint32_t  crc_out  = 0xffffffff;
+  const unsigned int  BIT_OFF  = 37 % 8;	/* Skip initial fields */
+  const unsigned int  BYTE_OFF = 37 / 8;
 
-  /* Validate the fields for the SPR read. This mostly just prints
-     out warnings and corrects the problems. However if the access type
-     cannot be worked out, we must use empty data. */
-  uint32_t  spr;
+  /* Store the SPR in the register, without trampling adjacent bits, computing
+     the CRC as we go. We have to fill all the JTAG register bytes. If there
+     is overrun, we pack in zeros. */
+  uint32_t           spr      = mfspr (runtime.debug.addr);
+  uint32_t           crc_out  = 0xffffffff;
+  unsigned long int  i;
 
-  if (validate_spr_fields())
+  for (i = 0; i < jreg_bytes; i++)
     {
-      /* Transfer the SPR */
-      spr = mfspr (runtime.debug.addr);
-    }
-  else
-    {
-      spr = 0;
-    }
+      unsigned char  byte = 0;
 
-  runtime.debug.addr++;
-
-  /* Store the SPR in the register, without trampling adjacent
-     bits. Simplified version when the bit offset is zero. Compute the CRC as
-     we go. */
-  unsigned  byte_off = skip_bits / 8;
-  unsigned  bit_off  = skip_bits % 8;
-
-  if (0 == bit_off)
-    {
-      /* Each byte in turn */
-      int  i;
-
-      for (i = 0; i < 4; i++)
+      /* Get the byte from the SPR if available, otherwise use zero */
+      if (i < 4)
 	{
 #ifdef OR32_BIG_ENDIAN
-	  uint8_t byte = (spr >> 8 * i) & 0xff;
+	  byte = (spr >> 8 * i) & 0xff;
 #else /* !OR32_BIG_ENDIAN */
-	  uint8_t byte = (spr >> (24 - (8 * i))) & 0xff;
+	  byte = (spr >> (24 - (8 * i))) & 0xff;
 #endif /* OR32_BIG_ENDIAN */
-
-	  jreg[byte_off + i] =  byte;
-	  crc_out = crc32 (byte, 8, crc_out);
 	}
-    }
-  else
-    {
-      /* Each byte in turn */
-      int  i;
 
-      for (i = 0; i < 4; i++)
-	{
-#ifdef OR32_BIG_ENDIAN
-	  uint8_t byte = (spr >> 8 * i) & 0xff;
-#else /* !OR32_BIG_ENDIAN */
-	  uint8_t byte = (spr >> (24 - (8 * i))) & 0xff;
-#endif /* OR32_BIG_ENDIAN */
-	  
-	  /* Clear the bits (only) we are setting */
-	  jreg[byte_off + i]     <<= bit_off;
-	  jreg[byte_off + i]     >>= bit_off;
-	  jreg[byte_off + i + 1] >>= 8 - bit_off;
-	  jreg[byte_off + i + 1] <<= 8 - bit_off;
+      /* Update the CRC */
+      crc_out = crc32 (byte, 8, crc_out);
+
+      /* Reverse, then store the byte in the register, without trampling
+	 adjacent bits. */
+      byte = reverse_byte (byte);
+
+      /* Clear the bits (only) we are setting */
+      jreg[BYTE_OFF + i]     <<= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i]     >>= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i + 1] >>= BIT_OFF;
+      jreg[BYTE_OFF + i + 1] <<= BIT_OFF;
       
-	  /* OR in the bits */
-	  jreg[byte_off + i]     |= (byte <<      bit_off)  & 0xff;
-	  jreg[byte_off + i + 1] |= (byte >> (8 - bit_off)) & 0xff;
+      /* OR in the bits */
+      jreg[BYTE_OFF + i]     |= (byte <<      BIT_OFF)  & 0xff;
+      jreg[BYTE_OFF + i + 1] |= (byte >> (8 - BIT_OFF)) & 0xff;
+    }
 
-	  crc_out = crc32 (byte, 8, crc_out);
-	}
+  /* Only advance if there we no errors (including over/under-run). */
+  if (JS_OK == *status_ptr)
+    {
+      runtime.debug.addr++;
     }
 
   return  crc_out;
 
 }	/* spr_read () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Set up null data.
+
+   When there is an error in GO_COMMAND_READ, the data fields must be
+   populated and the CRC set up, to ensure a correct return.
+
+   The data follows an initial 37 bits corresponding to the incoming command
+   and CRC. We use the smaller of the data size in the original WRITE_COMMAND
+   and the size of the data in the GO_COMMAND_WRITE packet, so we can handle
+   over/under-run.
+
+   @param[out] jreg       The JTAG register buffer where data is to be stored.
+   @param[in]  jreg_bytes   The number of bytes expected in the JTAG register
+                           (may be different to that in the prior READ/WRITE
+                           if we have over- or under-run).
+
+   @return  The CRC of the data read                                         */
+/*---------------------------------------------------------------------------*/
+static uint32_t
+null_read (unsigned char     *jreg,
+	   unsigned long int  jreg_bytes)
+{
+  const unsigned int  BIT_OFF  = 37 % 8;	/* Skip initial fields */
+  const unsigned int  BYTE_OFF = 37 / 8;
+
+  /* Store each null byte in turn, computing the CRC as we go */
+  uint32_t           crc_out  = 0xffffffff;
+  unsigned long int  i;
+
+  for (i = 0; i < jreg_bytes; i++)
+    {
+      crc_out = crc32 (0, 8, crc_out);	/* Compute the CRC for null byte */
+
+      /* Store null byte in the register, without trampling adjacent
+	 bits. */
+      jreg[BYTE_OFF + i]     <<= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i]     >>= 8 - BIT_OFF;
+      jreg[BYTE_OFF + i + 1] >>= BIT_OFF;
+      jreg[BYTE_OFF + i + 1] <<= BIT_OFF;
+    }
+
+  return  crc_out;
+
+}	/* null_read () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -723,15 +614,32 @@ spr_read (unsigned char *jreg,
    @note The size of the data is one greater than the length specified in the
          original WRITE_COMMAND.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-go_command_read (unsigned char *jreg)
+static void
+go_command_read (unsigned char *jreg,
+		 int            num_bits)
 {
+  /* Check the length is consistent with the prior WRITE_COMMAND. If not we
+     have overrun or underrun and flag accordingly. */
+  const int          REG_BITS = 36 + 8 * runtime.debug.size + 32 + 4 + 1;
+  unsigned long int  jreg_bytes;
+  enum jtag_status   status;
+
+  if (REG_BITS == num_bits)
+    {
+      jreg_bytes = runtime.debug.size;
+      status    = JS_OK;
+    }
+  else
+    {
+      /* Size will round down for safety */
+      jreg_bytes = (runtime.debug.size * 8 + num_bits - REG_BITS) / 8;
+      status    = JS_OVER_UNDERRUN;
+    }
+
   /* Break out the fields */
   uint32_t  crc_in   = reverse_bits (((uint32_t) (jreg[0] & 0xe0) >>  5) |
                                      ((uint32_t)  jreg[1]         <<  3) |
@@ -745,34 +653,26 @@ go_command_read (unsigned char *jreg)
   crc_computed = crc32 (0,                1, 0xffffffff);
   crc_computed = crc32 (JCMD_GO_COMMAND,  4, crc_computed);
 
-  /* Status flags */
-  enum jtag_status  status = JS_OK;
-
   /* CRC to go out */
   uint32_t  crc_out = 0;
 
   /* Validate the CRC */
   if (crc_computed == crc_in)
     {
-      /* Read the data. */
+      /* Read the data. Module errors will have been detected earlier, so we
+	 do nothing more here. */
       switch (runtime.debug.mod_id)
 	{
 	case JM_WISHBONE:
-	  crc_out = wishbone_read (jreg, 37, &status);
+	  crc_out = wishbone_read (jreg, jreg_bytes, &status);
 	  break;
 	      
 	case JM_CPU0:
-	  crc_out = spr_read (jreg, 37);
+	  crc_out = spr_read (jreg, jreg_bytes, &status);
 	  break;
 	      
-	case JM_CPU1:
-	  fprintf (stderr, "Warning: JTAG attempt to read from CPU1: Not "
-		   "supported.\n");
-	  break;
-	  
 	default:
-	  fprintf (stderr, "Warning: go_command_read: invalid module 0x%lx\n",
-		   runtime.debug.mod_id);
+	  crc_out = null_read (jreg, jreg_bytes);
 	  break;
 	}
     }
@@ -784,8 +684,7 @@ go_command_read (unsigned char *jreg)
 
   /* Construct the outgoing register, skipping the data read and returning the
      number of JTAG cycles taken (the register length). */
-  return  construct_response (jreg, status, crc_out, 8 * runtime.debug.size,
-			      37);
+  construct_response (jreg, status, crc_out, 8UL * jreg_bytes, 37);
 
 }	/* go_command_read () */
 
@@ -796,69 +695,63 @@ go_command_read (unsigned char *jreg)
    Write memory to WishBone. The WRITE_COMMAND address is updated to reflect
    the completed write if successful.
 
+   The data follows an initial 5 bits specifying the command. We use the
+   smaller of the data size in the original WRITE_COMMAND and the size of the
+   data in the GO_COMMAND_WRITE packet, so we can handle over/under-run.
+
    @note The size of the data is one greater than the length specified in the
          original WRITE_COMMAND.
 
    @todo For now we always write a byte a time. In the future, we ought to use
-         16 and 32-bit accesses for greater efficiency.
+         16 and 32-bit accesses for greater efficiency and to correctly model
+         the use of different access types.
 
-   @todo  The algorithm for ensuring we only set the bits of interest in the
-          register is inefficient. We should instead clear the whole area
-          before starting.
-
-   @param[out] jreg        The JTAG register buffer where data is to be
-                           stored.
-   @param[in]  skip_bits   Bits to skip before reading data from jreg.
-   @param[in]  status_ptr  Pointer to the status register.                   */
+   @param[in]  jreg        The JTAG register buffer where data is found.
+   @param[in]  jreg_bytes   The number of bytes expected in the JTAG register
+                           (may be different to that in the prior READ/WRITE
+                           if we have over- or under-run).
+   @param[out] status_ptr  Pointer to the status register.                   */
 /*---------------------------------------------------------------------------*/
 static void
-wishbone_write (unsigned char   *jreg,
-	       unsigned int      skip_bits,
-	       enum jtag_status *status_ptr)
+wishbone_write (unsigned char     *jreg,
+		unsigned long int  jreg_bytes,
+		enum jtag_status  *status_ptr)
 {
-  /* Validate the fields for the wishbone write. If this fails we stop here,
-     setting an error in the status_ptr. */
-  if (!validate_wb_fields())
+  const unsigned int  BIT_OFF  = 5;	/* Skip initial command */
+
+  /* Transfer each byte in turn, computing the CRC as we go. We must supply
+     jreg_bytes. If there is overrun, we ignore the remaining bytes. */
+  unsigned long int  i;
+
+  for (i = 0; i < jreg_bytes; i++)
     {
-      *status_ptr |= JS_WISHBONE_ERROR;
-      return;
-    }
-      
-  /* Transfer each byte in turn, computing the CRC as we go */
-  unsigned  byte_off = skip_bits / 8;
-  unsigned  bit_off  = skip_bits % 8;
-
-  uint32_t  i;				/* Index into the data being write */
-
-  for (i = 0; i < runtime.debug.size; i++)
-    {
-      /* Error if we can't access this byte */
-      if (NULL == verify_memoryarea (runtime.debug.addr + i))
+      /* Set a byte if available */
+      if (i < runtime.debug.size)
 	{
-	  *status_ptr |= JS_WISHBONE_ERROR;
-	  return;
-	}
+	  /* Error if we can't access this byte */
+	  if (NULL == verify_memoryarea (runtime.debug.addr + i))
+	    {
+	      *status_ptr |= JS_WISHBONE_ERROR;
+	    }
+	  else
+	    {
+	      /* Extract the byte from the register, reverse it and write it,
+		 circumventing the usual checks by pretending this is program
+		 memory. */
+	      unsigned char  byte;
 
-      /* Extract the byte from the register. Simplified version when the bit
-	 offset is zero. */
-      unsigned char  byte;
-
-      if (0 == bit_off)
-	{
-	  byte = jreg[byte_off + i];
+	      byte = (jreg[i] >> BIT_OFF) | (jreg[i + 1] << (8 - BIT_OFF));
+	      byte = reverse_byte (byte);
+	      
+	      set_program8 (runtime.debug.addr + i, byte);
+	    }
 	}
-      else
-	{
-	  byte = jreg[byte_off + i]     >>      bit_off  |
-	         jreg[byte_off + i + 1] << (8 - bit_off);
-	}
-
-      /* Circumvent the read-only check usually done for mem accesses. */
-      set_program8 (runtime.debug.addr + i, reverse_byte (byte));
     }
 
-  runtime.debug.addr += runtime.debug.size;
-
+  if (JS_OK == *status_ptr)
+    {
+      runtime.debug.addr += runtime.debug.size;
+    }
 }	/* wishbone_write () */
 
 
@@ -868,8 +761,12 @@ wishbone_write (unsigned char   *jreg,
    Write memory to WishBone. The WRITE_COMMAND address is updated to reflect
    the completed write if successful.
 
+   The data follows an initial 5 bits specifying the command. We use the
+   smaller of the data size in the original WRITE_COMMAND and the size of the
+   data in the GO_COMMAND_WRITE packet, so we can handle over/under-run.
+
    Unlike with Wishbone, there is no concept of any errors possible when
-   writeing an SPR.
+   writing an SPR.
 
    @todo The algorithm for ensuring we only set the bits of interest in the
          register is inefficient. We should instead clear the whole area
@@ -883,55 +780,48 @@ wishbone_write (unsigned char   *jreg,
          transfer the bytes in the endianness of the OR1K.
 
    @param[out] jreg       The JTAG register buffer where data is to be stored.
-   @param[in]  skip_bits  Bits to skip before reading data from jreg.        */
+   @param[in]  jreg_bytes   The number of bytes expected in the JTAG register
+                           (may be different to that in the prior READ/WRITE
+                           if we have over- or under-run).
+   @param[out] status_ptr  Pointer to the status register.                   */
 /*---------------------------------------------------------------------------*/
 static void
-spr_write (unsigned char *jreg,
-	  unsigned int   skip_bits)
+spr_write (unsigned char     *jreg,
+	   unsigned long int  jreg_bytes,
+	   enum jtag_status  *status_ptr)
 {
-  /* Validate the fields for the SPR write. This doesn't stop us most of the
-     time, just prints out warnings and corrects the problems. However if we
-     don't know the access type, then it will fail and we do nothing. */
-  if (!validate_spr_fields ())
+  const unsigned int  BIT_OFF  = 5;	/* Skip initial command */
+
+  /* Construct the SPR value one byte at a time. If there is overrun, ignore
+     the excess bytes. */
+  uint32_t           spr = 0;
+  unsigned long int  i;
+
+  for (i = 0; i < jreg_bytes; i++)
     {
-      return;
-    }
-      
-  /* Construct the SPR value one byte at a time. */
-  uint32_t  spr = 0;
-
-  unsigned  byte_off = skip_bits / 8;
-  unsigned  bit_off  = skip_bits % 8;
-
-  /* Each byte in turn */
-  int  i;
-
-  for (i = 0; i < 4; i++)
-    {
-      uint8_t byte;
-
-      /* Simplified version when the bit offset is zero */
-      if (0 == bit_off)
+      if (i < 4)
 	{
-	  byte = reverse_byte (jreg[byte_off + i]);
-	}
-      else
-	{
-	  byte = reverse_byte ((jreg[byte_off + i]     >>      bit_off) |
-			       (jreg[byte_off + i + 1] << (8 - bit_off)));
-	}
+	  uint8_t byte;
+
+	  byte = (jreg[i] >> BIT_OFF) | (jreg[i + 1] << (8 - BIT_OFF));
+	  byte = reverse_byte (byte);
 
 #ifdef OR32_BIG_ENDIAN
-      spr |= ((uint32_t) (byte)) << (8 * i);
+	  spr |= ((uint32_t) (byte)) << (8 * i);
 #else /* !OR32_BIG_ENDIAN */
-      spr |= ((uint32_t) (byte)) << (24 - (8 * i));
+	  spr |= ((uint32_t) (byte)) << (24 - (8 * i));
 #endif /* OR32_BIG_ENDIAN */
+	}
     }
 
   /* Transfer the SPR */
   mtspr (runtime.debug.addr, spr);
-  runtime.debug.addr++;
 
+  /* Only advance if there we no errors (including over/under-run). */
+  if (JS_OK == *status_ptr)
+    {
+      runtime.debug.addr++;
+    }
 }	/* spr_write () */
 
 
@@ -969,22 +859,39 @@ spr_write (unsigned char *jreg,
          here. However it would be better to do that at WRITE_COMMAND time and
          save the result for here, to avoid using duff data.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-go_command_write (unsigned char *jreg)
+static void
+go_command_write (unsigned char *jreg,
+		  int            num_bits)
 {
+  /* Check the length is consistent with the prior WRITE_COMMAND. If not we
+     have overrun or underrun and flag accordingly. */
+  const int          REG_BITS = 36 + 32 + 8 * runtime.debug.size + 4 + 1;
+  unsigned long int  real_size;
+  enum jtag_status   status;
+
+  if (REG_BITS == num_bits)
+    {
+      real_size = runtime.debug.size;
+      status    = JS_OK;
+    }
+  else
+    {
+      /* Size will round down for safety */
+      real_size = (runtime.debug.size * 8UL + num_bits - REG_BITS) / 8UL;
+      status    = JS_OVER_UNDERRUN;
+    }
+
   /* Break out the fields */
   uint32_t  crc_in =
-    reverse_bits (((uint32_t) (jreg[runtime.debug.size + 0] & 0xe0) >>  5) |
-		  ((uint32_t)  jreg[runtime.debug.size + 1]         <<  3) |
-		  ((uint32_t)  jreg[runtime.debug.size + 2]         << 11) |
-		  ((uint32_t)  jreg[runtime.debug.size + 3]         << 19) |
-		  ((uint32_t) (jreg[runtime.debug.size + 4] & 0x1f) << 27),
+    reverse_bits (((uint32_t) (jreg[real_size + 0] & 0xe0) >>  5) |
+		  ((uint32_t)  jreg[real_size + 1]         <<  3) |
+		  ((uint32_t)  jreg[real_size + 2]         << 11) |
+		  ((uint32_t)  jreg[real_size + 3]         << 19) |
+		  ((uint32_t) (jreg[real_size + 4] & 0x1f) << 27),
 		  32);
 
   /* Compute the expected CRC */
@@ -993,40 +900,31 @@ go_command_write (unsigned char *jreg)
   crc_computed = crc32 (0,                1, 0xffffffff);
   crc_computed = crc32 (JCMD_GO_COMMAND,  4, crc_computed);
 
-  int  i;
+  unsigned long int  i;
 
-  for (i = 0; i < runtime.debug.size; i++)
+  for (i = 0; i < real_size; i++)
     {
       uint8_t  byte = reverse_bits (((jreg[i] & 0xe0) >> 5) |
 		      ((jreg[i + 1] & 0x1f) << 3), 8);
       crc_computed = crc32 (byte, 8, crc_computed);
     }
 
-  /* Status flags */
-  enum jtag_status  status = JS_OK;
-
   /* Validate the CRC */
   if (crc_computed == crc_in)
     {
-      /* Read the data. */
+      /* Write the data. Module errors will have been detected earlier, so we
+	 do nothing more here. */
       switch (runtime.debug.mod_id)
 	{
 	case JM_WISHBONE:
-	  wishbone_write (jreg, 5, &status);
+	  wishbone_write (jreg, real_size, &status);
 	  break;
 	      
 	case JM_CPU0:
-	  spr_write (jreg, 5);
+	  spr_write (jreg, real_size, &status);
 	  break;
-	      
-	case JM_CPU1:
-	  fprintf (stderr, "Warning: JTAG attempt to write to CPU1: Not "
-		   "supported.\n");
-	  break;
-	  
+
 	default:
-	  fprintf (stderr, "Warning: go_command_write: invalid module 0x%lx\n",
-		   runtime.debug.mod_id);
 	  break;
 	}
     }
@@ -1038,8 +936,7 @@ go_command_write (unsigned char *jreg)
 
   /* Construct the outgoing register, skipping the data read and returning the
      number of JTAG cycles taken (the register length). */
-  return  construct_response (jreg, status, 0xffffffff, 0,
-			      37 + 8 * runtime.debug.size);
+  construct_response (jreg, status, 0xffffffff, 0, 37UL + 8UL * real_size);
 
 }	/* go_command_write () */
 
@@ -1054,40 +951,41 @@ go_command_write (unsigned char *jreg)
 
    This function breaks this out.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-go_command (unsigned char *jreg)
+static void
+go_command (unsigned char *jreg,
+	    int            num_bits)
 {
   /* Have we even had a WRITE_COMMAND? */
   if (!runtime.debug.write_defined_p)
     {
-      fprintf (stderr, "Warning: JTAG GO_COMMAND with no prior WRITE_COMMAND: "
-	       "ignored\n");
-      return 4 + 1;			/* Only the first 5 bits meaningful */
+      memset (jreg, 0, (num_bits + 7) / 8);
+      fprintf (stderr, "ERROR: JTAG GO_COMMAND with no prior WRITE_COMMAND.\n");
+      return;
     }
 
-  /* Whether to read or write depends on the access type */
+  /* Whether to read or write depends on the access type. We don't put an
+     error message if it's invalid here - we rely on the prior WRITE_COMMAND
+     to do that. We just silently ignore. */
   switch (runtime.debug.acc_type)
     {
     case JAT_WRITE8:
     case JAT_WRITE16:
     case JAT_WRITE32:
-      return  go_command_write (jreg);
+      go_command_write (jreg, num_bits);
+      break;
 
     case JAT_READ8:
     case JAT_READ16:
     case JAT_READ32:
-      return  go_command_read (jreg);
+      go_command_read (jreg, num_bits);
+      break;
 
     default:
-      fprintf (stderr, "Warning: JTAG GO_COMMAND: invalid access type: "
-	       "ignored\n");
-      return 4 + 1;			/* Only the first 5 bits meaningful */
+      break;
     }
 }	/* go_command () */
       
@@ -1119,15 +1017,27 @@ go_command (unsigned char *jreg)
    is computed on the first 5 bits, the CRC out on the 56 status, length,
    address and access type bits.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   This is a register of a fixed size, which we verify initially.
 
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-read_command (unsigned char *jreg)
+static void
+read_command (unsigned char *jreg,
+	      int            num_bits)
 {
+  /* Validate register size, which is fixed */
+  const int  REG_BITS = 88 + 32 + 4 + 1;
+
+  if (REG_BITS != num_bits)
+    {
+      fprintf (stderr,
+	       "ERROR: JTAG READ_COMMAND %d bits, when %d bits expected.\n",
+	       num_bits, REG_BITS);
+      return;
+    }
+
   /* Break out the fields */
   uint32_t  crc_in   = reverse_bits (((uint32_t) (jreg[0] & 0xe0) >>  5) |
                                      ((uint32_t)  jreg[1]         <<  3) |
@@ -1147,69 +1057,231 @@ read_command (unsigned char *jreg)
   /* Status flags */
   enum jtag_status  status = JS_OK;
 
-  /* Validate the CRC */
-  if (crc_computed != crc_in)
+  /* Only do anything with this if the CRC's match */
+  if (crc_computed == crc_in)
     {
-      /* Mismatch: record the error */
-      status |= JS_CRC_IN_ERROR;
-    }
+      /* If we haven't had a previous WRITE_COMMAND, then we return empty
+	 data. There is no valid status flag we can use, but we print a rude
+	 message. */
+      uint8_t   acc_type;
+      uint32_t  addr;
+      uint16_t  len;
 
-  /* If we haven't had a previous WRITE_COMMAND, then we return empty
-     data. There is no valid status flag we can use, but we print a rude
-     message. */
-  uint8_t   acc_type_r;
-  uint32_t  addr_r;
-  uint16_t  len_r;
-
-  if (runtime.debug.write_defined_p)
-    {
+      if (runtime.debug.write_defined_p)
+	{
+	  acc_type = runtime.debug.acc_type;
+	  addr     = runtime.debug.addr;
+	  len      = runtime.debug.size - 1;
+	}
+      else
+	{
+	  fprintf (stderr, "ERROR: JTAG READ_COMMAND finds no data.\n");
+	  
+	  acc_type = 0;
+	  addr     = 0;
+	  len      = 0;
+	}
+      
       /* Compute the CRC */
-      crc_out = crc32 (runtime.debug.acc_type,  4, crc_out);
-      crc_out = crc32 (runtime.debug.addr,     32, crc_out);
-      crc_out = crc32 (runtime.debug.size - 1, 16, crc_out);
-
+      crc_out = crc32 (acc_type,  4, crc_out);
+      crc_out = crc32 (addr,     32, crc_out);
+      crc_out = crc32 (len,      16, crc_out);
+      
       /* Reverse the bit fields */
-      acc_type_r = reverse_bits (runtime.debug.acc_type,  4);
-      addr_r     = reverse_bits (runtime.debug.addr,     32);
-      len_r      = reverse_bits (runtime.debug.size - 1, 16);
+      acc_type = reverse_bits (acc_type,  4);
+      addr     = reverse_bits (addr,     32);
+      len      = reverse_bits (len,      16);
+      
+      /* Construct the outgoing register. */
+      jreg[ 4] |= (acc_type <<  5) & 0xe0;
+      jreg[ 5] |= (acc_type >>  3) & 0x01;
+      jreg[ 5] |= (addr     <<  1) & 0xfe;
+      jreg[ 6] |= (addr     >>  7) & 0xff;
+      jreg[ 7] |= (addr     >> 15) & 0xff;
+      jreg[ 8] |= (addr     >> 23) & 0xff;
+      jreg[ 9] |= (addr     >> 31) & 0x01;
+      jreg[ 9] |= (len      <<  1) & 0xfe;
+      jreg[10] |= (len      >>  7) & 0xff;
+      jreg[11] |= (len      >> 15) & 0x01;
     }
   else
     {
-      fprintf (stderr, "Warning: JTAG READ_COMMAND finds no data\n");
-
-      /* Compute the CRC */
-      crc_out = crc32 (0,  4, crc_out);
-      crc_out = crc32 (0, 32, crc_out);
-      crc_out = crc32 (0, 16, crc_out);
-
-      /* Empty data */
-      acc_type_r = 0;
-      addr_r     = 0;
-      len_r      = 0;
+      /* CRC Mismatch: record the error */
+      status |= JS_CRC_IN_ERROR;
     }
 
-  /* Construct the outgoing register. Fields can only be written if they
-     are available */
-  jreg[ 4] |= (acc_type_r <<  5) & 0xf8;
-  jreg[ 5] |= (acc_type_r >>  3) & 0x07;
-  jreg[ 5] |= (addr_r     <<  1) & 0xfe;
-  jreg[ 6] |= (addr_r     >>  7) & 0xff;
-  jreg[ 7] |= (addr_r     >> 15) & 0xff;
-  jreg[ 8] |= (addr_r     >> 23) & 0xff;
-  jreg[ 9] |= (addr_r     >> 31) & 0x01;
-  jreg[ 9] |= (len_r      <<  1) & 0xfe;
-  jreg[10] |= (len_r      >>  7) & 0xff;
-  jreg[11] |= (len_r      >> 15) & 0x01;
-
   /* Construct the final response with the status, skipping the fields we've
-     just (possibly) written. */
+     just written. */
   return  construct_response (jreg, status, crc_out, 52, 37);
 
 }	/* read_command () */
 
 
 /*---------------------------------------------------------------------------*/
-/*!Specify details for a subsequence GO_COMMAND
+/*!Validate WRITE_COMMAND fields for WishBone
+
+   Check that a WRITE_COMMAND's fields are valid for WishBone access.
+
+   - 16 and 32-bit access must be correctly aligned.
+
+   - size must be a multiple of 2 for 16-bit access, and a multiple of 4 for
+     32-bit access.
+
+   Error messages are printed to explain any validation problems.
+
+   @todo Should multiple SPR accesses be allowed in a single access?
+
+   @note The size of the data is one greater than the length specified in the
+         original WRITE_COMMAND.
+
+   @param[in] acc_type  The access type field
+   @param[in] addr      The address field
+   @param[in] size      The number of bytes to transfer (field is 1 less than
+                        this).
+
+   @return  1 (TRUE) if validation is OK, 0 (FALSE) if validation fails.     */
+/*---------------------------------------------------------------------------*/
+static int
+validate_wb_fields (unsigned char      acc_type,
+		    unsigned long int  addr,
+		    unsigned long int  size)
+{
+  int  res_p = 1;			/* Result */
+
+  /* Determine the size of the access */
+  uint32_t  access_bytes = 1;
+
+  switch (acc_type)
+    {
+    case JAT_WRITE8:
+    case JAT_READ8:
+      access_bytes = 1;
+      break;
+
+    case JAT_WRITE16:
+    case JAT_READ16:
+      access_bytes = 2;
+      break;
+
+    case JAT_WRITE32:
+    case JAT_READ32:
+      access_bytes = 4;
+      break;
+
+    default:
+      fprintf (stderr, "ERROR: JTAG WRITE_COMMAND unknown access type %u.\n",
+	       acc_type);
+      res_p = 0;
+      break;
+    }
+
+  /* Check for alignment. This works for 8-bit and undefined access type,
+     although the tests will always pass. */
+
+  if (0 != (addr % access_bytes))
+    {
+      fprintf (stderr, "ERROR: JTAG WishBone %d-bit access must be %d-byte "
+	       "aligned.\n", access_bytes * 8, access_bytes);
+      res_p = 0;
+    }
+
+  /* Check byte length is multiple of access width */
+  if (0 != (size % access_bytes))
+    {
+      fprintf (stderr, "ERROR: JTAG %d-bit WishBone access must be multiple "
+	       "of %d bytes in length.\n", access_bytes * 8, access_bytes);
+      res_p = 0;
+    }
+
+  return  res_p;
+
+}	/* validate_wb_fields () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Validate WRITE_COMMAND fields for SPR
+
+   Check that a WRITE_COMMAND's fields are valid for SPR access. Only prints
+   messages, since the protocol does not allow for any errors.
+
+   - 8 and 16-bit access is not permitted.
+
+   - size must be 4 bytes (1 word). Any other value is an error.
+
+   - address must be less than MAX_SPRS. If a larger value is specified, it
+     will be reduced module MAX_SPRS (which is hopefully a power of 2). This
+     is only a warning, not an error.
+
+   Error/warning messages are printed to explain any validation problems.
+
+   @todo Should multiple SPR accesses be allowed in a single access?
+
+   @note The size of the data is one greater than the length specified in the
+         original WRITE_COMMAND.                                             
+
+   @param[in] acc_type  The access type field
+   @param[in] addr      The address field
+   @param[in] size      The number of bytes to transfer (field is 1 less than
+                        this).
+
+   @return  1 (TRUE) if we could validate (even if addr needs truncating),
+            0 (FALSE) otherwise.                                             */
+/*---------------------------------------------------------------------------*/
+static int
+validate_spr_fields (unsigned char      acc_type,
+		     unsigned long int  addr,
+		     unsigned long int  size)
+{
+  int  res_p = 1;			/* Result */
+
+  /* Determine the size and direction of the access */
+  switch (acc_type)
+    {
+    case JAT_WRITE8:
+    case JAT_READ8:
+      fprintf (stderr, "ERROR: JTAG 8-bit access for SPR not supported.\n");
+      res_p = 0;
+      break;
+
+    case JAT_WRITE16:
+    case JAT_READ16:
+      fprintf (stderr, "ERROR: JTAG 16-bit access for SPR not supported.\n");
+      res_p = 0;
+      break;
+
+    case JAT_WRITE32:
+    case JAT_READ32:
+      break;
+
+    default:
+      fprintf (stderr, "ERROR: unknown JTAG SPR access type %u.\n",
+	       acc_type);
+      res_p = 0;
+      break;
+    }
+
+  /* Validate access size */
+  if (4 != size)
+    {
+      fprintf (stderr, "ERROR: JTAG SPR access 0x%lx bytes not supported.\n",
+	       size);
+      res_p = 0;
+    }
+
+  /* Validate address. This will be truncated if wrong, so not an error. */
+  if (addr >= MAX_SPRS)
+    {
+      fprintf (stderr, "Warning: truncated JTAG SPR address 0x%08lx.\n",
+	       addr);
+    }
+
+  return  res_p;			/* Success */
+
+}	/* validate_spr_fields () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify details for a subsequent GO_COMMAND
 
    Process a WRITE_COMMAND register. The format is:
 
@@ -1235,15 +1307,37 @@ read_command (unsigned char *jreg)
    Fields are always shifted in MS bit first, so must be reversed. The CRC in
    is computed on the first 57 bits, the CRC out on the 4 status bits.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   There are no bits for reporting bit specification errors other than CRC
+   mismatch. The subsequent GO_COMMAND will report an error in reading from
+   Wishbone or over/under-run. We report any inconsistencies here with warning
+   messages, correcting them if possible.
 
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   All errors invalidate any prior data. This will ensure any subsequent usage
+   continues to trigger faults, rather than a failed WRITE_COMMAND being
+   missed.
+
+   This is a register of a fixed size, which we verify initially.
+
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-write_command (unsigned char *jreg)
+static void
+write_command (unsigned char *jreg,
+	       int            num_bits)
 {
+  /* Validate register size, which is fixed */
+  const int  REG_BITS = 36 + 32 +16 + 32 + 4 + 4 + 1;
+
+  if (REG_BITS != num_bits)
+    {
+      runtime.debug.write_defined_p = 0;
+      fprintf (stderr,
+	       "ERROR: JTAG WRITE_COMMAND %d bits, when %d bits expected.\n",
+	       num_bits, REG_BITS);
+      return;
+    }
+
   /* Break out the fields */
   uint8_t   acc_type = reverse_bits (((jreg[0] & 0xe0) >> 5) |
 				     ((jreg[1] & 0x01) << 3) , 4);
@@ -1273,25 +1367,78 @@ write_command (unsigned char *jreg)
   /* Status flags */
   enum jtag_status  status = JS_OK;
 
-  /* Validate the CRC */
-  if (crc_computed != crc_in)
+  /* We only do anything with this packet if the CRC's match */
+  if (crc_computed == crc_in)
     {
-      /* Mismatch: record the error */
-      status |= JS_CRC_IN_ERROR;
+      unsigned long int  data_size = (unsigned long int) len + 1UL;
+
+      switch (runtime.debug.mod_id)
+	{
+	case JM_WISHBONE:
+
+	  if (validate_wb_fields (acc_type, addr, data_size))
+	    {
+	      runtime.debug.write_defined_p = 1;
+	      runtime.debug.acc_type        = acc_type;
+	      runtime.debug.addr            = addr;
+	      runtime.debug.size            = data_size;
+	    }
+	  else
+	    {
+	      runtime.debug.write_defined_p = 0;
+	    }
+	  
+	  break;
+	  
+	case JM_CPU0:
+	  
+	  /* Oversize addresses are permitted, but cause a validation warning
+	     and are truncated here. */
+	  if (validate_spr_fields (acc_type, addr, data_size))
+	    {
+	      runtime.debug.write_defined_p = 1;
+	      runtime.debug.acc_type        = acc_type;
+	      runtime.debug.addr            = addr % MAX_SPRS;
+	      runtime.debug.size            = data_size;
+	    }
+	  else
+	    {
+	      runtime.debug.write_defined_p = 0;
+	    }
+	  
+	  break;
+	  
+	case JM_CPU1:
+	  
+	  runtime.debug.write_defined_p = 0;
+	  fprintf (stderr,
+		   "ERROR: JTAG WRITE_COMMAND for CPU1 not supported.\n");
+	  break;
+	  
+	case JM_UNDEFINED:
+	  
+	  runtime.debug.write_defined_p = 0;
+	  fprintf (stderr,
+		   "ERROR: JTAG WRITE_COMMAND with no module selected.\n");
+	  break;
+	  
+	default:
+
+	  /* All other modules will have triggered an error on selection. */
+	  runtime.debug.write_defined_p = 0;
+	  break;
+	}
     }
   else
     {
-      /* All OK. All other errors can only occur when the GO_COMMAND tries to
-	 execute the write. Record the information for next GO_COMMAND */
-      runtime.debug.write_defined_p = 1;
-      runtime.debug.acc_type        = acc_type;
-      runtime.debug.addr            = addr;
-      runtime.debug.size            = (unsigned long int) len + 1UL;
+      /* CRC Mismatch: record the error */
+      runtime.debug.write_defined_p  = 0;
+      status                        |= JS_CRC_IN_ERROR;
     }
-      
-  /* Construct the outgoing register and return the JTAG cycles taken (the
-     register length) */
-  return  construct_response (jreg, status, 0xffffffff, 0, 89);
+
+  
+  /* Construct the outgoing register */
+  construct_response (jreg, status, 0xffffffff, 0, 89);
 
 }	/* write_command () */
 
@@ -1306,7 +1453,7 @@ write_command (unsigned char *jreg)
    TDI -> | Ignored |  CRC  | CONTROL | 0 | -> TDO
           |         |       |  (0x3)  |   |
           +---------+-------+---------+---+
-              36        32       4
+              88        32       4
              bits      bits    bits
 
    The returned register has the format:
@@ -1322,15 +1469,27 @@ write_command (unsigned char *jreg)
    Fields are always shifted in MS bit first, so must be reversed. The CRC in
    is computed on the first 57 bits, the CRC out on the 4 status bits.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
+   This is a register of a fixed size, which we verify initially.
 
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-read_control (unsigned char *jreg)
+static void
+read_control (unsigned char *jreg,
+	      int            num_bits)
 {
+  /* Validate register size, which is fixed */
+  const int  REG_BITS = 88 + 32 + 4 + 1;
+
+  if (REG_BITS != num_bits)
+    {
+      fprintf (stderr,
+	       "ERROR: JTAG READ_CONTROL %d bits, when %d bits expected.\n",
+	       num_bits, REG_BITS);
+      return;
+    }
+
   /* Break out the fields. */
   uint32_t  crc_in = reverse_bits (((uint32_t) (jreg[0] & 0xe0) >>  5) |
                                    ((uint32_t)  jreg[1]         <<  3) |
@@ -1350,38 +1509,61 @@ read_control (unsigned char *jreg)
   /* Status flags */
   enum jtag_status  status = JS_OK;
 
-  /* Validate the CRC */
-  if (crc_computed != crc_in)
+  /* Only do anything if the CRC's match */
+  if (crc_computed == crc_in)
     {
-      /* Mismatch: record the error */
-      status |= JS_CRC_IN_ERROR;
-    }
-  else if (JM_CPU0 == runtime.debug.mod_id)
-    {
-      /* Valid module. Only bit we can sensibly read is the stall bit. */
-      uint64_t  data = (uint64_t) runtime.cpu.stalled << JCB_STALL;
+      uint64_t  data = 0;
 
-      /* Compute the CRC */
+      switch (runtime.debug.mod_id)
+	{
+	case JM_CPU0:
+	  
+	  /* Valid module. Only bit we can sensibly read is the stall
+	     bit. Compute the CRC, reverse the data and construct the
+	     outgoing register. */
+	  data    = (uint64_t) runtime.cpu.stalled << JCB_STALL;
+	  break;
+	  
+	case JM_UNDEFINED:
+	  fprintf (stderr,
+		   "ERROR: JTAG READ_CONTROL with no module selected.\n");
+	  break;
+      
+	case JM_WISHBONE:
+	  fprintf (stderr,
+		   "ERROR: JTAG READ_CONTROL of WishBone not supported.\n");
+	  break;
+      
+	case JM_CPU1:
+	  fprintf (stderr,
+		   "ERROR: JTAG READ_CONTROL of CPU1 not supported.\n");
+	  break;
+      
+	default:
+	  /* All other modules will have triggered an error on selection. */
+	  break;
+	}
+  
+      /* Compute the CRC, reverse and store the data, and construct the
+	 response with the status. */
       crc_out = crc32 (data,  52, crc_out);
-
-      /* Construct the outgoing register. */
-      uint64_t  data_r = reverse_bits (data, 52);
-
-      jreg[ 4] |= (data_r <<  5) & 0xf8;
-      jreg[ 5] |= (data_r >>  3) & 0x07;
-      jreg[ 5] |= (data_r >> 11) & 0xff;
-      jreg[ 5] |= (data_r >> 19) & 0xff;
-      jreg[ 5] |= (data_r >> 27) & 0xff;
-      jreg[ 5] |= (data_r >> 35) & 0xff;
-      jreg[ 5] |= (data_r >> 43) & 0xff;
-      jreg[ 5] |= (data_r >> 51) & 0x01;
+      data    = reverse_bits (data, 52);
+  
+      jreg[ 4] |= (data <<  5) & 0xf8;
+      jreg[ 5] |= (data >>  3) & 0x07;
+      jreg[ 6] |= (data >> 11) & 0xff;
+      jreg[ 7] |= (data >> 19) & 0xff;
+      jreg[ 8] |= (data >> 27) & 0xff;
+      jreg[ 9] |= (data >> 35) & 0xff;
+      jreg[10] |= (data >> 43) & 0xff;
+      jreg[11] |= (data >> 51) & 0x01;
     }
   else
     {
-      /* Not a valid module */
-      fprintf (stderr, "ERROR: JTAG attempt to read control data for module "
-	       "other than CPU0: ignored\n");
+      /* CRC Mismatch: record the error */
+      status |= JS_CRC_IN_ERROR;
     }
+
 
   /* Construct the response with the status */
   return  construct_response (jreg, status, crc_out, 52, 37);
@@ -1415,15 +1597,27 @@ read_control (unsigned char *jreg)
    Fields are always shifted in MS bit first, so must be reversed. The CRC in
    is computed on the first 57 bits, the CRC out on the 4 status bits.
 
+   This is a register of a fixed size, which we verify initially.
+
    @param[in,out] jreg  The register to shift in, and the register shifted
                         back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-static int
-write_control (unsigned char *jreg)
+static void
+write_control (unsigned char *jreg,
+	       int            num_bits)
 {
+  /* Validate register size, which is fixed */
+  const int  REG_BITS = 36 + 32 + 52 + 4 + 1;
+
+  if (REG_BITS != num_bits)
+    {
+      fprintf (stderr,
+	       "ERROR: JTAG WRITE_CONTROL %d bits, when %d bits expected.\n",
+	       num_bits, REG_BITS);
+      return;
+    }
+
   /* Break out the fields. */
   uint64_t  data   = reverse_bits (((uint64_t) (jreg[ 0] & 0xe0) >>  5) |
 				   ((uint64_t)  jreg[ 1]         <<  3) |
@@ -1449,34 +1643,57 @@ write_control (unsigned char *jreg)
   /* Status flags */
   enum jtag_status  status = JS_OK;
 
-  /* Validate the CRC */
-  if (crc_computed != crc_in)
+  /* Only use the data if CRC's match */
+  if (crc_computed == crc_in)
     {
-      /* Mismatch: record the error */
-      status |= JS_CRC_IN_ERROR;
-    }
-  else if (JM_CPU0 == runtime.debug.mod_id)
-    {
-      /* Good data and valid module. Reset, stall or unstall the register as
-	 required. If reset is requested, there is no point considering
-	 stalling! */
-      int  reset_bit = (0x1 == ((data >> JCB_RESET) & 0x1));
-      int  stall_bit = (0x1 == ((data >> JCB_STALL) & 0x1));
+      int  reset_bit;
+      int  stall_bit;
 
-      if (reset_bit)
+      switch (runtime.debug.mod_id)
 	{
-	  sim_reset ();
-	}
-      else
-	{
-	  set_stall_state (stall_bit);
+	case JM_CPU0:
+
+	  /* Good data and valid module. Reset, stall or unstall the register
+	     as required. If reset is requested, there is no point considering
+	     stalling! */
+	  reset_bit = (0x1 == ((data >> JCB_RESET) & 0x1));
+	  stall_bit = (0x1 == ((data >> JCB_STALL) & 0x1));
+
+	  if (reset_bit)
+	    {
+	      sim_reset ();
+	    }
+	  else
+	    {
+	      set_stall_state (stall_bit);
+	    }
+
+	  break;
+
+	case JM_UNDEFINED:
+	  fprintf (stderr,
+		   "ERROR: JTAG WRITE_CONTROL with no module selected.\n");
+	  break;
+      
+	case JM_WISHBONE:
+	  fprintf (stderr,
+		   "ERROR: JTAG WRITE_CONTROL of WishBone not supported.\n");
+	  break;
+      
+	case JM_CPU1:
+	  fprintf (stderr,
+		   "ERROR: JTAG WRITE_CONTROL of CPU1 not supported.\n");
+	  break;
+      
+	default:
+	  /* All other modules will have triggered an error on selection. */
+	  break;
 	}
     }
   else
     {
-      /* Not a valid module */
-      fprintf (stderr, "ERROR: JTAG attempt to control module other than "
-	       "CPU0: ignored\n");
+      /* CRC Mismatch: record the error */
+      status |= JS_CRC_IN_ERROR;
     }
 
   /* Construct the response with the status */
@@ -1501,16 +1718,12 @@ jtag_init ()
 /*---------------------------------------------------------------------------*/
 /*!Reset the JTAG interface
 
-   Mark the current JTAG instruction as undefined.
-
-   @return  The number of cycles the reset took.                             */
+   Mark the current JTAG instruction as undefined.                           */
 /*---------------------------------------------------------------------------*/
-int
+void
 jtag_reset ()
 {
   runtime.debug.instr = JI_UNDEFINED;
-
-  return  JTAG_RESET_CYCLES;
 
 }	/* jtag_reset () */
 
@@ -1538,35 +1751,45 @@ jtag_reset ()
                  4
                bits
 
+   We first verify that we have received the correct number of bits. If not we
+   put out a warning, and for consistency return the number of bits supplied
+   as the number of cycles the shift took.
+
    With this debug interface, registers are shifted MS bit first, so we must
    reverse the bits to get the actual value.
 
    We record the selected instruction. For completeness the register is parsed
    and a warning given if any register other than DEBUG is shifted.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-int
-jtag_shift_ir (unsigned char *jreg)
+void
+jtag_shift_ir (unsigned char *jreg,
+	       int            num_bits)
 {
+  if (4 != num_bits)
+    {
+      fprintf (stderr, "ERROR: Invalid JTAG instruction length %d bits.\n",
+	       num_bits);
+      return;
+    }
+
   runtime.debug.instr = reverse_bits (jreg[0] & 0xf, 4);
 
   switch (runtime.debug.instr)
     {
     case JI_EXTEST:
-      fprintf (stderr, "Warning: JTAG EXTEST shifted\n");
+      fprintf (stderr, "Warning: JTAG EXTEST shifted.\n");
       break;
 
     case JI_SAMPLE_PRELOAD:
-      fprintf (stderr, "Warning: JTAG SAMPLE/PRELOAD shifted\n");
+      fprintf (stderr, "Warning: JTAG SAMPLE/PRELOAD shifted.\n");
       break;
 
     case JI_IDCODE:
-      fprintf (stderr, "Warning: JTAG IDCODE shifted\n");
+      fprintf (stderr, "Warning: JTAG IDCODE shifted.\n");
       break;
 
     case JI_DEBUG:
@@ -1574,21 +1797,18 @@ jtag_shift_ir (unsigned char *jreg)
       break;
 
     case JI_MBIST:
-      fprintf (stderr, "Warning: JTAG MBIST shifted\n");
+      fprintf (stderr, "Warning: JTAG MBIST shifted.\n");
       break;
 
     case JI_BYPASS:
-      fprintf (stderr, "Warning: JTAG BYPASS shifted\n");
+      fprintf (stderr, "Warning: JTAG BYPASS shifted.\n");
       break;
 
     default:
-      fprintf (stderr, "Warning: Unknown JTAG instruction 0x%1x shifted\n",
+      fprintf (stderr, "ERROR: Unknown JTAG instruction 0x%1x shifted.\n",
 	       runtime.debug.instr);
       break;
     }
-
-  return  4;			/* Register length */
-      
 }	/* jtag_shift_ir () */
 
 
@@ -1610,7 +1830,7 @@ jtag_shift_ir (unsigned char *jreg)
 
    The register is parsed to determine which of the six possible register
    types it could be.
-   - MODULE_SELECT
+   - SELECT_MODULE
    - WRITE_COMMNAND
    - READ_COMMAND
    - GO_COMMAND
@@ -1621,46 +1841,43 @@ jtag_shift_ir (unsigned char *jreg)
          provided for future compatibility.
 
    The parsing is hierarchical. The first bit determines if we have
-   MODULE_SELECT, if not, the next 4 bits determine the command.
+   SELECT_MODULE, if not, the next 4 bits determine the command.
 
-   @param[in,out] jreg  The register to shift in, and the register shifted
-                        back out.
-
-   @return  The number of cycles the shift took, which in turn is the number
-            of bits in the register                                          */
+   @param[in,out] jreg      The register to shift in, and the register shifted
+                            back out.
+   @param[in]     num_bits  The number of bits supplied.                     */
 /*---------------------------------------------------------------------------*/
-int
-jtag_shift_dr (unsigned char *jreg)
+void
+jtag_shift_dr (unsigned char *jreg,
+	       int            num_bits)
 {
   if (JI_DEBUG != runtime.debug.instr)
     {
       fprintf (stderr, "ERROR: Attempt to shift JTAG data register when "
-	       "DEBUG not instruction: ignored\n");
-      return  0;
+	       "DEBUG not instruction.\n");
+      return;
     }
 
-  int  module_select_p = (1 == (jreg[0] & 0x1));
+  int  select_module_p = (1 == (jreg[0] & 0x1));
 
-  if (module_select_p)
+  if (select_module_p)
     {
-      return  module_select (jreg);
+      select_module (jreg, num_bits);
     }
   else
     {
-      enum jtag_cmd  cmd = reverse_bits ((jreg[0] >> 1) & 0xf, 4);
-
-      switch (cmd)
+      switch (reverse_bits ((jreg[0] >> 1) & 0xf, 4))
 	{
-	case JCMD_GO_COMMAND:    return  go_command (jreg);
-	case JCMD_READ_COMMAND:  return  read_command (jreg);
-	case JCMD_WRITE_COMMAND: return  write_command (jreg);
-	case JCMD_READ_CONTROL:  return  read_control (jreg);
-	case JCMD_WRITE_CONTROL: return  write_control (jreg);
+	case JCMD_GO_COMMAND:    go_command (jreg, num_bits); break;
+	case JCMD_READ_COMMAND:  read_command (jreg, num_bits); break;
+	case JCMD_WRITE_COMMAND: write_command (jreg, num_bits); break;
+	case JCMD_READ_CONTROL:  read_control (jreg, num_bits); break;
+	case JCMD_WRITE_CONTROL: write_control (jreg, num_bits); break;
 
 	default:
-	  /* Not a command we recognize. Decide this after we've read just
-	     the module and command bits */
-	  return  4 + 1;
+	  /* Not a command we recognize. */
+	  fprintf (stderr, "ERROR: DEBUG command not recognized.\n");
+	  break;
 	}
     }
 }	/* jtag_shift_dr () */

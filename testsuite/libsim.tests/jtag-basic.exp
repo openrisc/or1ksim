@@ -49,7 +49,7 @@ run_libsim "lib-jtag IR 0000"              \
           "  time taken "                  \
           "Execution step completed OK."   \
           "Test completed successfully."]  \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "00"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "0"
 
 run_libsim "lib-jtag IR 0001"                    \
     [list "Initalization succeeded."             \
@@ -63,7 +63,7 @@ run_libsim "lib-jtag IR 0001"                    \
           "  time taken "                        \
           "Execution step completed OK."         \
           "Test completed successfully."]        \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "08"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "8"
 
 run_libsim "lib-jtag IR 0010"              \
     [list "Initalization succeeded."       \
@@ -77,7 +77,7 @@ run_libsim "lib-jtag IR 0010"              \
           "  time taken "                  \
           "Execution step completed OK."   \
           "Test completed successfully."]  \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "04"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "4"
 
 run_libsim "lib-jtag instr reg 0011"                      \
     [list "Initalization succeeded."                      \
@@ -86,12 +86,12 @@ run_libsim "lib-jtag instr reg 0011"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 0c"                             \
-          "Warning: Unknown JTAG instruction 0x3 shifted" \
+          "ERROR: Unknown JTAG instruction 0x3 shifted"   \
           "  shifted out: 0c"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0c"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "c"
 
 run_libsim "lib-jtag instr reg 0100"                      \
     [list "Initalization succeeded."                      \
@@ -100,12 +100,12 @@ run_libsim "lib-jtag instr reg 0100"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 02"                             \
-          "Warning: Unknown JTAG instruction 0x4 shifted" \
+          "ERROR: Unknown JTAG instruction 0x4 shifted"   \
           "  shifted out: 02"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "02"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "2"
 
 run_libsim "lib-jtag instr reg 0101"                      \
     [list "Initalization succeeded."                      \
@@ -114,12 +114,12 @@ run_libsim "lib-jtag instr reg 0101"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 0a"                             \
-          "Warning: Unknown JTAG instruction 0x5 shifted" \
+          "ERROR: Unknown JTAG instruction 0x5 shifted"   \
           "  shifted out: 0a"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0a"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "a"
 
 run_libsim "lib-jtag instr reg 0110"                      \
     [list "Initalization succeeded."                      \
@@ -128,12 +128,12 @@ run_libsim "lib-jtag instr reg 0110"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 06"                             \
-          "Warning: Unknown JTAG instruction 0x6 shifted" \
+          "ERROR: Unknown JTAG instruction 0x6 shifted"   \
           "  shifted out: 06"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "06"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "6"
 
 run_libsim "lib-jtag instr reg 0111"                      \
     [list "Initalization succeeded."                      \
@@ -142,12 +142,12 @@ run_libsim "lib-jtag instr reg 0111"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 0e"                             \
-          "Warning: Unknown JTAG instruction 0x7 shifted" \
+          "ERROR: Unknown JTAG instruction 0x7 shifted"   \
           "  shifted out: 0e"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0e"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "e"
 
 run_libsim "lib-jtag instr reg 1000"       \
     [list "Initalization succeeded."       \
@@ -160,7 +160,7 @@ run_libsim "lib-jtag instr reg 1000"       \
           "  time taken "                  \
           "Execution step completed OK."   \
           "Test completed successfully."]  \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "01"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "1"
 
 run_libsim "lib-jtag IR 1001"              \
     [list "Initalization succeeded."       \
@@ -174,7 +174,7 @@ run_libsim "lib-jtag IR 1001"              \
           "  time taken "                  \
           "Execution step completed OK."   \
           "Test completed successfully."]  \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "09"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "9"
 
 run_libsim "lib-jtag instr reg 1010"                      \
     [list "Initalization succeeded."                      \
@@ -183,12 +183,12 @@ run_libsim "lib-jtag instr reg 1010"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 05"                             \
-          "Warning: Unknown JTAG instruction 0xa shifted" \
+          "ERROR: Unknown JTAG instruction 0xa shifted"   \
           "  shifted out: 05"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "05"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "5"
 
 run_libsim "lib-jtag instr reg 1011"                      \
     [list "Initalization succeeded."                      \
@@ -197,12 +197,12 @@ run_libsim "lib-jtag instr reg 1011"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 0d"                             \
-          "Warning: Unknown JTAG instruction 0xb shifted" \
+          "ERROR: Unknown JTAG instruction 0xb shifted"   \
           "  shifted out: 0d"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0d"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "d"
 
 run_libsim "lib-jtag instr reg 1100"                      \
     [list "Initalization succeeded."                      \
@@ -211,12 +211,12 @@ run_libsim "lib-jtag instr reg 1100"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 03"                             \
-          "Warning: Unknown JTAG instruction 0xc shifted" \
+          "ERROR: Unknown JTAG instruction 0xc shifted"   \
           "  shifted out: 03"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "03"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "3"
 
 run_libsim "lib-jtag instr reg 1101"                      \
     [list "Initalization succeeded."                      \
@@ -225,12 +225,12 @@ run_libsim "lib-jtag instr reg 1101"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 0b"                             \
-          "Warning: Unknown JTAG instruction 0xd shifted" \
+          "ERROR: Unknown JTAG instruction 0xd shifted"   \
           "  shifted out: 0b"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0b"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "b"
 
 run_libsim "lib-jtag instr reg 1110"                      \
     [list "Initalization succeeded."                      \
@@ -239,12 +239,12 @@ run_libsim "lib-jtag instr reg 1110"                      \
           "Execution step completed OK."                  \
           "Shifting instruction register."                \
           "  shifting in: 07"                             \
-          "Warning: Unknown JTAG instruction 0xe shifted" \
+          "ERROR: Unknown JTAG instruction 0xe shifted"   \
           "  shifted out: 07"                             \
           "  time taken "                                 \
           "Execution step completed OK."                  \
           "Test completed successfully."]                 \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "07"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "7"
 
 run_libsim "lib-jtag IR 1111"              \
     [list "Initalization succeeded."       \
@@ -258,4 +258,4 @@ run_libsim "lib-jtag IR 1111"              \
           "  time taken "                  \
           "Execution step completed OK."   \
           "Test completed successfully."]  \
-    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "0f"
+    "lib-jtag/lib-jtag" "" "loop/loop" "R" "I" "4" "f"

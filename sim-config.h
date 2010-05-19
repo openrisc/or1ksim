@@ -199,7 +199,7 @@ struct runtime
     int  write_defined_p;	/* WRITE_COMMAND has set details for GO */
     unsigned char  acc_type;	/* Access type for GO */
     unsigned long int  addr;	/* Address to read/write for GO */
-    unsigned long int  size;	/* Number of bytes to read/write */
+    unsigned long int  size;	/* Num bytes to read/write (up to 2^16) */
   } debug;
 
   struct

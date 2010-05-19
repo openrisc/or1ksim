@@ -26,9 +26,6 @@
 #ifndef JTAG__H
 #define JTAG__H
 
-/*! Number of JTAG clock cycles a reset sequence takes */
-#define  JTAG_RESET_CYCLES 5
-
 /*! Enumeration of the JTAG instruction types */
 enum  jtag_instr {
   JI_UNDEFINED      =  -1,		/* Won't fit in bitfield */
@@ -86,8 +83,10 @@ enum jtag_control_bits {
 
 /* Function prototypes for external use */
 extern void  jtag_init ();
-extern int   jtag_reset ();
-extern int   jtag_shift_ir (unsigned char *jreg);
-extern int   jtag_shift_dr (unsigned char *jreg);
+extern void  jtag_reset ();
+extern void  jtag_shift_ir (unsigned char *jreg,
+			    int            num_bits);
+extern void  jtag_shift_dr (unsigned char *jreg,
+			    int            num_bits);
 
 #endif	/* JTAG__H */

@@ -1,3 +1,56 @@
+2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/Makefile.am: upcalls.exp added to distribution.
+	* libsim.tests/Makefile.in: Regenerated.
+
+2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/default.cfg: Disabled MC, replaced with memory block
+	and set CPU to take vectors at high address.
+	* test-code/lib-jtag/lib-jtag-full.c: Increase time quanta to 3ms to
+	allow time for messages.
+
+2010-05-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/Makefile.am: Added new test files to dist
+	* libsim.tests/Makefile: Regenerated.
+	* libsim.tests/jtag-go-command-read.exp: New file.
+	* libsim.tests/jtag-go-command-write.exp: New file.
+	* libsim.tests/jtag-read-command.exp: Tests updated for new interface.
+	* libsim.tests/jtag-read-control.exp: New file.
+	* libsim.tests/jtag-select-module.exp: Tests updated for new
+	interface. All tests related to subsequent commands moved to their own
+	tests.
+	* libsim.tests/jtag-write-command.exp: Tests updated for new interface.
+	* libsim.tests/jtag-write-control.exp: New file.
+	* test-code/lib-jtag/lib-jtag.c: Interface changed to allow use of new
+	JTAG library interface with bit lengths.
+	* test-code/lib-jtag/lib-jtag-full.c: Use new JTAG library interface
+	with bit lengths.
+
+
+2010-05-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/jtag-read-command.exp: Better test naming.
+	* libsim.tests/jtag-select-module.exp: Better test naming.
+	* libsim.tests/jtag-write-command.exp: Better test naming.
+	* libsim.tests/jtag-select-module.exp
+	<SELECT_MODULE READ_COMMAND WB>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND CPU0>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND CPU1>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND module 4>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND module 14>: Check for correct access
+	type.
+	
+
+2010-05-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* libsim.tests/default.cfg: Add memory block at top of memory.
+	* libsim.tests/lib-jtag-full.c: Corrected some error messages.
+	* libsim.tests/Makefile.am: Added new JTAG test files.
+	* libsim.tests/Makefile.in: Regenerated.
+	* libsim.tests/jtag-read-command.exp: Break out READ_COMMAND tests.
+	* libsim.tests/jtag-select-module.exp: Break out SELECT_MODULE tests.
+	* libsim.tests/jtag-write-command.exp: Break out WRITE_COMMAND tests.
+	* README: Updated with new tests.
+	* test-code/lib-jtag/lib-jtag-full.c (process_read_command):
+	Corrected printout of access_type.
+
 2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure.ac: lib-jtag/Makefile.am added as output
 	* configure: Regenerated

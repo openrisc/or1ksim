@@ -109,8 +109,8 @@ hexch2val (char  c)
 
    @param[in] type       'D' if this is a data register, 'I' if an instruction
                          register.
-   @param[in] next_jreg  Offset into argv of the next JTAG register hex
-                         string.
+   @param[in] next_jreg  Offset into argv of the next JTAG register length
+                         field.
    @param[in] argc       argc from the main program (for checking next_jref).
    @param[in] argv       argv from the main program.
 
@@ -124,26 +124,34 @@ process_jreg (const char  type,
 {
   const char *long_name = ('D' == type) ? "data" : "instruction";
 
-  /* Do we have the arg? */
-  if (next_jreg > argc)
+  /* Do we have the arg (length and value)? */
+  if ((next_jreg + 1) > argc)
     {
       printf ("ERROR: no %s register found.\n", long_name);
+      return  0;
+    }
+
+  /* Get the length field */
+  int  bit_len = strtol (argv[next_jreg++], NULL, 0);
+
+  if (0 == bit_len)
+    {
+      printf ("ERROR: invalid register length\n");
       return  0;
     }
 
   /* Is the reg an exact number of bytes? */
   char *hex_str   = argv[next_jreg];
   int   num_chars = strlen (hex_str);
+  int   num_bytes = (bit_len + 7) / 8;
 
-  if (0 != (num_chars % 2))
+  if (num_chars > (2 * num_bytes))
     {
-      printf ("ERROR: %s register not exact number of bytes.\n", long_name);
-      return  0;
+      printf ("Warning: Too many digits for register: truncated.\n");
     }
 
-  /* Allocate space */
-  int            num_bytes = num_chars / 2;
-  unsigned char *jreg      = malloc (num_bytes);
+  /* Allocate and clear space */
+  unsigned char *jreg = malloc (num_bytes);
 
   if (NULL == jreg)
     {
@@ -151,33 +159,27 @@ process_jreg (const char  type,
       return  0;
     }
 
+  memset (jreg, 0, num_bytes);
+
   /* Initialize the register. The hex presentation is MS byte of the string on
      the left (i.e. at offset 0), but the internal representation is LS byte
      at the lowest address. */
   int  i;
   
-  for (i = 0; i < num_bytes; i++)
+  for (i = num_chars - 1; i >= 0; i--)
     {
-      int  byte_off = num_bytes - i - 1;
-      int  ch_off   = i * 2;
-      int  j;
+      int  dig_num  = num_chars - 1 - i;	/* Which digit */
+      int  dig_val  = hexch2val (hex_str[i]);
 
-      /* Each nybble in turn */
-      for (j = 0; j < 2; j++)
+      if (dig_val < 0)
 	{
-	  char  c     = hex_str[ch_off + j];
-	  int   c_val = hexch2val (c);
-
-	  if (c_val < 0)
-	    {
-	      printf ("ERROR: %c not valid hex digit.\n", c);
-	      free (jreg);
-	      return  0;
-	    }
-
-	  jreg[byte_off] <<= 4;
-	  jreg[byte_off]  |= c_val;
+	  printf ("ERROR: %c not valid hex digit.\n", hex_str[i]);
+	  free (jreg);
+	  return  0;
 	}
+
+      /* MS digits are the odd numbered ones */
+      jreg[dig_num / 2] |= (0 == (dig_num % 2)) ? dig_val : dig_val << 4;
     }
 
   /* Note what we are doing */
@@ -187,11 +189,11 @@ process_jreg (const char  type,
 
   if ('D' == type)
     {
-      t = or1ksim_jtag_shift_dr (jreg);
+      t = or1ksim_jtag_shift_dr (jreg, bit_len);
     }
   else
     {
-      t = or1ksim_jtag_shift_ir (jreg);
+      t = or1ksim_jtag_shift_ir (jreg, bit_len);
     }
 
   dump_jreg ("  shifted out", jreg, num_bytes);
@@ -209,16 +211,18 @@ process_jreg (const char  type,
    Build an or1ksim program using the library which loads a program and config
    from the command line which will drive JTAG.
 
-   lib-jtag <config-file> <image> <jtype> [<reg>] [<jtype> [<reg>]] ...
+   lib-jtag <config-file> <image> <jtype> [<bitlen> <reg>]
+            [<jtype> [<bitlen> <reg>]] ...
 
    - config-file  An Or1ksim configuration file.
    - image        A OpenRISC binary image to load into Or1ksim
    - jtype        One of 'R' (JTAG reset), 'I' (JTAG instruction register) or
                   'D' (JTAG data register).
+   - bitlen       If jtype is 'D' or 'I', the number of bits in the JTAG
+                  register.
    - reg          If jtype is 'D' or 'I', a JTAG register specified in
-                  hex. Must be an even number of digits (i.e. exact number of
-                  bytes), and use leading zeros if null bytes are needed at
-                  the MS end.
+                  hex. Specified LS digit on the right, and leading zeros may
+                  be omitted.
 
    The target program is run in bursts of 1ms execution, and the type of
    return (OK, hit breakpoint) noted. Between each burst of execution, the
@@ -237,8 +241,8 @@ main (int   argc,
   /* Check we have minimum number of args. */
   if (argc < 4)
     {
-      printf ("usage: lib-jtag <config-file> <image> <jtype> <reg> [<jtype> "
-	      "<reg>] ...\n");
+      printf ("usage: lib-jtag <config-file> <image> <jtype> [<bitlen> <reg>] "
+	      "[<jtype> [<bitlen> <reg>]] ...\n");
       return  1;
     }
 
@@ -286,17 +290,25 @@ main (int   argc,
 	case 'I':
 	  printf ("Shifting instruction register.\n");
 
-	  if (!process_jreg ('I', next_jreg++, argc, argv))
+	  if (process_jreg ('I', next_jreg, argc, argv))
+	    {
+	      next_jreg += 2;
+	    }
+	  else
 	    {
 	      return  1;		/* Something went wrong */
 	    }
-
+	  
 	  break;
 
 	case 'D':
 	  printf ("Shifting data register.\n");
 
-	  if (!process_jreg ('D', next_jreg++, argc, argv))
+	  if (process_jreg ('D', next_jreg, argc, argv))
+	    {
+	      next_jreg += 2;
+	    }
+	  else
 	    {
 	      return  1;		/* Something went wrong */
 	    }

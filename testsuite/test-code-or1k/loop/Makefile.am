@@ -1,4 +1,4 @@
-# Makefile.am for or1ksim OR1K test program: loop
+# Makefile.am for or1ksim OR1K various loop test programs.
 
 # Copyright (C) Embecosm Limited, 2010
 
@@ -24,12 +24,34 @@
 # -----------------------------------------------------------------------------
 
 
-# A test program which just loops.
-check_PROGRAMS = loop
+# Test programs which just loop. One does nothing, one initializes certain
+# addresses and SPR's (for testing reading through JTAG), one reports certain
+# addresses and SPR's which have been changed (for testing writing through
+# JTAG).
+check_PROGRAMS = loop        \
+		 loop-init   \
+		 loop-report
 
+# Simple loop
 loop_SOURCES   = loop.c
 
 loop_LDFLAGS   = -T$(srcdir)/../default.ld
 
 loop_LDADD     = ../except/except.lo      \
 	         ../support/libsupport.la
+
+# Loop with initialization
+loop_init_SOURCES = loop-init.c
+
+loop_init_LDFLAGS = -T$(srcdir)/../default.ld
+
+loop_init_LDADD   = ../except/except.lo      \
+	            ../support/libsupport.la
+
+# Loop with reporting
+loop_report_SOURCES = loop-report.c
+
+loop_report_LDFLAGS = -T$(srcdir)/../default.ld
+
+loop_report_LDADD   = ../except/except.lo      \
+	              ../support/libsupport.la

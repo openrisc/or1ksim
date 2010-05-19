@@ -167,6 +167,10 @@ reg_mem_area (oraddr_t addr, uint32_t size, unsigned mc_dev,
   unsigned int addr_mask = ~size_mask;
   struct dev_memarea *mem;
 
+  printf ("Reg mem area, addr = 0x%08lx, size_mask = 0x%08lx, "
+	  "addr_mask = 0x%08lx\n", (unsigned long int) addr,
+	  (unsigned long int) size_mask, (unsigned long int) addr_mask);
+
   mem = register_memoryarea_mask (addr_mask, addr & addr_mask, size_mask + 1,
 				  mc_dev);
 
@@ -243,21 +247,30 @@ verify_memoryarea (oraddr_t addr)
   if (mc_area
       && (addr & mc_area->addr_mask) ==
       (mc_area->addr_compare & mc_area->addr_mask))
-    return cur_area = mc_area;
+    {
+      return cur_area = mc_area;
+    }
 
   /* Check cached value */
   if (cur_area
       && (addr & cur_area->addr_mask) ==
       (cur_area->addr_compare & cur_area->addr_mask))
-    return cur_area;
+    {
+      return cur_area;
+    }
 
   /* When mc is enabled, we must check valid also, otherwise we assume it is
      nonzero */
   /* Check list of registered devices. */
   for (ptmp = dev_list; ptmp; ptmp = ptmp->next)
-    if ((addr & ptmp->addr_mask) == (ptmp->addr_compare & ptmp->addr_mask)
-	&& ptmp->valid)
-      return cur_area = ptmp;
+    {
+      if ((addr & ptmp->addr_mask) == (ptmp->addr_compare & ptmp->addr_mask)
+	  && ptmp->valid)
+	{
+	  return cur_area = ptmp;
+	}
+    }
+
   return cur_area = NULL;
 }
 

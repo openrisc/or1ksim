@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-05-02.tar.bz2
+     tar jxf or1ksim-2010-05-19.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-05-02/configure --target=or32-uclinux ...
+     ../or1ksim-2010-05-19/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -243,7 +243,7 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 =============================
 
 The following problems and issues are known about with Or1ksim
-2010-05-02.  The OpenRISC tracker may be used to see the current state
+2010-05-19.  The OpenRISC tracker may be used to see the current state
 of these issues and to raise new problems and feature requests.  It may
 be found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
@@ -1039,6 +1039,11 @@ The following parameters may be specified.
      to VALUE.  Default value is 0x00008001, i.e.  start in supervision
      mode (0x00000001) and set the "Fixed One" bit (0x00008000).
 
+          Note: This is particularly useful when an image is held in
+          Flash at high memory (0xf0000000).  The EPH  bit can be set,
+          so that interrupt vectors are basedf at 0xf0000000, rather
+          than 0x0.
+
 `superscalar = 0|1'
      If 1, the processor operates in superscalar mode.  Default value is
      0.
@@ -1094,8 +1099,33 @@ File: or1ksim.info,  Node: Memory Configuration,  Next: Memory Management Config
 --------------------------
 
 Memory configuration is described in `section memory'.  This section
-may appear multiple times, specifying multiple blocks of memory.  The
-following parameters may be specified.
+may appear multiple times, specifying multiple blocks of memory.
+
+     Caution: The user may choose whether or not to enable a memory
+     controller. If a memory controller is enabled, then the standard
+     OpenRISC C libraries will initialize it to expect 64MB memory
+     blocks, and any memory declarations _must_ reflect this.  The
+     section describing memory controller configuration describes the
+     steps necessary for using smaller or larger memory sections (*note
+     Memory Controller Configuration: Memory Controller Configuration.).
+
+     If a memory controller is _not_ enabled, then the standard C
+     library code will generate memory access errors.  The solution is
+     to declare an additional writable memory block, mimicing the memory
+     controller's register bank as follows.
+
+          section memory
+            pattern = 0x00
+            type = unknown
+            name = "MC shadow"
+            baseaddr = 0x93000000
+            size     = 0x00000080
+            delayr = 2
+            delayw = 4
+          end
+
+
+The following parameters may be specified.
 
 `type=random|pattern|unknown|zero'
      Specifies the values to which memory should be initialized.  The
@@ -1184,7 +1214,8 @@ following parameters may be specified.
      greater than or equal to zero.  This is used by the memory
      controller when identifying different memory instances.
 
-     The default value is -1 (invalid).
+     There is no requirement to set  `ce' if a memory controller is not
+     enabled. The default value is -1 (invalid).
 
 `mc = VALUE'
      Specifies the memory controller this memory is connected to.  It
@@ -1192,9 +1223,10 @@ following parameters may be specified.
      for a memory controller (*note Memory Controller Configuration:
      Memory Controller Configuration.).
 
-     Default value is 0, which is also the default value of a memory
-     controller `index' field.  This is suitable therefore for designs
-     with just one memory controller.
+     There is no requirement to set  `mc' if a memory controller is not
+     enabled. Default value is 0, which is also the default value of a
+     memory controller `index' field.  This is suitable therefore for
+     designs with just one memory controller.
 
 `delayr = VALUE'
      The number of cycles required for a read access.  Set to -1 if the
@@ -1554,7 +1586,7 @@ File: or1ksim.info,  Node: Memory Controller Configuration,  Next: UART Configur
 -------------------------------------
 
 The memory controller used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `mem_ctrl'.  It is
+OpenCores, and found in the top level SVN directory, `mem_ctrl'.  It is
 described in the document `Memory Controller IP Core' by Rudolf
 Usselmann, which can be found in the `doc' subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
@@ -1562,7 +1594,24 @@ data bus.
 
 The memory controller configuration is described in `section mc'.  This
 section may appear multiple times, specifying multiple memory
-controllers.  The following parameters may be specified.
+controllers.
+
+     Caution: The standard OpenRISC C libraries will initialize the
+     memory controller to expect 64MB memory blocks, and any memory
+     declarations _must_ reflect this.
+
+     If smaller memory blocks are declared with a memory controller,
+     then sufficient memory will not be allocated by Or1ksim, but out of
+     range memory accesses will not be trapped. For example declaring a
+     memory section from 0-4MB with a memory controller enabled would
+     mean that accesses between 4MB and 64MB would be permitted, but
+     having no allocated memory would likely cause a segmentation fault.
+
+     If the user is determined to use smaller memories with the memory
+     controller, then custom initialization code must be provided, to
+     ensure the memory controller traps out-of-memory accesses.
+
+The following parameters may be specified.
 
 `enabled = 0|1'
      If 1 (true, the default), this memory controller is enabled.  If
@@ -1706,7 +1755,7 @@ File: or1ksim.info,  Node: DMA Configuration,  Next: Ethernet Configuration,  Pr
 -----------------------
 
 The DMA controller used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `wb_dma'.  It is
+OpenCores, and found in the top level SVN directory, `wb_dma'.  It is
 described in the document `Wishbone DMA/Bridge IP Core' by Rudolf
 Usselmann, which can be found in the `doc' subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
@@ -1750,8 +1799,8 @@ File: or1ksim.info,  Node: Ethernet Configuration,  Next: GPIO Configuration,  P
 ----------------------------
 
 The Ethernet MAC used in Or1ksim is the component implemented at
-OpenCores, and found in the top level CVS directory, `ethernet'.  It
-also forms part of the OpenRISC SoC, ORPSoC.  It is described in the
+OpenCores, and found in the top level SVN directory, `ethmac'.  It also
+forms part of the OpenRISC SoC, ORPSoC.  It is described in the
 document `Ethernet IP Core Specification' by Igor Mohor, which can be
 found in the `doc' subdirectory.  It is a memory mapped component,
 which resides on the main OpenRISC Wishbone data bus.
@@ -1844,7 +1893,7 @@ File: or1ksim.info,  Node: GPIO Configuration,  Next: Display Interface Configur
 ------------------------
 
 The GPIO used in Or1ksim is the component implemented at OpenCores, and
-found in the top level CVS directory, `gpio'.  It is described in the
+found in the top level SVN directory, `gpio'.  It is described in the
 document `GPIO IP Core Specification' by Damjan Lampret and Goran
 Djakovic, which can be found in the `doc' subdirectory.  It is a memory
 mapped component, which resides on the main OpenRISC Wishbone data bus.
@@ -1885,7 +1934,7 @@ File: or1ksim.info,  Node: Display Interface Configuration,  Next: Frame Buffer 
 
 Or1ksim models a VGA interface to an external monitor.  The VGA
 controller used in Or1ksim is the component implemented at OpenCores,
-and found in the top level CVS directory, `vga_lcd', with no support
+and found in the top level SVN directory, `vga_lcd', with no support
 for the optional hardware cursors.  It is described in the document
 `VGA/LCD Core v2.0 Specifications' by Richard Herveille, which can be
 found in the `doc' subdirectory.  It is a memory mapped component,
@@ -1983,7 +2032,7 @@ File: or1ksim.info,  Node: Keyboard Configuration,  Next: Disc Interface Configu
 ----------------------------------
 
 The PS2 interface provided by Or1ksim is not documented.  It may be
-based on the PS2 project at OpenCores, and found in the top level CVS
+based on the PS2 project at OpenCores, and found in the top level SVN
 directory, `ps2'.  However this project lacks any documentation beyond
 its project webpage.  Since most PS2 interfaces follow the Intel i8042
 standard, this is presumably what is expected with this device.
@@ -2040,7 +2089,7 @@ File: or1ksim.info,  Node: Disc Interface Configuration,  Next: Generic Peripher
 
 The ATA/ATAPI disc controller used in Or1ksim is the OCIDEC (OpenCores
 IDE Controller) component implemented at OpenCores, and found in the
-top level CVS directory, `ata'.  It is described in the document
+top level SVN directory, `ata'.  It is described in the document
 `ATA/ATAPI-5 Core Specification' by Richard Herveille, which can be
 found in the `doc' subdirectory.  It is a memory mapped component,
 which resides on the main OpenRISC Wishbone data bus.
@@ -3345,9 +3394,9 @@ Index
 * baseaddr (keyboard configuration):     Keyboard Configuration.
                                                               (line  36)
 * baseaddr (memory configuration):       Memory Configuration.
-                                                              (line  62)
+                                                              (line  87)
 * baseaddr (memory controller configuration): Memory Controller Configuration.
-                                                              (line  29)
+                                                              (line  46)
 * baseaddr (UART configuration):         UART Configuration.  (line  22)
 * baseaddr (VGA configuration):          Display Interface Configuration.
                                                               (line  26)
@@ -3371,7 +3420,7 @@ Index
 * cache configuration:                   Cache Configuration. (line   6)
 * calling_convention (CUC configuration): CUC Configuration.  (line  34)
 * ce (memory configuration):             Memory Configuration.
-                                                              (line  92)
+                                                              (line 117)
 * cfgr (CPU configuration):              CPU Configuration.   (line  47)
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
@@ -3480,10 +3529,10 @@ Index
 * debugging enabled (Argtable2):         Configuring the Build.
                                                               (line 121)
 * delayr (memory configuration):         Memory Configuration.
-                                                              (line 110)
+                                                              (line 137)
 * delayw (memory configuration):         Memory Configuration.
-                                                              (line 116)
-* dependstats (CPU configuration):       CPU Configuration.   (line  84)
+                                                              (line 143)
+* dependstats (CPU configuration):       CPU Configuration.   (line  89)
 * dev_id (ATA/ATAPI configuration):      Disc Interface Configuration.
                                                               (line  36)
 * disassemble (Interactive CLI):         Interactive Command Line.
@@ -3547,7 +3596,7 @@ Index
 * enabled (keyboard configuration):      Keyboard Configuration.
                                                               (line  32)
 * enabled (memory controller configuration): Memory Controller Configuration.
-                                                              (line  18)
+                                                              (line  35)
 * enabled (MMU configuration):           Memory Management Configuration.
                                                               (line  12)
 * enabled (power management configuration): Power Management Configuration.
@@ -3617,7 +3666,7 @@ Index
 * GPIO_VAPI_INTE (GPIO verification):    Verification API.    (line 110)
 * GPIO_VAPI_PTRIG (GPIO verification):   Verification API.    (line 113)
 * GPIO_VAPI_RGPIO (GPIO verification):   Verification API.    (line 107)
-* hazards (CPU configuration):           CPU Configuration.   (line  69)
+* hazards (CPU configuration):           CPU Configuration.   (line  74)
 * heads (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 121)
 * help (Interactive CLI):                Interactive Command Line.
@@ -3642,7 +3691,7 @@ Index
 * IMMU configuration:                    Memory Management Configuration.
                                                               (line   6)
 * index (memory controller configuration): Memory Controller Configuration.
-                                                              (line  51)
+                                                              (line  68)
 * info (Interactive CLI):                Interactive Command Line.
                                                               (line 119)
 * installing Or1ksim:                    Installation.        (line   6)
@@ -3677,12 +3726,12 @@ Index
 * load_missdelay (data cache configuration): Cache Configuration.
                                                               (line  50)
 * log (memory configuration):            Memory Configuration.
-                                                              (line 122)
+                                                              (line 149)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
 * long:                                  Simulator Library.   (line  87)
 * mc (memory configuration):             Memory Configuration.
-                                                              (line 100)
+                                                              (line 126)
 * memory configuration:                  Memory Configuration.
                                                               (line   6)
 * memory controller configuration:       Memory Controller Configuration.
@@ -3729,7 +3778,7 @@ Index
 * name (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  42)
 * name (memory configuration):           Memory Configuration.
-                                                              (line  83)
+                                                              (line 108)
 * no_multicycle (CUC configuration):     CUC Configuration.   (line  42)
 * nsets (cache configuration):           Cache Configuration. (line  15)
 * nsets (MMU configuration):             Memory Management Configuration.
@@ -3760,7 +3809,7 @@ Index
 * patching the program counter (Interactive CLI): Interactive Command Line.
                                                               (line  51)
 * pattern (memory configuration):        Memory Configuration.
-                                                              (line  50)
+                                                              (line  75)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
 * PIC configuration:                     Interrupt Configuration.
@@ -3790,7 +3839,7 @@ Index
 * PMU configuration:                     Power Management Configuration.
                                                               (line   6)
 * poc (memory controller configuration): Memory Controller Configuration.
-                                                              (line  38)
+                                                              (line  55)
 * port range for TCP/IP:                 Verification API Configuration.
                                                               (line  23)
 * power management configuration:        Power Management Configuration.
@@ -3834,7 +3883,7 @@ Index
 * r (Interactive CLI):                   Interactive Command Line.
                                                               (line  14)
 * random_seed (memory configuration):    Memory Configuration.
-                                                              (line  40)
+                                                              (line  65)
 * refresh_rate (frame buffer configuration): Frame Buffer Configuration.
                                                               (line  30)
 * refresh_rate (VGA configuration):      Display Interface Configuration.
@@ -3886,7 +3935,7 @@ Index
                                                               (line  23)
 * sbp_bnf_fwd (branch prediction configuration): Branch Prediction Configuration.
                                                               (line  28)
-* sbuf_len (CPU configuration):          CPU Configuration.   (line  96)
+* sbuf_len (CPU configuration):          CPU Configuration.   (line 101)
 * SDF (power management register):       Power Management Configuration.
                                                               (line  12)
 * section ata:                           Disc Interface Configuration.
@@ -3955,7 +4004,7 @@ Index
 * size (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  30)
 * size (memory configuration):           Memory Configuration.
-                                                              (line  67)
+                                                              (line  92)
 * sleep mode (power management register): Power Management Configuration.
                                                               (line  16)
 * slow down factor (power management register): Power Management Configuration.
@@ -3983,7 +4032,7 @@ Index
                                                               (line  58)
 * SUME (power management register):      Power Management Configuration.
                                                               (line  24)
-* superscalar (CPU configuration):       CPU Configuration.   (line  58)
+* superscalar (CPU configuration):       CPU Configuration.   (line  63)
 * suspend mode (power management register): Power Management Configuration.
                                                               (line  24)
 * t (Interactive CLI):                   Interactive Command Line.
@@ -4016,15 +4065,15 @@ Index
 * type (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line  99)
 * type (memory configuration):           Memory Configuration.
-                                                              (line  11)
+                                                              (line  36)
 * type=pattern (memory configuration):   Memory Configuration.
-                                                              (line  21)
+                                                              (line  46)
 * type=random (memory configuration):    Memory Configuration.
-                                                              (line  15)
+                                                              (line  40)
 * type=unknown (memory configuration):   Memory Configuration.
-                                                              (line  25)
+                                                              (line  50)
 * type=zero (memory configuration):      Memory Configuration.
-                                                              (line  29)
+                                                              (line  54)
 * UART configuration:                    UART Configuration.  (line   6)
 * UART I/O from/to a physical serial port: UART Configuration.
                                                               (line  62)
@@ -4094,33 +4143,33 @@ Node: Verification API Configuration30208
 Node: CUC Configuration32148
 Node: Core OpenRISC Configuration34065
 Node: CPU Configuration34567
-Node: Memory Configuration38372
-Node: Memory Management Configuration43685
-Node: Cache Configuration46062
-Node: Interrupt Configuration48448
-Node: Power Management Configuration49184
-Node: Branch Prediction Configuration50461
-Node: Debug Interface Configuration51821
-Node: Peripheral Configuration56041
-Node: Memory Controller Configuration56667
-Node: UART Configuration59272
-Node: DMA Configuration62791
-Node: Ethernet Configuration64658
-Node: GPIO Configuration68636
-Node: Display Interface Configuration70269
-Node: Frame Buffer Configuration72578
-Node: Keyboard Configuration74442
-Node: Disc Interface Configuration76680
-Node: Generic Peripheral Configuration81623
-Node: Interactive Command Line83918
-Node: Verification API90892
-Node: Code Internals95322
-Node: Coding Conventions95882
-Node: Global Data Structures100309
-Node: Concepts102966
-Ref: Output Redirection103111
-Node: Internal Debugging103650
-Node: GNU Free Documentation License104147
-Node: Index126554
+Node: Memory Configuration38602
+Node: Memory Management Configuration45060
+Node: Cache Configuration47437
+Node: Interrupt Configuration49823
+Node: Power Management Configuration50559
+Node: Branch Prediction Configuration51836
+Node: Debug Interface Configuration53196
+Node: Peripheral Configuration57416
+Node: Memory Controller Configuration58042
+Node: UART Configuration61456
+Node: DMA Configuration64975
+Node: Ethernet Configuration66842
+Node: GPIO Configuration70818
+Node: Display Interface Configuration72451
+Node: Frame Buffer Configuration74760
+Node: Keyboard Configuration76624
+Node: Disc Interface Configuration78862
+Node: Generic Peripheral Configuration83805
+Node: Interactive Command Line86100
+Node: Verification API93074
+Node: Code Internals97504
+Node: Coding Conventions98064
+Node: Global Data Structures102491
+Node: Concepts105148
+Ref: Output Redirection105293
+Node: Internal Debugging105832
+Node: GNU Free Documentation License106329
+Node: Index128736
 
 End Tag Table
