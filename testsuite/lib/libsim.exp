@@ -68,23 +68,46 @@ proc run_libsim { testname match_list libprog config or1kprog args } {
 	    send_user "matching |$matchstr|\n";
 	}
 
+	# The matching is slightly tricky. In general we want to find warnings
+	# or errors. However expect will look at the entire buffer, so if we
+	# have the match string *after* an error or warning message, then the
+	# match will still work OK.
+
+	# The trick is to do some post-processing of the matched buffer to see
+	# if there was a preceding Warning or ERROR message.
+
 	expect {
-
 	    $matchstr {
-		# String to match. Silently accept. Do first, so we can match
-		# specific warnings or errors if desired
-	    }
+		set matchlen [string length $matchstr]
+		set buflen [string length $expect_out(buffer)]
+		set lastch [expr {$buflen - $matchlen}]
+		set prefix [string range $expect_out(buffer) 0 $lastch]
 
-	    -re "Warning" {
-		fail "$testname: warning: $expect_out(buffer)";
+		if { [string match *ERROR* $prefix] } {
+		    # We skipped an error
+		    fail "$testname: ERROR seeking match line $match_line";
+		    return
+		} elseif { [string match *Warning* $prefix] } {
+		    # We skipped a warning
+		    fail "$testname: Warning seeking match line $match_line";
+		    return;
+		}
+
+		# Otherwise silently match
+	    }
+	    
+	    ERROR {
+		# An error other than the one we seek
+		fail "$testname: ERROR seeking match line $match_line";
 		return
 	    }
-
-	    -re "ERROR" {
-		fail "$testname: error: $expect_out(buffer)";
-		return
+	    
+	    Warning {
+		# Any warning
+		fail "$testname: Warning seeking match line $match_line";
+		return;
 	    }
-
+	    
 	    eof {
 		fail "$testname: hit EOF seeking match line $match_line";
 		return

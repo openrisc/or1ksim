@@ -1,3 +1,7 @@
+2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	configure.ac: Date of version updated.
+	configure: Regenerated.
+
 2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* debug/jtag.c (wishbone_write): Corrected writing when invalid
 	address.

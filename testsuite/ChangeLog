@@ -1,3 +1,15 @@
+2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* lib/libsim.exp (run_libsim): Expect clause corrected to detect
+	all unexpected warning/errors.
+	* libsim.tests/jtag-go-command-read.exp
+	<JTAG WRITE_COMMAND module CPU1>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 write half words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 write words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 access type 3>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 read half words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 read words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 access type 7>: Missing error added.
+
 2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* libsim.tests/Makefile.am: upcalls.exp added to distribution.
 	* libsim.tests/Makefile.in: Regenerated.
