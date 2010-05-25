@@ -207,6 +207,11 @@ cpu_sbuf_len (union param_val val, void *dat)
     config.cpu.sbuf_len = val.int_val;
 }
 
+static void
+cpu_hardfloat (union param_val val, void *dat)
+{
+  config.cpu.hardfloat = val.int_val;
+}
 /*---------------------------------------------------------------------------*/
 /*!Register the functions to handle a section cpu
 
@@ -231,5 +236,6 @@ reg_cpu_sec ()
   reg_config_param (sec, "hazards",     paramt_int, cpu_hazards);
   reg_config_param (sec, "dependstats", paramt_int, cpu_dependstats);
   reg_config_param (sec, "sbuf_len",    paramt_int, cpu_sbuf_len);
+  reg_config_param (sec, "hardfloat",   paramt_int, cpu_hardfloat);
 
 }	/* reg_cpu_sec() */

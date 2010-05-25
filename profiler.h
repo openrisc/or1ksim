@@ -28,7 +28,7 @@
 #define PROFILER__H
 
 /*! Maximum number of functions that can be profiled */
-#define MAX_FUNCS 1024
+#define MAX_FUNCS 8192
 
 /*! Data structure for information about functions */
 struct func_struct {

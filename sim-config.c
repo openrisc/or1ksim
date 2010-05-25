@@ -142,6 +142,7 @@ init_defconfig ()
   config.cpu.hazards          = 0;
   config.cpu.dependstats      = 0;
   config.cpu.sbuf_len         = 0;
+  config.cpu.hardfloat        = 0;
 
   /* Data cache (IC is set dynamically). Also set relevant SPR bits */
   config.dc.enabled         = 0;

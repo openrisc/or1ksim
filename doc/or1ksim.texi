@@ -1315,6 +1315,9 @@ disable the store buffer.
 When the store buffer is active, stores are accumulated and committed
 when I/O is idle.
 
+@item hardfloat = 0|1
+@cindex @code{hardfloat} (CPU configuration)
+If 1, hardfloat instructions are enabled. Default value 0.
 @end table
 
 @node Memory Configuration

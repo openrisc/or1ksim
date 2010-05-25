@@ -113,6 +113,7 @@ struct config
     int hazards;		/* dependency hazards analysis */
     int dependstats;		/* dependency statistics */
     int sbuf_len;		/* length of store buffer, 0=disabled */
+    int hardfloat;      /* whether hardfloat is enabled */
   } cpu;
 
   struct

@@ -1,5 +1,7 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
-../../doc/or1ksim.texi.
+This is
+/home/jules/Documents/openrisc_svn/openrisc/trunk/or1ksim/doc/or1ksim.info,
+produced by makeinfo version 4.13 from
+/home/jules/Documents/openrisc_svn/openrisc/trunk/or1ksim/doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -1091,6 +1093,8 @@ The following parameters may be specified.
      When the store buffer is active, stores are accumulated and
      committed when I/O is idle.
 
+`hardfloat = 0|1'
+     If 1, hardfloat instructions are enabled. Default value 0.
 
 
 File: or1ksim.info,  Node: Memory Configuration,  Next: Memory Management Configuration,  Prev: CPU Configuration,  Up: Core OpenRISC Configuration
@@ -3666,6 +3670,7 @@ Index
 * GPIO_VAPI_INTE (GPIO verification):    Verification API.    (line 110)
 * GPIO_VAPI_PTRIG (GPIO verification):   Verification API.    (line 113)
 * GPIO_VAPI_RGPIO (GPIO verification):   Verification API.    (line 107)
+* hardfloat (CPU configuration):         CPU Configuration.   (line 110)
 * hazards (CPU configuration):           CPU Configuration.   (line  74)
 * heads (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 121)
@@ -4122,54 +4127,54 @@ Index
 
 
 Tag Table:
-Node: Top814
-Node: Installation1224
-Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install7245
-Node: Known Issues8091
-Node: Usage10232
-Node: Standalone Simulator10446
-Node: Profiling Utility13349
-Node: Memory Profiling Utility14259
-Node: Simulator Library15624
-Node: Configuration21816
-Node: Configuration File Format22425
-Node: Configuration File Preprocessing22717
-Node: Configuration File Syntax23088
-Node: Simulator Configuration25873
-Node: Simulator Behavior26164
-Node: Verification API Configuration30208
-Node: CUC Configuration32148
-Node: Core OpenRISC Configuration34065
-Node: CPU Configuration34567
-Node: Memory Configuration38602
-Node: Memory Management Configuration45060
-Node: Cache Configuration47437
-Node: Interrupt Configuration49823
-Node: Power Management Configuration50559
-Node: Branch Prediction Configuration51836
-Node: Debug Interface Configuration53196
-Node: Peripheral Configuration57416
-Node: Memory Controller Configuration58042
-Node: UART Configuration61456
-Node: DMA Configuration64975
-Node: Ethernet Configuration66842
-Node: GPIO Configuration70818
-Node: Display Interface Configuration72451
-Node: Frame Buffer Configuration74760
-Node: Keyboard Configuration76624
-Node: Disc Interface Configuration78862
-Node: Generic Peripheral Configuration83805
-Node: Interactive Command Line86100
-Node: Verification API93074
-Node: Code Internals97504
-Node: Coding Conventions98064
-Node: Global Data Structures102491
-Node: Concepts105148
-Ref: Output Redirection105293
-Node: Internal Debugging105832
-Node: GNU Free Documentation License106329
-Node: Index128736
+Node: Top918
+Node: Installation1328
+Node: Preparation1575
+Node: Configuring the Build1870
+Node: Build and Install7349
+Node: Known Issues8195
+Node: Usage10336
+Node: Standalone Simulator10550
+Node: Profiling Utility13453
+Node: Memory Profiling Utility14363
+Node: Simulator Library15728
+Node: Configuration21920
+Node: Configuration File Format22529
+Node: Configuration File Preprocessing22821
+Node: Configuration File Syntax23192
+Node: Simulator Configuration25977
+Node: Simulator Behavior26268
+Node: Verification API Configuration30312
+Node: CUC Configuration32252
+Node: Core OpenRISC Configuration34169
+Node: CPU Configuration34671
+Node: Memory Configuration38788
+Node: Memory Management Configuration45246
+Node: Cache Configuration47623
+Node: Interrupt Configuration50009
+Node: Power Management Configuration50745
+Node: Branch Prediction Configuration52022
+Node: Debug Interface Configuration53382
+Node: Peripheral Configuration57602
+Node: Memory Controller Configuration58228
+Node: UART Configuration61642
+Node: DMA Configuration65161
+Node: Ethernet Configuration67028
+Node: GPIO Configuration71004
+Node: Display Interface Configuration72637
+Node: Frame Buffer Configuration74946
+Node: Keyboard Configuration76810
+Node: Disc Interface Configuration79048
+Node: Generic Peripheral Configuration83991
+Node: Interactive Command Line86286
+Node: Verification API93260
+Node: Code Internals97690
+Node: Coding Conventions98250
+Node: Global Data Structures102677
+Node: Concepts105334
+Ref: Output Redirection105479
+Node: Internal Debugging106018
+Node: GNU Free Documentation License106515
+Node: Index128922
 
 End Tag Table

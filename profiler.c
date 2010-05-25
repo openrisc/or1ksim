@@ -27,6 +27,7 @@
    by or1ksim. (use profile command interactively, when running or1ksim, or
    separate psim command).  */
 
+#define PROF_DEBUG 0
 
 /* Autoconf and/or portability configuration */
 #include "config.h"
@@ -38,7 +39,7 @@
 #include "argtable2.h"
 
 /*! Maximum stack frames that can be profiled */
-#define MAX_STACK  1024
+#define MAX_STACK  262144
 
 /*! Data structure representing information about a stack frame */
 struct stack_struct
@@ -100,6 +101,7 @@ prof_acquire (const char *fprofname)
     {
       fprof = runtime.sim.fprof;
       reopened = 1;
+      if (PROF_DEBUG) printf("reopened=1\n");
       rewind (fprof);
     }
   else
@@ -110,9 +112,10 @@ prof_acquire (const char *fprofname)
       fprintf (stderr, "Cannot open profile file: %s\n", fprofname);
       return 1;
     }
-
+  int ctr =0;
   while (1)
     {
+      if (PROF_DEBUG) printf("%d ",ctr++);
       char dir = fgetc (fprof);
       line++;
       if (dir == '+')
@@ -126,6 +129,7 @@ prof_acquire (const char *fprofname)
 	    {
 	      prof_cycles = stack[nstack].cycles;
 	      nstack++;
+	      if (PROF_DEBUG) printf("+ 0x%.8x nstack %d\n",stack[nstack-1].raddr, nstack);
 	      if (nstack > maxstack)
 		maxstack = nstack;
 	    }
@@ -140,6 +144,7 @@ prof_acquire (const char *fprofname)
 	    {
 	      int i;
 	      prof_cycles = s.cycles;
+	      if (PROF_DEBUG) printf("- 0x%.8x nstack %d\n",s.raddr ,nstack);
 	      for (i = nstack - 1; i >= 0; i--)
 		if (stack[i].raddr == s.raddr)
 		  break;
@@ -204,7 +209,7 @@ prof_acquire (const char *fprofname)
 
   /* If we have reopened the file, we need to add end of "[outside functions]" */
   if (reopened)
-    {
+    {      
       prof_cycles = runtime.sim.cycles;
       /* pop everything above current from stack,
          if more than one, something went wrong */

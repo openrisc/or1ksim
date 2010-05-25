@@ -3,9 +3,11 @@
    Copyright (C) 1999 Damjan Lampret, lampret@opencores.org
                  2000-2002 Marko Mlinar, markom@opencores.org
    Copyright (C) 2008 Embecosm Limited
+   Copyright (C) 2009 Jungsook yang, jungsook.yang@uci.edu
   
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
-  
+   Contributor Julius Baxter julius@orsoc.se  
+
    This file is part of OpenRISC 1000 Architectural Simulator.
   
    This program is free software; you can redistribute it and/or modify it
@@ -541,65 +543,139 @@ INSTRUCTION (l_ff1) {
 /******* Floating point instructions *******/
 /* Single precision */
 INSTRUCTION (lf_add_s) {
-  SET_PARAM0((float)PARAM1 + (float)PARAM2);
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1, param2;
+  param1.hval = (uorreg_t)PARAM1;
+  param2.hval = (uorreg_t)PARAM2;
+  param0.fval = param1.fval + param2.fval;
+  SET_PARAM0(param0.hval);
+  } else l_invalid();
 }
 INSTRUCTION (lf_div_s) {
-  SET_PARAM0((float)PARAM1 / (float)PARAM2);
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1, param2;
+  param1.hval = (uorreg_t)PARAM1;
+  param2.hval = (uorreg_t)PARAM2;
+  param0.fval = param1.fval / param2.fval;
+  SET_PARAM0(param0.hval);
+  } else l_invalid();
 }
 INSTRUCTION (lf_ftoi_s) {
-//  set_operand32(0, freg[get_operand(1)], &breakpoint);
+  if (config.cpu.hardfloat) {
+    // no other way appeared to work --jb
+    float tmp_f; memcpy((void*)&tmp_f, (void*)&PARAM1, sizeof(float));
+    SET_PARAM0((int)tmp_f);
+  } else l_invalid();
 }
 INSTRUCTION (lf_itof_s) {
-//  freg[get_operand(0)] = eval_operand32(1, &breakpoint);
+  if (config.cpu.hardfloat) {
+  FLOAT param0;
+  param0.fval = (float)((int)PARAM1);
+  SET_PARAM0(param0.hval);
+  } else l_invalid();
 }
 INSTRUCTION (lf_madd_s) {
-  SET_PARAM0((float)PARAM0 + (float)PARAM1 * (float)PARAM2);
+  if (config.cpu.hardfloat) {
+  FLOAT param0,param1, param2;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  param2.hval = PARAM2;
+  param0.fval += param1.fval * param2.fval; 
+  SET_PARAM0(param0.hval);
+  } else l_invalid();
 }
 INSTRUCTION (lf_mul_s) {
-  SET_PARAM0((float)PARAM1 * (float)PARAM2);
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1, param2;
+  param1.hval = (uorreg_t)PARAM1;
+  param2.hval = (uorreg_t)PARAM2;
+  param0.fval = param1.fval * param2.fval;
+  SET_PARAM0(param0.hval); 
+  } else l_invalid();
 }
 INSTRUCTION (lf_rem_s) {
-  float temp = (float)PARAM1 / (float)PARAM2;
-  SET_PARAM0(temp - (uint32_t)temp);
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1, param2;
+  param1.hval = PARAM1;
+  param2.hval = PARAM2;
+  param0.fval = param1.fval / param2.fval;
+  SET_PARAM0(param0.hval);
+  } else l_invalid();
 }
 INSTRUCTION (lf_sfeq_s) {
-  if((float)PARAM0 == (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval == param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sfge_s) {
-  if((float)PARAM0 >= (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval >= param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sfgt_s) {
-  if((float)PARAM0 > (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval > param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sfle_s) {
-  if((float)PARAM0 <= (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval <= param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sflt_s) {
-  if((float)PARAM0 < (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval < param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sfne_s) {
-  if((float)PARAM0 != (float)PARAM1)
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1;
+  param0.hval = PARAM0;
+  param1.hval = PARAM1;
+  if(param0.fval != param1.fval)
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  } else l_invalid();
 }
 INSTRUCTION (lf_sub_s) {
-  SET_PARAM0((float)PARAM1 - (float)PARAM2);
+  if (config.cpu.hardfloat) {
+  FLOAT param0, param1, param2;
+  param1.hval = PARAM1;
+  param2.hval = PARAM2;
+  param0.fval = param1.fval - param2.fval;
+  SET_PARAM0(param0.hval); 
+  } else l_invalid();
 }
 
 /******* Custom instructions *******/
@@ -613,4 +689,12 @@ INSTRUCTION (l_cust2) {
 INSTRUCTION (l_cust3) {
 }
 INSTRUCTION (l_cust4) {
+}
+INSTRUCTION (lf_cust1) {
+}
+INSTRUCTION (lf_cust2) {
+}
+INSTRUCTION (lf_cust3) {
+}
+INSTRUCTION (lf_cust4) {
 }
