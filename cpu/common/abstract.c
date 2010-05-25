@@ -167,10 +167,6 @@ reg_mem_area (oraddr_t addr, uint32_t size, unsigned mc_dev,
   unsigned int addr_mask = ~size_mask;
   struct dev_memarea *mem;
 
-  printf ("Reg mem area, addr = 0x%08lx, size_mask = 0x%08lx, "
-	  "addr_mask = 0x%08lx\n", (unsigned long int) addr,
-	  (unsigned long int) size_mask, (unsigned long int) addr_mask);
-
   mem = register_memoryarea_mask (addr_mask, addr & addr_mask, size_mask + 1,
 				  mc_dev);
 

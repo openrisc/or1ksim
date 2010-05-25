@@ -1,3 +1,45 @@
+2010-05-25  Julius Baxter <julius.baxter@orsoc.se>
+	* profiler.c: PROF_DEBUG added as symbol, MAX_STACK increased.
+	(prof_acquire): Conditional debugging statements added.
+	* profiler.h: MAX_FUNCS increased.
+
+2010-05-25  Jungsook yang <jungsook.yang@uci.edu>
+	* cpu/common/labels.c (add_label): Improved commenting.
+	* cpu/or32/generate.c (generate_header): extend typedef generation
+	for FP opcodes.
+	* cpu/or32/insnset.c <lf_add_s>: Implementation added.
+	<lf_def_s>: Implementation added.
+	<ftoi_s>: Implementation added.
+	<mad_s>: Implementation added.
+	<mul_s>: Implementation added.
+	<rem_s>: Implementation added.
+	<sfeq_s>: Implementation added.
+	<sfge_s>: Implementation added.
+	<sfgt_s>: Implementation added.
+	<sfle_s>: Implementation added.
+	<sflt_s>: Implementation added.
+	<sfne_s>: Implementation added.
+	<sub_s>: Implementation added.
+	<lf_cust1>: Placeholder added.
+	<lf_cust2>: Placeholder added.
+	<lf_cust3>: Placeholder added.
+	<lf_cust4>: Placeholder added.
+	* cpu-config.c (cpu_hardfloat): Function added.
+	(reg_cpu_sec): "hardfloat" parameter added.
+	* doc/or1ksim.texi <CPU Configuration>: Documentation of
+	"hardfloat" added.
+	* sim-config.c (init_defconfig): config.cpu.hardfloat initialized.
+	* sim-config.h <struct config>: cpu.hardfloat field added.
+
+2010-05-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/common/abstract.c (reg_mem_area): Remove debugging printf ().
+	* peripheral/generic.c (generic_read_byte): Pass class ptr to upcall.
+	(generic_write_byte): Pass class ptr to upcall.
+	(generic_read_hw): Pass class ptr to upcall.
+	(generic_write_hw): Pass class ptr to upcall.
+	(generic_read_word): Pass class ptr to upcall.
+	(generic_write_word): Pass class ptr to upcall.
+
 2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	configure.ac: Date of version updated.
 	configure: Regenerated.
@@ -17,7 +59,7 @@
 	over-run.
 	(wishbone_read): Correcly handle under- and over-run.
 	(wishbone_write): Correcly handle under- and over-run.
-	
+
 2010-05-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* debug/jtag.c (construct_response): Return type changed to void.
 	(go_command): Number of bits passed as arg and on to subsidiary

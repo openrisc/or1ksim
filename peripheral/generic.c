@@ -128,7 +128,8 @@ generic_read_byte (oraddr_t  addr,
       memset (mask, 0, sizeof (mask));
       mask[bytenum] = 0xff;
 
-      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+      if (0 != config.ext.read_up (config.ext.class_ptr, wordaddr, mask, res,
+				   4))
 	{
 	  fprintf (stderr, "Warning: external byte read failed.\n");
 	  return  0;
@@ -185,7 +186,8 @@ generic_write_byte (oraddr_t  addr,
       mask[bytenum] = 0xff;
       val[bytenum]  = value;
 
-      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+      if (0 != config.ext.write_up (config.ext.class_ptr, wordaddr, mask, val,
+				    4))
 	{
 	  fprintf (stderr, "Warning: external byte write failed.\n");
 	}
@@ -249,7 +251,8 @@ generic_read_hw (oraddr_t  addr,
       mask[hwnum    ] = 0xff;
       mask[hwnum + 1] = 0xff;
 
-      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+      if (0 != config.ext.read_up (config.ext.class_ptr, wordaddr, mask, res,
+				   4))
 	{
 	  fprintf (stderr, "Warning: external half word read failed.\n");
 	  return  0;
@@ -327,7 +330,8 @@ generic_write_hw (oraddr_t  addr,
       val[hwnum    ] = (unsigned char) (value     );
 #endif
 
-      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+      if (0 != config.ext.write_up (config.ext.class_ptr, wordaddr, mask, val,
+				    4))
 	{
 	  fprintf (stderr, "Warning: external half word write failed.\n");
 	}
@@ -383,7 +387,8 @@ generic_read_word (oraddr_t  addr,
       /* Set the mask, read and get the result */
       memset (mask, 0xff, sizeof (mask));
 
-      if (0 != config.ext.read_up (NULL, wordaddr, mask, res, 4))
+      if (0 != config.ext.read_up (config.ext.class_ptr, wordaddr, mask, res,
+				   4))
 	{
 	  fprintf (stderr, "Warning: external full word read failed.\n");
 	  return  0;
@@ -462,7 +467,8 @@ generic_write_word (oraddr_t  addr,
       val[0] = (unsigned char) (value      );
 #endif
 
-      if (0 != config.ext.write_up (NULL, wordaddr, mask, val, 4))
+      if (0 != config.ext.write_up (config.ext.class_ptr, wordaddr, mask, val,
+				    4))
 	{
 	  fprintf (stderr, "Warning: external full word write failed.\n");
 	}

@@ -1,4 +1,4 @@
-/* abstract.c -- Abstract entities, handling labels
+/* labels.c -- Abstract entities, handling labels
 
    Copyright (C) 2001 Marko Mlinar, markom@opencores.org
    Copyright (C) 2008 Embecosm Limited
@@ -58,7 +58,7 @@ void
 add_label (oraddr_t addr, char *name)
 {
   struct label_entry **tmp;
-  tmp = &(label_hash[addr % LABELS_HASH_SIZE]); 
+  tmp = &(label_hash[addr % LABELS_HASH_SIZE]);
   for (; *tmp; tmp = &((*tmp)->next)); // Find the next NULL label entry pointer (loop while the pointer de-refernce is non-NULL)
   *tmp = malloc (sizeof (**tmp)); // allocate space for the pointer to the hash entry pointer
   (*tmp)->name = malloc (strlen (name) + 1); // now allocate space for the name string
