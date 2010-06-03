@@ -27,7 +27,7 @@
 # Run the keyboard test. Note the need for double quoting of "backslash"
 # characters.
 run_or1ksim "kbdtest"              \
-    [list "Reading from keyboard." \
+    [list "!Reading from keyboard." \
 	  "Enabling interrupts."   \
           "Received 'T'"           \
           "Received 'e'"           \
@@ -38,10 +38,10 @@ run_or1ksim "kbdtest"              \
           "Received '<'"           \
           "Received '/'"           \
           "Received '.'"           \
-          "Received '\\\\'"        \
+          "Received '\\'"          \
           "Received '|'"           \
           "Received '\"'"          \
-          "Received '\\\''"        \
+          "Received '\''"          \
           "Received '`'"           \
           "Received '}'"           \
           "Received ']'"           \
@@ -54,6 +54,6 @@ run_or1ksim "kbdtest"              \
           "Received ')'"           \
           "Received '*'"           \
           "Received: ENTER"        \
-	  "report(0xdeaddead);"    \
-	  "exit(0)"]               \
+	  "!report(0xdeaddead);"    \
+	  "!exit(0)"]               \
     "kbdtest.cfg" "kbdtest/kbdtest"

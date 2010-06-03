@@ -53,6 +53,7 @@ SUBDIRS = support       \
 	  exit          \
 	  ext           \
 	  fbtest        \
+	  fp            \
 	  functest      \
 	  flag          \
 	  inst-set-test \
@@ -61,6 +62,7 @@ SUBDIRS = support       \
 	  kbdtest       \
 	  local-global  \
 	  loop          \
+	  lws-test      \
 	  mc-async      \
 	  mc-dram       \
 	  mc-ssram      \

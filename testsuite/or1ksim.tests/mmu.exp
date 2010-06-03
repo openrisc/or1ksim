@@ -136,6 +136,6 @@ run_or1ksim "mmu"                                \
           "ta = 0017e000"                        \
           "ea = 0017c000 set = 62 way = 0"       \
           "ea = 0017c000 set = 62 way = 0"       \
-          "report(0xdeaddead);"                  \
-	  "exit(0)"]                             \
+          "!report(0xdeaddead);"                  \
+	  "!exit(0)"]                             \
     "mmu.cfg" "mmu/mmu"

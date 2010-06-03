@@ -1,3 +1,24 @@
+2010-06-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Added creation of lws-test makefile
+	* fp/fp.S (_puts): Fixed register usage.
+	* lws-test: Directory created.
+	* lws-test/lws-test.S: Created.
+	* lws-test/Makefile.am: Created.
+	* lws-test/Makefile.in: Generated.
+	* Makefile.am: Added lws-test directory
+	* Makefile.in: Regenerated.
+
+2010-06-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Added creation of FP test makefile
+	* fp: Directory created.
+	* fp/fp.S: Created.
+	* fp/Makefile.am: Created.
+	* fp/Makefile.in: Generated.
+	* Makefile.am: Added FP test directory
+	* Makefile.in: Regenerated.
+
 2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* loop/loop-init.c (main): Initialize top of each memory block.
 	* loop/loop-report.c (main): Rewritten to ensure reliable

@@ -19,11 +19,14 @@ The GNU toolchain for OpenRISC 1000 is required to compile programs for use
 with Or1ksim. Instructions how to build these GNU tools can be found on
 www.opencores.org
 
+Both the tool chain and DejaGnu are need to run the test suite.
+
 
 Installation
 ============
 
-See the file INSTALL for generic installation instructions. Full details are in the user guide, which can be found in the 'doc' subdirectory.
+See the file INSTALL for generic installation instructions. Full details are
+in the user guide, which can be found in the 'doc' subdirectory.
 
 
 GNU Tools
@@ -74,4 +77,4 @@ For more information visit us at http://www.opencores.org.
 
 
 Upated by Jeremy Bennett (jeremy.bennett@embecosm.com)
-20 April 2010
+3 June 2010

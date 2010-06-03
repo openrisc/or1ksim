@@ -1,6 +1,6 @@
-# Basic CPU test using DejaGNU under automake
+# Makefile.am for or1ksim testsuite CPU test program: lws-test
 
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) Embecosm Limited, 2010
 
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
@@ -24,15 +24,9 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the basic test
-run_or1ksim "basic" \
-    [list "report(0xffff0012);" \
-          "report(0x12352af7);" \
-          "report(0x7ffffffe);" \
-          "report(0xffffa5a7);" \
-          "report(0x000fffff);" \
-          "report(0x00002800);" \
-          "report(0x00000009);" \
-          "report(0xdeaddead);" \
-          "!exit(0)"] \
-    "" "basic/basic"
+# A test program of the l.lws instruction
+check_PROGRAMS   = lws-test
+
+lws_test_SOURCES = lws-test.S
+
+lws_test_LDFLAGS = -T$(srcdir)/../default.ld

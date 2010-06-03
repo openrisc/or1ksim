@@ -25,17 +25,18 @@
 
 
 # Run the Function parameter test.
-run_or1ksim "functest"          \
-    [list "0"                   \
-          "2"                   \
-          "4"                   \
-          "6"                   \
-          "8"                   \
-          "10"                  \
-          "12"                  \
-          "14"                  \
-          "16"                  \
-          "18"                  \
-          "report(0x00000014);" \
-	  "exit(0)"]            \
+run_or1ksim "functest"           \
+    [list "0"                    \
+          "2"                    \
+          "4"                    \
+          "6"                    \
+          "8"                    \
+          "10"                   \
+          "12"                   \
+          "14"                   \
+          "16"                   \
+          "18"                   \
+          "report(0x00000014);"  \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"]            \
     "" "functest/functest"

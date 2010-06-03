@@ -26,14 +26,14 @@
 
 # Run the DMA test
 run_or1ksim "dmatest" \
-    [list "Starting DMA test" \
-	  "  Simple DMA: report(0x00000001);" \
+    [list "!Starting DMA test" \
+	  "!  Simple DMA: report(0x00000001);" \
 	  "Passed" \
-	  "  Chunks DMA: report(0x00000006);" \
+	  "!  Chunks DMA: report(0x00000006);" \
 	  "Passed" \
-	  "  List DMA: report(0x0000000a);" \
+	  "!  List DMA: report(0x0000000a);" \
 	  "Passed" \
-	  "Ending DMA test" \
-          "report(0xdeaddead);" \
-	  "exit(0)"] \
+	  "!Ending DMA test" \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"] \
     "" "dmatest/dmatest"

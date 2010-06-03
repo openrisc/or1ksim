@@ -38,6 +38,6 @@ run_or1ksim "cfg" \
 	  "report(0x0000000f);" \
 	  "report(0x00000000);" \
 	  "report(0xf0acfad0);" \
-          "report(0xdeaddead);" \
-	  "exit(0)"] \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"] \
     "" "cfg/cfg"

@@ -27,5 +27,5 @@
 # Run the Interrupt controller test
 run_or1ksim "flag"              \
     [list "report(0xdeaddead);" \
-	  "exit(0)"]            \
+	  "!exit(0)"]            \
     "" "flag/flag"

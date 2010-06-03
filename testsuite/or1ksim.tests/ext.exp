@@ -130,6 +130,6 @@ run_or1ksim "ext"               \
           "report(0x7fff7f7f);" \
           "report(0x12345678);" \
           "report(0x12345678);" \
-	  "report(0xdeaddead);" \
-	  "exit(0)"]            \
+	  "!report(0xdeaddead);" \
+	  "!exit(0)"]            \
     "" "ext/ext"

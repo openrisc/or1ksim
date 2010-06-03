@@ -110,8 +110,13 @@ to GNU @command{configure} scripts.  Use @kbd{configure --help} to see
 all the options.  The most useful is @code{--prefix} to specify a
 directory for installation of the tools.
 
-A number of @value{OR1KSIM} features in the simulator do require enabling at
-configuration.  These include
+For testing (using @command{make check}), the @code{--target} parameter
+@emph{must} be specified, to allow the target tool chain to be
+selected. If the tools have been installed using the standard OpenRISC
+script, then this should be set to @code{or32-elf}.
+
+A number of @value{OR1KSIM} specific features in the simulator do
+require enabling at configuration.  These include
 
 @table @code
 @item --enable-profiling
@@ -343,9 +348,28 @@ design, and can only be fixed by a complete rewrite.  The entire source
 code uses static global constants liberally!
 
 @item
-There is no support for floating point instructions currently in
-@value{OR1KSIM}.  However this is a work in progress and should be available in
-the future.
+@cindex floating point support
+There is no support for single precision floating point instructions in
+@value{OR1KSIM} if configured in the CPU (@pxref{CPU Configuration, ,
+CPU Configuration}).  These are implemented using the floating point
+support in the host C library, which will usually be IEEE 745 compliant.
+There is at present no support for double precision floating point
+instructions, since these are meaningless with 32-bit registers.
+
+Floating point support within OpenRISC is intended to follow IEEE 745,
+which offers a degree of configurability. However at present the FPSCR
+register is not supported, so there is no mechanism for configuring
+floating point behavior. Thus the default functionality of the host C
+library will be used.
+
+@item
+@cindex floating point multiply and add
+@cindex lf.madd.s
+The single precision floating point multiply and add instruction,
+@code{lf.madd.s}, is not clearly specified in the original architectural
+manual. User should consult the @cite{OpenRISC 1200 version 2
+Supplementary Programmer's Reference Manual} for a specification of the
+functionality implemented.
 
 @end itemize
 
@@ -722,6 +746,45 @@ previously asserted by a call to @code{or1ksim_interrupt_set}.  A warning will
 be generated, and the interrupt request ignored if edge sensitive interrupts
 have been configured with the programmable interrupt controller
 (@pxref{Interrupt Configuration, , Interrupt Configuration}).
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_reset ()
+
+Drive a reset sequence through the JTAG interface. Return the (model)
+time taken for this action.  Remember that the JTAG has its own clock,
+which can be an order of magnitude slower than the main clock, so even a
+reset (5 JTAG cycles) could take 50 processor clock cycles to complete.
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir (unsigned
+char *@var{jreg}, int @var{num_bits})
+
+Shift the supplied register through the JTAG instruction
+register.  Return the (model) time taken for this action. The register is
+supplied as a byte vector, with the least significant bits in the least
+significant byte.  If the total number of bits is not an exact number of
+bytes, then the odd bits are found in the least significant end of the
+highest numbered byte.
+
+For example a 12-bit register would have bits 0-7 in byte 0 and bits
+11-8 in the least significant 4 bits of byte 1.
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_dr (unsigned
+char *@var{jreg}, int @var{num_bits})
+
+Shift the supplied register through the JTAG data register.  Return the
+(model) time taken for this action. The register is supplied as a byte
+vector, with the least significant bits in the least significant byte.
+If the total number of bits is not an exact number of bytes, then the
+odd bits are found in the least significant end of the highest numbered
+byte.
+
+For example a 12-bit register would have bits 0-7 in byte 0 and bits
+11-8 in the least significant 4 bits of byte 1.
 
 @end deftypefn
 
@@ -3218,6 +3281,7 @@ make tags
 * Global Data Structures::
 * Concepts::
 * Internal Debugging::
+* Regression Testing::
 @end menu
 
 @node Coding Conventions
@@ -3484,6 +3548,113 @@ in the simulator configuration (@pxref{Simulator Behavior, , Simulator
 Behavior}) is greater than or equal to this value, the remaining
 arguments are printed to the current output stream (@pxref{Output
 Redirection, , Output Redirection}).
+
+@node Regression Testing
+@section Regression Testing
+@cindex regression testing
+@cindex testing
+@value{OR1KSIM} now includes a regression test suite for both standalone
+and library usage as described earlier (@pxref{Build and Install,
+, Building and Installing}).  Running the tests requires that the
+OpenRISC toolchain and DejaGNU are both installed.
+
+Tests are written using @command{expect}, a derivative of TCL.
+Documentation of DejaGnu, @command{expect} and TCL are freely available
+on the Web.  The Embecosm Application Note 8, @cite{Howto: Using DejaGnu
+for Testing: A Simple Introduction}
+(@uref{http://www.embecosm.com/download/ean8.html}) provides a concise
+introduction.
+
+All test code is found in the @file{testsuite} directory.  The key
+files and directories used are as follows.
+
+@table @code
+@item global-conf.exp
+@cindex DejaGnu configuration
+This is the global DejaGNU configuration file used to set up parameters
+common to all tests.  If the user has the environment varialbe
+@env{DEJAGNU} defined, it will be used instead, but this is not
+recommended.
+
+@item Makefile.am
+@cindex test make file
+@cindex make file for tests
+This is the top level @command{automake} file for the testsuite.  The
+only changes likely to be needed here is additional local cleanup of
+files created by new tests.
+
+@item README
+@cindex test README
+This contains details of all the tests
+
+@item config
+@cindex DejaGnu board configurations
+This contains DejaGnu board configurations.  Since the tests are
+generally run on a Unix host, this should just contain @file{Unix.exp}.
+
+@item lib
+@cindex DejaGnu tool specific configuration
+This contains DejaGnu tool specific configurations.  ``Tool'' has a
+specific meaning in DejaGNU, referring just to a grouping of tests.  In
+this case there are two such ``tools'', ``or1ksim'' and ``libsim''
+for tests of the standalone tool and tests of the library.
+
+Corresponding to this, there are two tool specific configuration files,
+@file{or1ksim.exp} and @file{libsim.exp}.  These contain @command{expect}/TCL
+procedures for common use among the tests.
+
+@item libsim.tests
+@itemx or1ksim.tests
+@cindex DejaGNU tests directories
+These are the directories of tests of the Or1ksim library.  They also include
+@value{OR1KSIM} configuration files and each has a @file{Makefile.am} file.
+@file{Makefile.am} should be updated whenever files are added to this
+directory, to ensure they are included in the distribution.
+
+@item test-code
+@cindex host test code
+@cindex test code for host
+These are all the test programs to be compiled on the host (each in its
+own directory).  In general these are programs to support testing of the
+library, and build various programs linking in the library.
+
+@item test-code
+@cindex target test code
+@cindex test code for target
+These are all the test programs to be compiled with the OpenRISC tool
+chain to run with either standalone @value{OR1KSIM} or the library. This
+directory includes its own @file{configure.ac}, since it must set up a
+separate tool chain based on the target, not the host.
+
+@end table
+
+To add a new test needs the following steps.
+
+@itemize @bullet
+
+@item
+Put new host C code in its own directory within @file{test-code}. Add
+the directory to the existing @file{Makefile.am} in the @file{test-code}
+directory and create a @file{Makefile.am} in the new directory to
+drive building the test program(s). Don't forget to add the new
+@file{Makefile} to the top level @file{configure.ac} so it gets generated. Not
+all tests require code here.
+
+@item
+Put new target C code in its own directory within
+@file{test-code-or1k}. Once again modify & create
+@file{Makefile.am}. this time though modify the @file{configure.ac} in
+the @file{test-code-or1k} so the @file{Makefile} gets generated. The
+existing programs provide examples to start from, including custom
+linker scripts where needed.
+
+@item
+Add one or more tests and configuration files to the relevant ``tool''
+test directory. Use the existing tests as templates. They make heavy use
+of the @command{expect}/TCL procedures in the @file{config} directory to
+facilitate driving the tests.
+
+@end itemize
 
 @node  GNU Free Documentation License
 @chapter GNU Free Documentation License

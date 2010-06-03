@@ -12,8 +12,9 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 21 tests of the standalone simulator and 14
-tests of the library compile, run and pass.
+At the time of writing a total of 1,063 tests compile, run and pass. That
+figure is broken down into 799 tests of the standalone simulator and 264 tests
+of the library
 
 Configuration and make files are provided for further test programs. These
 come in three categories.
@@ -45,44 +46,46 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
+A total of 799 tests of standalone Or1ksim:
+
+basic:          8 tests of a wide range of instructions and registers.
+cache:	        5 tests of the Or1ksim cache modeling
+cbasic:        19 tests of minimal C functionality
+cfg:           12 tests of the OR1K configuration register
+dhry:           1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
+dmatest:        3 tests of DMA.
+eth:	       12 tests of the Ethernet interface.
+except-test:    7 tests of OR1K exception handling
+exit:           1 test that C program exits correctly
+ext:          104 tests of the sign extension (l.ext) instructions.
+fbtest:         1 test of the frame buffer.
+fp	      337 tests of floating point functionality (Feature 413).
+functest:      11 tests of the C function calling interface.
+flag:           1 test of Supervision Register (SR) flag bits.
+int-test:      86 tests of the programmable interrupt controller.
+kbdtest:       26 tests of the PS2 keyboard interface.
+local-global:   1 test of C local and global variables.
+lws-test:      13 tests of the l.lws instruction (Bug 1767).
+mem-test:      16 tests of simple memory access.
+mmu:          110 tests of the MMU.
+mul:            5 tests of the multiply functionality.
+mycompress:     1 test using a compression program.
+tick:          19 tests of the OR1K tick timer.
+
 A total of 264 tests of the libsim library:
 
-int-edge:              6 tests of edge triggered interrupts.
-int-level:             5 tests of level triggered interrupts. 
-lib-iftest:            1 test of the basic library interface functions.
+int-edge:               6 tests of edge triggered interrupts.
+int-level:              5 tests of level triggered interrupts. 
+lib-iftest:             1 test  of the basic library interface functions.
 jtag-basic:            17 tests of JTAG reset and instruction selection
 jtag-go-command-read:  60 tests of JTAG GO_COMMAND for reading
 jtag-go-command-write: 54 tests of JTAG GO_COMMAND for writing
 jtag-read-command:     18 tests of JTAG READ_COMMAND
-jtag-read-control:     8 tests of JTAG READ_CONTROL
+jtag-read-control:      8 tests of JTAG READ_CONTROL
 jtag-select-module:    20 tests of JTAG module selection
 jtag-write-command:    58 tests of JTAG WRITE_COMMAND
 jtag-write-control:    13 tests of JTAG WRITE_CONTROL
-upcalls:               2 tests of the upcall interface.
-
-A total of 21 tests of standalone Or1ksim:
-
-basic:        A test of a wide range of instructions and registers.
-cache:	      A test of the Or1ksim cache modeling
-cbasic:       A minimal test in C
-cfg:          A test of the OR1K configuration register
-dhry:         Dhrystone 2.1 benchmark using Or1ksim's timing facility.
-dmatest:      A test of DMA.
-eth:	      A test of the Ethernet interface.
-except-test:  A test of OR1K exception handling
-exit:         A test that C program exits correctly
-ext:          A test of the sign extension (l.ext) instructions.
-fbtest:       A test of the frame buffer.
-functest:     A test of the C function calling interface.
-flag:         A test of Supervision Register (SR) flag bits.
-int-test:     A test of the programmable interrupt controller.
-kbdtest:      A test of the PS2 keyboard interface.
-local-global: A test of C local and global variables.
-mem-test:     A simple memory test.
-mmu:          A test of the MMU.
-mul:          A test of the multiply functionality.
-mycompress:   A compression program.
-tick:         A test of the OR1K tick timer.
+upcalls:                2 tests of the upcall interface.
 
 Tests which build, but do not run to completion
 ===============================================
@@ -115,4 +118,4 @@ inst-set-test:  a comprehensive test of the instruction set using C.
 
 
 Updated by Jeremy Bennett (jeremy@jeremybennett.com)
-28 April 2010
+3 June 2010

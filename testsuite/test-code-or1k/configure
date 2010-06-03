@@ -12684,7 +12684,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files Makefile acv-gpio/Makefile acv-uart/Makefile basic/Makefile cache/Makefile cbasic/Makefile cfg/Makefile dhry/Makefile dmatest/Makefile eth/Makefile except/Makefile except-test/Makefile exit/Makefile ext/Makefile fbtest/Makefile functest/Makefile flag/Makefile int-test/Makefile int-logger/Makefile inst-set-test/Makefile kbdtest/Makefile local-global/Makefile loop/Makefile mc-async/Makefile mc-dram/Makefile mc-ssram/Makefile mc-sync/Makefile mc-common/Makefile mem-test/Makefile mmu/Makefile mul/Makefile mycompress/Makefile support/Makefile tick/Makefile uos/Makefile upcalls/Makefile"
+ac_config_files="$ac_config_files Makefile acv-gpio/Makefile acv-uart/Makefile basic/Makefile cache/Makefile cbasic/Makefile cfg/Makefile dhry/Makefile dmatest/Makefile eth/Makefile except/Makefile except-test/Makefile exit/Makefile ext/Makefile fbtest/Makefile fp/Makefile functest/Makefile flag/Makefile int-test/Makefile int-logger/Makefile inst-set-test/Makefile kbdtest/Makefile local-global/Makefile loop/Makefile lws-test/Makefile mc-async/Makefile mc-dram/Makefile mc-ssram/Makefile mc-sync/Makefile mc-common/Makefile mem-test/Makefile mmu/Makefile mul/Makefile mycompress/Makefile support/Makefile tick/Makefile uos/Makefile upcalls/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -13601,6 +13601,7 @@ do
     "exit/Makefile") CONFIG_FILES="$CONFIG_FILES exit/Makefile" ;;
     "ext/Makefile") CONFIG_FILES="$CONFIG_FILES ext/Makefile" ;;
     "fbtest/Makefile") CONFIG_FILES="$CONFIG_FILES fbtest/Makefile" ;;
+    "fp/Makefile") CONFIG_FILES="$CONFIG_FILES fp/Makefile" ;;
     "functest/Makefile") CONFIG_FILES="$CONFIG_FILES functest/Makefile" ;;
     "flag/Makefile") CONFIG_FILES="$CONFIG_FILES flag/Makefile" ;;
     "int-test/Makefile") CONFIG_FILES="$CONFIG_FILES int-test/Makefile" ;;
@@ -13609,6 +13610,7 @@ do
     "kbdtest/Makefile") CONFIG_FILES="$CONFIG_FILES kbdtest/Makefile" ;;
     "local-global/Makefile") CONFIG_FILES="$CONFIG_FILES local-global/Makefile" ;;
     "loop/Makefile") CONFIG_FILES="$CONFIG_FILES loop/Makefile" ;;
+    "lws-test/Makefile") CONFIG_FILES="$CONFIG_FILES lws-test/Makefile" ;;
     "mc-async/Makefile") CONFIG_FILES="$CONFIG_FILES mc-async/Makefile" ;;
     "mc-dram/Makefile") CONFIG_FILES="$CONFIG_FILES mc-dram/Makefile" ;;
     "mc-ssram/Makefile") CONFIG_FILES="$CONFIG_FILES mc-ssram/Makefile" ;;

@@ -45,12 +45,15 @@ EXTRA_DIST = acv-gpio.cfg     \
              ext.exp          \
              fbtest.exp       \
              flag.exp         \
+	     fp.cfg           \
+	     fp.exp           \
              functest.exp     \
              int-test.exp     \
              kbdtest.cfg      \
              kbdtest.exp      \
              kbdtest.rx       \
              local-global.exp \
+	     lws-test.exp     \
              mem-test.exp     \
              mmu.cfg          \
              mmu.exp          \

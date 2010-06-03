@@ -113,6 +113,6 @@ run_or1ksim "int-test"          \
           "report(0x00000034);" \
           "report(0x00000660);" \
           "report(0x00000038);" \
-          "report(0xdeaddead);" \
-	  "exit(0)"]            \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"]            \
     "" "int-test/int-test"

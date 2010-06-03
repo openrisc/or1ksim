@@ -31,5 +31,5 @@ run_or1ksim "cache" \
           "report(0xdeaddead);" \
           "report(0xdeaddead);" \
           "report(0xdeaddead);" \
-          "exit(0)"] \
+          "!exit(0)"] \
     "" "cache/cache"

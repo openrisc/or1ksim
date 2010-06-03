@@ -1,3 +1,38 @@
+2010-06-03  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/fp.exp: Removed timeout change
+	* or1ksim.tests/lws-test.exp: Created.
+	* or1ksim/test/Makefile.am: Added lws-test & config.
+	* or1ksim/test/Makefile.in: Regenerated.
+
+2010-06-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* lib/or1ksim.exp: Use same matching as libsim.exp, treat each
+	match as a pass.
+	* or1ksim/test/basic.exp: Unreported test entries marked.
+	* or1ksim/test/cache.exp: Unreported test entries marked.
+	* or1ksim/test/cbasic.exp: Unreported test entries marked.
+	* or1ksim/test/cfg.exp: Unreported test entries marked.
+	* or1ksim/test/dhry.exp: Unreported test entries marked.
+	* or1ksim/test/dmatest.exp: Unreported test entries marked.
+	* or1ksim/test/eth.exp: Unreported test entries marked.
+	* or1ksim/test/except-test.exp: Unreported test entries marked.
+	* or1ksim/test/exit.exp: Unreported test entries marked.
+	* or1ksim/test/ext.exp: Unreported test entries marked.
+	* or1ksim/test/fbtest.exp: Unreported test entries marked.
+	* or1ksim.tests/fp.cfg: Created.
+	* or1ksim.tests/fp.exp: Created.
+	* or1ksim/test/functest.exp: Unreported test entries marked.
+	* or1ksim/test/flag.exp: Unreported test entries marked.
+	* or1ksim/test/int-test.exp: Unreported test entries marked.
+	* or1ksim/test/kbdtest.exp: Unreported test entries marked.
+	* or1ksim/test/local-global.exp: Unreported test entries marked.
+	* or1ksim/test/Makefile.am: Added floating point test & config.
+	* or1ksim/test/Makefile.in: Regenerated.
+	* or1ksim/test/mem-test.exp: Unreported test entries marked.
+	* or1ksim/test/mmu.exp: Unreported test entries marked.
+	* or1ksim/test/mul.exp: Unreported test entries marked.
+	* or1ksim/test/mycompress.exp: Unreported test entries marked.
+	* or1ksim/test/tick.exp: Unreported test entries marked.
+
 2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* lib/libsim.exp (run_libsim): Expect clause corrected to detect
 	all unexpected warning/errors.
@@ -49,7 +84,6 @@
 	<SELECT_MODULE READ_COMMAND module 4>: Check for correct access type.
 	<SELECT_MODULE READ_COMMAND module 14>: Check for correct access
 	type.
-	
 
 2010-05-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* libsim.tests/default.cfg: Add memory block at top of memory.

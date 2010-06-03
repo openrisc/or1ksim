@@ -1,4 +1,4 @@
-# fbtest.exp. Frame buffer test using DejaGNU under automake
+# lws-test.exp. Test of l.lws using DejaGNU under automake
 
 # Copyright (C) 2010 Embecosm Limited
 
@@ -24,14 +24,23 @@
 # -----------------------------------------------------------------------------
 
 
-# This takes time. Timeout 30 seconds is more suitable than the default
-set old_timeout $timeout
-set timeout 30
-
 # Run the Frame buffer test
-run_or1ksim "fbtest"                  \
-    [list "report(0xdeaddead);"    \
-	  "!exit(0)"]               \
-    "" "fbtest/fbtest"
-
-set timeout $old_timeout
+run_or1ksim "lws-test"                            \
+    [list "!l.lws"                                \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "!Test completed"                       \
+          "!report(0xdeaddead);"                  \
+	  "!exit(0)"]                             \
+    "" "lws-test/lws-test"

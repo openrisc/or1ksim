@@ -19,7 +19,7 @@
    more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program.  If not, see <http:  www.gnu.org/licenses/>.  */
+   with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* ----------------------------------------------------------------------------
    This code is commented throughout for use with Doxygen.
@@ -46,7 +46,7 @@
 
    @return  The computed CRC.                                                */
 /* --------------------------------------------------------------------------*/
-unsigned long int
+static unsigned long int
 crc32 (unsigned long long int  value,
        int                     num_bits,
        unsigned long int       crc_in)
@@ -60,7 +60,7 @@ crc32 (unsigned long long int  value,
   static const unsigned long int  CRC32_POLY = 0x04c11db7;
   int                             i;
 
-  // Compute the CRC, MS bit first
+  /* Compute the CRC, MS bit first */
   for (i = num_bits - 1; i >= 0; i--)
     {
       unsigned long int  d;

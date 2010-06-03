@@ -26,7 +26,7 @@
 
 # Run the Ethernet test
 run_or1ksim "eth"                  \
-    [list "Starting Ethernet test" \
+    [list "!Starting Ethernet test" \
           "enable ints"            \
           "set mask flags TX"      \
           "Init"                   \
@@ -39,7 +39,7 @@ run_or1ksim "eth"                  \
           "SetFlags"               \
           "Int"                    \
           "Receive Frame"          \
-          "Ending Ethernet test"   \
-          "report(0xdeaddead);"    \
-	  "exit(0)"]               \
+          "!Ending Ethernet test"   \
+          "!report(0xdeaddead);"    \
+	  "!exit(0)"]               \
     "eth.cfg" "eth/eth"

@@ -94,10 +94,6 @@ set_csc_tms (int cs, uint32_t csc, uint32_t tms, struct mc *mc)
 	{
 	  /* FIXME: No peripheral should _ever_ acess a dev_memarea structure
 	   * directly */
-	  printf ("mem->addr_mask 0x%08lx, ba_mask 0x%08lx\n", 
-		  (unsigned long int) cur->mem->addr_mask,
-		  (unsigned long int) mc->ba_mask);
-
 	  cur->mem->addr_mask = mc->ba_mask << 22;
 	  cur->mem->addr_compare =
 	    ((csc >> MC_CSC_SEL_OFFSET) /* & 0xff */ ) << 22;

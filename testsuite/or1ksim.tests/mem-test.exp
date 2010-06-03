@@ -42,5 +42,5 @@ run_or1ksim "mem-test"          \
           "report(0xddccbbaa);" \
           "report(0xda25e544);" \
           "report(0xdeaddead);" \
-	  "exit(0)"]            \
+	  "!exit(0)"]            \
     "" "mem-test/mem-test"

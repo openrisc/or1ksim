@@ -107,6 +107,15 @@ INSTRUCTION (l_sh) {
     sbuf_store (t - old_cyc);
   }
 }
+INSTRUCTION (l_lws) {
+  uint32_t val;
+  if (config.cpu.sbuf_len) sbuf_load ();
+  val = eval_mem32(PARAM1, &breakpoint);
+  /* If eval operand produced exception don't set anything. JPB changed to
+     trigger on breakpoint, as well as except_pending (seemed to be a bug). */
+  if (!(except_pending || breakpoint))
+    SET_PARAM0(val);
+}
 INSTRUCTION (l_lwz) {
   uint32_t val;
   if (config.cpu.sbuf_len) sbuf_load ();
@@ -577,8 +586,8 @@ INSTRUCTION (lf_itof_s) {
 INSTRUCTION (lf_madd_s) {
   if (config.cpu.hardfloat) {
   FLOAT param0,param1, param2;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
+  param0.hval = (uorreg_t)PARAM0;
+  param1.hval = (uorreg_t)PARAM1;
   param2.hval = PARAM2;
   param0.fval += param1.fval * param2.fval; 
   SET_PARAM0(param0.hval);
@@ -598,7 +607,7 @@ INSTRUCTION (lf_rem_s) {
   FLOAT param0, param1, param2;
   param1.hval = PARAM1;
   param2.hval = PARAM2;
-  param0.fval = param1.fval / param2.fval;
+  param0.fval = fmodf (param1.fval, param2.fval);
   SET_PARAM0(param0.hval);
   } else l_invalid();
 }
@@ -691,10 +700,4 @@ INSTRUCTION (l_cust3) {
 INSTRUCTION (l_cust4) {
 }
 INSTRUCTION (lf_cust1) {
-}
-INSTRUCTION (lf_cust2) {
-}
-INSTRUCTION (lf_cust3) {
-}
-INSTRUCTION (lf_cust4) {
 }

@@ -29,16 +29,16 @@ run_or1ksim "except-test"                                             \
     [list "except_test"                                               \
           "dtlb_test"                                                 \
           "buserr_test"                                               \
-          "EXCEPTION: read out of memory (32-bit access to 0400e000)" \
-          "EXCEPTION: read out of memory (32-bit access to 04000000)" \
-          "EXCEPTION: read out of memory (32-bit access to 04006000)" \
-          "EXCEPTION: read out of memory (32-bit access to 04004000)" \
+          "!EXCEPTION: read out of memory (32-bit access to 0400e000)" \
+          "!EXCEPTION: read out of memory (32-bit access to 04000000)" \
+          "!EXCEPTION: read out of memory (32-bit access to 04006000)" \
+          "!EXCEPTION: read out of memory (32-bit access to 04004000)" \
           "illegal_insn_test"                                         \
           "align_test"                                                \
           "trap_test"                                                 \
           "except_priority_test"                                      \
-          "EXCEPTION: read out of memory (32-bit access to 0400c000)" \
-          "EXCEPTION: read out of memory (32-bit access to 04004000)" \
-          "report(0xdeaddead);"                                       \
-	  "exit(0)"]                                                  \
+          "!EXCEPTION: read out of memory (32-bit access to 0400c000)" \
+          "!EXCEPTION: read out of memory (32-bit access to 04004000)" \
+          "!report(0xdeaddead);"                                       \
+	  "!exit(0)"]                                                  \
     "" "except-test/except-test"

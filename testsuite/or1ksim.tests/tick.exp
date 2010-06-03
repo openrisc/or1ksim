@@ -45,6 +45,6 @@ run_or1ksim "tick"                                                            \
           "Test succeeded Continuous mode wrapped round"                    \
           "Test succeeded Spurious interrupts handled with matching period" \
           "Test succeeded Spurious interrupts handled after TTCR and TTMR"  \
-	  "report(0xdeaddead);"                                             \
-	  "exit(0)"]                                                        \
+	  "!report(0xdeaddead);"                                             \
+	  "!exit(0)"]                                                        \
     "" "tick/tick"

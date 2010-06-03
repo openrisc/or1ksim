@@ -1,3 +1,14 @@
+2010-06-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or32/generate.c (generate_header): Include math.h.
+	* cpu/or32/insnset.c <lf_lws>: Added definition.
+	* cpu/or32/insnset.c <lf_rem_s>: Corrected implementation.
+	* cpu/or32/or32.c <or32_opcodes>: Made l.lws valid, rather than
+	ignored.
+
+2010-05-31  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or32/insnset.c <lf_cust2, lf_cust3, lf_cust4>: Removed since
+	invalid.
+
 2010-05-25  Julius Baxter <julius.baxter@orsoc.se>
 	* profiler.c: PROF_DEBUG added as symbol, MAX_STACK increased.
 	(prof_acquire): Conditional debugging statements added.
