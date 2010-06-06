@@ -48,29 +48,31 @@ Working tests
 
 A total of 799 tests of standalone Or1ksim:
 
-basic:          8 tests of a wide range of instructions and registers.
-cache:	        5 tests of the Or1ksim cache modeling
-cbasic:        19 tests of minimal C functionality
-cfg:           12 tests of the OR1K configuration register
-dhry:           1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
-dmatest:        3 tests of DMA.
-eth:	       12 tests of the Ethernet interface.
-except-test:    7 tests of OR1K exception handling
-exit:           1 test that C program exits correctly
-ext:          104 tests of the sign extension (l.ext) instructions.
-fbtest:         1 test of the frame buffer.
-fp	      337 tests of floating point functionality (Feature 413).
-functest:      11 tests of the C function calling interface.
-flag:           1 test of Supervision Register (SR) flag bits.
-int-test:      86 tests of the programmable interrupt controller.
-kbdtest:       26 tests of the PS2 keyboard interface.
-local-global:   1 test of C local and global variables.
-lws-test:      13 tests of the l.lws instruction (Bug 1767).
-mem-test:      16 tests of simple memory access.
-mmu:          110 tests of the MMU.
-mul:            5 tests of the multiply functionality.
-mycompress:     1 test using a compression program.
-tick:          19 tests of the OR1K tick timer.
+basic:             8 tests of a wide range of instructions and registers.
+cache:             5 tests of the Or1ksim cache modeling
+cbasic:           19 tests of minimal C functionality
+cfg:              12 tests of the OR1K configuration register
+dhry:              1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
+dmatest:           3 tests of DMA.
+eth:              12 tests of the Ethernet interface.
+except-test:       7 tests of OR1K exception handling
+exit:              1 test that C program exits correctly
+ext:             104 tests of the sign extension (l.ext) instructions.
+fbtest:            1 test of the frame buffer.
+fp               337 tests of floating point functionality (Feature 413).
+functest:         11 tests of the C function calling interface.
+flag:              1 test of Supervision Register (SR) flag bits.
+int-test:         86 tests of the programmable interrupt controller.
+kbdtest:          26 tests of the PS2 keyboard interface.
+local-global:      1 test of C local and global variables.
+inst-set-test:       A collection of tests of individual instructions
+  is-div-test:     2 tests of tje l.div and l.divu instruction (Bug 1770).
+  is-lws-test:    13 tests of the l.lws instruction (Bug 1767).
+mem-test:         16 tests of simple memory access.
+mmu:             110 tests of the MMU.
+mul:               5 tests of the multiply functionality.
+mycompress:        1 test using a compression program.
+tick:             19 tests of the OR1K tick timer.
 
 A total of 264 tests of the libsim library:
 

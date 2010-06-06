@@ -213,7 +213,8 @@ INSTRUCTION (l_div) {
   if (temp3)
     temp1 = temp2 / temp3;
   else {
-    except_handle(EXCEPT_ILLEGAL, cpu_state.pc);
+    mtspr (SPR_SR, SPR_SR_CY | mfspr (SPR_SR));	/* Div by zero sets carry */
+    except_handle (EXCEPT_RANGE, cpu_state.pc);
     return;
   }
   SET_OV_FLAG_FN (temp1);
@@ -227,7 +228,8 @@ INSTRUCTION (l_divu) {
   if (temp3)
     temp1 = temp2 / temp3;
   else {
-    except_handle(EXCEPT_ILLEGAL, cpu_state.pc);
+    mtspr (SPR_SR, SPR_SR_CY | mfspr (SPR_SR));	/* Div by zero sets carry */
+    except_handle(EXCEPT_RANGE, cpu_state.pc);
     return;
   }
   SET_OV_FLAG_FN (temp1);

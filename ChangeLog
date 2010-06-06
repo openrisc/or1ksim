@@ -1,6 +1,13 @@
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/insnset.c <l_div, l_divu>: Corrected divide by zero
+	exception. Set carry flag on divide by zero.
+	* NEWS: Updated with bugs fixed.
+
 2010-06-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* cpu/or32/generate.c (generate_header): Include math.h.
-	* cpu/or32/insnset.c <lf_lws>: Added definition.
+	* cpu/or32/insnset.c <l_lws>: Added definition.
 	* cpu/or32/insnset.c <lf_rem_s>: Corrected implementation.
 	* cpu/or32/or32.c <or32_opcodes>: Made l.lws valid, rather than
 	ignored.

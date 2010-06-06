@@ -1,3 +1,13 @@
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.cfg: Created.
+	* or1ksim.tests/inst-set-test.exp: Created.
+	* or1ksim.tests/Makefile.am: Updated to reflect added and deleted
+	files.
+	* or1ksim.tests/Makefile.in: Regenerated
+	* or1ksim.tests/lws-test.exp: Deleted (incorporated within
+	inst-set-test.ex).
+	* README: Updated to reflect new structure.
+
 2010-06-03  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/fp.exp: Removed timeout change
 	* or1ksim.tests/lws-test.exp: Created.

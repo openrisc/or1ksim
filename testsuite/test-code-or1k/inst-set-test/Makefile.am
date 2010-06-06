@@ -1,4 +1,4 @@
-# Makefile.am for or1ksim testsuite CPU test program: inst-set-test
+# Makefile.am for or1ksim instruction set test programs:
 
 # Copyright (C) Embecosm Limited, 2010
 
@@ -24,15 +24,40 @@
 # -----------------------------------------------------------------------------
 
 
-# A test of the instruction set. Currently not working. Builds with warnings
-# and runs with errors.
+# Tests of the instruction set. Broken out into separate tests, to avoid them
+# getting too large. The original instruction set test is still here, but not
+# built by default.
+EXTRA_DIST = inst-set.ld  
+
 if BUILD_ALL_TESTS
-check_PROGRAMS        = inst-set-test
+INST_SET_TEST_OLD = inst-set-test-old
+else
+INST_SET_TEST_OLD = 
 endif
 
-inst_set_test_SOURCES = inst-set-test.c
+# Support library for use when testing the instruction set.
+check_LTLIBRARIES           = libinst-set-test.la
 
-inst_set_test_LDFLAGS = -T$(srcdir)/../default.ld
+libinst_set_test_la_SOURCES = inst-set-test.S
 
-inst_set_test_LDADD   = ../except/except.lo      \
-	                ../support/libsupport.la
+# The test programs
+check_PROGRAMS = is-div-test          \
+		 is-lws-test          \
+	         $(INST_SET_TEST_OLD)
+
+# The new instruction set tests.
+is_div_test_SOURCES = is-div-test.S
+is_div_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_div_test_LDADD   = inst-set-test.lo
+
+is_lws_test_SOURCES = is-lws-test.S
+is_lws_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_lws_test_LDADD   = inst-set-test.lo
+
+# The old test which builds with warnings and runs with errors
+inst_set_test_old_SOURCES = inst-set-test-old.c
+
+inst_set_test_old_LDFLAGS = -T$(srcdir)/../default.ld
+
+inst_set_test_old_LDADD   = ../except/except.lo      \
+	                    ../support/libsupport.la

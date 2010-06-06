@@ -62,7 +62,6 @@ SUBDIRS = support       \
 	  kbdtest       \
 	  local-global  \
 	  loop          \
-	  lws-test      \
 	  mc-async      \
 	  mc-dram       \
 	  mc-ssram      \

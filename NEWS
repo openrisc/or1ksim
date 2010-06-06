@@ -2,6 +2,19 @@
 	      ==================================================
 
 
+New in top of tree
+==================
+
+No new features are provided, pending full release of 0.4.0.
+
+The following bugs are fixed.
+* Bug 1770: l.div does not set carry or give correct exception.
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+
+
 New in release 0.4.0rc1
 =======================
 

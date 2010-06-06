@@ -1,3 +1,22 @@
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Removed	creation of lws-test makefile.
+	* fp/fp.S (_puts): Fixed register usage.
+	* inst-set-test/inst-set-test.ld: Created.
+	* inst-set-test/inst-set-test.S: Created using functions
+	lws-test/lws-test.S
+	* inst-set-test/is-div-test.S: Created.
+	* inst-set-test/inst-set-test.h: Created using macros from
+	lws-test/lws-test.S.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/is-lws-test.S: Created from lws-test/lws-test.S
+	* lws-test: Directory deleted.
+	* lws-test/lws-test.S: Deleted.
+	* lws-test/Makefile.am: Deleted.
+	* lws-test/Makefile.in: Deleted.
+	* Makefile.am: Removed lws-test directory
+	* Makefile.in: Regenerated.
+
 2010-06-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Added creation of lws-test makefile

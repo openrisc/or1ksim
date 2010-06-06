@@ -138,7 +138,6 @@ AC_CONFIG_FILES([Makefile               \
 		 kbdtest/Makefile       \
 		 local-global/Makefile  \
 		 loop/Makefile          \
-		 lws-test/Makefile      \
 		 mc-async/Makefile      \
 		 mc-dram/Makefile       \
 		 mc-ssram/Makefile      \
