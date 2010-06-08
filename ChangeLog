@@ -1,3 +1,6 @@
+2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
+	* peripherals/mc.h: Moved defines to peripherals/mc_defines.h
+	* peripherals/mc_defines.h: Created.
 2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.

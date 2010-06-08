@@ -29,8 +29,6 @@ check_PROGRAMS = eth
 
 eth_SOURCES    = eth.c
 
-eth_CPPFLAGS   = -I$(srcdir)/../../../peripheral
-
 eth_LDFLAGS    = -T$(srcdir)/../default.ld
 
 eth_LDADD      = ../except/except.lo      \

@@ -31,7 +31,7 @@
 #include "mc-sync.h"
 
 #include "config.h"
-#include "mc.h"
+#include "mc_defines.h"
 #include "gpio.h"
 #include "fields.h"
 

@@ -1,3 +1,10 @@
+2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
+	* eth/eth.h: Created from ethernet peripheral's header.
+	* eth/Makefile.am: Removed eth_CPPFLAGS.
+	* mc-sync/mc-sync.c: Changed include of mc.h to mc_defines.h
+	* mc-ssram/mc-ssram.c: Changed include of mc.h to mc_defines.h
+	* mc-dram/mc-dram.c: Changed include of mc.h to mc_defines.h
+	* mc-async/mc-async.c: Changed include of mc.h to mc_defines.h
 2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Removed	creation of lws-test makefile.
