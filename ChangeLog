@@ -1,6 +1,19 @@
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date. Removed
+	enable_ov_flag as option for configuration.
+	* peripheral/Makefile.am: mc-defines.h added to sources.
+
+2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* peripheral/mc.h: mc_defines.h -> mc-defines.h.
+	* peripherals/mc-defines.h: Renamed from mc_defines.h
+
 2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
 	* peripherals/mc.h: Moved defines to peripherals/mc_defines.h
 	* peripherals/mc_defines.h: Created.
+
 2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.

@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-06-06], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-06-09], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -264,17 +264,6 @@ AC_ARG_ENABLE(range_stats,
 ])
 AC_MSG_RESULT(${enable_range_stats-no})
 
-set_ov_flag="0"
-AC_MSG_CHECKING(whether instructions set overflow flag)
-AC_ARG_ENABLE(ov_flag,
-    [  --enable-ov-flag      Whether instructions set overflow flag.], [
-    case "$enableval" in
-    no)  set_ov_flag="0" ;;
-    yes) set_ov_flag="1" ;;
-    esac
-])
-AC_MSG_RESULT(${enable_ov_flag-no})
-
 set_arith_flag="0"
 AC_MSG_CHECKING(whether arithmethic instructions set flag)
 AC_ARG_ENABLE(arith_flag,
@@ -302,7 +291,6 @@ AC_ARG_ENABLE(
 AC_SUBST(DEBUGFLAGS)
 
 AC_DEFINE_UNQUOTED(RAW_RANGE_STATS, $raw_range_stats, [ Specifies, whether we should do register accesses over time analysis. Simple execution must be enabled!])
-AC_DEFINE_UNQUOTED(SET_OV_FLAG, $set_ov_flag, [ Whether instructions set overflow flag])
 AC_DEFINE_UNQUOTED(ARITH_SET_FLAG, $set_arith_flag, [Whether arithmethic instructions set flag on zero])
 AC_DEFINE_UNQUOTED(HAVE_ETH_PHY, $eth_phy, [Whether we have ethernet PHY support])
 AC_DEFINE_UNQUOTED(SIMPLE_EXECUTION, $execution == 0, [Whether we are building with simple execution module]) 

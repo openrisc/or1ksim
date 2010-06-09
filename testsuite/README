@@ -12,8 +12,8 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 1,063 tests compile, run and pass. That
-figure is broken down into 799 tests of the standalone simulator and 264 tests
+At the time of writing a total of 1,100 tests compile, run and pass. That
+figure is broken down into 836 tests of the standalone simulator and 264 tests
 of the library
 
 Configuration and make files are provided for further test programs. These
@@ -46,7 +46,7 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 799 tests of standalone Or1ksim:
+A total of 836 tests of standalone Or1ksim:
 
 basic:             8 tests of a wide range of instructions and registers.
 cache:             5 tests of the Or1ksim cache modeling
@@ -66,7 +66,8 @@ int-test:         86 tests of the programmable interrupt controller.
 kbdtest:          26 tests of the PS2 keyboard interface.
 local-global:      1 test of C local and global variables.
 inst-set-test:       A collection of tests of individual instructions
-  is-div-test:     2 tests of tje l.div and l.divu instruction (Bug 1770).
+  is-add-test     33 tests of the l.add* instructions (Bugs)
+  is-div-test:     4 tests of the l.div and l.divu instruction (Bug 1770).
   is-lws-test:    13 tests of the l.lws instruction (Bug 1767).
 mem-test:         16 tests of simple memory access.
 mmu:             110 tests of the MMU.

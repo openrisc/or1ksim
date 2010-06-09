@@ -1,3 +1,6 @@
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added division and addition tests.
+
 2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/inst-set-test.cfg: Created.
 	* or1ksim.tests/inst-set-test.exp: Created.

@@ -178,37 +178,6 @@ The default is for this to be disabled.
 If enabled, this option allows statistics to be collected to analyse
 register access over time.  The default is for this to be disabled.
 
-@item --enable-ov-flag
-@cindex @code{--enable-ov-flag}
-@itemx --disable-ov-flag
-@cindex @code{--disable-ov-flag}
-@cindex overflow flag setting by instructions
-If enabled, this option causes instructions to set the overflow
-flag.  The instructions affected by this are @code{l.add},
-@code{l.addc}, @code{l.addi}, @code{l.and}, @code{l.andi},
-@code{l.div}, @code{l.divu}, @code{l.mul}, @code{l.muli}, @code{l.or},
-@code{l.ori}, @code{l.sll}, @code{l.slli}, @code{l.srl},
-@code{l.srli}, @code{l.sra}, @code{l.srai}, @code{l.sub}, @code{l.xor}
-and @code{l.xori}.
-
-The default is for this to be disabled.
-
-@quotation Caution
-This appears a very dangerous option, to the extent of arguably being
-a bug.  Whether or not flags are set is part of the OpenRISC 1000
-architectural specification.  Within the above list, the arithmetic
-instructions (@code{l.add}, @code{l.addc}, @code{l.addi},
-@code{l.div}, @code{l.divu}, @code{l.mul}, @code{l.muli} and
-@code{l.sub}), together with @code{l.addic} which is missed out, set
-the overflow flag.  All the others (@code{l.and}, @code{l.andi},
-@code{l.or}, @code{l.ori}, @code{l.sll}, @code{l.slli}, @code{l.srl},
-@code{l.srli}, @code{l.sra}, @code{l.srai}, @code{l.xor} and
-@code{l.xori}) do not.
-
-Thus it is impossible to get correct behavior whichever way this option is
-set.
-@end quotation
-
 @item --enable-arith-flag
 @cindex @code{--enable-arith-flag}
 @itemx --disable-arith-flag
@@ -263,6 +232,37 @@ compiled with @command{make check}.
 
 This flag is intended for those working on the test package, who wish to
 get the missing test(s) working.
+
+@end table
+
+A number of configuration flags have been removed since version 0.3.0,
+because they led to invalid behavior of Or1ksim. Those removed include
+
+@table @code
+
+@item --enable-ov-flag
+@cindex @code{--enable-ov-flag}
+@itemx --disable-ov-flag
+@cindex @code{--disable-ov-flag}
+@cindex overflow flag setting by instructions
+This flag used to cause certain instructions to set the overflow flag.
+If not, those instructions would not set the overflow flat.  The
+instructions affected by this were @code{l.add}, @code{l.addc},
+@code{l.addi}, @code{l.and}, @code{l.andi}, @code{l.div}, @code{l.divu},
+@code{l.mul}, @code{l.muli}, @code{l.or}, @code{l.ori}, @code{l.sll},
+@code{l.slli}, @code{l.srl}, @code{l.srli}, @code{l.sra}, @code{l.srai},
+@code{l.sub}, @code{l.xor} and @code{l.xori}.
+
+This guaranteed incorrect behavior.  The OpenRISC 1000 architecture
+specification defines which flags are set by which instructions.
+
+Within the above list, the arithmetic instructions (@code{l.add},
+@code{l.addc}, @code{l.addi}, @code{l.div}, @code{l.divu}, @code{l.mul},
+@code{l.muli} and @code{l.sub}), together with @code{l.addic} which is
+missed out, set the overflow flag.  All the others (@code{l.and},
+@code{l.andi}, @code{l.or}, @code{l.ori}, @code{l.sll}, @code{l.slli},
+@code{l.srl}, @code{l.srli}, @code{l.sra}, @code{l.srai}, @code{l.xor}
+and @code{l.xori}) do not.
 
 @end table
 

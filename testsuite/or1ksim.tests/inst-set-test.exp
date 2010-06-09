@@ -44,3 +44,63 @@ run_or1ksim "lws-test"                            \
           "!report(0xdeaddead);"                  \
 	  "!exit(0)"]                             \
     "inst-set-test.cfg" "inst-set-test/is-lws-test"
+
+# Run the l.div and l.divu test
+run_or1ksim "lws-test"                                \
+    [list "!l.div"                                    \
+          "!  RANGE exception"                        \
+          "  - caused by: report(0xe0853309);"        \
+          "!  - SR value:  report(0x00008601);"       \
+          "  1 / 0 (with error) carry flag set: TRUE" \
+          "!l.divu"                                   \
+          "!  RANGE exception"                        \
+          "  - caused by: report(0xe085330a);"        \
+          "!  - SR value:  report(0x00008601);"       \
+          "  1 / 0 (with error) carry flag set: TRUE" \
+          "!Test completed"                           \
+          "!report(0xdeaddead);"                      \
+	  "!exit(0)"]                                 \
+    "inst-set-test.cfg" "inst-set-test/is-div-test"
+
+# Run the l.add, l.addc, l.addi and l.addic tests
+run_or1ksim "lws-test"                                 \
+    [list "!l.add"                                     \
+          "  0x00000001 + 0x00000002 = 0x00000003: OK" \
+          "  - carry flag set:    FALSE"               \
+          "  - overflow flag set: FALSE"               \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                \
+          "  - overflow flag set: FALSE"               \
+          "  0x40000000 + 0x3fffffff = 0x7fffffff: OK" \
+          "  - carry flag set:    FALSE"               \
+          "  - overflow flag set: FALSE"               \
+          "  0x40000000 + 0x40000000 = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"               \
+          "  - overflow flag set: TRUE"                \
+          "  0xc0000000 + 0xc0000000 = 0x80000000: OK" \
+          "  - carry flag set:    TRUE"                \
+          "  - overflow flag set: FALSE"               \
+          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK" \
+          "  - carry flag set:    TRUE"                \
+          "  - overflow flag set: TRUE"                \
+          "!  OVE flag set"                            \
+          "  RANGE exception"                          \
+          "  - caused by: report(0xe0853000);"         \
+          "  - SR value:  report(0x00009a01);"         \
+          "  0x40000000 + 0x40000000 = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"               \
+          "  - overflow flag set: TRUE"                \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                \
+          "  - overflow flag set: FALSE"               \
+          "  RANGE exception"                          \
+          "  - caused by: report(0xe0853000);"         \
+          "  - SR value:  report(0x00009e01);"         \
+          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK" \
+          "  - carry flag set:    TRUE"                \
+          "  - overflow flag set: TRUE"                \
+          "!  OVE flag cleared"                        \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+	  "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-add-test"

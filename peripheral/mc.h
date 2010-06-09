@@ -32,7 +32,7 @@
 
 
 /* Constants. Also used by the test harness */
-#include "mc_defines.h"
+#include "mc-defines.h"
 
 /* Prototypes for external use */
 extern void  mc_done ();

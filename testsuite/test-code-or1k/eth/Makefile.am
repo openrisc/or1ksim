@@ -27,7 +27,9 @@
 # A test program of the OR1K Ethernet
 check_PROGRAMS = eth
 
-eth_SOURCES    = eth.c
+eth_SOURCES    = eth.c    \
+	 	 eth.h    \
+		 fields.h
 
 eth_LDFLAGS    = -T$(srcdir)/../default.ld
 

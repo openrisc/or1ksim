@@ -1,3 +1,14 @@
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* inst-set-test/is-add-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* mc-sync/mc-sync.c: mc_defines.h -> mc-defines.h.
+	* mc-ssram/mc-ssram.c: mc_defines.h -> mc-defines.h.
+	* mc-dram/mc-dram.c: mc_defines.h -> mc-defines.h.
+	* mc-async/mc-async.c: mc_defines.h -> mc-defines.h.
+
 2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
 	* eth/eth.h: Created from ethernet peripheral's header.
 	* eth/Makefile.am: Removed eth_CPPFLAGS.
@@ -5,6 +16,7 @@
 	* mc-ssram/mc-ssram.c: Changed include of mc.h to mc_defines.h
 	* mc-dram/mc-dram.c: Changed include of mc.h to mc_defines.h
 	* mc-async/mc-async.c: Changed include of mc.h to mc_defines.h
+
 2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Removed	creation of lws-test makefile.
@@ -16,6 +28,7 @@
 	* inst-set-test/inst-set-test.h: Created using macros from
 	lws-test/lws-test.S.
 	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
 	* inst-set-test/is-lws-test.S: Created from lws-test/lws-test.S
 	* lws-test: Directory deleted.
 	* lws-test/lws-test.S: Deleted.

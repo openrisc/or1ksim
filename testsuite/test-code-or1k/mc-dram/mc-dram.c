@@ -31,7 +31,7 @@
 #include "mc-dram.h"
 
 #include "config.h"
-#include "mc_defines.h"
+#include "mc-defines.h"
 #include "gpio.h"
 #include "fields.h"
 

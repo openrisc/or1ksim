@@ -27,7 +27,7 @@
 # Tests of the instruction set. Broken out into separate tests, to avoid them
 # getting too large. The original instruction set test is still here, but not
 # built by default.
-EXTRA_DIST = inst-set.ld  
+EXTRA_DIST = inst-set-test.ld  
 
 if BUILD_ALL_TESTS
 INST_SET_TEST_OLD = inst-set-test-old
@@ -41,16 +41,24 @@ check_LTLIBRARIES           = libinst-set-test.la
 libinst_set_test_la_SOURCES = inst-set-test.S
 
 # The test programs
-check_PROGRAMS = is-div-test          \
+check_PROGRAMS = is-add-test          \
+		 is-div-test          \
 		 is-lws-test          \
 	         $(INST_SET_TEST_OLD)
 
 # The new instruction set tests.
-is_div_test_SOURCES = is-div-test.S
+is_add_test_SOURCES = inst-set-test.h \
+	              is-add-test.S
+is_add_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_add_test_LDADD   = inst-set-test.lo
+
+is_div_test_SOURCES = inst-set-test.h \
+	              is-div-test.S
 is_div_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_div_test_LDADD   = inst-set-test.lo
 
-is_lws_test_SOURCES = is-lws-test.S
+is_lws_test_SOURCES = inst-set-test.h \
+	              is-lws-test.S
 is_lws_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_lws_test_LDADD   = inst-set-test.lo
 

@@ -39,16 +39,12 @@
 
 #define CURINSN(INSN) (strcmp(cur->insn, (INSN)) == 0)
 
-/*! Sets a new SPR_SR_OV value, based on next register value */
-#if SET_OV_FLAG
-#define SET_OV_FLAG_FN(value) \
+/*! Sets a new SPR_SR_OV value, based on a three register operation. */
+#define SET_OV_FLAG_FN(value)		\
   if((value) & 0x80000000) \
     cpu_state.sprs[SPR_SR] |= SPR_SR_OV; \
   else \
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV
-#else
-#define SET_OV_FLAG_FN(value)
-#endif
 
 /*!The main structure holding the current execution state of the CPU
 

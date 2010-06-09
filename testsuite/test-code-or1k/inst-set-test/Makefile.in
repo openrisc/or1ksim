@@ -58,8 +58,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = is-div-test$(EXEEXT) is-lws-test$(EXEEXT) \
-	$(am__EXEEXT_1)
+check_PROGRAMS = is-add-test$(EXEEXT) is-div-test$(EXEEXT) \
+	is-lws-test$(EXEEXT) $(am__EXEEXT_1)
 subdir = inst-set-test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -84,6 +84,12 @@ inst_set_test_old_DEPENDENCIES = ../except/except.lo \
 inst_set_test_old_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(inst_set_test_old_LDFLAGS) $(LDFLAGS) -o $@
+am_is_add_test_OBJECTS = is-add-test.$(OBJEXT)
+is_add_test_OBJECTS = $(am_is_add_test_OBJECTS)
+is_add_test_DEPENDENCIES = inst-set-test.lo
+is_add_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_add_test_LDFLAGS) $(LDFLAGS) -o $@
 am_is_div_test_OBJECTS = is-div-test.$(OBJEXT)
 is_div_test_OBJECTS = $(am_is_div_test_OBJECTS)
 is_div_test_DEPENDENCIES = inst-set-test.lo
@@ -115,10 +121,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libinst_set_test_la_SOURCES) $(inst_set_test_old_SOURCES) \
-	$(is_div_test_SOURCES) $(is_lws_test_SOURCES)
-DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
-	$(inst_set_test_old_SOURCES) $(is_div_test_SOURCES) \
+	$(is_add_test_SOURCES) $(is_div_test_SOURCES) \
 	$(is_lws_test_SOURCES)
+DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
+	$(inst_set_test_old_SOURCES) $(is_add_test_SOURCES) \
+	$(is_div_test_SOURCES) $(is_lws_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -240,7 +247,7 @@ top_srcdir = @top_srcdir@
 # Tests of the instruction set. Broken out into separate tests, to avoid them
 # getting too large. The original instruction set test is still here, but not
 # built by default.
-EXTRA_DIST = inst-set.ld  
+EXTRA_DIST = inst-set-test.ld  
 @BUILD_ALL_TESTS_FALSE@INST_SET_TEST_OLD = 
 @BUILD_ALL_TESTS_TRUE@INST_SET_TEST_OLD = inst-set-test-old
 
@@ -249,10 +256,19 @@ check_LTLIBRARIES = libinst-set-test.la
 libinst_set_test_la_SOURCES = inst-set-test.S
 
 # The new instruction set tests.
-is_div_test_SOURCES = is-div-test.S
+is_add_test_SOURCES = inst-set-test.h \
+	              is-add-test.S
+
+is_add_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_add_test_LDADD = inst-set-test.lo
+is_div_test_SOURCES = inst-set-test.h \
+	              is-div-test.S
+
 is_div_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_div_test_LDADD = inst-set-test.lo
-is_lws_test_SOURCES = is-lws-test.S
+is_lws_test_SOURCES = inst-set-test.h \
+	              is-lws-test.S
+
 is_lws_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_lws_test_LDADD = inst-set-test.lo
 
@@ -319,6 +335,9 @@ clean-checkPROGRAMS:
 inst-set-test-old$(EXEEXT): $(inst_set_test_old_OBJECTS) $(inst_set_test_old_DEPENDENCIES) 
 	@rm -f inst-set-test-old$(EXEEXT)
 	$(inst_set_test_old_LINK) $(inst_set_test_old_OBJECTS) $(inst_set_test_old_LDADD) $(LIBS)
+is-add-test$(EXEEXT): $(is_add_test_OBJECTS) $(is_add_test_DEPENDENCIES) 
+	@rm -f is-add-test$(EXEEXT)
+	$(is_add_test_LINK) $(is_add_test_OBJECTS) $(is_add_test_LDADD) $(LIBS)
 is-div-test$(EXEEXT): $(is_div_test_OBJECTS) $(is_div_test_DEPENDENCIES) 
 	@rm -f is-div-test$(EXEEXT)
 	$(is_div_test_LINK) $(is_div_test_OBJECTS) $(is_div_test_LDADD) $(LIBS)
@@ -334,6 +353,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inst-set-test-old.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inst-set-test.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-add-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-div-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-lws-test.Po@am__quote@
 
