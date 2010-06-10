@@ -79,24 +79,59 @@ INSTRUCTION (l_add) {
 INSTRUCTION (l_addc) {
   orreg_t temp1, temp2, temp3;
   int8_t temp4;
-  
+  int    carry_in = (cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY;
+
   temp2 = (orreg_t)PARAM2;
   temp3 = (orreg_t)PARAM1;
   temp1 = temp2 + temp3;
-  if(cpu_state.sprs[SPR_SR] & SPR_SR_CY)
-    temp1++;
+
+  if(carry_in)
+    {
+      temp1++;				/* Add in the carry bit */
+    }
+
   SET_PARAM0(temp1);
-  SET_OV_FLAG_FN (temp1);
-  if (ARITH_SET_FLAG) {
-    if(!temp1)
-      cpu_state.sprs[SPR_SR] |= SPR_SR_F;
-    else
-      cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  }
-  if ((uorreg_t) temp1 < (uorreg_t) temp2)
-    cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+
+  /* Set overflow if two negative values gave a positive sum, or if two
+     positive values gave a negative sum. Otherwise clear it. There are no
+     corner cases with the extra bit carried in (unlike the carry flag - see
+     below). */
+  if ((((long int) temp2 <  0) && 
+       ((long int) temp3 <  0) &&
+       ((long int) temp1 >= 0)) ||
+      (((long int) temp2 >= 0) && 
+       ((long int) temp3 >= 0) &&
+       ((long int) temp1 <  0)))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
+    }
   else
-    cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+    }
+
+  /* Set the carry flag if (as unsigned values) the result is smaller than
+     either operand (if it smaller than one, it will be smaller than both, so
+     we need only test one). If there is a carry in, the test should be less
+     than or equal, to deal with the 0 + 0xffffffff + c = 0 case (which
+     generates a carry). */
+  if ((carry_in && ((uorreg_t) temp1 <= (uorreg_t) temp2)) ||
+      ((uorreg_t) temp1 < (uorreg_t) temp2))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
+      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
+    {
+      except_handle (EXCEPT_RANGE, cpu_state.pc);
+    }
 
   temp4 = temp1;
   if (temp4 == temp1)

@@ -63,44 +63,200 @@ run_or1ksim "lws-test"                                \
     "inst-set-test.cfg" "inst-set-test/is-div-test"
 
 # Run the l.add, l.addc, l.addi and l.addic tests
-run_or1ksim "lws-test"                                 \
-    [list "!l.add"                                     \
-          "  0x00000001 + 0x00000002 = 0x00000003: OK" \
-          "  - carry flag set:    FALSE"               \
-          "  - overflow flag set: FALSE"               \
-          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK" \
-          "  - carry flag set:    TRUE"                \
-          "  - overflow flag set: FALSE"               \
-          "  0x40000000 + 0x3fffffff = 0x7fffffff: OK" \
-          "  - carry flag set:    FALSE"               \
-          "  - overflow flag set: FALSE"               \
-          "  0x40000000 + 0x40000000 = 0x80000000: OK" \
-          "  - carry flag set:    FALSE"               \
-          "  - overflow flag set: TRUE"                \
-          "  0xc0000000 + 0xc0000000 = 0x80000000: OK" \
-          "  - carry flag set:    TRUE"                \
-          "  - overflow flag set: FALSE"               \
-          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK" \
-          "  - carry flag set:    TRUE"                \
-          "  - overflow flag set: TRUE"                \
-          "!  OVE flag set"                            \
-          "  RANGE exception"                          \
-          "  - caused by: report(0xe0853000);"         \
-          "  - SR value:  report(0x00009a01);"         \
-          "  0x40000000 + 0x40000000 = 0x80000000: OK" \
-          "  - carry flag set:    FALSE"               \
-          "  - overflow flag set: TRUE"                \
-          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK" \
-          "  - carry flag set:    TRUE"                \
-          "  - overflow flag set: FALSE"               \
-          "  RANGE exception"                          \
-          "  - caused by: report(0xe0853000);"         \
-          "  - SR value:  report(0x00009e01);"         \
-          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK" \
-          "  - carry flag set:    TRUE"                \
-          "  - overflow flag set: TRUE"                \
-          "!  OVE flag cleared"                        \
-          "!Test completed"                            \
-          "!report(0xdeaddead);"                       \
-	  "!exit(0)"]                                  \
+run_or1ksim "lws-test"                                     \
+    [list "!l.add"                                         \
+          "  0x00000001 + 0x00000002 = 0x00000003: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000001 + 0x00000002 = 0x00000003: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x40000000 + 0x3fffffff = 0x7fffffff: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x40000000 + 0x40000000 = 0x80000000: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xc0000000 + 0xc0000000 = 0x80000000: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xe0853000);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x40000000 + 0x40000000 = 0x80000000: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xe0853000);"             \
+          "  - SR value:  report(0x00009e01);"             \
+          "  0xbfffffff + 0xbfffffff = 0x7ffffffe: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag cleared **"                      \
+          "!l.addc"                                        \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x40000000 + 0x3fffffff     = 0x7fffffff: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x40000000 + 0x3fffffff + c = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0x00000000 + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0xc0000000 + 0xc0000000     = 0x80000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0xc0000000 + 0xbfffffff + c = 0x80000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xe0853001);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xe0853001);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x40000000 + 0x3fffffff + c = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xe0853001);"             \
+          "  - SR value:  report(0x00009e01);"             \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag cleared **"                      \
+          "!l.addi"                                        \
+          "  0x00000001 + 0x00000002 = 0x00000003: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000001 + 0x00000002 = 0x00000003: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x7fff8000 + 0x00007fff = 0x7fffffff: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x7fffc000 + 0x00004000 = 0x80000000: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0x80008000 + 0xffff8000 = 0x80000000: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x80007fff + 0xffff8000 = 0x7fffffff: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  - caused by: report(0x9c854000);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x7fffc000 + 0x00004000 = 0x80000000: OK"     \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0xfffffffe = 0xfffffffd: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  RANGE exception"                              \
+          "  - caused by: report(0x9c858000);"             \
+          "  - SR value:  report(0x00009e01);"             \
+          "  0x80007fff + 0xffff8000 = 0x7ffffffe: OK"     \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag cleared **"                      \
+          "!l.addic"                                       \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x7fff8000 + 0x00007fff     = 0x7fffffff: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: FALSE"                   \
+          "  0x7fff8000 + 0x00007fff + c = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0x00000000 + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x80008000 + 0xffff8000     = 0x80000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x80007fff + 0xffff8000 + c = 0x80000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x80007fff + 0xffff8000     = 0x7fffffff: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xa0854000);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xa0853fff);"             \
+          "  - SR value:  report(0x00009a01);"             \
+          "  0x7fffc000 + 0x00003fff + c = 0x80000000: OK" \
+          "  - carry flag set:    FALSE"                   \
+          "  - overflow flag set: TRUE"                    \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: FALSE"                   \
+          "  RANGE exception"                              \
+          "  - caused by: report(0xa0858000);"             \
+          "  - SR value:  report(0x00009e01);"             \
+          "  0x80007fff + 0xffff8000     = 0x7ffffffe: OK" \
+          "  - carry flag set:    TRUE"                    \
+          "  - overflow flag set: TRUE"                    \
+          "!  ** OVE flag cleared **"                      \
+          "!Test completed"                                \
+          "!report(0xdeaddead);"                           \
+	  "!exit(0)"]                                      \
     "inst-set-test.cfg" "inst-set-test/is-add-test"

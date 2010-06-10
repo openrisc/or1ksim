@@ -1,7 +1,15 @@
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* peripheral/Makefile.am: mc-defines.h added to sources.
+	* cpu/or32/insnset.c <l_addc>: Updated to handle overflow and
+	exceptions correctly.
+	* cpu/or32/or32.c <or32_opcodes>: l.addic enabled.
+
 2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date. Removed
 	enable_ov_flag as option for configuration.
+	* cpu/or32/insnset.c <l_add>: Updated to handle overflow and
+	exceptions correctly.
 	* peripheral/Makefile.am: mc-defines.h added to sources.
 
 2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>

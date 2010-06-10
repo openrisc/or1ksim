@@ -1,3 +1,6 @@
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Extended addition tests.
+
 2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/inst-set-test.exp: Added division and addition tests.
 

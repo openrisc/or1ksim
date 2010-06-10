@@ -62,6 +62,92 @@
 
 #include "inst-set-test.h"
 
+/* ----------------------------------------------------------------------------
+ * A macro to carry out a test of addition in registers
+ *
+ *
+ * Arguments
+ *   set_flags: Flags to set in the SR
+ *   clr_flags: Flags to clear in the SR
+ *   opc:       The opcode
+ *   op1:       First operand value
+ *   op2:       Second operand value
+ *   res:       Expected result
+ *   str:       Output string
+ *   cy:        Expected carry flag
+ *   ov:        Expected overflow flag
+ * ------------------------------------------------------------------------- */
+#define TEST_ADD(set_flags, clr_flags, opc, op1, op2, res, str, cy, ov)	 \
+	l.mfspr	r3,r0,SPR_SR						;\
+	LOAD_CONST (r2, set_flags)	/* Set flags */			;\
+	l.or	r3,r3,r2						;\
+	LOAD_CONST (r2, ~clr_flags)	/* Clear flags */		;\
+	l.and	r3,r3,r2						;\
+	l.mtspr	r0,r3,SPR_SR						;\
+									;\
+	LOAD_CONST (r5,op1)		/* Load numbers to add */	;\
+	LOAD_CONST (r6,op2)						;\
+	opc	r4,r5,r6						;\
+	l.mfspr	r2,r0,SPR_SR		/* So we can examine flags */	;\
+	PUSH (r2)							;\
+	CHECK_RES (str, r4, res)					;\
+	POP(r2)				/* Retrieve SR */		;\
+	PUSH(r2)							;\
+	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */		;\
+	l.and	r2,r2,r4						;\
+	l.sfeq	r2,r4							;\
+	CHECK_FLAG ("- carry flag set:    ", cy)			;\
+									;\
+	POP(r2)				/* Retrieve SR */		;\
+	PUSH(r2)							;\
+	LOAD_CONST (r4, SPR_SR_OV)	/* The overflow bit */		;\
+	l.and	r2,r2,r4						;\
+	l.sfeq	r2,r4							;\
+	CHECK_FLAG ("- overflow flag set: ", ov)
+
+/* ----------------------------------------------------------------------------
+ * A macro to carry out a test of addition with an immediate value
+ *
+ *
+ * Arguments
+ *   set_flags: Flags to set in the SR
+ *   clr_flags: Flags to clear in the SR
+ *   opc:       The opcode
+ *   op1:       First operand value
+ *   op2:       Second operand value (immediate)
+ *   res:       Expected result
+ *   str:       Output string
+ *   cy:        Expected carry flag
+ *   ov:        Expected overflow flag
+ * ------------------------------------------------------------------------- */
+#define TEST_ADDI(set_flags, clr_flags, opc, op1, op2, res, str, cy, ov) \
+	l.mfspr	r3,r0,SPR_SR						;\
+	LOAD_CONST (r2, set_flags)	/* Set flags */			;\
+	l.or	r3,r3,r2						;\
+	LOAD_CONST (r2, ~clr_flags)	/* Clear flags */		;\
+	l.and	r3,r3,r2						;\
+	l.mtspr	r0,r3,SPR_SR						;\
+									;\
+	LOAD_CONST (r5,op1)		/* Load first number to add */	;\
+	opc	r4,r5,op2						;\
+	l.mfspr	r2,r0,SPR_SR		/* So we can examine flags */	;\
+	PUSH (r2)							;\
+	CHECK_RES (str, r4, res)					;\
+	POP(r2)				/* Retrieve SR */		;\
+	PUSH(r2)							;\
+	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */		;\
+	l.and	r2,r2,r4						;\
+	l.sfeq	r2,r4							;\
+	CHECK_FLAG ("- carry flag set:    ", cy)			;\
+									;\
+	POP(r2)				/* Retrieve SR */		;\
+	PUSH(r2)							;\
+	LOAD_CONST (r4, SPR_SR_OV)	/* The overflow bit */		;\
+	l.and	r2,r2,r4						;\
+	l.sfeq	r2,r4							;\
+	CHECK_FLAG ("- overflow flag set: ", ov)
+
+	
 	.section .text
 	.global	_start
 _start:
@@ -75,269 +161,434 @@ _add:
 	l.nop
 
 	/* Add two small positive numbers */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 1, 2, 3,
+	          "0x00000001 + 0x00000002 = 0x00000003: ",
+	          FALSE, FALSE)
 
-	LOAD_CONST (r5,1)		/* Add two small positive numbers */
-	LOAD_CONST (r6,2)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0x00000001 + 0x00000002 = 0x00000003: ", r4, 0x00000003)
+	/* Check carry in is ignored. */
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.add, 1, 2, 3,
+	          "0x00000001 + 0x00000002 = 0x00000003: ",
+	          FALSE, FALSE)
 
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", FALSE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", FALSE)
-
-	/* Add two small negative numbers */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0xffffffff)	/* Add two small negative numbers */
-	LOAD_CONST (r6,0xfffffffe)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0xffffffff + 0xfffffffe = 0xfffffffd: ", r4, 0xfffffffd)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", TRUE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", FALSE)
+	/* Add two small negative numbers. Sets the carry flag but not the
+	   overflow flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0xffffffff, 0xfffffffe, 0xfffffffd,
+	          "0xffffffff + 0xfffffffe = 0xfffffffd: ",
+	          TRUE, FALSE)
 
 	/* Add two quite large positive numbers. Should set neither the
 	   overflow nor the carry flag. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0x40000000)	/* Add two large positive numbers */
-	LOAD_CONST (r6,0x3fffffff)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0x40000000 + 0x3fffffff = 0x7fffffff: ", r4, 0x7fffffff)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", FALSE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", FALSE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0x40000000, 0x3fffffff, 0x7fffffff,
+	          "0x40000000 + 0x3fffffff = 0x7fffffff: ",
+	          FALSE, FALSE)
 
 	/* Add two large positive numbers. Should set the overflow, but not
 	   the carry flag. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0x40000000)	/* Add two large positive numbers */
-	LOAD_CONST (r6,0x40000000)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0x40000000 + 0x40000000 = 0x80000000: ", r4, 0x80000000)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", FALSE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", TRUE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0x40000000, 0x40000000, 0x80000000,
+	          "0x40000000 + 0x40000000 = 0x80000000: ",
+	          FALSE, TRUE)
 
 	/* Add two quite large negative numbers. Should set the carry, but not
-	   the overflow flag. flag. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0xc0000000)	/* Add two large positive numbers */
-	LOAD_CONST (r6,0xc0000000)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0xc0000000 + 0xc0000000 = 0x80000000: ", r4, 0x80000000)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", TRUE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", FALSE)
+	   the overflow flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0xc0000000, 0xc0000000, 0x80000000,
+	          "0xc0000000 + 0xc0000000 = 0x80000000: ",
+	          TRUE, FALSE)
 
 	/* Add two large negative numbers. Should set both the overflow and
 	   carry flags. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0xbfffffff)	/* Add two large negative numbers */
-	LOAD_CONST (r6,0xbfffffff)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0xbfffffff + 0xbfffffff = 0x7ffffffe: ", r4, 0x7ffffffe)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", TRUE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", TRUE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0xbfffffff, 0xbfffffff, 0x7ffffffe,
+	          "0xbfffffff + 0xbfffffff = 0x7ffffffe: ",
+	          TRUE, TRUE)
 
 	/* Check that range exceptions are triggered */
-	LOAD_CONST (r2, SPR_SR_OVE)	/* Set OVE */
 	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, SPR_SR_OVE)	/* Set OVE */
 	l.or	r3,r3,r2
 	l.mtspr	r0,r3,SPR_SR
 	
-	LOAD_STR (r3, "  OVE flag set\n")
+	LOAD_STR (r3, "  ** OVE flag set **\n")
 	l.jal	_puts
 	l.nop
 
 	/* Check that an overflow alone causes a RANGE Exception. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0x40000000)	/* Add two large positive numbers */
-	LOAD_CONST (r6,0x40000000)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0x40000000 + 0x40000000 = 0x80000000: ", r4, 0x80000000)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", FALSE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", TRUE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0x40000000, 0x40000000, 0x80000000,
+	          "0x40000000 + 0x40000000 = 0x80000000: ",
+	          FALSE, TRUE)
 
 	/* Check that a carry alone does not cause a RANGE Exception. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0xffffffff)	/* Add two small negative numbers */
-	LOAD_CONST (r6,0xfffffffe)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0xffffffff + 0xfffffffe = 0xfffffffd: ", r4, 0xfffffffd)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", TRUE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", FALSE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0xffffffff, 0xfffffffe, 0xfffffffd,
+	          "0xffffffff + 0xfffffffe = 0xfffffffd: ",
+	          TRUE, FALSE)
 
 	/* Check that carry and overflow together cause an exception. */
-	LOAD_CONST (r2, ~(SPR_SR_CY | SPR_SR_OV))	/* Clear flags */
-	l.mfspr	r3,r0,SPR_SR
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-
-	LOAD_CONST (r5,0xbfffffff)	/* Add two large negative numbers */
-	LOAD_CONST (r6,0xbfffffff)
-	l.add	r4,r5,r6
-	l.mfspr	r2,r0,SPR_SR		/* So we can examine the carry flag */
-	PUSH (r2)
-	CHECK_RES ("0xbfffffff + 0xbfffffff = 0x7ffffffe: ", r4, 0x7ffffffe)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_CY)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- carry flag set:    ", TRUE)
-
-	POP(r2)				/* Retrieve SR */
-	PUSH(r2)
-	LOAD_CONST (r4, SPR_SR_OV)	/* The carry bit */
-	l.and	r2,r2,r4
-	l.sfeq	r2,r4
-	CHECK_FLAG ("- overflow flag set: ", TRUE)
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.add, 0xbfffffff, 0xbfffffff, 0x7ffffffe,
+	          "0xbfffffff + 0xbfffffff = 0x7ffffffe: ",
+	          TRUE, TRUE)
 
 	/* Finished checking range exceptions */
-	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
 	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
 	l.and	r3,r3,r2
 	l.mtspr	r0,r3,SPR_SR
 	
-	LOAD_STR (r3, "  OVE flag cleared\n")
+	LOAD_STR (r3, "  ** OVE flag cleared **\n")
+	l.jal	_puts
+	l.nop
+
+/* ----------------------------------------------------------------------------
+ * Test of add signed and carry, l.addc
+ * ------------------------------------------------------------------------- */
+_addc:
+	LOAD_STR (r3, "l.addc\n")
+	l.jal	_puts
+	l.nop
+
+	/* Add two small positive numbers */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 1, 2, 3,
+	          "0x00000001 + 0x00000002     = 0x00000003: ",
+	          FALSE, FALSE)
+
+	/* Add two small negative numbers. Sets the carry flag but not the
+	   overflow flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0xffffffff, 0xfffffffe, 0xfffffffd,
+	          "0xffffffff + 0xfffffffe     = 0xfffffffd: ",
+	          TRUE, FALSE)
+
+	/* Add two quite large positive numbers. Should set neither the
+	   overflow nor the carry flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0x40000000, 0x3fffffff, 0x7fffffff,
+	          "0x40000000 + 0x3fffffff     = 0x7fffffff: ",
+	          FALSE, FALSE)
+
+	/* Add two quite large positive numbers with a carry in. Should set
+	   the overflow but not the carry flag. */
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0x40000000, 0x3fffffff, 0x80000000,
+	          "0x40000000 + 0x3fffffff + c = 0x80000000: ",
+	          FALSE, TRUE)
+
+	/* Add two large positive numbers. Should set the overflow, but not
+	   the carry flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0x40000000, 0x40000000, 0x80000000,
+	          "0x40000000 + 0x40000000     = 0x80000000: ",
+	          FALSE, TRUE)
+
+	/* Add the largest unsigned value to zero with a carry. This
+	   potentially can break a simplistic test for carry that does not
+	   consider the carry flag properly. Do it both ways around. */
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0xffffffff, 0x00000000, 0x00000000,
+	          "0xffffffff + 0x00000000 + c = 0x00000000: ",
+	          TRUE, FALSE)
+
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0x00000000, 0xffffffff, 0x00000000,
+	          "0x00000000 + 0xffffffff + c = 0x00000000: ",
+	          TRUE, FALSE)
+
+	/* Add two quite large negative numbers. Should set the carry, but not
+	   the overflow flag. flag. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0xc0000000, 0xc0000000, 0x80000000,
+	          "0xc0000000 + 0xc0000000     = 0x80000000: ",
+	          TRUE, FALSE)
+
+	/* Add two quite large negative numbers that would overflow, with a
+	   carry that just avoids the overflow. Should set the carry, but not
+	   the overflow flag. flag. */
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0xc0000000, 0xbfffffff, 0x80000000,
+	          "0xc0000000 + 0xbfffffff + c = 0x80000000: ",
+	          TRUE, FALSE)
+
+	/* Add two large negative numbers. Should set both the overflow and
+	   carry flags. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0xbfffffff, 0xbfffffff, 0x7ffffffe,
+	          "0xbfffffff + 0xbfffffff     = 0x7ffffffe: ",
+	          TRUE, TRUE)
+
+	/* Check that range exceptions are triggered */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, SPR_SR_OVE)	/* Set OVE */
+	l.or	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag set **\n")
+	l.jal	_puts
+	l.nop
+
+	/* Check that an overflow alone causes a RANGE Exception, even when it
+	   is the carry that causes the overflow. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0x40000000, 0x40000000, 0x80000000,
+	          "0x40000000 + 0x40000000     = 0x80000000: ",
+	          FALSE, TRUE)
+
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0x40000000, 0x3fffffff, 0x80000000,
+	          "0x40000000 + 0x3fffffff + c = 0x80000000: ",
+	          FALSE, TRUE)
+
+	/* Check that a carry alone does not cause a RANGE Exception, even
+	   when it is the carry that causes the overflow. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0xffffffff, 0xfffffffe, 0xfffffffd,
+	          "0xffffffff + 0xfffffffe     = 0xfffffffd: ",
+	          TRUE, FALSE)
+
+	TEST_ADD (SPR_SR_CY, SPR_SR_OV,
+	          l.addc, 0x00000000, 0xffffffff, 0x00000000,
+	          "0x00000000 + 0xffffffff + c = 0x00000000: ",
+	          TRUE, FALSE)
+
+	/* Check that carry and overflow together cause an exception. */
+	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
+	          l.addc, 0xbfffffff, 0xbfffffff, 0x7ffffffe,
+	          "0xbfffffff + 0xbfffffff     = 0x7ffffffe: ",
+	          TRUE, TRUE)
+
+	/* Finished checking range exceptions */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
+	l.and	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag cleared **\n")
+	l.jal	_puts
+	l.nop
+
+/* ----------------------------------------------------------------------------
+ * Test of add signed immediate, l.addi
+ * ------------------------------------------------------------------------- */
+_addi:
+	LOAD_STR (r3, "l.addi\n")
+	l.jal	_puts
+	l.nop
+
+	/* Add two small positive numbers */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 1, 2, 3,
+	           "0x00000001 + 0x00000002 = 0x00000003: ",
+	           FALSE, FALSE)
+
+	/* Check carry in is ignored. */
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addi, 1, 2, 3,
+	           "0x00000001 + 0x00000002 = 0x00000003: ",
+	           FALSE, FALSE)
+
+	/* Add two small negative numbers. Sets the carry flag but not the
+	   overflow flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0xffffffff, 0xfffe, 0xfffffffd,
+	           "0xffffffff + 0xfffffffe = 0xfffffffd: ",
+	           TRUE, FALSE)
+
+	/* Add two quite large positive numbers. Should set neither the
+	   overflow nor the carry flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x7fff8000, 0x7fff, 0x7fffffff,
+	           "0x7fff8000 + 0x00007fff = 0x7fffffff: ",
+	           FALSE, FALSE)
+
+	/* Add two large positive numbers. Should set the overflow, but not
+	   the carry flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x7fffc000, 0x4000, 0x80000000,
+	           "0x7fffc000 + 0x00004000 = 0x80000000: ",
+	           FALSE, TRUE)
+
+	/* Add two quite large negative numbers. Should set the carry, but not
+	   the overflow flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x80008000, 0x8000, 0x80000000,
+	           "0x80008000 + 0xffff8000 = 0x80000000: ",
+	           TRUE, FALSE)
+
+	/* Add two large negative numbers. Should set both the overflow and
+	   carry flags. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x80007fff, 0x8000, 0x7fffffff,
+	           "0x80007fff + 0xffff8000 = 0x7fffffff: ",
+	           TRUE, TRUE)
+
+	/* Check that range exceptions are triggered */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, SPR_SR_OVE)	/* Set OVE */
+	l.or	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag set **\n")
+	l.jal	_puts
+	l.nop
+
+	/* Check that an overflow alone causes a RANGE Exception. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x7fffc000, 0x4000, 0x80000000,
+	           "0x7fffc000 + 0x00004000 = 0x80000000: ",
+	           FALSE, TRUE)
+
+	/* Check that a carry alone does not cause a RANGE Exception. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0xffffffff, 0xfffe, 0xfffffffd,
+	           "0xffffffff + 0xfffffffe = 0xfffffffd: ",
+	           TRUE, FALSE)
+
+	/* Check that carry and overflow together cause an exception. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addi, 0x80007fff, 0x8000, 0x7fffffff,
+	           "0x80007fff + 0xffff8000 = 0x7ffffffe: ",
+	           TRUE, TRUE)
+
+	/* Finished checking range exceptions */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
+	l.and	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag cleared **\n")
+	l.jal	_puts
+	l.nop
+
+/* ----------------------------------------------------------------------------
+ * Test of add signed and carry, l.addic
+ * ------------------------------------------------------------------------- */
+_addic:
+	LOAD_STR (r3, "l.addic\n")
+	l.jal	_puts
+	l.nop
+
+	/* Add two small positive numbers */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 1, 2, 3,
+	           "0x00000001 + 0x00000002     = 0x00000003: ",
+	           FALSE, FALSE)
+
+	/* Add two small negative numbers. Sets the carry flag but not the
+	   overflow flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0xffffffff, 0xfffe, 0xfffffffd,
+	           "0xffffffff + 0xfffffffe     = 0xfffffffd: ",
+	           TRUE, FALSE)
+
+	/* Add two quite large positive numbers. Should set neither the
+	   overflow nor the carry flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x7fff8000, 0x7fff, 0x7fffffff,
+	           "0x7fff8000 + 0x00007fff     = 0x7fffffff: ",
+	           FALSE, FALSE)
+
+	/* Add two quite large positive numbers with a carry in. Should set
+	   the overflow but not the carry flag. */
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0x7fff8000, 0x7fff, 0x80000000,
+	           "0x7fff8000 + 0x00007fff + c = 0x80000000: ",
+	           FALSE, TRUE)
+
+	/* Add two large positive numbers. Should set the overflow, but not
+	   the carry flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x7fffc000, 0x4000, 0x80000000,
+	           "0x7fffc000 + 0x00004000     = 0x80000000: ",
+	           FALSE, TRUE)
+
+	/* Add the largest unsigned value to zero with a carry. This
+	   potentially can break a simplistic test for carry that does not
+	   consider the carry flag properly. Do it both ways around. */
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0xffffffff, 0x0000, 0x00000000,
+	           "0xffffffff + 0x00000000 + c = 0x00000000: ",
+	           TRUE, FALSE)
+
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0x00000000, 0xffff, 0x00000000,
+	           "0x00000000 + 0xffffffff + c = 0x00000000: ",
+	           TRUE, FALSE)
+
+	/* Add two quite large negative numbers. Should set the carry, but not
+	   the overflow flag. flag. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x80008000, 0x8000, 0x80000000,
+	           "0x80008000 + 0xffff8000     = 0x80000000: ",
+	           TRUE, FALSE)
+
+	/* Add two quite large negative numbers that would overflow, with a
+	   carry that just avoids the overflow. Should set the carry, but not
+	   the overflow flag. flag. */
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0x80007fff, 0x8000, 0x80000000,
+	           "0x80007fff + 0xffff8000 + c = 0x80000000: ",
+	           TRUE, FALSE)
+
+	/* Add two large negative numbers. Should set both the overflow and
+	   carry flags. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x80007fff, 0x8000, 0x7fffffff,
+	           "0x80007fff + 0xffff8000     = 0x7fffffff: ",
+	           TRUE, TRUE)
+
+	/* Check that range exceptions are triggered */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, SPR_SR_OVE)	/* Set OVE */
+	l.or	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag set **\n")
+	l.jal	_puts
+	l.nop
+
+	/* Check that an overflow alone causes a RANGE Exception, even when it
+	   is the carry that causes the overflow. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x7fffc000, 0x4000, 0x80000000,
+	           "0x7fffc000 + 0x00004000     = 0x80000000: ",
+	           FALSE, TRUE)
+
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0x7fffc000, 0x3fff, 0x80000000,
+	           "0x7fffc000 + 0x00003fff + c = 0x80000000: ",
+	           FALSE, TRUE)
+
+	/* Check that a carry alone does not cause a RANGE Exception, even
+	   when it is the carry that causes the overflow. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0xffffffff, 0xfffe, 0xfffffffd,
+	           "0xffffffff + 0xfffffffe     = 0xfffffffd: ",
+	           TRUE, FALSE)
+
+	TEST_ADDI (SPR_SR_CY, SPR_SR_OV,
+	           l.addic, 0x00000000, 0xffff, 0x00000000,
+	           "0x00000000 + 0xffffffff + c = 0x00000000: ",
+	           TRUE, FALSE)
+
+	/* Check that carry and overflow together cause an exception. */
+	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
+	           l.addic, 0x80007fff, 0x8000, 0x7fffffff,
+	           "0x80007fff + 0xffff8000     = 0x7ffffffe: ",
+	           TRUE, TRUE)
+
+	/* Finished checking range exceptions */
+	l.mfspr	r3,r0,SPR_SR
+	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
+	l.and	r3,r3,r2
+	l.mtspr	r0,r3,SPR_SR
+	
+	LOAD_STR (r3, "  ** OVE flag cleared **\n")
 	l.jal	_puts
 	l.nop
 

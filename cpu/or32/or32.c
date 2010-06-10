@@ -332,8 +332,8 @@ CONST struct or32_opcode or32_opcodes[] = {
 
   {"l.addi", "rD,rA,I", "10 0x7  DDDDD AAAAA IIII IIII IIII IIII",
    EF (l_add), OR32_W_FLAG, it_arith},
-  {"l.addic", "rD,rA,I", "10 0x8  DDDDD AAAAA IIII IIII IIII IIII", EFI,
-   0, it_arith},
+  {"l.addic", "rD,rA,I", "10 0x8  DDDDD AAAAA IIII IIII IIII IIII",
+   EF (l_addc), OR32_W_FLAG, it_arith},
   {"l.andi", "rD,rA,K", "10 0x9  DDDDD AAAAA KKKK KKKK KKKK KKKK",
    EF (l_and), OR32_W_FLAG, it_arith},
   {"l.ori", "rD,rA,K", "10 0xA  DDDDD AAAAA KKKK KKKK KKKK KKKK",
