@@ -50,9 +50,9 @@
  * In addition the l.addc and l.addic instructions should add in the carry
  * bit.
  *
- * Problems in this area were reported in Bug 1771. Having fixed the problem,
- * this is (in good software engineering style), a  regression test to go with
- * the fix.
+ * Problems in this area were reported in Bugs 1771 and 1776. Having fixed the
+ * problem, this is (in good software engineering style), a  regression test
+ * to go with the fix.
  *
  * This is not a comprehensive test of any instruction (yet).
  *

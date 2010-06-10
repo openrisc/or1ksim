@@ -43,24 +43,30 @@ libinst_set_test_la_SOURCES = inst-set-test.S
 # The test programs
 check_PROGRAMS = is-add-test          \
 		 is-div-test          \
+		 is-find-test         \
 		 is-lws-test          \
 	         $(INST_SET_TEST_OLD)
 
 # The new instruction set tests.
-is_add_test_SOURCES = inst-set-test.h \
-	              is-add-test.S
-is_add_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
-is_add_test_LDADD   = inst-set-test.lo
+is_add_test_SOURCES  = inst-set-test.h \
+	               is-add-test.S
+is_add_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_add_test_LDADD    = inst-set-test.lo
 
-is_div_test_SOURCES = inst-set-test.h \
-	              is-div-test.S
-is_div_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
-is_div_test_LDADD   = inst-set-test.lo
+is_div_test_SOURCES  = inst-set-test.h \
+	               is-div-test.S
+is_div_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_div_test_LDADD    = inst-set-test.lo
 
-is_lws_test_SOURCES = inst-set-test.h \
-	              is-lws-test.S
-is_lws_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
-is_lws_test_LDADD   = inst-set-test.lo
+is_find_test_SOURCES = inst-set-test.h \
+	               is-find-test.S
+is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_find_test_LDADD   = inst-set-test.lo
+
+is_lws_test_SOURCES  = inst-set-test.h \
+	               is-lws-test.S
+is_lws_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_lws_test_LDADD    = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c

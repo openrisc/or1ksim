@@ -1,8 +1,15 @@
 2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* peripheral/Makefile.am: mc-defines.h added to sources.
+	* cpu/or32/insnset.c <l_fl1>: New entry.
+	* cpu/or32/or32.c <or32_opcodes>: l.fl1 enabled.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* peripheral/Makefile.am: mc-defines.h added to sources.
 	* cpu/or32/insnset.c <l_addc>: Updated to handle overflow and
 	exceptions correctly.
 	* cpu/or32/or32.c <or32_opcodes>: l.addic enabled.
+	* NEWS: Updated with new bugs fixed.
 
 2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
@@ -11,6 +18,7 @@
 	* cpu/or32/insnset.c <l_add>: Updated to handle overflow and
 	exceptions correctly.
 	* peripheral/Makefile.am: mc-defines.h added to sources.
+	* NEWS: Updated with new bugs fixed.
 
 2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.

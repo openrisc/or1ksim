@@ -611,6 +611,18 @@ INSTRUCTION (l_cmov) {
 INSTRUCTION (l_ff1) {
   SET_PARAM0(ffs(PARAM1));
 }
+INSTRUCTION (l_fl1) {
+  orreg_t t = (orreg_t)PARAM1;
+
+  /* Reverse the word and use ffs */
+  t = (((t & 0xaaaaaaaa) >> 1) | ((t & 0x55555555) << 1));
+  t = (((t & 0xcccccccc) >> 2) | ((t & 0x33333333) << 2));
+  t = (((t & 0xf0f0f0f0) >> 4) | ((t & 0x0f0f0f0f) << 4));
+  t = (((t & 0xff00ff00) >> 8) | ((t & 0x00ff00ff) << 8));
+  t = ffs ((t >> 16) | (t << 16));
+  
+  SET_PARAM0 (0 == t ? t : 33 - t);
+}
 /******* Floating point instructions *******/
 /* Single precision */
 INSTRUCTION (lf_add_s) {

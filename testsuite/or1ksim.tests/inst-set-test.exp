@@ -24,46 +24,8 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the l.lws test
-run_or1ksim "lws-test"                            \
-    [list "!l.lws"                                \
-          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
-          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
-          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
-          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
-          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
-          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
-          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
-          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
-          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
-          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
-          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
-          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
-          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
-          "!Test completed"                       \
-          "!report(0xdeaddead);"                  \
-	  "!exit(0)"]                             \
-    "inst-set-test.cfg" "inst-set-test/is-lws-test"
-
-# Run the l.div and l.divu test
-run_or1ksim "lws-test"                                \
-    [list "!l.div"                                    \
-          "!  RANGE exception"                        \
-          "  - caused by: report(0xe0853309);"        \
-          "!  - SR value:  report(0x00008601);"       \
-          "  1 / 0 (with error) carry flag set: TRUE" \
-          "!l.divu"                                   \
-          "!  RANGE exception"                        \
-          "  - caused by: report(0xe085330a);"        \
-          "!  - SR value:  report(0x00008601);"       \
-          "  1 / 0 (with error) carry flag set: TRUE" \
-          "!Test completed"                           \
-          "!report(0xdeaddead);"                      \
-	  "!exit(0)"]                                 \
-    "inst-set-test.cfg" "inst-set-test/is-div-test"
-
 # Run the l.add, l.addc, l.addi and l.addic tests
-run_or1ksim "lws-test"                                     \
+run_or1ksim "add-test"                                     \
     [list "!l.add"                                         \
           "  0x00000001 + 0x00000002 = 0x00000003: OK"     \
           "  - carry flag set:    FALSE"                   \
@@ -260,3 +222,64 @@ run_or1ksim "lws-test"                                     \
           "!report(0xdeaddead);"                           \
 	  "!exit(0)"]                                      \
     "inst-set-test.cfg" "inst-set-test/is-add-test"
+
+# Run the l.div and l.divu test
+run_or1ksim "div-test"                                \
+    [list "!l.div"                                    \
+          "!  RANGE exception"                        \
+          "  - caused by: report(0xe0853309);"        \
+          "!  - SR value:  report(0x00008601);"       \
+          "  1 / 0 (with error) carry flag set: TRUE" \
+          "!l.divu"                                   \
+          "!  RANGE exception"                        \
+          "  - caused by: report(0xe085330a);"        \
+          "!  - SR value:  report(0x00008601);"       \
+          "  1 / 0 (with error) carry flag set: TRUE" \
+          "!Test completed"                           \
+          "!report(0xdeaddead);"                      \
+	  "!exit(0)"]                                 \
+    "inst-set-test.cfg" "inst-set-test/is-div-test"
+
+# Run the l.ff1 and l.fl1 test
+run_or1ksim "find-test"                 \
+    [list "!l.ff1"                      \
+          "  ff1 (0x00000001) =  1: OK" \
+          "  ff1 (0x80000000) = 32: OK" \
+          "  ff1 (0x55555555) =  1: OK" \
+          "  ff1 (0xaaaaaaaa) =  2: OK" \
+          "  ff1 (0x00018000) = 16: OK" \
+          "  ff1 (0xc0000000) = 31: OK" \
+          "  ff1 (0x00000000) =  0: OK" \
+          "!l.fl1"                      \
+          "  fl1 (0x00000001) =  1: OK" \
+          "  fl1 (0x80000000) = 32: OK" \
+          "  fl1 (0x55555555) = 31: OK" \
+          "  fl1 (0xaaaaaaaa) = 32: OK" \
+          "  fl1 (0x00018000) = 17: OK" \
+          "  fl1 (0xc0000000) = 32: OK" \
+          "  fl1 (0x00000000) =  0: OK" \
+          "!Test completed"             \
+          "!report(0xdeaddead);"        \
+	  "!exit(0)"]                   \
+    "inst-set-test.cfg" "inst-set-test/is-find-test"
+
+# Run the l.lws test
+run_or1ksim "lws-test"                            \
+    [list "!l.lws"                                \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "!Test completed"                       \
+          "!report(0xdeaddead);"                  \
+	  "!exit(0)"]                             \
+    "inst-set-test.cfg" "inst-set-test/is-lws-test"

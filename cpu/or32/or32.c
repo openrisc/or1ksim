@@ -497,8 +497,8 @@ CONST struct or32_opcode or32_opcodes[] = {
    EF (l_cmov), OR32_R_FLAG, it_move},
   {"l.ff1", "rD,rA", "11 0x8  DDDDD AAAAA ---- --00 ---- 0xF",
    EF (l_ff1), 0, it_arith},
-  {"l.fl1", "rD,rA", "11 0x8  DDDDD AAAAA ---- --01 ---- 0xF", EFI, 0,
-   it_arith},
+  {"l.fl1", "rD,rA", "11 0x8  DDDDD AAAAA ---- --01 ---- 0xF",
+   EF (l_fl1), 0, it_arith},
 
   {"l.sfeq", "rA,rB", "11 0x9  00000 AAAAA BBBB B--- ---- ----",
    EF (l_sfeq), OR32_W_FLAG, it_compare},
