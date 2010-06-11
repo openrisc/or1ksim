@@ -553,15 +553,19 @@ INSTRUCTION (l_trap) {
 INSTRUCTION (l_mac) {
   uorreg_t lo, hi;
   LONGEST l;
-  orreg_t x, y;
+  orreg_t x, y, t;
 
   lo = cpu_state.sprs[SPR_MACLO];
   hi = cpu_state.sprs[SPR_MACHI];
   x = PARAM0;
   y = PARAM1;
 /*   PRINTF ("[%"PRIxREG",%"PRIxREG"]\t", x, y); */
+
+  /* Compute the temporary as (signed) 32-bits, then sign-extend to 64 when
+     adding in. */
   l = (ULONGEST)lo | ((LONGEST)hi << 32);
-  l += (LONGEST) x * (LONGEST) y;
+  t = x * y;
+  l += (LONGEST) t;
 
   /* This implementation is very fast - it needs only one cycle for mac.  */
   lo = ((ULONGEST)l) & 0xFFFFFFFF;
@@ -593,15 +597,11 @@ INSTRUCTION (l_msb) {
 /*   PRINTF ("(%"PRIxREG",%"PRIxREG")\n", hi, lo); */
 }
 INSTRUCTION (l_macrc) {
-  uorreg_t lo, hi;
-  LONGEST l;
+  orreg_t lo;
   /* No need for synchronization here -- all MAC instructions are 1 cycle long.  */
   lo =  cpu_state.sprs[SPR_MACLO];
-  hi =  cpu_state.sprs[SPR_MACHI];
-  l = (ULONGEST) lo | ((LONGEST)hi << 32);
-  l >>= 28;
   //PRINTF ("<%08x>\n", (unsigned long)l);
-  SET_PARAM0((orreg_t)l);
+  SET_PARAM0(lo);
   cpu_state.sprs[SPR_MACLO] = 0;
   cpu_state.sprs[SPR_MACHI] = 0;
 }

@@ -23,22 +23,7 @@
  */
 
 /* ----------------------------------------------------------------------------
- * Coding conventions
- *
- * A simple rising stack is provided starting at _stack and pointed to by
- * r1. r1 points to the next free word. Only 32-bit registers may be pushed
- * onto the stack.
- *
- * Local labels up to 49 are reserved for macros. Each is used only once in
- * all macros. You can get in a serious mess if you get local label clashing
- * in macros.
- *
- * Arguments to functions are passed in r3 through r8.
- * r9 is the link (return address)
- * r11 is for returning results
- *
- * Only r1 and r2 are preserved across function calls. It is up to the callee
- * to save any other registers required.
+ * Coding conventions are described in inst-set-test.S
  * ------------------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------------------

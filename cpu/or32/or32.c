@@ -304,7 +304,7 @@ CONST struct or32_opcode or32_opcodes[] = {
    EF (l_jr), OR32_IF_DELAY, it_jump},
   {"l.jalr", "rB", "01 0x2  ----- ----- BBBB B--- ---- ----",
    EF (l_jalr), OR32_IF_DELAY, it_jump},
-  {"l.maci", "rA,I", "01 0x3  IIIII AAAAA ---- -III IIII IIII",
+  {"l.maci", "rA,I", "01 0x3  ----- AAAAA IIII IIII IIII IIII",
    EF (l_mac), 0, it_mac},
   {"l.cust1", "", "01 0xC  ----- ----- ---- ---- ---- ----",
    EF (l_cust1), 0, it_unknown},

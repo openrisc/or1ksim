@@ -22,39 +22,11 @@
    with this program.  If not, see <http:  www.gnu.org/licenses/>.  */
 
 
-/* ----------------------------------------------------------------------------
- * Test coverage
- *
- * The l.lws instruction was omitted from Or1ksim originally. It is specified
- * for ORBIS32, even though it is functionally equivalent to l.lwz.
- *
- * Having fixed the problem, this is (in good software engineering style), a
- * regresison test to go with the fix.
- *
- * Of course what is really needed is a comprehensive instruction test...
- * ------------------------------------------------------------------------- */
-
-
 #include "spr-defs.h"
 #include "board.h"
 
 /* ----------------------------------------------------------------------------
- * Coding conventions
- *
- * A simple rising stack is provided starting at _stack and pointed to by
- * r1. r1 points to the next free word. Only 32-bit registers may be pushed
- * onto the stack.
- *
- * Local labels up to 49 are reserved for macros. Each is used only once in
- * all macros. You can get in a serious mess if you get local label clashing
- * in macros.
- *
- * Arguments to functions are passed in r3 through r8.
- * r9 is the link (return address)
- * r11 is for returning results
- *
- * Only r1 and r2 are preserved across function calls. It is up to the callee
- * to save any other registers required.
+ * Coding conventions are described in inst-set-test.S
  * ------------------------------------------------------------------------- */
 
 
@@ -142,9 +114,35 @@
 	l.nop	NOP_PUTC
 	
 /* ----------------------------------------------------------------------------
+ * Macro to print a string
+ *
+ * Arguments:
+ *   s  The string to print
+ * ------------------------------------------------------------------------- */
+#define PUTS(s)								 \
+	LOAD_STR (r3, s)						;\
+	PUSH (r9)							;\
+	l.jal	_puts							;\
+	l.nop								;\
+	POP (r9)
+	
+/* ----------------------------------------------------------------------------
+ * Macro to print a hex value
+ *
+ * Arguments:
+ *   v  The value to print
+ * ------------------------------------------------------------------------- */
+#define PUTH(v)								 \
+	LOAD_CONST (r3, v)						;\
+	PUSH (r9)							;\
+	l.jal	_puth							;\
+	l.nop								;\
+	POP (r9)
+	
+/* ----------------------------------------------------------------------------
  * Macro for recording the result of a test
  *
- * The test result is in r4. Print out the name of test indented two spaces,
+ * The test result is in reg. Print out the name of test indented two spaces,
  * followed by  ": ", either "OK" or "Failed" and a newline.
  *
  * Arguments:
@@ -252,6 +250,71 @@
 	l.nop								;\
 9:
 
+/* ----------------------------------------------------------------------------
+ * Macro for recording the result of a test (in two regs)
+ *
+ * The test result is in reg1 and reg2. Print out the name of test indented
+ * two spaces, followed by  ": ", either "OK" or "Failed" and a newline.
+ *
+ * Arguments:
+ *   str   Textual name of the test
+ *   reg1  The result to test (not r2)
+ *   reg2  The result to test (not r2)
+ *   val1  Desired result of the test
+ *   val2  Desired result of the test
+ * ------------------------------------------------------------------------- */
+#define CHECK_RES2(reg1, reg2, val1, val2)				 \
+	PUSH (reg2)			/* Save the test registers */	;\
+	PUSH (reg1)							;\
+									;\
+	LOAD_CONST(r2,val1)		/* First desired result */	;\
+	POP (reg1)			/* First register to test */	;\
+	PUSH (reg1)			/* May need again later */	;\
+	l.sfeq	r2,reg1			/* Does the result match? */	;\
+	l.bf	10f							;\
+	l.nop								;\
+									;\
+	/* First register failed. */					;\
+	l.jal	_pfail			/* Test failed */		;\
+	l.nop								;\
+	POP (reg1)			/* Report the registers */	;\
+	l.add	r3,r0,reg1						;\
+	l.nop	NOP_REPORT						;\
+	POP (reg2)			/* Report the registers */	;\
+	l.add	r3,r0,reg2						;\
+	l.j	12f							;\
+	l.nop	NOP_REPORT						;\
+									;\
+	/* First register matched, check the second */			;\
+10:									;\
+	LOAD_CONST(r2,val2)		/* Second desired result */	;\
+	POP (reg1)			/* First register to test */	;\
+	POP (reg2)			/* Second register to test */	;\
+	PUSH (reg2)			/* May need again later */	;\
+	PUSH (reg1)			/* May need again later */	;\
+	l.sfeq	r2,reg2			/* Does the result match? */	;\
+	l.bf	11f							;\
+	l.nop								;\
+									;\
+	/* Second register failed. */					;\
+	l.jal	_pfail			/* Test failed */		;\
+	l.nop								;\
+	POP (reg1)			/* Report the registers */	;\
+	l.add	r3,r0,reg1						;\
+	l.nop	NOP_REPORT						;\
+	POP (reg2)			/* Report the registers */	;\
+	l.add	r3,r0,reg2						;\
+	l.j	12f							;\
+	l.nop	NOP_REPORT						;\
+									;\
+	/* Both registers passed */					;\
+11:									;\
+	POP (reg1)			/* Discard the registers */	;\
+	POP (reg2)			/* Discard the registers */	;\
+	l.jal	_pok			/* Test succeeded */		;\
+	l.nop								;\
+12:
+	
 /* ----------------------------------------------------------------------------
  * Macro to report 0xdeaddead and then terminate
  * ------------------------------------------------------------------------- */

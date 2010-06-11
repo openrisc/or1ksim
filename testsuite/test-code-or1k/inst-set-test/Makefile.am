@@ -44,6 +44,7 @@ libinst_set_test_la_SOURCES = inst-set-test.S
 check_PROGRAMS = is-add-test          \
 		 is-div-test          \
 		 is-find-test         \
+		 is-mac-test          \
 		 is-lws-test          \
 	         $(INST_SET_TEST_OLD)
 
@@ -62,6 +63,11 @@ is_find_test_SOURCES = inst-set-test.h \
 	               is-find-test.S
 is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_find_test_LDADD   = inst-set-test.lo
+
+is_mac_test_SOURCES  = inst-set-test.h \
+	               is-mac-test.S
+is_mac_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_mac_test_LDADD    = inst-set-test.lo
 
 is_lws_test_SOURCES  = inst-set-test.h \
 	               is-lws-test.S

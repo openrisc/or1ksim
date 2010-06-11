@@ -37,8 +37,7 @@
  * r9 is the link (return address)
  * r11 is for returning results
  *
- * Only r1 and r2 are preserved across function calls. It is up to the callee
- * to save any other registers required.
+ * All registers apart from r2, r9 and r11 are preserved across function calls.
  * ------------------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------------------
@@ -151,6 +150,7 @@ _range_end:
  * ------------------------------------------------------------------------- */
 	.global	_puts
 _puts:
+	PUSH (r3)
 	l.add	r2,r0,r3		/* Copy the string pointer */
 	
 	/* Loop getting and printing each char until end of string */
@@ -162,7 +162,77 @@ _puts:
 	l.j	60b			/* Repeat */
 	l.nop	NOP_PUTC		/* Delay slot */
 
-61:	l.jr	r9			/* Return */
+61:	POP (r3)
+	l.jr	r9			/* Return */
+	l.nop
+
+/* ----------------------------------------------------------------------------
+ * Subroutine to print out a register in hex
+ *
+ * Parameters:
+ *  r3  The value to print
+ * ------------------------------------------------------------------------- */
+	.section .rodata
+62:	.string "0123456789abcdef"
+	.section .text
+
+	.global	_puth
+_puth:
+	PUSH (r3)
+	PUSH (r4)
+	
+	l.add	r2,r0,r3		/* Copy the value pointer */
+	LOAD_CONST (r4,62b)		/* Ptr to digit chars */
+	
+	l.srli	r3,r2,28		/* Print each digit in turn. */
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,24
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,20
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,16
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,12
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,8
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,4
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.andi	r3,r2,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	POP (r4)			/* Return */
+	POP (r3)
+	l.jr	r9
 	l.nop
 
 /* ----------------------------------------------------------------------------
@@ -175,10 +245,10 @@ _puts:
  * ------------------------------------------------------------------------- */
 	.global	_ptest
 _ptest:
-	PUSH(r9)			/* Save the return address */
-	PUSH(r3)			/* Save the test name for later */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)			/* Save the test name for later */
 
-	LOAD_STR(r3, "  ")		/* Prefix */
+	LOAD_STR (r3, "  ")		/* Prefix */
 	l.jal	_puts
 	l.nop
 
@@ -197,12 +267,14 @@ _ptest:
  * ------------------------------------------------------------------------- */
 	.global	_pok
 _pok:
-	PUSH(r9)			/* Save the return address */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)
 
-	LOAD_STR(r3, "OK\n")
+	LOAD_STR (r3, "OK\n")
 	l.jal	_puts
 	l.nop
 
+	POP (r3)
 	POP (r9)
 	l.jr	r9
 	l.nop
@@ -214,12 +286,14 @@ _pok:
  * ------------------------------------------------------------------------- */
 	.global	_pfail
 _pfail:
-	PUSH(r9)			/* Save the return address */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)
 
-	LOAD_STR(r3, "Failed: ")
+	LOAD_STR (r3, "Failed: ")
 	l.jal	_puts
 	l.nop
 
+	POP (r3)
 	POP (r9)
 	l.jr	r9
 	l.nop
@@ -229,12 +303,14 @@ _pfail:
  * ------------------------------------------------------------------------- */
 	.global	_ptrue
 _ptrue:
-	PUSH(r9)			/* Save the return address */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)
 
-	LOAD_STR(r3, "TRUE")
+	LOAD_STR (r3, "TRUE")
 	l.jal	_puts
 	l.nop
 
+	POP (r3)
 	POP (r9)
 	l.jr	r9
 	l.nop
@@ -244,12 +320,14 @@ _ptrue:
  * ------------------------------------------------------------------------- */
 	.global	_pfalse
 _pfalse:
-	PUSH(r9)			/* Save the return address */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)
 
-	LOAD_STR(r3, "FALSE")
+	LOAD_STR (r3, "FALSE")
 	l.jal	_puts
 	l.nop
 
+	POP (r3)
 	POP (r9)
 	l.jr	r9
 	l.nop
@@ -261,12 +339,14 @@ _pfalse:
  * ------------------------------------------------------------------------- */
 	.global	_punexpected
 _punexpected:
-	PUSH(r9)			/* Save the return address */
+	PUSH (r9)			/* Save the return address */
+	PUSH (r3)
 
-	LOAD_STR(r3, " unexpected\n")
+	LOAD_STR (r3, " unexpected\n")
 	l.jal	_puts
 	l.nop
 
+	POP (r3)
 	POP (r9)
 	l.jr	r9
 	l.nop

@@ -30,8 +30,8 @@
 #include "support.h"
 
 #define T1 0xa6312f33
-#define T2 0x0d4de375
-#define T3 0x61ab48dc
+#define T2 0x059b8f08
+#define T3 0x00000000
 
 #define MAC(x,y) asm volatile ("l.mac\t%0,%1" : : "r" (x), "r" (y))
 #define MACRC macrc()

@@ -283,3 +283,220 @@ run_or1ksim "lws-test"                            \
           "!report(0xdeaddead);"                  \
 	  "!exit(0)"]                             \
     "inst-set-test.cfg" "inst-set-test/is-lws-test"
+
+# Run the l.mac test
+run_or1ksim "mac-test"                            \
+    [list "!l.mac"                                \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x00000000 0000000c: OK" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000001 00000000: OK" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x40000000 00000000: OK" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000 00000000: OK" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0xffffffff 00000006: OK" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008001 * 0x0000fffe = 0x00000000 7ffffffe: OK" \
+  "  0x00000000 00000002 + 0x00008001 * 0x0000fffe = 0x00000000 80000000: OK" \
+  "  0x00000000 80000002 + 0x00008001 * 0x0000fffe = 0x00000001 00000000: OK" \
+  "  0x7fffffff 80000001 + 0x00008001 * 0x0000fffe = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff + 0x00008001 * 0x0000fffe = 0x00000000 7ffffffd: OK" \
+  "  0xffffffff 80000002 + 0x00008001 * 0x0000fffe = 0x00000000 00000000: OK" \
+  "  0xfffffffe 80000002 + 0x00008001 * 0x0000fffe = 0xffffffff 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0xfffffffe * 0xfffffffd = 0x00000000 0000000c: OK" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0xfffffffd = 0x00000000 00000005: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0xfffffffd = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c + 0x00000002 * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000001 00000005 + 0x00000002 * 0xfffffffd = 0x00000000 ffffffff: OK" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0xfffffffd = 0x7fffffff fffffff9: OK" \
+  "  0xffffffff ffffffff + 0x00000002 * 0xfffffffd = 0xffffffff fffffff9: OK" \
+  "  0xffffffff 00000005 + 0x00000002 * 0xfffffffd = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 + 0x00000002 * 0xfffffffd = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008000 * 0xffff0000 = 0xffffffff 80000000: OK" \
+  "  0x00000000 00000006 + 0x00008000 * 0xffff0000 = 0xffffffff 80000006: OK" \
+  "  0x00000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000 00000000: OK" \
+  "  0x7fffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff 7fffffff: OK" \
+  "  0xffffffff ffffffff + 0x00008000 * 0xffff0000 = 0xffffffff 7fffffff: OK" \
+  "  0xffffffff 7fffffff + 0x00008000 * 0xffff0000 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 80000000 + 0x00008000 * 0xffff0000 = 0x80000000 00000000: OK" \
+  "!" \
+  "l.maci" \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x00000000 0000000c: OK" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000001 00000000: OK" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x40000000 00000000: OK" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000 00000000: OK" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0xffffffff 00000006: OK" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00010002 * 0x00007fff = 0x00000000 7ffffffe: OK" \
+  "  0x00000000 00000002 + 0x00010002 * 0x00007fff = 0x00000000 80000000: OK" \
+  "  0x00000000 80000002 + 0x00010002 * 0x00007fff = 0x00000001 00000000: OK" \
+  "  0x7fffffff 80000001 + 0x00010002 * 0x00007fff = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff + 0x00010002 * 0x00007fff = 0x00000000 7ffffffd: OK" \
+  "  0xffffffff 80000002 + 0x00010002 * 0x00007fff = 0x00000000 00000000: OK" \
+  "  0xfffffffe 80000002 + 0x00010002 * 0x00007fff = 0xffffffff 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0x0000fffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0xfffffffe * 0x0000fffd = 0x00000000 0000000c: OK" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0x0000fffd = 0x00000000 00000005: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0x0000fffd = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c + 0x00000002 * 0x0000fffd = 0x00000000 00000006: OK" \
+  "  0x00000001 00000005 + 0x00000002 * 0x0000fffd = 0x00000000 ffffffff: OK" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0x0000fffd = 0x7fffffff fffffff9: OK" \
+  "  0xffffffff ffffffff + 0x00000002 * 0x0000fffd = 0xffffffff fffffff9: OK" \
+  "  0xffffffff 00000005 + 0x00000002 * 0x0000fffd = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 + 0x00000002 * 0x0000fffd = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00010000 * 0x00008000 = 0xffffffff 80000000: OK" \
+  "  0x00000000 00000006 + 0x00010000 * 0x00008000 = 0xffffffff 80000006: OK" \
+  "  0x00000000 80000000 + 0x00010000 * 0x00008000 = 0x00000000 00000000: OK" \
+  "  0x7fffffff ffffffff + 0x00010000 * 0x00008000 = 0x7fffffff 7fffffff: OK" \
+  "  0xffffffff ffffffff + 0x00010000 * 0x00008000 = 0xffffffff 7fffffff: OK" \
+  "  0xffffffff 7fffffff + 0x00010000 * 0x00008000 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 80000000 + 0x00010000 * 0x00008000 = 0x80000000 00000000: OK" \
+  "!" \
+  "l.macrc" \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x0000000c:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008001 * 0x0000fffe = 0x7ffffffe:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000002 + 0x00008001 * 0x0000fffe = 0x80000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff 80000001 + 0x00008001 * 0x0000fffe = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00008001 * 0x0000fffe = 0x7ffffffd:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xfffffffe 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0xfffffffd = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0xfffffffe * 0xfffffffd = 0x0000000c:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0xfffffffd = 0x00000005:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0xfffffffd = 0xfffffffa:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 0000000c + 0x00000002 * 0xfffffffd = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000001 00000005 + 0x00000002 * 0xfffffffd = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0xfffffffd = 0xfffffff9:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00000002 * 0xfffffffd = 0xfffffff9:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 00000005 + 0x00000002 * 0xfffffffd = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 00000006 + 0x00000002 * 0xfffffffd = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008000 * 0xffff0000 = 0x80000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0x00008000 * 0xffff0000 = 0x80000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 7fffffff + 0x00008000 * 0xffff0000 = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "l.msb" \
+  "  0x00000000 00000000 - 0x00000002 * 0x00000003 = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c - 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000001 00000000 - 0x00000002 * 0x00000003 = 0x00000000 fffffffa: OK" \
+  "  0x40000000 00000000 - 0x00000002 * 0x00000003 = 0x3fffffff fffffffa: OK" \
+  "  0xffffffff fffffffa - 0x00000002 * 0x00000003 = 0xffffffff fffffff4: OK" \
+  "  0xffffffff 00000005 - 0x00000002 * 0x00000003 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 - 0x00000002 * 0x00000003 = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00008001 * 0x0000fffe = 0xffffffff 80000002: OK" \
+  "  0x00000000 00000002 - 0x00008001 * 0x0000fffe = 0xffffffff 80000004: OK" \
+  "  0x00000000 80000002 - 0x00008001 * 0x0000fffe = 0x00000000 00000004: OK" \
+  "  0x7fffffff 7ffffffd - 0x00008001 * 0x0000fffe = 0x7ffffffe ffffffff: OK" \
+  "  0xffffffff ffffffff - 0x00008001 * 0x0000fffe = 0xffffffff 80000001: OK" \
+  "  0xffffffff 80000002 - 0x00008001 * 0x0000fffe = 0xffffffff 00000004: OK" \
+  "  0xfffffffe 80000002 - 0x00008001 * 0x0000fffe = 0xfffffffe 00000004: OK" \
+  "!" \
+  "  0x00000000 00000006 - 0xfffffffe * 0xfffffffd = 0x00000000 00000000: OK" \
+  "  0x00000000 0000000c - 0xfffffffe * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0xffffffff ffffffff - 0xfffffffe * 0xfffffffd = 0xffffffff fffffff9: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00000002 * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 - 0x00000002 * 0xfffffffd = 0x00000000 0000000c: OK" \
+  "  0x00000000 ffffffff - 0x00000002 * 0xfffffffd = 0x00000001 00000005: OK" \
+  "  0x7fffffff fffffff9 - 0x00000002 * 0xfffffffd = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff fffffff9 - 0x00000002 * 0xfffffffd = 0xffffffff ffffffff: OK" \
+  "  0xfffffffe ffffffff - 0x00000002 * 0xfffffffd = 0xffffffff 00000005: OK" \
+  "  0x80000000 00000000 - 0x00000002 * 0xfffffffd = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00008000 * 0xffff0000 = 0x00000000 80000000: OK" \
+  "  0x00000000 00000006 - 0x00008000 * 0xffff0000 = 0x00000000 80000006: OK" \
+  "  0x00000000 80000000 - 0x00008000 * 0xffff0000 = 0x00000001 00000000: OK" \
+  "  0x7fffffff 7fffffff - 0x00008000 * 0xffff0000 = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff - 0x00008000 * 0xffff0000 = 0x00000000 7fffffff: OK" \
+  "  0xfffffffe ffffffff - 0x00008000 * 0xffff0000 = 0xffffffff 7fffffff: OK" \
+  "  0x80000000 00000000 - 0x00008000 * 0xffff0000 = 0x80000000 80000000: OK" \
+  "!" \
+  "!Test completed"                       \
+  "!report(0xdeaddead);"                  \
+  "!exit(0)"]                             \
+    "inst-set-test.cfg" "inst-set-test/is-mac-test"

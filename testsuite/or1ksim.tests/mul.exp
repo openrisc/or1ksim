@@ -27,10 +27,10 @@
 # Run the multiplication test
 run_or1ksim "mul"                       \
     [list "00000000"                    \
-          "70a2588c"                    \
+          "cac28a17"                    \
           "a6312f33, expected a6312f33" \
-          "0d4de375, expected 0d4de375" \
-          "61ab48dc, expected 61ab48dc" \
+          "059b8f08, expected 059b8f08" \
+          "00000000, expected 00000000" \
           "!report(0xdeaddead);"         \
           "!Test succesful."             \
 	  "!exit(0)"]                    \

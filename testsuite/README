@@ -12,9 +12,9 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 1,261 tests compile, run and pass. That
-figure is broken down into 997 tests of the standalone simulator and 264 tests
-of the library
+At the time of writing a total of 1,450 tests compile, run and pass. That
+figure is broken down into 1,186 tests of the standalone simulator and 264
+tests of the library
 
 Configuration and make files are provided for further test programs. These
 come in three categories.
@@ -46,7 +46,7 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 997 tests of standalone Or1ksim:
+A total of 1,186 tests of standalone Or1ksim:
 
 basic:             8 tests of a wide range of instructions and registers.
 cache:             5 tests of the Or1ksim cache modeling
@@ -70,6 +70,7 @@ inst-set-test:       A collection of tests of individual instructions
   is-div-test:     4 tests of the l.div and l.divu instructions (Bug 1770).
   is-find-test:   14 tests of the l.ff1 and l.fl1 instructions (Bug 1772).
   is-lws-test:    13 tests of the l.lws instruction (Bug 1767).
+  is-mac-test:   189 tests of the MAC instructions (Bug 1773).
 mem-test:         16 tests of simple memory access.
 mmu:             110 tests of the MMU.
 mul:               5 tests of the multiply functionality.
