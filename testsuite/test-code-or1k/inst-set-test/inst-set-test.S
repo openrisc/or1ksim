@@ -236,6 +236,86 @@ _puth:
 	l.nop
 
 /* ----------------------------------------------------------------------------
+ * Subroutine to print out the lower half of a register in hex
+ *
+ * Parameters:
+ *  r3  The value to print
+ * ------------------------------------------------------------------------- */
+	.section .rodata
+63:	.string "0123456789abcdef"
+	.section .text
+
+	.global	_puthh
+_puthh:
+	PUSH (r3)
+	PUSH (r4)
+	
+	l.add	r2,r0,r3		/* Copy the value pointer */
+	LOAD_CONST (r4,63b)		/* Ptr to digit chars */
+	
+	l.srli	r3,r2,12		/* Print each digit in turn. */
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,8
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.srli	r3,r2,4
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.andi	r3,r2,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	POP (r4)			/* Return */
+	POP (r3)
+	l.jr	r9
+	l.nop
+
+/* ----------------------------------------------------------------------------
+ * Subroutine to print out the lowest byte of a register in hex
+ *
+ * Parameters:
+ *  r3  The value to print
+ * ------------------------------------------------------------------------- */
+	.section .rodata
+63:	.string "0123456789abcdef"
+	.section .text
+
+	.global	_puthq
+_puthq:
+	PUSH (r3)
+	PUSH (r4)
+	
+	l.add	r2,r0,r3		/* Copy the value pointer */
+	LOAD_CONST (r4,63b)		/* Ptr to digit chars */
+	
+	l.srli	r3,r2,4			/* Print each digit in turn. */
+	l.andi	r3,r3,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	l.andi	r3,r2,0xf
+	l.add	r3,r4,r3
+	l.lbz	r3,0(r3)
+	l.nop	NOP_PUTC
+
+	POP (r4)			/* Return */
+	POP (r3)
+	l.jr	r9
+	l.nop
+
+/* ----------------------------------------------------------------------------
  * Subroutine to print out a test name prompt
  *
  * The string is preceded by two spaces

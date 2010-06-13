@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-06-11], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-06-13], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -94,7 +94,8 @@ AC_TYPE_SIGNAL
 AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h      \
 		 sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
 		 termcap.h termios.h termio.h sys/file.h locale.h getopt.h    \
-		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h)
+		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h  \
+                 limits.h)
 AC_CHECK_FUNCS(strcasecmp select setenv putenv tcgetattr setlocale lstat)
 AC_CHECK_FUNCS(grantpt unlockpt ptsname on_exit)
 AC_CHECK_FUNCS(basename)

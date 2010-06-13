@@ -256,45 +256,143 @@ INSTRUCTION (l_sub) {
 }
 /*int mcount = 0;*/
 INSTRUCTION (l_mul) {
-  orreg_t temp1;
-  
-  temp1 = (orreg_t)PARAM1 * (orreg_t)PARAM2;
-  SET_OV_FLAG_FN (temp1);
-  SET_PARAM0(temp1);
-  /*if (!(mcount++ & 1023)) {
-    PRINTF ("[%i]\n",mcount);
-    }*/
+  orreg_t   temp0, temp1, temp2;
+  LONGEST   ltemp0, ltemp1, ltemp2;
+  ULONGEST  ultemp0, ultemp1, ultemp2;
+
+  /* Args in 32-bit */
+  temp2 = (orreg_t) PARAM2;
+  temp1 = (orreg_t) PARAM1;
+
+  /* Compute initially in 64-bit */
+  ltemp1 = (LONGEST) temp1;
+  ltemp2 = (LONGEST) temp2;
+  ltemp0 = ltemp1 * ltemp2;
+
+  temp0  = (orreg_t) (ltemp0  & 0xffffffffLL);
+  SET_PARAM0 (temp0);
+
+  /* We have 2's complement overflow, if the result is less than the smallest
+     possible 32-bit negative number, or greater than the largest possible
+     32-bit positive number. */
+  if ((ltemp0 < (LONGEST) INT32_MIN) || (ltemp0 > (LONGEST) INT32_MAX))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+    }
+
+  /* We have 1's complement overflow, if, as an unsigned operation, the result
+     is greater than the largest possible 32-bit unsigned number. This is
+     probably quicker than unpicking the bits of the signed result. */
+  ultemp1 = (ULONGEST) temp1 & 0xffffffffULL;
+  ultemp2 = (ULONGEST) temp2 & 0xffffffffULL;
+  ultemp0 = ultemp1 * ultemp2;
+
+  if (ultemp0 > (ULONGEST) UINT32_MAX)
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
+      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
+    {
+      except_handle (EXCEPT_RANGE, cpu_state.pc);
+    }
+}
+INSTRUCTION (l_mulu) {
+  uorreg_t   temp0, temp1, temp2;
+  ULONGEST  ultemp0, ultemp1, ultemp2;
+
+  /* Args in 32-bit */
+  temp2 = (uorreg_t) PARAM2;
+  temp1 = (uorreg_t) PARAM1;
+
+  /* Compute initially in 64-bit */
+  ultemp1 = (ULONGEST) temp1 & 0xffffffffULL;
+  ultemp2 = (ULONGEST) temp2 & 0xffffffffULL;
+  ultemp0 = ultemp1 * ultemp2;
+
+  temp0  = (uorreg_t) (ultemp0  & 0xffffffffULL);
+  SET_PARAM0 (temp0);
+
+  /* We never have 2's complement overflow */
+  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+
+  /* We have 1's complement overflow, if the result is greater than the
+     largest possible 32-bit unsigned number. */
+  if (ultemp0 > (ULONGEST) UINT32_MAX)
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
 }
 INSTRUCTION (l_div) {
-  orreg_t temp3, temp2, temp1;
+  orreg_t  temp3, temp2, temp1;
   
-  temp3 = PARAM2;
-  temp2 = PARAM1;
-  if (temp3)
-    temp1 = temp2 / temp3;
-  else {
-    cpu_state.sprs[SPR_SR] |= SPR_SR_CY;	/* Div by zero sets carry */
-    except_handle (EXCEPT_RANGE, cpu_state.pc);
-    return;
-  }
-  SET_OV_FLAG_FN (temp1);
-  SET_PARAM0(temp1);
+  temp3 = (orreg_t) PARAM2;
+  temp2 = (orreg_t) PARAM1;
+ 
+ /* Check for divide by zero (sets carry) */
+  if (0 == temp3)
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      temp1 = temp2 / temp3;
+      SET_PARAM0(temp1);
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
+
+  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;	/* Never set */
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
+      ((cpu_state.sprs[SPR_SR] & SPR_SR_CY)  == SPR_SR_CY))
+    {
+      except_handle (EXCEPT_RANGE, cpu_state.pc);
+    }
 }
 INSTRUCTION (l_divu) {
   uorreg_t temp3, temp2, temp1;
   
-  temp3 = PARAM2;
-  temp2 = PARAM1;
-  if (temp3)
-    temp1 = temp2 / temp3;
-  else {
-    cpu_state.sprs[SPR_SR] |= SPR_SR_CY;	/* Div by zero sets carry */
-    except_handle(EXCEPT_RANGE, cpu_state.pc);
-    return;
-  }
-  SET_OV_FLAG_FN (temp1);
-  SET_PARAM0(temp1);
-  /* runtime.sim.cycles += 16; */
+  temp3 = (uorreg_t) PARAM2;
+  temp2 = (uorreg_t) PARAM1;
+ 
+ /* Check for divide by zero (sets carry) */
+  if (0 == temp3)
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      temp1 = temp2 / temp3;
+      SET_PARAM0(temp1);
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
+
+  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;	/* Never set */
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
+      ((cpu_state.sprs[SPR_SR] & SPR_SR_CY)  == SPR_SR_CY))
+    {
+      except_handle (EXCEPT_RANGE, cpu_state.pc);
+    }
 }
 INSTRUCTION (l_sll) {
   uorreg_t temp1;

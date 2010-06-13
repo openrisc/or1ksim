@@ -29,13 +29,14 @@
 /* ----------------------------------------------------------------------------
  * Test coverage
  *
- * The l.add, l.addc, l.addi and l.addic instructions should set the carry and
- * overflow flags.
+ * The l.mac, l.maci, l.macrc and l.msb instructions perform operations related
+ * to combined signed multiply and addition/subtraction.
  *
- * In addition the l.addc and l.addic instructions should add in the carry
- * bit.
+ * The precise definition of these instructions is in flux. In addition there
+ * are known problems with the assembler/disassembler (will not correctly
+ * handle l.maci) and with the Verilog RTL implementation (not functional).
  *
- * Problems in this area were reported in Bugs 1771 and 1776. Having fixed the
+ * Problems in this area were reported in Bugs 1773 and 1777. Having fixed the
  * problem, this is (in good software engineering style), a  regression test
  * to go with the fix.
  *
@@ -224,6 +225,9 @@
 	CHECK_RES2 (r5, r6, reshi, reslo)
 	
 	
+/* ----------------------------------------------------------------------------
+ * Start of code
+ * ------------------------------------------------------------------------- */
 	.section .text
 	.global	_start
 _start:

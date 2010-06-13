@@ -48,18 +48,49 @@
  * A macro to carry out a test of find
  *
  * Arguments
- *   opc:       The opcode
  *   op:        First operand value
  *   res:       Expected result
- *   str:       Output string
  * ------------------------------------------------------------------------- */
-#define TEST_FIND(opc, op, res, str)					 \
+#define TEST_FF1(op, res)						 \
 	LOAD_CONST (r4,33)		/* Invalid result */		;\
 	LOAD_CONST (r5,op)		/* Load number to analyse */	;\
-	opc	r4,r5						;\
-	CHECK_RES (str, r4, res)
+	l.ff1	r4,r5							;\
+	PUSH	(r4)			/* Save for later */		;\
+									;\
+	PUTS ("  ff1 (0x")						;\
+	PUTH (op)							;\
+	PUTS (") = 0x") 						;\
+	PUTHQ (res)							;\
+	PUTS (": ")	 						;\
+									;\
+	CHECK_RES1 (r4, res)
 
 	
+/* ----------------------------------------------------------------------------
+ * A macro to carry out a test of find
+ *
+ * Arguments
+ *   op:        First operand value
+ *   res:       Expected result
+ * ------------------------------------------------------------------------- */
+#define TEST_FL1(op, res)						 \
+	LOAD_CONST (r4,33)		/* Invalid result */		;\
+	LOAD_CONST (r5,op)		/* Load number to analyse */	;\
+	l.fl1	r4,r5							;\
+	PUSH	(r4)			/* Save for later */		;\
+									;\
+	PUTS ("  fl1 (0x")						;\
+	PUTH (op)							;\
+	PUTS (") = 0x")							;\
+	PUTHQ (res)							;\
+	PUTS (": ")	 						;\
+									;\
+	CHECK_RES1 (r4, res)
+
+	
+/* ----------------------------------------------------------------------------
+ * Start of code
+ * ------------------------------------------------------------------------- */
 	.section .text
 	.global	_start
 _start:
@@ -73,13 +104,13 @@ _ff1:
 	l.nop
 
 	/* Try a range of candidates. */
-	TEST_FIND (l.ff1, 0x00000001,  1, "ff1 (0x00000001) =  1: ") 
-	TEST_FIND (l.ff1, 0x80000000, 32, "ff1 (0x80000000) = 32: ")
-	TEST_FIND (l.ff1, 0x55555555,  1, "ff1 (0x55555555) =  1: ")
-	TEST_FIND (l.ff1, 0xaaaaaaaa,  2, "ff1 (0xaaaaaaaa) =  2: ")
-	TEST_FIND (l.ff1, 0x00018000, 16, "ff1 (0x00018000) = 16: ")
-	TEST_FIND (l.ff1, 0xc0000000, 31, "ff1 (0xc0000000) = 31: ")
-	TEST_FIND (l.ff1, 0x00000000,  0, "ff1 (0x00000000) =  0: ")
+	TEST_FF1 (0x00000001,  1) 
+	TEST_FF1 (0x80000000, 32)
+	TEST_FF1 (0x55555555,  1)
+	TEST_FF1 (0xaaaaaaaa,  2)
+	TEST_FF1 (0x00018000, 16)
+	TEST_FF1 (0xc0000000, 31)
+	TEST_FF1 (0x00000000,  0)
 
 /* ----------------------------------------------------------------------------
  * Test of find first 1, l.fl1
@@ -90,13 +121,13 @@ _fl1:
 	l.nop
 
 	/* Try a range of candidates. */
-	TEST_FIND (l.fl1, 0x00000001,  1, "fl1 (0x00000001) =  1: ") 
-	TEST_FIND (l.fl1, 0x80000000, 32, "fl1 (0x80000000) = 32: ")
-	TEST_FIND (l.fl1, 0x55555555, 31, "fl1 (0x55555555) = 31: ")
-	TEST_FIND (l.fl1, 0xaaaaaaaa, 32, "fl1 (0xaaaaaaaa) = 32: ")
-	TEST_FIND (l.fl1, 0x00018000, 17, "fl1 (0x00018000) = 17: ")
-	TEST_FIND (l.fl1, 0xc0000000, 32, "fl1 (0xc0000000) = 32: ")
-	TEST_FIND (l.fl1, 0x00000000,  0, "fl1 (0x00000000) =  0: ")
+	TEST_FL1 (0x00000001,  1) 
+	TEST_FL1 (0x80000000, 32)
+	TEST_FL1 (0x55555555, 31)
+	TEST_FL1 (0xaaaaaaaa, 32)
+	TEST_FL1 (0x00018000, 17)
+	TEST_FL1 (0xc0000000, 32)
+	TEST_FL1 (0x00000000,  0)
 
 /* ----------------------------------------------------------------------------
  * All done

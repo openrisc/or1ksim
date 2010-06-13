@@ -12,6 +12,7 @@ The following bugs are fixed.
 * Bug 1771: l.add* do not correctly set the overflow flag.
 * Bug 1772: l.fl1 not implemented.
 * Bug 1773: l.maci not correctly implemented.
+* Bug 1774: l.mulu not implemented.
 * Bug 1776: l.addic is not implemented.
 
 The following bugs are either cannot be reproduced or will not be fixed.

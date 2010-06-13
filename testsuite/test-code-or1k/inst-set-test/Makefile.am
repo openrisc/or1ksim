@@ -44,8 +44,9 @@ libinst_set_test_la_SOURCES = inst-set-test.S
 check_PROGRAMS = is-add-test          \
 		 is-div-test          \
 		 is-find-test         \
-		 is-mac-test          \
 		 is-lws-test          \
+		 is-mac-test          \
+		 is-mul-test          \
 	         $(INST_SET_TEST_OLD)
 
 # The new instruction set tests.
@@ -64,15 +65,20 @@ is_find_test_SOURCES = inst-set-test.h \
 is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_find_test_LDADD   = inst-set-test.lo
 
+is_lws_test_SOURCES  = inst-set-test.h \
+	               is-lws-test.S
+is_lws_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_lws_test_LDADD    = inst-set-test.lo
+
 is_mac_test_SOURCES  = inst-set-test.h \
 	               is-mac-test.S
 is_mac_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
 is_mac_test_LDADD    = inst-set-test.lo
 
-is_lws_test_SOURCES  = inst-set-test.h \
-	               is-lws-test.S
-is_lws_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_lws_test_LDADD    = inst-set-test.lo
+is_mul_test_SOURCES  = inst-set-test.h \
+	               is-mul-test.S
+is_mul_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_mul_test_LDADD    = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c

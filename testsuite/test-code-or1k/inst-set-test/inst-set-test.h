@@ -140,6 +140,32 @@
 	POP (r9)
 	
 /* ----------------------------------------------------------------------------
+ * Macro to print a half word hex value
+ *
+ * Arguments:
+ *   v  The value to print
+ * ------------------------------------------------------------------------- */
+#define PUTHH(v)							 \
+	LOAD_CONST (r3, v)						;\
+	PUSH (r9)							;\
+	l.jal	_puthh							;\
+	l.nop								;\
+	POP (r9)
+	
+/* ----------------------------------------------------------------------------
+ * Macro to print a byte hex value
+ *
+ * Arguments:
+ *   v  The value to print
+ * ------------------------------------------------------------------------- */
+#define PUTHQ(v)							 \
+	LOAD_CONST (r3, v)						;\
+	PUSH (r9)							;\
+	l.jal	_puthq							;\
+	l.nop								;\
+	POP (r9)
+	
+/* ----------------------------------------------------------------------------
  * Macro for recording the result of a test
  *
  * The test result is in reg. Print out the name of test indented two spaces,
@@ -314,6 +340,39 @@
 	l.jal	_pok			/* Test succeeded */		;\
 	l.nop								;\
 12:
+	
+/* ----------------------------------------------------------------------------
+ * Macro for recording the result of a test
+ *
+ * This is a newer version of CHECK_RES, which should eventually become the
+ * standard macro to use.
+ *
+ * The test result is in reg. If it matches the supplied val, print "OK" and a
+ * newline, otherwise "Failed" and report the value of the register (which will
+ * be followed by a newline).
+ *
+ * Arguments:
+ *   reg  The result to test (not r2)
+ *   val  Desired result of the test
+ * ------------------------------------------------------------------------- */
+#define CHECK_RES1(reg,val)						 \
+	LOAD_CONST(r2,val)		/* The desired result */	;\
+	PUSH (reg)			/* May need again later */	;\
+	l.sfeq	r2,reg			/* Does the result match? */	;\
+	l.bf	13f							;\
+	l.nop								;\
+									;\
+	l.jal	_pfail			/* Test failed */		;\
+	l.nop								;\
+	POP (reg)			/* Report the register */	;\
+	l.add	r3,r0,reg						;\
+	l.j	14f							;\
+	l.nop	NOP_REPORT						;\
+13:									;\
+	POP (reg)			/* Discard the register */	;\
+	l.jal	_pok			/* Test succeeded */		;\
+	l.nop								;\
+14:
 	
 /* ----------------------------------------------------------------------------
  * Macro to report 0xdeaddead and then terminate

@@ -1,3 +1,13 @@
+2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/generate.c (generate_header): stdint.h included in header.
+	* cpu/or32/insnset.c <l_mul>: Overflow and carry flags computed and
+	range exception triggered if SR[OVE] is set.
+	<l_mulu>: Created
+	* cpu/or32/or32.c <or32_opcodes>: l.mulu enabled.
+	* NEWS: Updated with new bugs fixed.
+
 2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* cpu/or32/insnset.c <l_maci>: Intermediate result computed as 32
 	bits, then sign extended.

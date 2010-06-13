@@ -1,3 +1,9 @@
+2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added multiplication
+	tests. Extended divistion tests. Changed output to match new
+	format from existing tests.
+	* README: Updated with new tests.
+
 2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/inst-set-test.exp: Added MAC tests.
 	* or1ksim.tests/mul.exp: Corrected erroneous expected results.
