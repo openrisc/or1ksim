@@ -4,6 +4,7 @@
 	<align>: Alignment exception handler.
 	<illegal>: Illegal instruction exception handler.
 	* inst-set-test/is-jump-test.S: Created.
+	* inst-set-test/is-ror-test.S: Created.
 	* inst-set-test/Makefile.am: Updated for new tests
 	* inst-set-test/Makefile.in: Regenerated.
 

@@ -15,6 +15,8 @@ The following bugs are fixed.
 * Bug 1774: l.mulu not implemented.
 * Bug 1775: l.jalr and l.jr don't trigger alignment exceptions.
 * Bug 1776: l.addic is not implemented.
+* Bug 1777: l.macrc not correctly implemented.
+* Bug 1778: l.ror and l.rori are not implemented.
 
 The following bugs are either cannot be reproduced or will not be fixed.
 

@@ -1,6 +1,6 @@
 2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/inst-set-test.exp: Modified output from RANGE
-	exception. Added tests for jump instructions.
+	exception. Added tests for jump and rotate right instructions.
 
 2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/inst-set-test.exp: Added multiplication

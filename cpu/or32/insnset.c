@@ -417,6 +417,12 @@ INSTRUCTION (l_srl) {
   SET_PARAM0(temp1);
   /* runtime.sim.cycles += 2; */
 }
+INSTRUCTION (l_ror) {
+  uorreg_t temp1;
+  temp1  = PARAM1 >> (PARAM2 & 0x1f);
+  temp1 |= PARAM1 << (32 - (PARAM2 & 0x1f));
+  SET_PARAM0(temp1);
+}
 INSTRUCTION (l_bf) {
   if (config.bpb.enabled) {
     int fwd = (PARAM0 >= cpu_state.pc) ? 1 : 0;

@@ -864,3 +864,48 @@ run_or1ksim "mul-test"                                 \
           "!report(0xdeaddead);"                       \
           "!exit(0)"]                                  \
     "inst-set-test.cfg" "inst-set-test/is-mul-test"
+
+# Run the l.ror test
+run_or1ksim "ror-test"                                   \
+    [list "!l.ror"                                       \
+          "  0xb38f0f83 ROR 0x00000000 = 0xb38f0f83: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000001 = 0xd9c787c1: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000004 = 0x3b38f0f8: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000010 = 0x0f83b38f: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x0000001f = 0x671e1f07: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000021 = 0xd9c787c1: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00002224 = 0x3b38f0f8: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00f789f0 = 0x0f83b38f: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0xffffffff = 0x671e1f07: OK" \
+          "  - exception triggered: FALSE"               \
+          "!l.rori"                                      \
+          "  0xb38f0f83 RORI 0x00 = 0xb38f0f83: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x01 = 0xd9c787c1: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x04 = 0x3b38f0f8: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x10 = 0x0f83b38f: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x1f = 0x671e1f07: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x21 = 0xd9c787c1: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x24 = 0x3b38f0f8: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x30 = 0x0f83b38f: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x3f = 0x671e1f07: OK"      \
+          "  - exception triggered: FALSE"               \
+          "!Test completed"                              \
+          "!report(0xdeaddead);"                         \
+          "!exit(0)"]                                    \
+    "inst-set-test.cfg" "inst-set-test/is-ror-test"
