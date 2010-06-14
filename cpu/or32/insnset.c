@@ -467,16 +467,43 @@ INSTRUCTION (l_jal) {
   }
 }
 INSTRUCTION (l_jalr) {
-  cpu_state.pc_delay = PARAM0;
-  setsim_reg(LINK_REGNO, cpu_state.pc + 8);
-  next_delay_insn = 1;
+  /* Badly aligned destination or use of link register triggers an exception */
+  uorreg_t  temp1 = PARAM0;
+
+  if (REG_PARAM0 == LINK_REGNO)
+    {
+      except_handle (EXCEPT_ILLEGAL, cpu_state.pc);
+    }
+  else if ((temp1 & 0x3) != 0)
+    {
+      except_handle (EXCEPT_ALIGN, cpu_state.pc);
+    }
+  else
+    {
+      cpu_state.pc_delay = temp1;
+      setsim_reg(LINK_REGNO, cpu_state.pc + 8);
+      next_delay_insn = 1;
+    }
 }
 INSTRUCTION (l_jr) {
-  cpu_state.pc_delay = PARAM0;
-  next_delay_insn = 1;
-  if (config.sim.profile)
-    fprintf (runtime.sim.fprof, "-%08llX %"PRIxADDR"\n", runtime.sim.cycles,
-             cpu_state.pc_delay);
+  /* Badly aligned destination triggers an exception */
+  uorreg_t  temp1 = PARAM0;
+
+  if ((temp1 & 0x3) != 0)
+    {
+      except_handle (EXCEPT_ALIGN, cpu_state.pc);
+    }
+  else
+    {
+      cpu_state.pc_delay = temp1;
+      next_delay_insn = 1;
+
+      if (config.sim.profile)
+	{
+	  fprintf (runtime.sim.fprof, "-%08llX %"PRIxADDR"\n",
+		   runtime.sim.cycles, cpu_state.pc_delay);
+	}
+    }
 }
 INSTRUCTION (l_rfe) {
   pcnext = cpu_state.sprs[SPR_EPCR_BASE];

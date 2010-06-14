@@ -59,8 +59,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = is-add-test$(EXEEXT) is-div-test$(EXEEXT) \
-	is-find-test$(EXEEXT) is-lws-test$(EXEEXT) \
-	is-mac-test$(EXEEXT) is-mul-test$(EXEEXT) $(am__EXEEXT_1)
+	is-find-test$(EXEEXT) is-jump-test$(EXEEXT) \
+	is-lws-test$(EXEEXT) is-mac-test$(EXEEXT) is-mul-test$(EXEEXT) \
+	$(am__EXEEXT_1)
 subdir = inst-set-test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -103,6 +104,12 @@ is_find_test_DEPENDENCIES = inst-set-test.lo
 is_find_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_find_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_jump_test_OBJECTS = is-jump-test.$(OBJEXT)
+is_jump_test_OBJECTS = $(am_is_jump_test_OBJECTS)
+is_jump_test_DEPENDENCIES = inst-set-test.lo
+is_jump_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_jump_test_LDFLAGS) $(LDFLAGS) -o $@
 am_is_lws_test_OBJECTS = is-lws-test.$(OBJEXT)
 is_lws_test_OBJECTS = $(am_is_lws_test_OBJECTS)
 is_lws_test_DEPENDENCIES = inst-set-test.lo
@@ -141,13 +148,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libinst_set_test_la_SOURCES) $(inst_set_test_old_SOURCES) \
 	$(is_add_test_SOURCES) $(is_div_test_SOURCES) \
-	$(is_find_test_SOURCES) $(is_lws_test_SOURCES) \
-	$(is_mac_test_SOURCES) $(is_mul_test_SOURCES)
+	$(is_find_test_SOURCES) $(is_jump_test_SOURCES) \
+	$(is_lws_test_SOURCES) $(is_mac_test_SOURCES) \
+	$(is_mul_test_SOURCES)
 DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
 	$(inst_set_test_old_SOURCES) $(is_add_test_SOURCES) \
 	$(is_div_test_SOURCES) $(is_find_test_SOURCES) \
-	$(is_lws_test_SOURCES) $(is_mac_test_SOURCES) \
-	$(is_mul_test_SOURCES)
+	$(is_jump_test_SOURCES) $(is_lws_test_SOURCES) \
+	$(is_mac_test_SOURCES) $(is_mul_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -204,7 +212,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -294,6 +301,11 @@ is_find_test_SOURCES = inst-set-test.h \
 
 is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_find_test_LDADD = inst-set-test.lo
+is_jump_test_SOURCES = inst-set-test.h \
+	               is-jump-test.S
+
+is_jump_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_jump_test_LDADD = inst-set-test.lo
 is_lws_test_SOURCES = inst-set-test.h \
 	               is-lws-test.S
 
@@ -382,6 +394,9 @@ is-div-test$(EXEEXT): $(is_div_test_OBJECTS) $(is_div_test_DEPENDENCIES)
 is-find-test$(EXEEXT): $(is_find_test_OBJECTS) $(is_find_test_DEPENDENCIES) 
 	@rm -f is-find-test$(EXEEXT)
 	$(is_find_test_LINK) $(is_find_test_OBJECTS) $(is_find_test_LDADD) $(LIBS)
+is-jump-test$(EXEEXT): $(is_jump_test_OBJECTS) $(is_jump_test_DEPENDENCIES) 
+	@rm -f is-jump-test$(EXEEXT)
+	$(is_jump_test_LINK) $(is_jump_test_OBJECTS) $(is_jump_test_LDADD) $(LIBS)
 is-lws-test$(EXEEXT): $(is_lws_test_OBJECTS) $(is_lws_test_DEPENDENCIES) 
 	@rm -f is-lws-test$(EXEEXT)
 	$(is_lws_test_LINK) $(is_lws_test_OBJECTS) $(is_lws_test_LDADD) $(LIBS)
@@ -403,6 +418,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-add-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-div-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-find-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-jump-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-lws-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mac-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mul-test.Po@am__quote@

@@ -1,3 +1,13 @@
+2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/generate.c (gen_eval_operands): Generate macro
+	REG_PARAM0 to identify register. Corrected undef of SET_PARAM0.
+	* cpu/or32/insnset.c <l_jalr>: Trigger exceptions on use of link
+	register as destination or non-aligned effective address.
+	<jr>: Trigger exception on use of non-aligned effective address.
+	* NEWS: Updated with new bugs fixed.
+
 2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.

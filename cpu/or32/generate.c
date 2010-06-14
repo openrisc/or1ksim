@@ -218,6 +218,7 @@ gen_eval_operands (FILE *fo, int insn_index, int level)
       if ((opd->type & OPTYPE_REG) && !dis) {
         if(!i) {
           shift_fprintf (level, fo, "#define SET_PARAM0(val) cpu_state.reg[a] = val\n");
+          shift_fprintf (level, fo, "#define REG_PARAM0  a\n");
           set_param = 1;
         }
         shift_fprintf (level, fo, "#define PARAM%i cpu_state.reg[%c]\n", num_ops,
@@ -242,7 +243,10 @@ gen_eval_operands (FILE *fo, int insn_index, int level)
   output_function (fo, or32_opcodes[insn_index].function_name, level);
 
   if (set_param)
-    shift_fprintf (level, fo, "#undef SET_PARAM\n");
+    {
+      shift_fprintf (level, fo, "#undef SET_PARAM0\n");
+      shift_fprintf (level, fo, "#undef REG_PARAM0\n");
+    }
 
   for (i = 0; i < num_ops; i++)
     shift_fprintf (level, fo, "#undef PARAM%i\n", i);

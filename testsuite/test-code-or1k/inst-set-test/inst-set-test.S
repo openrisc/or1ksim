@@ -79,44 +79,94 @@ _reset:
 	l.nop
 
 /* ----------------------------------------------------------------------------
+ * Alignment exception
+ *
+ * Don't be tempted to use the LOAD_STR macro here, it will dump us back into
+ * text section.
+ *
+ * The handling is a bit dubious at present. We just patch the instruction and
+ * restart. This will go wrong in branch delay slots. Really we need to single
+ * step past and then continue.
+ *
+ * Print a message identifying the exception type.
+ * ------------------------------------------------------------------------- */
+	.section .rodata
+50:	.string	"  ALIGNMENT exception\n"
+
+	.section .boot-text
+	.org	0x600
+	.global	_align
+_align:
+	/* Report exception */
+	LOAD_CONST (r3, 50b)
+	l.jal	_puts
+	l.nop
+
+	/* Patch with l.nop */
+	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
+	LOAD_CONST (r3, 0x15000000)	/* l.nop */
+	l.sw	0(r2),r3
+
+	/* All done */
+	l.rfe
+_align_end:	
+	
+/* ----------------------------------------------------------------------------
+ * Illegal instruction exception
+ *
+ * Don't be tempted to use the LOAD_STR macro here, it will dump us back into
+ * text section.
+ *
+ * The handling is a bit dubious at present. We just patch the instruction and
+ * restart. This will go wrong in branch delay slots. Really we need to single
+ * step past and then continue.
+ *
+ * Print a message identifying the exception type.
+ * ------------------------------------------------------------------------- */
+	.section .rodata
+51:	.string	"  ILLEGAL INSTRUCTION exception\n"
+
+	.section .boot-text
+	.org	0x700
+	.global	_illegal
+_illegal:
+	/* Report exception */
+	LOAD_CONST (r3, 51b)
+	l.jal	_puts
+	l.nop
+
+	/* Patch with l.nop */
+	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
+	LOAD_CONST (r3, 0x15000000)	/* l.nop */
+	l.sw	0(r2),r3
+
+	/* All done */
+	l.rfe
+_illegal_end:	
+	
+/* ----------------------------------------------------------------------------
  * Range exception
  *
  * Don't be tempted to use the LOAD_STR macro here, it will dump us back into
- * text space.
- *	
- * Print a message about the instruction triggering the exception. Then
- * replace it by l.nop and return.
+ * text section.
+ *
+ * The handling is a bit dubious at present. We just patch the instruction and
+ * restart. This will go wrong in branch delay slots. Really we need to single
+ * step past and then continue.
+ *
+ * Print a message identifying the exception type.
  * ------------------------------------------------------------------------- */
 	.section .rodata
-50:	.string	"  RANGE exception\n"
-51:	.string	"  - caused by: "
-52:	.string	"  - SR value:  "
+52:	.string	"  RANGE exception\n"
 
 	.section .boot-text
 	.org	0xb00
 	.global	_range
 _range:
-	/* Note exception */
-	LOAD_CONST (r3, 50b)
-	l.jal	_puts
-	l.nop
-
-	/* Report problem instruction */
-	LOAD_CONST (r3, 51b)
-	l.jal	_puts
-	l.nop
-
-	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
-	l.lws	r3,0(r2)		/* The actual instruction */
-	l.nop	NOP_REPORT
-
-	/* Report status register */
+	/* Report exception */
 	LOAD_CONST (r3, 52b)
 	l.jal	_puts
 	l.nop
-
-	l.mfspr	r3,r0,SPR_ESR_BASE	/* Status reg */
-	l.nop	NOP_REPORT
 
 	/* Patch with l.nop */
 	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */

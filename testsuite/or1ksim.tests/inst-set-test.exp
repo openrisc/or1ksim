@@ -58,8 +58,6 @@ run_or1ksim "add-test"                                     \
           "  - exception triggered: FALSE"                 \
           "!  ** OVE flag set **"                          \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xe0853000);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x40000000 + 0x40000000     = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
@@ -69,8 +67,6 @@ run_or1ksim "add-test"                                     \
           "  - overflow flag set:   FALSE"                 \
           "  - exception triggered: FALSE"                 \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xe0853000);"            \
-          "!  - SR value:  report(0x00009e01);"            \
           "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
           "  - carry flag set:      TRUE"                  \
           "  - overflow flag set:   TRUE"                  \
@@ -119,15 +115,11 @@ run_or1ksim "add-test"                                     \
           "  - exception triggered: FALSE"                 \
           "!  ** OVE flag set **"                          \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xe0853001);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x40000000 + 0x40000000     = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
           "  - exception triggered: TRUE"                  \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xe0853001);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x40000000 + 0x3fffffff + c = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
@@ -141,8 +133,6 @@ run_or1ksim "add-test"                                     \
           "  - overflow flag set:   FALSE"                 \
           "  - exception triggered: FALSE"                 \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xe0853001);"            \
-          "!  - SR value:  report(0x00009e01);"            \
           "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
           "  - carry flag set:      TRUE"                  \
           "  - overflow flag set:   TRUE"                  \
@@ -179,8 +169,6 @@ run_or1ksim "add-test"                                     \
           "  - exception triggered: FALSE"                 \
           "!  ** OVE flag set **"                          \
           "  RANGE exception"                              \
-          "!  - caused by: report(0x9c854000);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
@@ -190,8 +178,6 @@ run_or1ksim "add-test"                                     \
           "  - overflow flag set:   FALSE"                 \
           "  - exception triggered: FALSE"                 \
           "  RANGE exception"                              \
-          "!  - caused by: report(0x9c858000);"            \
-          "!  - SR value:  report(0x00009e01);"            \
           "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
           "  - carry flag set:      TRUE"                  \
           "  - overflow flag set:   TRUE"                  \
@@ -240,15 +226,11 @@ run_or1ksim "add-test"                                     \
           "  - exception triggered: FALSE"                 \
           "!  ** OVE flag set **"                          \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xa0854000);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
           "  - exception triggered: TRUE"                  \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xa0853fff);"            \
-          "!  - SR value:  report(0x00009a01);"            \
           "  0x7fffc000 + 0x00003fff + c = 0x80000000: OK" \
           "  - carry flag set:      FALSE"                 \
           "  - overflow flag set:   TRUE"                  \
@@ -262,8 +244,6 @@ run_or1ksim "add-test"                                     \
           "  - overflow flag set:   FALSE"                 \
           "  - exception triggered: FALSE"                 \
           "  RANGE exception"                              \
-          "!  - caused by: report(0xa0858000);"            \
-          "!  - SR value:  report(0x00009e01);"            \
           "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
           "  - carry flag set:      TRUE"                  \
           "  - overflow flag set:   TRUE"                  \
@@ -319,15 +299,11 @@ run_or1ksim "div-test"                                 \
           "  - exception triggered: FALSE"             \
           "!  ** OVE flag set **"                      \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe0853309);"        \
-          "!  - SR value:  report(0x00009601);"        \
           "  0x0000000c / 0x00000000 = 0x00000000: OK" \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   FALSE"             \
           "  - exception triggered: TRUE"              \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe0853309);"        \
-          "!  - SR value:  report(0x00009601);"        \
           "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   FALSE"             \
@@ -376,15 +352,11 @@ run_or1ksim "div-test"                                 \
           "  - exception triggered: FALSE"             \
           "!  ** OVE flag set **"                      \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe085330a);"        \
-          "!  - SR value:  report(0x00009601);"        \
           "  0x0000000c / 0x00000000 = 0x00000000: OK" \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   FALSE"             \
           "  - exception triggered: TRUE"              \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe085330a);"        \
-          "!  - SR value:  report(0x00009601);"        \
           "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   FALSE"             \
@@ -417,6 +389,42 @@ run_or1ksim "find-test"                 \
           "!report(0xdeaddead);"        \
 	  "!exit(0)"]                   \
     "inst-set-test.cfg" "inst-set-test/is-find-test"
+
+# Run the l.jalf and l.jr test
+run_or1ksim "jump-test"                                     \
+    [list "!l.jalr"                                         \
+          "  Jump to 0x000010dc using register 0x05 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x000012b9 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001496 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001673 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ILLEGAL INSTRUCTION exception"                 \
+          "  Jump to 0x0000184c using register 0x09 failed" \
+          "  - exception triggered: TRUE"                   \
+          "!l.jr"                                           \
+          "  Jump to 0x00001a38 using register 0x05 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001c15 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001df2 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001fcf using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  Jump to 0x000021a8 using register 0x09 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "!Test completed"                                 \
+          "!report(0xdeaddead);"                            \
+	  "!exit(0)"]                                       \
+    "inst-set-test.cfg" "inst-set-test/is-jump-test"
 
 # Run the l.lws test
 run_or1ksim "lws-test"                            \
@@ -710,8 +718,6 @@ run_or1ksim "mul-test"                                 \
           "  - exception triggered: FALSE"             \
           "!  ** OVE flag set **"                      \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe0853306);"        \
-          "!  - SR value:  report(0x00009a01);"        \
           "  0x00008000 * 0x00010000 = 0x80000000: OK" \
           "  - carry flag set:      FALSE"             \
           "  - overflow flag set:   TRUE"              \
@@ -721,8 +727,6 @@ run_or1ksim "mul-test"                                 \
           "  - overflow flag set:   FALSE"             \
           "  - exception triggered: FALSE"             \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xe0853306);"        \
-          "!  - SR value:  report(0x00009e01);"        \
           "  0xffff7fff * 0xffff0000 = 0x80010000: OK" \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   TRUE"              \
@@ -779,8 +783,6 @@ run_or1ksim "mul-test"                                 \
           "  - exception triggered: FALSE"             \
           "!  ** OVE flag set **"                      \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xb0854000);"        \
-          "!  - SR value:  report(0x00009a01);"        \
           "  0x00020000 * 0x4000 = 0x80000000: OK"     \
           "  - carry flag set:      FALSE"             \
           "  - overflow flag set:   TRUE"              \
@@ -790,8 +792,6 @@ run_or1ksim "mul-test"                                 \
           "  - overflow flag set:   FALSE"             \
           "  - exception triggered: FALSE"             \
           "  RANGE exception"                          \
-          "!  - caused by: report(0xb0858000);"        \
-          "!  - SR value:  report(0x00009e01);"        \
           "  0xfffdfffe * 0x8000 = 0x00010000: OK"     \
           "  - carry flag set:      TRUE"              \
           "  - overflow flag set:   TRUE"              \
