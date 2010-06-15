@@ -1,8 +1,13 @@
 2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
-	* configure.ac: Version changed to current date.
+	* configure.ac: Version changed to current date. enable-arith-flag
+	and enable-ov-flag config options removed.
 	* cpu/or32/insnset.c <l_mfspr, l_mtspr>: Use bitwise OR, not
 	addition to calculate SPR address.
+	<l_and, l_or, l_sll, l_sra, l_srl, l_xor>: Do not now affect CY and OV
+	flags.
+	<l_sub>: Sets OV and CY flags correctly, and triggers Range
+	Exception if required.
 	* NEWS: Updated with new bugs fixed.
 
 2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>

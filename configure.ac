@@ -234,7 +234,7 @@ AC_ARG_ENABLE(execution,
       AC_MSG_RESULT(dynamic)
       ;;
     *)
-      AC_MSG_ERROR("excecution must one of simple/complex/dynamic")
+      AC_MSG_ERROR("execution must one of simple/complex/dynamic")
       ;;
     esac
     ],
@@ -265,17 +265,6 @@ AC_ARG_ENABLE(range_stats,
 ])
 AC_MSG_RESULT(${enable_range_stats-no})
 
-set_arith_flag="0"
-AC_MSG_CHECKING(whether arithmethic instructions set flag)
-AC_ARG_ENABLE(arith_flag,
-    [  --enable-arith-flag      Whether arithmethic instructions setflag.], [
-    case "$enableval" in
-  no)  set_arith_flag="0" ;;
-	yes) set_arith_flag="1" ;;
-    esac
-])
-AC_MSG_RESULT(${enable_arith_flag-no})
-
 # check for --enable-debug argument (for argtable2)
 AC_ARG_ENABLE(
     [debug],
@@ -292,7 +281,6 @@ AC_ARG_ENABLE(
 AC_SUBST(DEBUGFLAGS)
 
 AC_DEFINE_UNQUOTED(RAW_RANGE_STATS, $raw_range_stats, [ Specifies, whether we should do register accesses over time analysis. Simple execution must be enabled!])
-AC_DEFINE_UNQUOTED(ARITH_SET_FLAG, $set_arith_flag, [Whether arithmethic instructions set flag on zero])
 AC_DEFINE_UNQUOTED(HAVE_ETH_PHY, $eth_phy, [Whether we have ethernet PHY support])
 AC_DEFINE_UNQUOTED(SIMPLE_EXECUTION, $execution == 0, [Whether we are building with simple execution module]) 
 AC_DEFINE_UNQUOTED(COMPLEX_EXECUTION, $execution == 1, [Whether we are building with complex execution module]) 

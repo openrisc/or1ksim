@@ -178,37 +178,6 @@ The default is for this to be disabled.
 If enabled, this option allows statistics to be collected to analyse
 register access over time.  The default is for this to be disabled.
 
-@item --enable-arith-flag
-@cindex @code{--enable-arith-flag}
-@itemx --disable-arith-flag
-@cindex @code{--disable-arith-flag}
-@cindex flag setting by instructions
-If enabled, this option causes instructions to set the flag (@code{F} bit) in
-the supervision register.  The instructions affected by this are @code{l.add},
-@code{l.addc}, @code{l.addi}, @code{l.and} and @code{l.andi}.
-
-The default is for this to be disabled.
-
-@quotation Caution
-As with @code{--enable-ov-flag}, this appears another very dangerous option,
-to the extent of arguably being a bug.  It also appears to be only partially
-implemented---why only the instructions early in the alphabet?
-
-Whether or not flags are set is part of the OpenRISC 1000 architectural
-specification.  The only flags which should set this are the ``set flag''
-instructions: @code{l.sfeq}, @code{l.sfeqi}, @code{l.sfges}, @code{l.sfgesi},
-@code{l.sfgeu}, @code{l.sfgeui}, @code{l.sfgts}, @code{l.sfgtsi},
-@code{l.sfgtu}, @code{l.sfgtui}, @code{l.sfles}, @code{l.sflesi},
-@code{l.sfleu}, @code{l.sfleui}, @code{l.sflts}, @code{l.sfltsi},
-@code{l.sfltu}, @code{l.sfltui}, @code{l.sfne} and @code{l.sfnei}.
-
-The flags are correctly set (irrespective of @code{--enable-arith_flag}).
-
-Correct behavior is thus achieved if this flag is not set.
-@code{--enable-arith-flag} should never be used.
-
-@end quotation
-
 @item --enable-debug
 @cindex @code{--enable-debug}
 @itemx --disable-debug
@@ -236,22 +205,41 @@ get the missing test(s) working.
 @end table
 
 A number of configuration flags have been removed since version 0.3.0,
-because they led to invalid behavior of Or1ksim. Those removed include
+because they led to invalid behavior of Or1ksim. Those removed are:
 
 @table @code
+
+@item --enable-arith-flag
+@cindex @code{--enable-arith-flag}
+@itemx --disable-arith-flag
+@cindex @code{--disable-arith-flag}
+@cindex flag setting by instructions
+If enabled, this option caused certain instructions to set the flag
+(@code{F} bit) in the supervision register if the result were zero.
+The instructions affected by this were @code{l.add}, @code{l.addc},
+@code{l.addi}, @code{l.and} and @code{l.andi}.
+
+If set, this caused incorrect behavior. Whether or not flags are set is part
+of the OpenRISC 1000 architectural specification.  The only flags which
+should set this are the ``set flag'' instructions: @code{l.sfeq},
+@code{l.sfeqi}, @code{l.sfges}, @code{l.sfgesi}, @code{l.sfgeu},
+@code{l.sfgeui}, @code{l.sfgts}, @code{l.sfgtsi}, @code{l.sfgtu},
+@code{l.sfgtui}, @code{l.sfles}, @code{l.sflesi}, @code{l.sfleu},
+@code{l.sfleui}, @code{l.sflts}, @code{l.sfltsi}, @code{l.sfltu},
+@code{l.sfltui}, @code{l.sfne} and @code{l.sfnei}.
 
 @item --enable-ov-flag
 @cindex @code{--enable-ov-flag}
 @itemx --disable-ov-flag
 @cindex @code{--disable-ov-flag}
 @cindex overflow flag setting by instructions
-This flag used to cause certain instructions to set the overflow flag.
-If not, those instructions would not set the overflow flat.  The
-instructions affected by this were @code{l.add}, @code{l.addc},
-@code{l.addi}, @code{l.and}, @code{l.andi}, @code{l.div}, @code{l.divu},
-@code{l.mul}, @code{l.muli}, @code{l.or}, @code{l.ori}, @code{l.sll},
-@code{l.slli}, @code{l.srl}, @code{l.srli}, @code{l.sra}, @code{l.srai},
-@code{l.sub}, @code{l.xor} and @code{l.xori}.
+This flag caused certain instructions to set the overflow flag.  If not,
+those instructions would not set the overflow flat.  The instructions
+affected by this were @code{l.add}, @code{l.addc}, @code{l.addi},
+@code{l.and}, @code{l.andi}, @code{l.div}, @code{l.divu}, @code{l.mul},
+@code{l.muli}, @code{l.or}, @code{l.ori}, @code{l.sll}, @code{l.slli},
+@code{l.srl}, @code{l.srli}, @code{l.sra}, @code{l.srai}, @code{l.sub},
+@code{l.xor} and @code{l.xori}.
 
 This guaranteed incorrect behavior.  The OpenRISC 1000 architecture
 specification defines which flags are set by which instructions.

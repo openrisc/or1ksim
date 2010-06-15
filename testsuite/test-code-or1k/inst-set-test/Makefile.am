@@ -42,61 +42,91 @@ libinst_set_test_la_SOURCES = inst-set-test.S
 
 # The test programs
 check_PROGRAMS = is-add-test          \
+		 is-and-test          \
 		 is-div-test          \
 		 is-find-test         \
 		 is-jump-test         \
 		 is-lws-test          \
 		 is-mac-test          \
 		 is-mul-test          \
+		 is-or-test           \
 		 is-ror-test          \
+		 is-shift-test        \
 		 is-spr-test          \
+		 is-sub-test          \
+		 is-xor-test          \
 	         $(INST_SET_TEST_OLD)
 
 # The new instruction set tests.
-is_add_test_SOURCES  = inst-set-test.h \
-	               is-add-test.S
-is_add_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_add_test_LDADD    = inst-set-test.lo
+is_add_test_SOURCES   = inst-set-test.h \
+	                is-add-test.S
+is_add_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_add_test_LDADD     = inst-set-test.lo
 
-is_div_test_SOURCES  = inst-set-test.h \
-	               is-div-test.S
-is_div_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_div_test_LDADD    = inst-set-test.lo
+is_and_test_SOURCES   = inst-set-test.h \
+	                is-and-test.S
+is_and_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_and_test_LDADD     = inst-set-test.lo
 
-is_find_test_SOURCES = inst-set-test.h \
-	               is-find-test.S
-is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
-is_find_test_LDADD   = inst-set-test.lo
+is_div_test_SOURCES   = inst-set-test.h \
+	                is-div-test.S
+is_div_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_div_test_LDADD     = inst-set-test.lo
 
-is_jump_test_SOURCES = inst-set-test.h \
-	               is-jump-test.S
-is_jump_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
-is_jump_test_LDADD   = inst-set-test.lo
+is_find_test_SOURCES  = inst-set-test.h \
+	                is-find-test.S
+is_find_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_find_test_LDADD    = inst-set-test.lo
 
-is_lws_test_SOURCES  = inst-set-test.h \
-	               is-lws-test.S
-is_lws_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_lws_test_LDADD    = inst-set-test.lo
+is_jump_test_SOURCES  = inst-set-test.h \
+	                is-jump-test.S
+is_jump_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_jump_test_LDADD    = inst-set-test.lo
 
-is_mac_test_SOURCES  = inst-set-test.h \
-	               is-mac-test.S
-is_mac_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_mac_test_LDADD    = inst-set-test.lo
+is_lws_test_SOURCES   = inst-set-test.h \
+	                is-lws-test.S
+is_lws_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_lws_test_LDADD     = inst-set-test.lo
 
-is_mul_test_SOURCES  = inst-set-test.h \
-	               is-mul-test.S
-is_mul_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_mul_test_LDADD    = inst-set-test.lo
+is_mac_test_SOURCES   = inst-set-test.h \
+	                is-mac-test.S
+is_mac_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_mac_test_LDADD     = inst-set-test.lo
 
-is_ror_test_SOURCES  = inst-set-test.h \
-	               is-ror-test.S
-is_ror_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_ror_test_LDADD    = inst-set-test.lo
+is_mul_test_SOURCES   = inst-set-test.h \
+	                is-mul-test.S
+is_mul_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_mul_test_LDADD     = inst-set-test.lo
 
-is_spr_test_SOURCES  = inst-set-test.h \
-	               is-spr-test.S
-is_spr_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
-is_spr_test_LDADD    = inst-set-test.lo
+is_or_test_SOURCES    = inst-set-test.h \
+	                is-or-test.S
+is_or_test_LDFLAGS    = -T$(srcdir)/inst-set-test.ld
+is_or_test_LDADD      = inst-set-test.lo
+
+is_ror_test_SOURCES   = inst-set-test.h \
+	                is-ror-test.S
+is_ror_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_ror_test_LDADD     = inst-set-test.lo
+
+is_shift_test_SOURCES = inst-set-test.h \
+	                 is-shift-test.S
+is_shift_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_shift_test_LDADD   = inst-set-test.lo
+
+is_spr_test_SOURCES   = inst-set-test.h \
+	                is-spr-test.S
+is_spr_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_spr_test_LDADD     = inst-set-test.lo
+
+is_sub_test_SOURCES   = inst-set-test.h \
+	                is-sub-test.S
+is_sub_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_sub_test_LDADD     = inst-set-test.lo
+
+is_xor_test_SOURCES   = inst-set-test.h \
+	                is-xor-test.S
+is_xor_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_xor_test_LDADD     = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c

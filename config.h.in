@@ -3,9 +3,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* Whether arithmethic instructions set flag on zero */
-#undef ARITH_SET_FLAG
-
 /* "Whether the compiler supports 'long long'." */
 #undef CC_HAS_LONG_LONG
 

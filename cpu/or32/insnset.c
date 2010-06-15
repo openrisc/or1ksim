@@ -34,7 +34,7 @@ INSTRUCTION (l_add) {
   temp2 = (orreg_t)PARAM2;
   temp3 = (orreg_t)PARAM1;
   temp1 = temp2 + temp3;
-  SET_PARAM0(temp1);
+  SET_PARAM0 (temp1);
 
   /* Set overflow if two negative values gave a positive sum, or if two
      positive values gave a negative sum. Otherwise clear it */
@@ -227,32 +227,61 @@ INSTRUCTION (l_movhi) {
 INSTRUCTION (l_and) {
   uorreg_t temp1;
   temp1 = PARAM1 & PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
-  if (ARITH_SET_FLAG) {
-    if(!temp1)
-      cpu_state.sprs[SPR_SR] |= SPR_SR_F;
-    else
-      cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  }
 }
 INSTRUCTION (l_or) {
   uorreg_t temp1;
   temp1 = PARAM1 | PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
 }
 INSTRUCTION (l_xor) {
   uorreg_t temp1;
   temp1 = PARAM1 ^ PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
 }
 INSTRUCTION (l_sub) {
-  orreg_t temp1;
-  temp1 = (orreg_t)PARAM1 - (orreg_t)PARAM2;
-  SET_OV_FLAG_FN (temp1);
-  SET_PARAM0(temp1);
+  orreg_t temp1, temp2, temp3;
+
+  temp3 = (orreg_t)PARAM2;
+  temp2 = (orreg_t)PARAM1;
+  temp1 = temp2 - temp3;
+  SET_PARAM0 (temp1);
+
+  /* Set overflow if a negative value minus a positive value gave a positive
+     sum, or if a positive value minus a negative value gave a negative
+     sum. Otherwise clear it */
+  if ((((long int) temp2 <  0) && 
+       ((long int) temp3 >= 0) &&
+       ((long int) temp1 >= 0)) ||
+      (((long int) temp2 >= 0) && 
+       ((long int) temp3 <  0) &&
+       ((long int) temp1 <  0)))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+    }
+
+  /* Set the carry flag if (as unsigned values) the second operand is greater
+     than the first. */
+  if ((uorreg_t) temp3 > (uorreg_t) temp2)
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+    }
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
+      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
+    {
+      except_handle (EXCEPT_RANGE, cpu_state.pc);
+    }
 }
 /*int mcount = 0;*/
 INSTRUCTION (l_mul) {
@@ -398,7 +427,6 @@ INSTRUCTION (l_sll) {
   uorreg_t temp1;
 
   temp1 = PARAM1 << PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
   /* runtime.sim.cycles += 2; */
 }
@@ -406,14 +434,12 @@ INSTRUCTION (l_sra) {
   orreg_t temp1;
   
   temp1 = (orreg_t)PARAM1 >> PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
   /* runtime.sim.cycles += 2; */
 }
 INSTRUCTION (l_srl) {
   uorreg_t temp1;
   temp1 = PARAM1 >> PARAM2;
-  SET_OV_FLAG_FN (temp1);
   SET_PARAM0(temp1);
   /* runtime.sim.cycles += 2; */
 }

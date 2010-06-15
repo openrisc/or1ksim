@@ -58,10 +58,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = is-add-test$(EXEEXT) is-div-test$(EXEEXT) \
-	is-find-test$(EXEEXT) is-jump-test$(EXEEXT) \
-	is-lws-test$(EXEEXT) is-mac-test$(EXEEXT) is-mul-test$(EXEEXT) \
-	is-ror-test$(EXEEXT) is-spr-test$(EXEEXT) $(am__EXEEXT_1)
+check_PROGRAMS = is-add-test$(EXEEXT) is-and-test$(EXEEXT) \
+	is-div-test$(EXEEXT) is-find-test$(EXEEXT) \
+	is-jump-test$(EXEEXT) is-lws-test$(EXEEXT) \
+	is-mac-test$(EXEEXT) is-mul-test$(EXEEXT) is-or-test$(EXEEXT) \
+	is-ror-test$(EXEEXT) is-shift-test$(EXEEXT) \
+	is-spr-test$(EXEEXT) is-sub-test$(EXEEXT) is-xor-test$(EXEEXT) \
+	$(am__EXEEXT_1)
 subdir = inst-set-test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -92,6 +95,12 @@ is_add_test_DEPENDENCIES = inst-set-test.lo
 is_add_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_add_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_and_test_OBJECTS = is-and-test.$(OBJEXT)
+is_and_test_OBJECTS = $(am_is_and_test_OBJECTS)
+is_and_test_DEPENDENCIES = inst-set-test.lo
+is_and_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_and_test_LDFLAGS) $(LDFLAGS) -o $@
 am_is_div_test_OBJECTS = is-div-test.$(OBJEXT)
 is_div_test_OBJECTS = $(am_is_div_test_OBJECTS)
 is_div_test_DEPENDENCIES = inst-set-test.lo
@@ -128,18 +137,42 @@ is_mul_test_DEPENDENCIES = inst-set-test.lo
 is_mul_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_mul_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_or_test_OBJECTS = is-or-test.$(OBJEXT)
+is_or_test_OBJECTS = $(am_is_or_test_OBJECTS)
+is_or_test_DEPENDENCIES = inst-set-test.lo
+is_or_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_or_test_LDFLAGS) $(LDFLAGS) -o $@
 am_is_ror_test_OBJECTS = is-ror-test.$(OBJEXT)
 is_ror_test_OBJECTS = $(am_is_ror_test_OBJECTS)
 is_ror_test_DEPENDENCIES = inst-set-test.lo
 is_ror_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_ror_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_shift_test_OBJECTS = is-shift-test.$(OBJEXT)
+is_shift_test_OBJECTS = $(am_is_shift_test_OBJECTS)
+is_shift_test_DEPENDENCIES = inst-set-test.lo
+is_shift_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_shift_test_LDFLAGS) $(LDFLAGS) -o $@
 am_is_spr_test_OBJECTS = is-spr-test.$(OBJEXT)
 is_spr_test_OBJECTS = $(am_is_spr_test_OBJECTS)
 is_spr_test_DEPENDENCIES = inst-set-test.lo
 is_spr_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_spr_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_sub_test_OBJECTS = is-sub-test.$(OBJEXT)
+is_sub_test_OBJECTS = $(am_is_sub_test_OBJECTS)
+is_sub_test_DEPENDENCIES = inst-set-test.lo
+is_sub_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_sub_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_xor_test_OBJECTS = is-xor-test.$(OBJEXT)
+is_xor_test_OBJECTS = $(am_is_xor_test_OBJECTS)
+is_xor_test_DEPENDENCIES = inst-set-test.lo
+is_xor_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_xor_test_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__depfiles_maybe = depfiles
@@ -159,17 +192,22 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libinst_set_test_la_SOURCES) $(inst_set_test_old_SOURCES) \
-	$(is_add_test_SOURCES) $(is_div_test_SOURCES) \
-	$(is_find_test_SOURCES) $(is_jump_test_SOURCES) \
-	$(is_lws_test_SOURCES) $(is_mac_test_SOURCES) \
-	$(is_mul_test_SOURCES) $(is_ror_test_SOURCES) \
-	$(is_spr_test_SOURCES)
-DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
-	$(inst_set_test_old_SOURCES) $(is_add_test_SOURCES) \
+	$(is_add_test_SOURCES) $(is_and_test_SOURCES) \
 	$(is_div_test_SOURCES) $(is_find_test_SOURCES) \
 	$(is_jump_test_SOURCES) $(is_lws_test_SOURCES) \
 	$(is_mac_test_SOURCES) $(is_mul_test_SOURCES) \
-	$(is_ror_test_SOURCES) $(is_spr_test_SOURCES)
+	$(is_or_test_SOURCES) $(is_ror_test_SOURCES) \
+	$(is_shift_test_SOURCES) $(is_spr_test_SOURCES) \
+	$(is_sub_test_SOURCES) $(is_xor_test_SOURCES)
+DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
+	$(inst_set_test_old_SOURCES) $(is_add_test_SOURCES) \
+	$(is_and_test_SOURCES) $(is_div_test_SOURCES) \
+	$(is_find_test_SOURCES) $(is_jump_test_SOURCES) \
+	$(is_lws_test_SOURCES) $(is_mac_test_SOURCES) \
+	$(is_mul_test_SOURCES) $(is_or_test_SOURCES) \
+	$(is_ror_test_SOURCES) $(is_shift_test_SOURCES) \
+	$(is_spr_test_SOURCES) $(is_sub_test_SOURCES) \
+	$(is_xor_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -301,50 +339,75 @@ libinst_set_test_la_SOURCES = inst-set-test.S
 
 # The new instruction set tests.
 is_add_test_SOURCES = inst-set-test.h \
-	               is-add-test.S
+	                is-add-test.S
 
 is_add_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_add_test_LDADD = inst-set-test.lo
+is_and_test_SOURCES = inst-set-test.h \
+	                is-and-test.S
+
+is_and_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_and_test_LDADD = inst-set-test.lo
 is_div_test_SOURCES = inst-set-test.h \
-	               is-div-test.S
+	                is-div-test.S
 
 is_div_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_div_test_LDADD = inst-set-test.lo
 is_find_test_SOURCES = inst-set-test.h \
-	               is-find-test.S
+	                is-find-test.S
 
 is_find_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_find_test_LDADD = inst-set-test.lo
 is_jump_test_SOURCES = inst-set-test.h \
-	               is-jump-test.S
+	                is-jump-test.S
 
 is_jump_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_jump_test_LDADD = inst-set-test.lo
 is_lws_test_SOURCES = inst-set-test.h \
-	               is-lws-test.S
+	                is-lws-test.S
 
 is_lws_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_lws_test_LDADD = inst-set-test.lo
 is_mac_test_SOURCES = inst-set-test.h \
-	               is-mac-test.S
+	                is-mac-test.S
 
 is_mac_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_mac_test_LDADD = inst-set-test.lo
 is_mul_test_SOURCES = inst-set-test.h \
-	               is-mul-test.S
+	                is-mul-test.S
 
 is_mul_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_mul_test_LDADD = inst-set-test.lo
+is_or_test_SOURCES = inst-set-test.h \
+	                is-or-test.S
+
+is_or_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_or_test_LDADD = inst-set-test.lo
 is_ror_test_SOURCES = inst-set-test.h \
-	               is-ror-test.S
+	                is-ror-test.S
 
 is_ror_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_ror_test_LDADD = inst-set-test.lo
+is_shift_test_SOURCES = inst-set-test.h \
+	                 is-shift-test.S
+
+is_shift_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_shift_test_LDADD = inst-set-test.lo
 is_spr_test_SOURCES = inst-set-test.h \
-	               is-spr-test.S
+	                is-spr-test.S
 
 is_spr_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_spr_test_LDADD = inst-set-test.lo
+is_sub_test_SOURCES = inst-set-test.h \
+	                is-sub-test.S
+
+is_sub_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_sub_test_LDADD = inst-set-test.lo
+is_xor_test_SOURCES = inst-set-test.h \
+	                is-xor-test.S
+
+is_xor_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_xor_test_LDADD = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c
@@ -412,6 +475,9 @@ inst-set-test-old$(EXEEXT): $(inst_set_test_old_OBJECTS) $(inst_set_test_old_DEP
 is-add-test$(EXEEXT): $(is_add_test_OBJECTS) $(is_add_test_DEPENDENCIES) 
 	@rm -f is-add-test$(EXEEXT)
 	$(is_add_test_LINK) $(is_add_test_OBJECTS) $(is_add_test_LDADD) $(LIBS)
+is-and-test$(EXEEXT): $(is_and_test_OBJECTS) $(is_and_test_DEPENDENCIES) 
+	@rm -f is-and-test$(EXEEXT)
+	$(is_and_test_LINK) $(is_and_test_OBJECTS) $(is_and_test_LDADD) $(LIBS)
 is-div-test$(EXEEXT): $(is_div_test_OBJECTS) $(is_div_test_DEPENDENCIES) 
 	@rm -f is-div-test$(EXEEXT)
 	$(is_div_test_LINK) $(is_div_test_OBJECTS) $(is_div_test_LDADD) $(LIBS)
@@ -430,12 +496,24 @@ is-mac-test$(EXEEXT): $(is_mac_test_OBJECTS) $(is_mac_test_DEPENDENCIES)
 is-mul-test$(EXEEXT): $(is_mul_test_OBJECTS) $(is_mul_test_DEPENDENCIES) 
 	@rm -f is-mul-test$(EXEEXT)
 	$(is_mul_test_LINK) $(is_mul_test_OBJECTS) $(is_mul_test_LDADD) $(LIBS)
+is-or-test$(EXEEXT): $(is_or_test_OBJECTS) $(is_or_test_DEPENDENCIES) 
+	@rm -f is-or-test$(EXEEXT)
+	$(is_or_test_LINK) $(is_or_test_OBJECTS) $(is_or_test_LDADD) $(LIBS)
 is-ror-test$(EXEEXT): $(is_ror_test_OBJECTS) $(is_ror_test_DEPENDENCIES) 
 	@rm -f is-ror-test$(EXEEXT)
 	$(is_ror_test_LINK) $(is_ror_test_OBJECTS) $(is_ror_test_LDADD) $(LIBS)
+is-shift-test$(EXEEXT): $(is_shift_test_OBJECTS) $(is_shift_test_DEPENDENCIES) 
+	@rm -f is-shift-test$(EXEEXT)
+	$(is_shift_test_LINK) $(is_shift_test_OBJECTS) $(is_shift_test_LDADD) $(LIBS)
 is-spr-test$(EXEEXT): $(is_spr_test_OBJECTS) $(is_spr_test_DEPENDENCIES) 
 	@rm -f is-spr-test$(EXEEXT)
 	$(is_spr_test_LINK) $(is_spr_test_OBJECTS) $(is_spr_test_LDADD) $(LIBS)
+is-sub-test$(EXEEXT): $(is_sub_test_OBJECTS) $(is_sub_test_DEPENDENCIES) 
+	@rm -f is-sub-test$(EXEEXT)
+	$(is_sub_test_LINK) $(is_sub_test_OBJECTS) $(is_sub_test_LDADD) $(LIBS)
+is-xor-test$(EXEEXT): $(is_xor_test_OBJECTS) $(is_xor_test_DEPENDENCIES) 
+	@rm -f is-xor-test$(EXEEXT)
+	$(is_xor_test_LINK) $(is_xor_test_OBJECTS) $(is_xor_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -446,14 +524,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inst-set-test-old.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inst-set-test.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-add-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-and-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-div-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-find-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-jump-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-lws-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mac-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mul-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-or-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-ror-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-shift-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-spr-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-sub-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-xor-test.Po@am__quote@
 
 .S.o:
 @am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

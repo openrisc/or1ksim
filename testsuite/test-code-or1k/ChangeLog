@@ -1,5 +1,10 @@
 2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* inst-set-test/is-and-test.S: Created.
+	* inst-set-test/is-or-test.S: Created.
+	* inst-set-test/is-shift-test.S: Created.
 	* inst-set-test/is-spr-test.S: Created.
+	* inst-set-test/is-sub-test.S: Created.
+	* inst-set-test/is-xor-test.S: Created.
 	* inst-set-test/Makefile.am: Updated for new tests
 	* inst-set-test/Makefile.in: Regenerated.
 

@@ -7,6 +7,9 @@ New in top of tree
 
 No new features are provided, pending full release of 0.4.0.
 
+The configuration options --enable-arith-flag and --enable-ov-flag have been
+removed, since they were the source of bugs, notably Bugs 1782, 1783 and 1784.
+
 The following bugs are fixed.
 * Bug 1770: l.div does not set carry or give correct exception.
 * Bug 1771: l.add* do not correctly set the overflow flag.
@@ -18,6 +21,9 @@ The following bugs are fixed.
 * Bug 1777: l.macrc not correctly implemented.
 * Bug 1778: l.ror and l.rori are not implemented.
 * Bug 1779: l.mtspr implementation is incorrect.
+* Bug 1782: Or1ksim setting of overflow flag is wrong.
+* Bug 1783: Or1ksim definition of overflow is wrong.
+* Bug 1784: Or1ksim does not trigger overflow exceptions.
 
 The following bugs are either cannot be reproduced or will not be fixed.
 

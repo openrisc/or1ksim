@@ -12,8 +12,8 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 1,857 tests compile, run and pass. That
-figure is broken down into 1,593 tests of the standalone simulator and 264
+At the time of writing a total of 2,499 tests compile, run and pass. That
+figure is broken down into 2,235 tests of the standalone simulator and 264
 tests of the library
 
 Configuration and make files are provided for further test programs. These
@@ -46,7 +46,7 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 1,593 tests of standalone Or1ksim:
+A total of 2,235 tests of standalone Or1ksim:
 
 basic:             8 tests of a wide range of instructions and registers.
 cache:             5 tests of the Or1ksim cache modeling
@@ -67,14 +67,19 @@ kbdtest:          26 tests of the PS2 keyboard interface.
 local-global:      1 test of C local and global variables.
 inst-set-test:       A collection of tests of individual instructions
   is-add-test    213 tests of the l.add* instructions (Bugs 1771, 1776)
+  is-and-test     80 tests of the l.and* instructions (Bugs 1782-1784)
   is-div-test:   101 tests of the l.div and l.divu instructions (Bug 1770).
   is-find-test:   14 tests of the l.ff1 and l.fl1 instructions (Bug 1772).
   is-jump-test:   27 tests of the jump instructions (Bug 1775).
   is-lws-test:    13 tests of the l.lws instruction (Bug 1767).
   is-mac-test:   189 tests of the MAC instructions (Bugs 1773, 1777).
   is-mul-test:   186 tests of the l.mul* instructions (Bug 1774).
+  is-or-test      80 tests of the l.or* instructions (Bugs 1782-1784)
   is-ror-test:    36 tests of the l.ror and l.rori instructions (Bug 1778).
+  is-shift-test: 344 tests of the shift instructions (Bug 1782-1784).
   is-spr-test:    28 tests of the l.mfspr and l.mtspr instructions (Bug 1779).
+  is-sub-test     58 tests of the l.sub instruction (Bugs 1782-1784)
+  is-xor-test     80 tests of the l.xor* instructions (Bugs 1782-1784)
 mem-test:         16 tests of simple memory access.
 mmu:             110 tests of the MMU.
 mul:               5 tests of the multiply functionality.
