@@ -49,6 +49,7 @@ check_PROGRAMS = is-add-test          \
 		 is-mac-test          \
 		 is-mul-test          \
 		 is-ror-test          \
+		 is-spr-test          \
 	         $(INST_SET_TEST_OLD)
 
 # The new instruction set tests.
@@ -91,6 +92,11 @@ is_ror_test_SOURCES  = inst-set-test.h \
 	               is-ror-test.S
 is_ror_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
 is_ror_test_LDADD    = inst-set-test.lo
+
+is_spr_test_SOURCES  = inst-set-test.h \
+	               is-spr-test.S
+is_spr_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_spr_test_LDADD    = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c

@@ -61,7 +61,7 @@ host_triplet = @host@
 check_PROGRAMS = is-add-test$(EXEEXT) is-div-test$(EXEEXT) \
 	is-find-test$(EXEEXT) is-jump-test$(EXEEXT) \
 	is-lws-test$(EXEEXT) is-mac-test$(EXEEXT) is-mul-test$(EXEEXT) \
-	is-ror-test$(EXEEXT) $(am__EXEEXT_1)
+	is-ror-test$(EXEEXT) is-spr-test$(EXEEXT) $(am__EXEEXT_1)
 subdir = inst-set-test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -134,6 +134,12 @@ is_ror_test_DEPENDENCIES = inst-set-test.lo
 is_ror_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(is_ror_test_LDFLAGS) $(LDFLAGS) -o $@
+am_is_spr_test_OBJECTS = is-spr-test.$(OBJEXT)
+is_spr_test_OBJECTS = $(am_is_spr_test_OBJECTS)
+is_spr_test_DEPENDENCIES = inst-set-test.lo
+is_spr_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(is_spr_test_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__depfiles_maybe = depfiles
@@ -156,13 +162,14 @@ SOURCES = $(libinst_set_test_la_SOURCES) $(inst_set_test_old_SOURCES) \
 	$(is_add_test_SOURCES) $(is_div_test_SOURCES) \
 	$(is_find_test_SOURCES) $(is_jump_test_SOURCES) \
 	$(is_lws_test_SOURCES) $(is_mac_test_SOURCES) \
-	$(is_mul_test_SOURCES) $(is_ror_test_SOURCES)
+	$(is_mul_test_SOURCES) $(is_ror_test_SOURCES) \
+	$(is_spr_test_SOURCES)
 DIST_SOURCES = $(libinst_set_test_la_SOURCES) \
 	$(inst_set_test_old_SOURCES) $(is_add_test_SOURCES) \
 	$(is_div_test_SOURCES) $(is_find_test_SOURCES) \
 	$(is_jump_test_SOURCES) $(is_lws_test_SOURCES) \
 	$(is_mac_test_SOURCES) $(is_mul_test_SOURCES) \
-	$(is_ror_test_SOURCES)
+	$(is_ror_test_SOURCES) $(is_spr_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -333,6 +340,11 @@ is_ror_test_SOURCES = inst-set-test.h \
 
 is_ror_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
 is_ror_test_LDADD = inst-set-test.lo
+is_spr_test_SOURCES = inst-set-test.h \
+	               is-spr-test.S
+
+is_spr_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_spr_test_LDADD = inst-set-test.lo
 
 # The old test which builds with warnings and runs with errors
 inst_set_test_old_SOURCES = inst-set-test-old.c
@@ -421,6 +433,9 @@ is-mul-test$(EXEEXT): $(is_mul_test_OBJECTS) $(is_mul_test_DEPENDENCIES)
 is-ror-test$(EXEEXT): $(is_ror_test_OBJECTS) $(is_ror_test_DEPENDENCIES) 
 	@rm -f is-ror-test$(EXEEXT)
 	$(is_ror_test_LINK) $(is_ror_test_OBJECTS) $(is_ror_test_LDADD) $(LIBS)
+is-spr-test$(EXEEXT): $(is_spr_test_OBJECTS) $(is_spr_test_DEPENDENCIES) 
+	@rm -f is-spr-test$(EXEEXT)
+	$(is_spr_test_LINK) $(is_spr_test_OBJECTS) $(is_spr_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -438,6 +453,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mac-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-mul-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-ror-test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/is-spr-test.Po@am__quote@
 
 .S.o:
 @am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

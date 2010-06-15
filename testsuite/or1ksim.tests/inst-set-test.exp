@@ -909,3 +909,40 @@ run_or1ksim "ror-test"                                   \
           "!report(0xdeaddead);"                         \
           "!exit(0)"]                                    \
     "inst-set-test.cfg" "inst-set-test/is-ror-test"
+
+# Run the l.mfspr and l.mtspr test
+run_or1ksim "spr-test"                         \
+    [list "!l.mfspr"                           \
+          "  l.mfspr  0x00000000 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x0000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00000801 | 0x2000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002000 | 0x0801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x0001: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00000800 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "!l.mtspr"                           \
+          "  l.mtspr  0x00000000 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x0000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00000801 | 0x2000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002000 | 0x0801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x0001: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00000800 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "!Test completed"                    \
+          "!report(0xdeaddead);"               \
+          "!exit(0)"]                          \
+    "inst-set-test.cfg" "inst-set-test/is-spr-test"

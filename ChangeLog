@@ -1,3 +1,10 @@
+2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/insnset.c <l_mfspr, l_mtspr>: Use bitwise OR, not
+	addition to calculate SPR address.
+	* NEWS: Updated with new bugs fixed.
+
 2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.

@@ -652,7 +652,7 @@ INSTRUCTION (l_extwz) {
   SET_PARAM0((uorreg_t)x);
 }
 INSTRUCTION (l_mtspr) {
-  uint16_t regno = PARAM0 + PARAM2;
+  uint16_t regno = PARAM0 | PARAM2;
   uorreg_t value = PARAM1;
 
   if (cpu_state.sprs[SPR_SR] & SPR_SR_SM)
@@ -663,7 +663,7 @@ INSTRUCTION (l_mtspr) {
   }
 }
 INSTRUCTION (l_mfspr) {
-  uint16_t regno = PARAM1 + PARAM2;
+  uint16_t regno = PARAM1 | PARAM2;
   uorreg_t value = mfspr(regno);
 
   if (cpu_state.sprs[SPR_SR] & SPR_SR_SM)

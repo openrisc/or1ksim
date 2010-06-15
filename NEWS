@@ -17,6 +17,7 @@ The following bugs are fixed.
 * Bug 1776: l.addic is not implemented.
 * Bug 1777: l.macrc not correctly implemented.
 * Bug 1778: l.ror and l.rori are not implemented.
+* Bug 1779: l.mtspr implementation is incorrect.
 
 The following bugs are either cannot be reproduced or will not be fixed.
 
