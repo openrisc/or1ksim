@@ -1,3 +1,7 @@
+2010-06-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Changed version to 0.4.0rc2.
+
 2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* inst-set-test/is-and-test.S: Created.
 	* inst-set-test/is-or-test.S: Created.

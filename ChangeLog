@@ -1,3 +1,13 @@
+2010-06-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.4.0rc2. New conditional to
+	allow l.xori to have unsigned immediate operand.
+	* cpu/or32/or32.c <or32_opcodes>: l.xori optionally uses unsigned
+	immediate.
+	* doc/or1ksim.texi: Updated with enable-unsigned-xori config
+	option.
+	* NEWS: Updated with new bugs fixed.
+
 2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date. enable-arith-flag
@@ -8,6 +18,8 @@
 	flags.
 	<l_sub>: Sets OV and CY flags correctly, and triggers Range
 	Exception if required.
+	* doc/or1ksim.texi: Updated to remove enable-arith-flag	and
+	enable-ov-flag config options.
 	* NEWS: Updated with new bugs fixed.
 
 2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>

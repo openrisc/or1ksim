@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-06-15], [openrisc@opencores.org])
+AC_INIT([or1ksim], [0.4.0rc2], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -253,6 +253,16 @@ AC_ARG_ENABLE(ethphy,
 ])
 AC_MSG_RESULT(${enable_eth_phy-no})
 
+unsigned_xori="0"
+AC_MSG_CHECKING(whether l.xori takes an unsigned immediate operand)
+AC_ARG_ENABLE(unsigned-xori,
+    [  --enable-unsigned-xori    l.xori immediate operand treated as unsigned], [
+    case "$enableval" in
+  no)  unsigned_xori="0" ;;
+	yes) unsigned_xori="1" ;;
+    esac
+])
+AC_MSG_RESULT(${enable_unsigned_xori-no})
 
 raw_range_stats="0"
 AC_MSG_CHECKING(whether to use raw range stats)
@@ -282,6 +292,7 @@ AC_SUBST(DEBUGFLAGS)
 
 AC_DEFINE_UNQUOTED(RAW_RANGE_STATS, $raw_range_stats, [ Specifies, whether we should do register accesses over time analysis. Simple execution must be enabled!])
 AC_DEFINE_UNQUOTED(HAVE_ETH_PHY, $eth_phy, [Whether we have ethernet PHY support])
+AC_DEFINE_UNQUOTED(HAVE_UNSIGNED_XORI, $unsigned_xori, [Whether l.xori takes an unsigned immediate operand])
 AC_DEFINE_UNQUOTED(SIMPLE_EXECUTION, $execution == 0, [Whether we are building with simple execution module]) 
 AC_DEFINE_UNQUOTED(COMPLEX_EXECUTION, $execution == 1, [Whether we are building with complex execution module]) 
 AC_DEFINE_UNQUOTED(DYNAMIC_EXECUTION, $execution == 2, [Whether we are building with dynamic execution module]) 

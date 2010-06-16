@@ -235,8 +235,11 @@ INSTRUCTION (l_or) {
   SET_PARAM0(temp1);
 }
 INSTRUCTION (l_xor) {
-  uorreg_t temp1;
-  temp1 = PARAM1 ^ PARAM2;
+  /* The argument is now specified as unsigned, but historically OR1K has
+     always treated the argument as signed (so l.xori rD,rA,-1 can be used in
+     the absence of l.not). Use this as the default behavior. This is
+     controlled from or32.c. */
+  uorreg_t  temp1 = PARAM1 ^ PARAM2;
   SET_PARAM0(temp1);
 }
 INSTRUCTION (l_sub) {

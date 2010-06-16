@@ -197,6 +197,9 @@
 /* Define to 1 if you have the `unlockpt' function. */
 #undef HAVE_UNLOCKPT
 
+/* Whether l.xori takes an unsigned immediate operand */
+#undef HAVE_UNSIGNED_XORI
+
 /* Define to 1 if you have the <varargs.h> header file. */
 #undef HAVE_VARARGS_H
 

@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-06-15.tar.bz2
+     tar jxf or1ksim-0.4.0rc2.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-06-15/configure --target=or32-uclinux ...
+     ../or1ksim-0.4.0rc2/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -134,6 +134,29 @@ enabling at configuration.  These include
      Ethernet Configuration: Ethernet Configuration.
 
      The default is for this to be disabled.
+
+`--enable-unsigned-xori'
+`--disable-unsigned-xori'
+     Historically, `l.xori', has sign extended its operand. This is
+     inconsistent with the other logical opcodes (`l.andi', `l.ori'),
+     but in the absence of `l.not', it allows a register to be inverted
+     in a single instruction using:
+
+          `l.xori  rD,rA,-1'
+
+     This flag causes Or1ksim to treat the immediate operand as
+     unsigned (i.e to zero-extend rather than sign-extend).
+
+     The default is to sign-extend, so that existing code will continue
+     to work.
+
+          Caution: The GNU compiler tool chain makes heavy use of this
+          instruction.  Using unsigned behavior will require the
+          compiler to be modified accordingly.
+
+          This option is provided for experimentation.  A future
+          version of OpenRISC may adopt this more consistent behavior
+          and also provide a `l.not' opcode.
 
 `--enable-range-stats'
 `--disable-range-stats'
@@ -235,9 +258,9 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 =============================
 
 The following problems and issues are known about with Or1ksim
-2010-06-15.  The OpenRISC tracker may be used to see the current state
-of these issues and to raise new problems and feature requests.  It may
-be found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
+0.4.0rc2.  The OpenRISC tracker may be used to see the current state of
+these issues and to raise new problems and feature requests.  It may be
+found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
    * The Supervision Register Little Endian Enable (LEE) bit is
      ignored.  Or1ksim can be built for either little endian or big
@@ -3413,25 +3436,27 @@ Index
 * --debug-config:                        Standalone Simulator.
                                                               (line  48)
 * --disable-all-tests:                   Configuring the Build.
-                                                              (line  82)
+                                                              (line 105)
 * --disable-arith-flag:                  Configuring the Build.
-                                                              (line  95)
+                                                              (line 118)
 * --disable-debug:                       Configuring the Build.
-                                                              (line  75)
+                                                              (line  98)
 * --disable-ethphy:                      Configuring the Build.
                                                               (line  59)
 * --disable-ov-flag:                     Configuring the Build.
-                                                              (line 110)
+                                                              (line 133)
 * --disable-profiling:                   Configuring the Build.
                                                               (line  30)
 * --disable-range-stats:                 Configuring the Build.
+                                                              (line  92)
+* --disable-unsigned-xori:               Configuring the Build.
                                                               (line  69)
 * --enable-all-tests:                    Configuring the Build.
-                                                              (line  81)
+                                                              (line 104)
 * --enable-arith-flag:                   Configuring the Build.
-                                                              (line  94)
+                                                              (line 117)
 * --enable-debug:                        Configuring the Build.
-                                                              (line  74)
+                                                              (line  97)
 * --enable-ethphy:                       Configuring the Build.
                                                               (line  58)
 * --enable-execution:                    Configuring the Build.
@@ -3439,12 +3464,14 @@ Index
 * --enable-mprofile:                     Standalone Simulator.
                                                               (line  77)
 * --enable-ov-flag:                      Configuring the Build.
-                                                              (line 109)
+                                                              (line 132)
 * --enable-profile:                      Standalone Simulator.
                                                               (line  74)
 * --enable-profiling:                    Configuring the Build.
                                                               (line  29)
 * --enable-range-stats:                  Configuring the Build.
+                                                              (line  91)
+* --enable-unsigned-xori:                Configuring the Build.
                                                               (line  68)
 * --file:                                Standalone Simulator.
                                                               (line  24)
@@ -3511,9 +3538,9 @@ Index
                                                               (line  66)
 * 16550 (UART configuration):            UART Configuration.  (line  73)
 * all tests enabled:                     Configuring the Build.
-                                                              (line  82)
+                                                              (line 105)
 * Argtable2 debugging:                   Configuring the Build.
-                                                              (line  75)
+                                                              (line  98)
 * ATA/ATAPI configuration:               Disc Interface Configuration.
                                                               (line   6)
 * ATA/ATAPI device configuration:        Disc Interface Configuration.
@@ -3666,7 +3693,7 @@ Index
                                                               (line   6)
 * Debug Unit verification (VAPI):        Verification API.    (line  34)
 * debugging enabled (Argtable2):         Configuring the Build.
-                                                              (line  75)
+                                                              (line  98)
 * DejaGnu board configurations:          Regression Testing.  (line  35)
 * DejaGnu configuration:                 Regression Testing.  (line  21)
 * DejaGNU tests directories:             Regression Testing.  (line  50)
@@ -3760,6 +3787,8 @@ Index
 * Ethernet verification (VAPI):          Verification API.    (line  78)
 * Ethernet via socket, enabling:         Configuring the Build.
                                                               (line  59)
+* exclusive-OR immediate operand:        Configuring the Build.
+                                                              (line  69)
 * exe_log (simulator configuration):     Simulator Behavior.  (line  49)
 * exe_log_end (simulator configuration): Simulator Behavior.  (line  89)
 * exe_log_file (simulator configuration): Simulator Behavior. (line  97)
@@ -3793,7 +3822,7 @@ Index
 * firmware (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 117)
 * flag setting by instructions:          Configuring the Build.
-                                                              (line  95)
+                                                              (line 118)
 * floating point multiply and add:       Known Issues.        (line  56)
 * floating point support:                Known Issues.        (line  42)
 * frame buffer configuration:            Frame Buffer Configuration.
@@ -3949,7 +3978,7 @@ Index
 * or1ksim_set_time_point:                Simulator Library.   (line  73)
 * output rediretion:                     Concepts.            (line   7)
 * overflow flag setting by instructions: Configuring the Build.
-                                                              (line 110)
+                                                              (line 133)
 * packet (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 113)
 * pagesize (MMU configuration):          Memory Management Configuration.
@@ -4044,7 +4073,7 @@ Index
 * register display (Interactive CLI):    Interactive Command Line.
                                                               (line  14)
 * register over time statistics:         Configuring the Build.
-                                                              (line  69)
+                                                              (line  92)
 * register patching (Interactive CLI):   Interactive Command Line.
                                                               (line  28)
 * regression testing:                    Regression Testing.  (line   6)
@@ -4172,7 +4201,7 @@ Index
 * stall the processor (Interactive CLI): Interactive Command Line.
                                                               (line  72)
 * statistics, register over time:        Configuring the Build.
-                                                              (line  69)
+                                                              (line  92)
 * statistics, simulation (Interactive CLI): Interactive Command Line.
                                                               (line  83)
 * stats (Interactive CLI):               Interactive Command Line.
@@ -4203,7 +4232,7 @@ Index
 * test README:                           Regression Testing.  (line  32)
 * testing:                               Regression Testing.  (line   6)
 * tests, all enabled.:                   Configuring the Build.
-                                                              (line  82)
+                                                              (line 105)
 * timings_file (CUC configuration):      CUC Configuration.   (line  46)
 * timings_fn (CUC configuration - deprecated): CUC Configuration.
                                                               (line  46)
@@ -4284,52 +4313,52 @@ Tag Table:
 Node: Top814
 Node: Installation1224
 Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install6975
-Node: Known Issues7821
-Node: Usage10883
-Node: Standalone Simulator11097
-Node: Profiling Utility14000
-Node: Memory Profiling Utility14910
-Node: Simulator Library16275
-Node: Configuration24053
-Node: Configuration File Format24662
-Node: Configuration File Preprocessing24954
-Node: Configuration File Syntax25325
-Node: Simulator Configuration28110
-Node: Simulator Behavior28401
-Node: Verification API Configuration32445
-Node: CUC Configuration34385
-Node: Core OpenRISC Configuration36302
-Node: CPU Configuration36804
-Node: Memory Configuration40922
-Node: Memory Management Configuration47380
-Node: Cache Configuration49757
-Node: Interrupt Configuration52143
-Node: Power Management Configuration52879
-Node: Branch Prediction Configuration54156
-Node: Debug Interface Configuration55516
-Node: Peripheral Configuration59736
-Node: Memory Controller Configuration60362
-Node: UART Configuration63776
-Node: DMA Configuration67295
-Node: Ethernet Configuration69162
-Node: GPIO Configuration73138
-Node: Display Interface Configuration74771
-Node: Frame Buffer Configuration77080
-Node: Keyboard Configuration78944
-Node: Disc Interface Configuration81182
-Node: Generic Peripheral Configuration86125
-Node: Interactive Command Line88420
-Node: Verification API95394
-Node: Code Internals99824
-Node: Coding Conventions100407
-Node: Global Data Structures104834
-Node: Concepts107491
-Ref: Output Redirection107636
-Node: Internal Debugging108175
-Node: Regression Testing108699
-Node: GNU Free Documentation License112494
-Node: Index134901
+Node: Configuring the Build1764
+Node: Build and Install7876
+Node: Known Issues8722
+Node: Usage11782
+Node: Standalone Simulator11996
+Node: Profiling Utility14899
+Node: Memory Profiling Utility15809
+Node: Simulator Library17174
+Node: Configuration24952
+Node: Configuration File Format25561
+Node: Configuration File Preprocessing25853
+Node: Configuration File Syntax26224
+Node: Simulator Configuration29009
+Node: Simulator Behavior29300
+Node: Verification API Configuration33344
+Node: CUC Configuration35284
+Node: Core OpenRISC Configuration37201
+Node: CPU Configuration37703
+Node: Memory Configuration41821
+Node: Memory Management Configuration48279
+Node: Cache Configuration50656
+Node: Interrupt Configuration53042
+Node: Power Management Configuration53778
+Node: Branch Prediction Configuration55055
+Node: Debug Interface Configuration56415
+Node: Peripheral Configuration60635
+Node: Memory Controller Configuration61261
+Node: UART Configuration64675
+Node: DMA Configuration68194
+Node: Ethernet Configuration70061
+Node: GPIO Configuration74037
+Node: Display Interface Configuration75670
+Node: Frame Buffer Configuration77979
+Node: Keyboard Configuration79843
+Node: Disc Interface Configuration82081
+Node: Generic Peripheral Configuration87024
+Node: Interactive Command Line89319
+Node: Verification API96293
+Node: Code Internals100723
+Node: Coding Conventions101306
+Node: Global Data Structures105733
+Node: Concepts108390
+Ref: Output Redirection108535
+Node: Internal Debugging109074
+Node: Regression Testing109598
+Node: GNU Free Documentation License113393
+Node: Index135800
 
 End Tag Table

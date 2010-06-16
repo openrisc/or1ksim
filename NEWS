@@ -2,13 +2,16 @@
 	      ==================================================
 
 
-New in top of tree
-==================
+New in release 0.4.0rc2
+=======================
 
 No new features are provided, pending full release of 0.4.0.
 
 The configuration options --enable-arith-flag and --enable-ov-flag have been
 removed, since they were the source of bugs, notably Bugs 1782, 1783 and 1784.
+
+The configuration option --enable-unsigned-xori has been added to allow a
+conditional solution to Bug 1790.
 
 The following bugs are fixed.
 * Bug 1770: l.div does not set carry or give correct exception.
@@ -24,6 +27,7 @@ The following bugs are fixed.
 * Bug 1782: Or1ksim setting of overflow flag is wrong.
 * Bug 1783: Or1ksim definition of overflow is wrong.
 * Bug 1784: Or1ksim does not trigger overflow exceptions.
+* Bug 1790: l.xori implementation is incorrect.
 
 The following bugs are either cannot be reproduced or will not be fixed.
 

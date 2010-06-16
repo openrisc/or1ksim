@@ -169,6 +169,35 @@ Configuration, , Ethernet Configuration}.
 
 The default is for this to be disabled.
 
+@item --enable-unsigned-xori
+@cindex @code{--enable-unsigned-xori}
+@itemx --disable-unsigned-xori
+@cindex @code{--disable-unsigned-xori}
+@cindex exclusive-OR immediate operand
+Historically, @code{l.xori}, has sign extended its operand. This is
+inconsistent with the other logical opcodes (@code{l.andi},
+@code{l.ori}), but in the absence of @code{l.not}, it allows a register
+to be inverted in a single instruction using:
+
+@example
+@code{l.xori  rD,rA,-1}
+@end example
+
+This flag causes Or1ksim to treat the immediate operand as unsigned (i.e
+to zero-extend rather than sign-extend).
+
+The default is to sign-extend, so that existing code will continue to
+work.
+
+@quotation Caution
+The GNU compiler tool chain makes heavy use of this instruction.  Using
+unsigned behavior will require the compiler to be modified accordingly.
+
+This option is provided for experimentation.  A future version of
+OpenRISC may adopt this more consistent behavior and also provide a
+@code{l.not} opcode.
+@end quotation
+
 @item --enable-range-stats
 @cindex @code{--enable-range-stats}
 @itemx --disable-range-stats

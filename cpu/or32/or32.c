@@ -338,8 +338,13 @@ CONST struct or32_opcode or32_opcodes[] = {
    EF (l_and), OR32_W_FLAG, it_arith},
   {"l.ori", "rD,rA,K", "10 0xA  DDDDD AAAAA KKKK KKKK KKKK KKKK",
    EF (l_or), 0, it_arith},
+#if HAVE_UNSIGNED_XORI
+  {"l.xori", "rD,rA,K", "10 0xB  DDDDD AAAAA KKKK KKKK KKKK KKKK",
+   EF (l_xor), 0, it_arith},
+#else
   {"l.xori", "rD,rA,I", "10 0xB  DDDDD AAAAA IIII IIII IIII IIII",
    EF (l_xor), 0, it_arith},
+#endif
   {"l.muli", "rD,rA,I", "10 0xC  DDDDD AAAAA IIII IIII IIII IIII",
    EF (l_mul), 0, it_arith},
   {"l.mfspr", "rD,rA,K", "10 0xD  DDDDD AAAAA KKKK KKKK KKKK KKKK",
