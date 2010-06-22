@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-0.4.0rc2.tar.bz2
+     tar jxf or1ksim-0.4.0.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-0.4.0rc2/configure --target=or32-uclinux ...
+     ../or1ksim-0.4.0/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -257,10 +257,10 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 1.4 Known Problems and Issues
 =============================
 
-The following problems and issues are known about with Or1ksim
-0.4.0rc2.  The OpenRISC tracker may be used to see the current state of
-these issues and to raise new problems and feature requests.  It may be
-found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
+The following problems and issues are known about with Or1ksim 0.4.0.
+The OpenRISC tracker may be used to see the current state of these
+issues and to raise new problems and feature requests.  It may be found
+at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
    * The Supervision Register Little Endian Enable (LEE) bit is
      ignored.  Or1ksim can be built for either little endian or big
@@ -4313,52 +4313,52 @@ Tag Table:
 Node: Top814
 Node: Installation1224
 Node: Preparation1471
-Node: Configuring the Build1764
-Node: Build and Install7876
-Node: Known Issues8722
-Node: Usage11782
-Node: Standalone Simulator11996
-Node: Profiling Utility14899
-Node: Memory Profiling Utility15809
-Node: Simulator Library17174
-Node: Configuration24952
-Node: Configuration File Format25561
-Node: Configuration File Preprocessing25853
-Node: Configuration File Syntax26224
-Node: Simulator Configuration29009
-Node: Simulator Behavior29300
-Node: Verification API Configuration33344
-Node: CUC Configuration35284
-Node: Core OpenRISC Configuration37201
-Node: CPU Configuration37703
-Node: Memory Configuration41821
-Node: Memory Management Configuration48279
-Node: Cache Configuration50656
-Node: Interrupt Configuration53042
-Node: Power Management Configuration53778
-Node: Branch Prediction Configuration55055
-Node: Debug Interface Configuration56415
-Node: Peripheral Configuration60635
-Node: Memory Controller Configuration61261
-Node: UART Configuration64675
-Node: DMA Configuration68194
-Node: Ethernet Configuration70061
-Node: GPIO Configuration74037
-Node: Display Interface Configuration75670
-Node: Frame Buffer Configuration77979
-Node: Keyboard Configuration79843
-Node: Disc Interface Configuration82081
-Node: Generic Peripheral Configuration87024
-Node: Interactive Command Line89319
-Node: Verification API96293
-Node: Code Internals100723
-Node: Coding Conventions101306
-Node: Global Data Structures105733
-Node: Concepts108390
-Ref: Output Redirection108535
-Node: Internal Debugging109074
-Node: Regression Testing109598
-Node: GNU Free Documentation License113393
-Node: Index135800
+Node: Configuring the Build1761
+Node: Build and Install7870
+Node: Known Issues8716
+Node: Usage11772
+Node: Standalone Simulator11986
+Node: Profiling Utility14889
+Node: Memory Profiling Utility15799
+Node: Simulator Library17164
+Node: Configuration24942
+Node: Configuration File Format25551
+Node: Configuration File Preprocessing25843
+Node: Configuration File Syntax26214
+Node: Simulator Configuration28999
+Node: Simulator Behavior29290
+Node: Verification API Configuration33334
+Node: CUC Configuration35274
+Node: Core OpenRISC Configuration37191
+Node: CPU Configuration37693
+Node: Memory Configuration41811
+Node: Memory Management Configuration48269
+Node: Cache Configuration50646
+Node: Interrupt Configuration53032
+Node: Power Management Configuration53768
+Node: Branch Prediction Configuration55045
+Node: Debug Interface Configuration56405
+Node: Peripheral Configuration60625
+Node: Memory Controller Configuration61251
+Node: UART Configuration64665
+Node: DMA Configuration68184
+Node: Ethernet Configuration70051
+Node: GPIO Configuration74027
+Node: Display Interface Configuration75660
+Node: Frame Buffer Configuration77969
+Node: Keyboard Configuration79833
+Node: Disc Interface Configuration82071
+Node: Generic Peripheral Configuration87014
+Node: Interactive Command Line89309
+Node: Verification API96283
+Node: Code Internals100713
+Node: Coding Conventions101296
+Node: Global Data Structures105723
+Node: Concepts108380
+Ref: Output Redirection108525
+Node: Internal Debugging109064
+Node: Regression Testing109588
+Node: GNU Free Documentation License113383
+Node: Index135790
 
 End Tag Table
