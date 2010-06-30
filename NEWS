@@ -2,6 +2,16 @@
 	      ==================================================
 
 
+New in top of tree
+==================
+
+The library interface is extended to allow registers and memory to be written
+directly. This is to allow direct integration as a simulator in GDB.
+
+The following bugs are fixed.
+* Bug 1797: Or1ksim does not compile with GCC 3.4.4 under Cygwin
+* Bug 1795: GDB breakpoints do not work with Icache enabled.
+
 New in release 0.4.0
 ====================
 

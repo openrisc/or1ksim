@@ -101,6 +101,7 @@ init_defconfig ()
   config.ext.write_up  = NULL;
 
   /* Sim */
+  config.sim.is_library     = 0;	/* Not library operation */
   config.sim.verbose        = 0;
   config.sim.debug          = 0;
   config.sim.profile        = 0;

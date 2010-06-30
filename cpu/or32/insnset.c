@@ -558,10 +558,19 @@ INSTRUCTION (l_nop) {
       fprintf(stderr, " diff  : cycles %lld, insn #%lld\n",
               runtime.sim.cycles - runtime.sim.reset_cycles,
               runtime.cpu.instructions - runtime.cpu.reset_instructions);
-      if (config.debug.gdb_enabled)
-        set_stall_state (1);
+      if (config.sim.is_library)
+	{
+	  runtime.cpu.halted = 1;
+	  set_stall_state (1);
+	}
+      else if (config.debug.gdb_enabled)
+	{
+	  set_stall_state (1);
+	}
       else
-        sim_done();
+	{
+	  sim_done();
+	}
       break;
     case NOP_CNT_RESET:
       PRINTF("****************** counters reset ******************\n");

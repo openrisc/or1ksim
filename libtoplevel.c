@@ -41,6 +41,12 @@
 #include "pic.h"
 #include "jtag.h"
 
+/* Indices of GDB registers that are not GPRs. Must match GDB settings! */
+#define MAX_GPRS    32			/*!< Maximum GPRs */
+#define PPC_REGNUM  (MAX_GPRS + 0)	/*!< Previous PC */
+#define NPC_REGNUM  (MAX_GPRS + 1)	/*!< Next PC */
+#define SR_REGNUM   (MAX_GPRS + 2)	/*!< Supervision Register */
+
 
 /*---------------------------------------------------------------------------*/
 /*!Initialize the simulator. 
@@ -94,12 +100,13 @@ or1ksim_init (const char *config_file,
       return OR1KSIM_RC_BADINIT;
     }
 
-  config.sim.profile   = 0;	/* No profiling */
-  config.sim.mprofile  = 0;
+  config.sim.is_library = 1;	/* Library operation */
+  config.sim.profile    = 0;	/* No profiling */
+  config.sim.mprofile   = 0;
 
-  config.ext.class_ptr = class_ptr;	/* SystemC linkage */
-  config.ext.read_up   = upr;
-  config.ext.write_up  = upw;
+  config.ext.class_ptr  = class_ptr;	/* SystemC linkage */
+  config.ext.read_up    = upr;
+  config.ext.write_up   = upw;
 
   print_config ();		/* Will go eventually */
   signal (SIGINT, ctrl_c);	/* Not sure we want this really */
@@ -117,7 +124,7 @@ or1ksim_init (const char *config_file,
 
   return OR1KSIM_RC_OK;
 
-}	/* or1ksim_init() */
+}	/* or1ksim_init () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -158,10 +165,10 @@ or1ksim_run (double duration)
   const int  num_ints = sizeof (runtime.sim.ext_int_set) * 8;
 
   /* If we are stalled we can't do anything. We treat this as hitting a
-     breakpoint. */
+     breakpoint or halting. */
   if(runtime.cpu.stalled)
     {
-      return  OR1KSIM_RC_BRKPT;
+      return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
     }
 
   /* Reset the duration */
@@ -181,7 +188,16 @@ or1ksim_run (double duration)
 
       if (cpu_clock ())
 	{
-	  return OR1KSIM_RC_BRKPT;	/* Hit a breakpoint */
+	  /* This is probably wrong. This is an Or1ksim breakpoint, not a GNU
+	     one. */
+	  return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
+	}
+
+      /* If we are stalled we can't do anything. We treat this as hitting a
+	 breakpoint or halting. */
+      if(runtime.cpu.stalled)
+	{
+	  return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
 	}
 
       runtime.sim.cycles += runtime.sim.mem_cycles;
@@ -227,7 +243,28 @@ or1ksim_run (double duration)
 
   return  OR1KSIM_RC_OK;
 
-}	/* or1ksim_run() */
+}	/* or1ksim_run () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Step the simulator
+
+   This is just a wrapper for the run function, specifying a time
+   corresponding to a single cycle. This will in fact mean that a single
+   instruction is executed, even if takes more than one cycle to execute.
+
+   @todo What happens if an event is triggered - that may mean multiple
+         instructions.
+
+   @return  OR1KSIM_RC_OK if we step to completion, OR1KSIM_RC_BRKPT if we hit
+            a breakpoint (not clear how this can be set without CLI access)  */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_step ()
+{
+  return  or1ksim_run ((double) config.sim.clkcycle_ps / 1e12);
+
+}	/* or1ksim_step () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -245,7 +282,7 @@ or1ksim_reset_duration (double duration)
     runtime.sim.cycles +
     (long long int) (duration * 1.0e12 / (double) config.sim.clkcycle_ps);
 
-}	/* or1ksim_reset_duration() */
+}	/* or1ksim_reset_duration () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -275,7 +312,7 @@ or1ksim_set_time_point ()
 {
   runtime.sim.time_point = internal_or1ksim_time ();
 
-}	/* or1ksim_set_time_point() */
+}	/* or1ksim_set_time_point () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -288,7 +325,7 @@ or1ksim_get_time_period ()
 {
   return internal_or1ksim_time () - runtime.sim.time_point;
 
-}	/* or1ksim_get_time_period() */
+}	/* or1ksim_get_time_period () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -307,7 +344,7 @@ or1ksim_is_le ()
   return 1;
 #endif
 
-}	/* or1ksim_is_le() */
+}	/* or1ksim_is_le () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -323,7 +360,7 @@ or1ksim_clock_rate ()
   return (unsigned long int) (1000000000000ULL /
 			      (unsigned long long int) (config.sim.
 							clkcycle_ps));
-}	/* or1ksim_clock_rate() */
+}	/* or1ksim_clock_rate () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -350,7 +387,7 @@ or1ksim_interrupt (int i)
       runtime.sim.ext_int_set |= 1 << i;	// Better not be > 31!
       runtime.sim.ext_int_clr |= 1 << i;	// Better not be > 31!
     }
-}	/* or1ksim_interrupt() */
+}	/* or1ksim_interrupt () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -376,7 +413,7 @@ or1ksim_interrupt_set (int i)
     {
       runtime.sim.ext_int_set |= 1 << i;	// Better not be > 31!
     }
-}	/* or1ksim_interrupt() */
+}	/* or1ksim_interrupt () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -402,7 +439,7 @@ or1ksim_interrupt_clear (int i)
     {
       runtime.sim.ext_int_clr |= 1 << i;	// Better not be > 31!
     }
-}	/* or1ksim_interrupt() */
+}	/* or1ksim_interrupt () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -505,3 +542,192 @@ or1ksim_jtag_shift_dr (unsigned char *jreg,
   return  (double) num_bits * (double) config.debug.jtagcycle_ps / 1.0e12;
 
 }	/* or1ksim_jtag_shift_dr () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Read a block of memory.
+
+   @param[out] buf   Where to put the data.
+   @param[in]  addr  The address to read from.
+   @param[in]  len   The number of bytes to read.
+
+   @return  Number of bytes read, or zero if error.                          */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_read_mem (unsigned char *buf,
+		  unsigned int   addr,
+		  int            len)
+{
+  int             off;			/* Offset into the memory */
+
+  /* Fill the buffer with data */
+  for (off = 0; off < len; off++)
+    {
+      /* Check memory area is valid */
+      if (NULL == verify_memoryarea (addr + off))
+	{
+	  /* Fail silently - others can raise any error message. */
+	  return  0;
+	}
+      else
+	{
+	  /* Get the memory direct - no translation. */
+	  buf[off] = eval_direct8 (addr + off, 0, 0);
+	}
+    }
+
+  return  len;
+
+}	/* or1ksim_read_mem () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Write a block of memory.
+
+   @param[in] buf   Where to get the data from.
+   @param[in] addr  The address to write to.
+   @param[in] len   The number of bytes to write.
+
+   @return  Number of bytes written, or zero if error.                       */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_write_mem (unsigned char *buf,
+		   unsigned int   addr,
+		   int            len)
+{
+  int             off;			/* Offset into the memory */
+
+  /* Write the bytes to memory */
+  for (off = 0; off < len; off++)
+    {
+      if (NULL == verify_memoryarea (addr + off))
+	{
+	  /* Fail silently - others can raise any error message. */
+	  return  0;
+	}
+      else
+	{
+	  /* circumvent the read-only check usually done for mem accesses data
+	     is in host order, because that's what set_direct32 needs */
+	  set_program8 (addr + off, buf[off]);
+	}
+    }
+
+  return  len;
+
+}	/* or1ksim_write_mem () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Read a single register
+
+   The registers follow the GDB sequence for OR1K: GPR0 through GPR31, PC
+   (i.e. SPR NPC) and SR (i.e. SPR SR).
+
+   @param[out] buf     Where to put the data.
+   @param[in]  regnum  The register to read.
+   @param[in]  len     Size of the register in bytes
+
+   @return  Size of the register, or zero if error.                          */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_read_reg (unsigned char *buf,
+		  int            regnum,
+		  int            len)
+{
+  unsigned long int *regbuf = (unsigned long *) buf;
+
+  if (4 != len)
+    {
+      return  0;			/* Not 32-bit reg */
+    }
+
+  /* Get the relevant register */
+  if (regnum < MAX_GPRS)
+    {
+      *regbuf = cpu_state.reg[regnum];
+    }
+  else if (PPC_REGNUM == regnum)
+    {
+      *regbuf = cpu_state.sprs[SPR_PPC];
+    }
+  else if (NPC_REGNUM == regnum)
+    {
+      *regbuf = cpu_state.pc;
+    }
+  else if (SR_REGNUM == regnum)
+    {
+      *regbuf = cpu_state.sprs[SPR_SR];
+    }
+  else
+    {
+      /* Silent error response if we don't know the register */
+      return  0;
+    }
+
+  return  len;
+
+}	/* or1ksim_read_reg () */
+
+    
+/*---------------------------------------------------------------------------*/
+/*!Write a single register
+
+   The registers follow the GDB sequence for OR1K: GPR0 through GPR31, PC
+   (i.e. SPR NPC) and SR (i.e. SPR SR). The register is specified as a
+   sequence of bytes in target endian order.
+
+   Each byte is packed as a pair of hex digits.
+
+   @param[in] buf     Where to get the data from.
+   @param[in] regnum  The register to write.
+   @param[in]  len     Size of the register in bytes
+
+   @return  Size of the register, or zero if error.                          */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_write_reg (unsigned char *buf,
+		   int            regnum,
+		   int            len)
+{
+  unsigned long int *regbuf = (unsigned long *) buf;
+  unsigned long int  regval = *regbuf;
+
+  if (4 != len)
+    {
+      return  0;			/* Not 32-bit reg */
+    }
+
+  /* Set the relevant register */
+  if (regnum < MAX_GPRS)
+    {
+      cpu_state.reg[regnum] =regval;
+    }
+  else if (PPC_REGNUM == regnum)
+    {
+      cpu_state.sprs[SPR_PPC] = regval;
+    }
+  else if (NPC_REGNUM == regnum)
+    {
+      if (cpu_state.pc != regval)
+	{
+	  cpu_state.pc         = regval;
+	  cpu_state.delay_insn = 0;
+	  pcnext               = regval + 4;
+	}
+    }
+  else if (SR_REGNUM == regnum)
+    {
+      cpu_state.sprs[SPR_SR] = regval;
+    }
+  else
+    {
+      /* Silent error response if we don't know the register */
+      return  0;
+    }
+
+  return  len;
+
+}	/* or1ksim_write_reg () */
+
+    

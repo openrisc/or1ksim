@@ -50,6 +50,8 @@
 #include "debug-unit.h"
 #include "sprs.h"
 #include "toplevel-support.h"
+#include "dcache-model.h"
+#include "icache-model.h"
 
 
 /* Define to log each packet */
@@ -1616,8 +1618,13 @@ rsp_write_mem (struct rsp_buf *buf)
 	  unsigned char  nyb1 = hex (symdat[off * 2]);
 	  unsigned char  nyb2 = hex (symdat[off * 2 + 1]);
 
-	  // circumvent the read-only check usually done for mem accesses
-	  // data is in host order, because that's what set_direct32 needs
+	  /* circumvent the read-only check usually done for mem accesses
+	     data is in host order, because that's what set_direct32 needs
+
+	     We make sure both data and instruction cache are invalidated
+	     first, so that the write goes through the cache. */
+	  dc_inv (addr + off);
+	  ic_inv (addr + off);
 	  set_program8 (addr + off, (nyb1 << 4) | nyb2);
 	}
     }
@@ -2200,7 +2207,12 @@ rsp_write_mem_bin (struct rsp_buf *buf)
 	}
       else
 	{
-	  // Circumvent the read-only check usually done for mem accesses
+	  /* Circumvent the read-only check usually done for mem accesses
+
+	     We make sure both data and instruction cache are invalidated
+	     first, so that the write goes through the cache. */
+	  dc_inv (addr + off);
+	  ic_inv (addr + off);
 	  set_program8 (addr + off, bindat[off]);
 	}
     }
@@ -2225,18 +2237,23 @@ static void
 rsp_remove_matchpoint (struct rsp_buf *buf)
 {
   enum mp_type       type;		/* What sort of matchpoint */
+  int                type_for_scanf;	/* To avoid old GCC limitations */
   unsigned long int  addr;		/* Address specified */
   int                len;		/* Matchpoint length (not used) */
   struct mp_entry   *mpe;		/* Info about the replaced instr */
 
-  /* Break out the instruction */
-  if (3 != sscanf (buf->data, "z%1d,%lx,%1d", (int *)&type, &addr, &len))
+  /* Break out the instruction. We have to use an intermediary for the type,
+     since older GCCs do not like taking the address of an enum
+     (dereferencing type-punned pointer). */
+  if (3 != sscanf (buf->data, "z%1d,%lx,%1d", &type_for_scanf, &addr, &len))
     {
       fprintf (stderr, "Warning: RSP matchpoint deletion request not "
 	       "recognized: ignored\n");
       put_str_packet ("E01");
       return;
     }
+
+  type = type_for_scanf;
 
   /* Sanity check that the length is 4 */
   if (4 != len)
@@ -2254,9 +2271,13 @@ rsp_remove_matchpoint (struct rsp_buf *buf)
       mpe = mp_hash_delete (type, addr);
 
       /* If the BP hasn't yet been deleted, put the original instruction
-	 back. Don't forget to free the hash table entry afterwards. */
+	 back. Don't forget to free the hash table entry afterwards.
+
+	 We make sure both the instruction cache is invalidated first, so that
+	 the write goes through the cache. */
       if (NULL != mpe)
 	{
+	  ic_inv (addr);
 	  set_program32 (addr, mpe->instr);
 	  free (mpe);
 	}
@@ -2306,17 +2327,22 @@ static void
 rsp_insert_matchpoint (struct rsp_buf *buf)
 {
   enum mp_type       type;		/* What sort of matchpoint */
+  int                type_for_scanf;	/* To avoid old GCC limitations */
   unsigned long int  addr;		/* Address specified */
   int                len;		/* Matchpoint length (not used) */
 
-  /* Break out the instruction */
-  if (3 != sscanf (buf->data, "Z%1d,%lx,%1d", (int *)&type, &addr, &len))
+  /* Break out the instruction. We have to use an intermediary for the type,
+     since older GCCs do not like taking the address of an enum
+     (dereferencing type-punned pointer). */
+  if (3 != sscanf (buf->data, "Z%1d,%lx,%1d", &type_for_scanf, &addr, &len))
     {
       fprintf (stderr, "Warning: RSP matchpoint insertion request not "
 	       "recognized: ignored\n");
       put_str_packet ("E01");
       return;
     }
+
+  type = type_for_scanf;
 
   /* Sanity check that the length is 4 */
   if (4 != len)
@@ -2330,8 +2356,12 @@ rsp_insert_matchpoint (struct rsp_buf *buf)
   switch (type)
     {
     case BP_MEMORY:
-      /* Memory breakpoint - substitute a TRAP instruction */
+      /* Memory breakpoint - substitute a TRAP instruction
+
+	 We make sure th instruction cache is invalidated first, so that the
+	 read and write always work correctly. */
       mp_hash_add (type, addr, eval_direct32 (addr, 0, 0));
+      ic_inv (addr);
       set_program32 (addr, OR1K_TRAP_INSTR);
       put_str_packet ("OK");
 

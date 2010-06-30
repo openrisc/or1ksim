@@ -37,7 +37,8 @@ enum  or1ksim_rc {
   OR1KSIM_RC_OK,		/* No error */
 
   OR1KSIM_RC_BADINIT,		/* Couldn't initialize */
-  OR1KSIM_RC_BRKPT		/* Hit a breakpoint */
+  OR1KSIM_RC_BRKPT,		/* Hit a breakpoint */
+  OR1KSIM_RC_HALTED		/* Hit NOP_EXIT */
 };
 
 /* The interface methods */
@@ -61,6 +62,8 @@ int  or1ksim_init (const char *config_file,
 				     int                data_len));
 
 int  or1ksim_run (double  duration);
+
+int  or1ksim_step ();
 
 void  or1ksim_reset_duration (double duration);
 
@@ -87,6 +90,23 @@ double  or1ksim_jtag_shift_ir (unsigned char *jreg,
 
 double  or1ksim_jtag_shift_dr (unsigned char *jreg,
 			       int            num_bits);
+
+/* Access to simulator state */
+int  or1ksim_read_mem (unsigned char *buf,
+		       unsigned int   addr,
+		       int            len);
+
+int  or1ksim_write_mem (unsigned char *buf,
+			unsigned int   addr,
+			int            len);
+
+int  or1ksim_read_reg (unsigned char *buf,
+		       int            regnum,
+		       int            len);
+
+int  or1ksim_write_reg (unsigned char *buf,
+			int            regnum,
+			int            len);
 
 
 #ifdef __cplusplus

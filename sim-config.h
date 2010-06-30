@@ -68,6 +68,7 @@ struct config
 
   struct
   {
+    int is_library;		/* Library operation */
     int debug;			/* Simulator debugging */
     int verbose;		/* Force verbose output */
 
@@ -209,6 +210,7 @@ struct runtime
     long long reset_instructions;
 
     int stalled;
+    int halted;			/* When library hits exit. */
     int hazardwait;		/* how many cycles were wasted because of hazards */
     int supercycles;		/* Superscalar cycles */
   } cpu;

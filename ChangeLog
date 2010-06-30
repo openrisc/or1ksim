@@ -1,3 +1,30 @@
+2010-06-31  Jeremy Bennett <jeremy.bennett@embecosm.co>
+	* argtable2/argtable2.c (arg_print_formatted): Cast argument to
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	isspace to int (x2).
+	* debug/rsp-server.c (rsp_remove_matchpoint)
+	(rsp_insert_matchpoint): Don't cast pointer to enum. Invalidate
+	instruction cache before writing.
+	(rsp_write_mem, rsp_write_mem_bin): Invalidate caches before writing.
+	* NEWS: Updated for new version
+
+2010-06-29  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/insnset.c <l_nop>: On exit, mark cpu as halted if this
+	is library.
+	* libtoplevel.c: Add definitions of GDB register numbers.
+	(or1ksim_init): Initailize config.sim.is_library.
+	(or1ksim_run): Distinguish between halting and hitting breakpoint,
+	return if stalled/halted after cpu_cock ().
+	(or1ksim_step, or1ksim_read_mem, or1ksim_write_mem)
+	(or1ksim_read_reg, or1ksim_write_reg): New functions.
+	* NEWS: Updated for new version
+	* sim-config.c (init_defconfig): Initialize config.sim.is_library.
+	* sim-config.h <struct config>: Added field sim.is_library.
+	<struct runtime>: Added field cpu.halted.
+
 2010-06-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* configure: Regenerated.
 	* configure.ac: Version changed to 0.4.0.
