@@ -977,6 +977,7 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
             { line_end = line_start + colwidth; }
 
         /* Find last whitespace, that fits into line */
+	/* JPB patch to cast argument */
         while ( ( line_end > line_start ) 
                 && ( line_end - line_start > colwidth )
                 && !isspace ((int) (*(text+line_end))))
