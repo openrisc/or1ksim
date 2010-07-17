@@ -79,7 +79,8 @@ main (int   argc,
   do_stats         = config.cpu.superscalar ||
                      config.cpu.dependstats ||
                      config.sim.history     ||
-                     config.sim.exe_log;
+                     config.sim.exe_log     ||
+                     config.sim.exe_bin_insn_log;
 
   sim_init ();
 

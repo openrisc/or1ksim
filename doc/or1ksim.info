@@ -1,5 +1,5 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
-../../doc/or1ksim.texi.
+This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
+4.13 from ../../or1ksim/doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -927,6 +927,18 @@ appear only once.  The following parameters may be specified.
      Default `executed.log'.  For backwards compatibility, the
      alternative name `exe_log_fn' is supported for this parameter, but
      deprecated.
+
+`exe_bin_insn_log = 0|1'
+     Enable logging of executed instructions to a file in binary
+     format. This is helpful for off-line dynamic execution analysis.
+
+          Note: Execution logs can be _very_ big. For example, while
+          booting the Linux kernel, version 2.6.34, a log file
+          1.2Gbytes in size was generated.
+
+`exe_bin_insn_log_file = FILENAME'
+     Filename for the binary execution log filename if
+     `exe_bin_insn_log' is enabled.  Default `exe-insn.bin'.
 
 `clkcycle = VALUE[ps|ns|us|ms]'
      Specify the time taken by one clock cycle.  If no units are
@@ -3591,7 +3603,7 @@ Index
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
                                                               (line  57)
-* clkcycle (simulator configuration):    Simulator Behavior.  (line 103)
+* clkcycle (simulator configuration):    Simulator Behavior.  (line 115)
 * cm (Interactive CLI):                  Interactive Command Line.
                                                               (line  54)
 * command line for Or1ksim standalone use: Standalone Simulator.
@@ -3789,6 +3801,10 @@ Index
                                                               (line  59)
 * exclusive-OR immediate operand:        Configuring the Build.
                                                               (line  69)
+* exe_bin_insn_log (simulator configuration): Simulator Behavior.
+                                                              (line 103)
+* exe_bin_insn_log_file (simulator configuration): Simulator Behavior.
+                                                              (line 111)
 * exe_log (simulator configuration):     Simulator Behavior.  (line  49)
 * exe_log_end (simulator configuration): Simulator Behavior.  (line  89)
 * exe_log_file (simulator configuration): Simulator Behavior. (line  97)
@@ -4310,55 +4326,55 @@ Index
 
 
 Tag Table:
-Node: Top814
-Node: Installation1224
-Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install7880
-Node: Known Issues8726
-Node: Usage11788
-Node: Standalone Simulator12002
-Node: Profiling Utility14905
-Node: Memory Profiling Utility15815
-Node: Simulator Library17180
-Node: Configuration24958
-Node: Configuration File Format25567
-Node: Configuration File Preprocessing25859
-Node: Configuration File Syntax26230
-Node: Simulator Configuration29015
-Node: Simulator Behavior29306
-Node: Verification API Configuration33350
-Node: CUC Configuration35290
-Node: Core OpenRISC Configuration37207
-Node: CPU Configuration37709
-Node: Memory Configuration41827
-Node: Memory Management Configuration48285
-Node: Cache Configuration50662
-Node: Interrupt Configuration53048
-Node: Power Management Configuration53784
-Node: Branch Prediction Configuration55061
-Node: Debug Interface Configuration56421
-Node: Peripheral Configuration60641
-Node: Memory Controller Configuration61267
-Node: UART Configuration64681
-Node: DMA Configuration68200
-Node: Ethernet Configuration70067
-Node: GPIO Configuration74043
-Node: Display Interface Configuration75676
-Node: Frame Buffer Configuration77985
-Node: Keyboard Configuration79849
-Node: Disc Interface Configuration82087
-Node: Generic Peripheral Configuration87030
-Node: Interactive Command Line89325
-Node: Verification API96299
-Node: Code Internals100729
-Node: Coding Conventions101312
-Node: Global Data Structures105739
-Node: Concepts108396
-Ref: Output Redirection108541
-Node: Internal Debugging109080
-Node: Regression Testing109604
-Node: GNU Free Documentation License113399
-Node: Index135806
+Node: Top830
+Node: Installation1240
+Node: Preparation1487
+Node: Configuring the Build1782
+Node: Build and Install7896
+Node: Known Issues8742
+Node: Usage11804
+Node: Standalone Simulator12018
+Node: Profiling Utility14921
+Node: Memory Profiling Utility15831
+Node: Simulator Library17196
+Node: Configuration24974
+Node: Configuration File Format25583
+Node: Configuration File Preprocessing25875
+Node: Configuration File Syntax26246
+Node: Simulator Configuration29031
+Node: Simulator Behavior29322
+Node: Verification API Configuration33855
+Node: CUC Configuration35795
+Node: Core OpenRISC Configuration37712
+Node: CPU Configuration38214
+Node: Memory Configuration42332
+Node: Memory Management Configuration48790
+Node: Cache Configuration51167
+Node: Interrupt Configuration53553
+Node: Power Management Configuration54289
+Node: Branch Prediction Configuration55566
+Node: Debug Interface Configuration56926
+Node: Peripheral Configuration61146
+Node: Memory Controller Configuration61772
+Node: UART Configuration65186
+Node: DMA Configuration68705
+Node: Ethernet Configuration70572
+Node: GPIO Configuration74548
+Node: Display Interface Configuration76181
+Node: Frame Buffer Configuration78490
+Node: Keyboard Configuration80354
+Node: Disc Interface Configuration82592
+Node: Generic Peripheral Configuration87535
+Node: Interactive Command Line89830
+Node: Verification API96804
+Node: Code Internals101234
+Node: Coding Conventions101817
+Node: Global Data Structures106244
+Node: Concepts108901
+Ref: Output Redirection109046
+Node: Internal Debugging109585
+Node: Regression Testing110109
+Node: GNU Free Documentation License113904
+Node: Index136311
 
 End Tag Table

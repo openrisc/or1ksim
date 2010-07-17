@@ -480,6 +480,9 @@ analysis (struct iqueue_entry *current)
   if (config.sim.exe_log)
     dump_exe_log ();
 
+  if (config.sim.exe_bin_insn_log)
+    dump_exe_bin_insn_log (current);
+
 }	/* analysis() */
 
 
@@ -701,6 +704,30 @@ dump_exe_log ()
 	}
     }
 }	/* dump_exe_log() */
+
+
+
+/*---------------------------------------------------------------------------*/
+/*!Outputs binary copy of instruction to a file                              */
+/*---------------------------------------------------------------------------*/
+void
+dump_exe_bin_insn_log (struct iqueue_entry *current)
+{
+  // Do endian swap before spitting out (will be kept in LE on a LE machine)
+  // but more useful to see it in big endian format.
+  // Should probably host htonl().
+  uint32_t insn = (((current->insn & 0xff)<<24) | 
+		   ((current->insn & 0xff00)<<8) | 
+		   ((current->insn & 0xff0000)>>8) | 
+		   ((current->insn & 0xff000000)>>24));
+  
+  //for(i=0;i<4;i++) tmp_insn[i] = eval_direct8 (insn_addr+i, 0, 0);
+  
+  // Dump it into binary log file
+  fwrite((void*)&insn, 4, 1, runtime.sim.fexe_bin_insn_log);
+    
+
+}	/* dump_exe_bin_insn_log() */
 
 
 /*---------------------------------------------------------------------------*/

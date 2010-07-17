@@ -1114,6 +1114,22 @@ Filename for the execution log filename if @code{exe_log} is enabled.  Default
 @file{executed.log}.  For backwards compatibility, the alternative name
 @code{exe_log_fn} is supported for this parameter, but deprecated.
 
+@item exe_bin_insn_log = 0|1
+@cindex @code{exe_bin_insn_log} (simulator configuration)
+Enable logging of executed instructions to a file in binary format. This is 
+helpful for off-line dynamic execution analysis.
+
+@quotation Note
+Execution logs can be @emph{very} big. For example, while booting the Linux 
+kernel, version 2.6.34, a log file 1.2GB in size was generated.
+@end quotation
+
+@item exe_bin_insn_log_file = @var{filename}
+@cindex @code{exe_bin_insn_log_file} (simulator configuration)
+Filename for the binary execution log filename if @code{exe_bin_insn_log} is 
+enabled.  Default @file{exe-insn.bin}.
+
+
 @item clkcycle = @var{value}[ps|ns|us|ms]
 @cindex @code{clkcycle} (simulator configuration)
 Specify the time taken by one clock cycle.  If no units are specified,

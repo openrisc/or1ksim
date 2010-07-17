@@ -1,3 +1,11 @@
+2010-07-17  Julius Baxter <julius.baxter@orsoc.se>
+	* sim-config.c: Adding binary execution trace support
+	* sim-config.h: Adding binary execution trace options to config struct
+	* toplevel.c: do_stats variable now set when binary insn. trace enabled
+	* toplevel-support.c: Added file handling for binary execution trace
+	* cpu/or32/execute.c: Adding binary execution dump function
+	* cpu/common/execute.h: Adding proptoype for binary dump function
+	
 2010-06-31  Jeremy Bennett <jeremy.bennett@embecosm.co>
 	* argtable2/argtable2.c (arg_print_formatted): Cast argument to
 	* configure: Regenerated.

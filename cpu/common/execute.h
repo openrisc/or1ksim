@@ -91,6 +91,8 @@ extern struct hist_exec *hist_exec_tail;
 /* Prototypes for external use */
 extern void      dumpreg ();
 extern void      dump_exe_log ();
+extern void      dump_exe_bin_insn_log (struct iqueue_entry *current);
+
 extern int       cpu_clock ();
 extern void      cpu_reset ();
 extern uorreg_t  evalsim_reg (unsigned int  regno);

@@ -275,6 +275,18 @@ sim_init ()
 	}
     }
 
+  if (config.sim.exe_bin_insn_log)
+    {
+      runtime.sim.fexe_bin_insn_log = fopen (config.sim.exe_bin_insn_log_fn, "wb+");
+      if (!runtime.sim.fexe_bin_insn_log)
+	{
+	  fprintf (stderr, "sim_init: cannot open binary instruction execution log file %s: ",
+		   config.sim.exe_bin_insn_log_fn);
+	  perror (NULL);
+	  exit (1);
+	}
+    }
+
   /* MM170901 always load at address zero */
   if (runtime.sim.filename)
     {
@@ -395,6 +407,11 @@ sim_done ()
       fclose (runtime.sim.fexe_log);
     }
 
+  if (config.sim.exe_bin_insn_log)
+    {
+      fclose (runtime.sim.fexe_bin_insn_log);
+    }
+  
   if (runtime.vapi.enabled)
     {
       vapi_done ();

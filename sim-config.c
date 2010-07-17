@@ -101,21 +101,23 @@ init_defconfig ()
   config.ext.write_up  = NULL;
 
   /* Sim */
-  config.sim.is_library     = 0;	/* Not library operation */
-  config.sim.verbose        = 0;
-  config.sim.debug          = 0;
-  config.sim.profile        = 0;
-  config.sim.prof_fn        = strdup ("sim.profile");
-  config.sim.mprofile       = 0;
-  config.sim.mprof_fn       = strdup ("sim.mprofile");
-  config.sim.history        = 0;
-  config.sim.exe_log        = 0;
-  config.sim.exe_log_type   = EXE_LOG_HARDWARE;
-  config.sim.exe_log_start  = 0;
-  config.sim.exe_log_end    = 0;
-  config.sim.exe_log_marker = 0;
-  config.sim.exe_log_fn     = strdup ("executed.log");
-  config.sim.clkcycle_ps    = 4000;	/* 4000 for 4ns (250MHz) */
+  config.sim.is_library          = 0;	/* Not library operation */
+  config.sim.verbose             = 0;
+  config.sim.debug               = 0;
+  config.sim.profile             = 0;
+  config.sim.prof_fn             = strdup ("sim.profile");
+  config.sim.mprofile            = 0;
+  config.sim.mprof_fn            = strdup ("sim.mprofile");
+  config.sim.history             = 0;
+  config.sim.exe_log             = 0;
+  config.sim.exe_log_type        = EXE_LOG_HARDWARE;
+  config.sim.exe_log_start       = 0;
+  config.sim.exe_log_end         = 0;
+  config.sim.exe_log_marker      = 0;
+  config.sim.exe_log_fn          = strdup ("executed.log");
+  config.sim.exe_bin_insn_log    = 0;
+  config.sim.exe_bin_insn_log_fn = strdup ("exe-insn.bin");
+  config.sim.clkcycle_ps         = 4000;	/* 4000 for 4ns (250MHz) */
 
   /* Debug */
   config.debug.jtagcycle_ps = 40000;	/* 40000 for 40ns (25MHz) */
@@ -631,6 +633,27 @@ sim_exe_log_fn (union param_val val, void *dat)
   config.sim.exe_log_fn = strdup (val.str_val);
 }
 
+void
+sim_exe_bin_insn_log (union param_val val, void *dat)
+{
+  config.sim.exe_bin_insn_log = val.int_val;
+}
+
+void
+sim_exe_bin_insn_log_fn (union param_val val, void *dat)
+{
+  if (NULL != config.sim.exe_bin_insn_log_fn)
+    {
+      free (config.sim.exe_bin_insn_log_fn);
+    }
+
+  config.sim.exe_bin_insn_log_fn = strdup (val.str_val);
+}
+
+
+
+
+
 /*---------------------------------------------------------------------------*/
 /*!Set the clock cycle time.
 
@@ -722,6 +745,9 @@ reg_sim_sec ()
   reg_config_param (sec, "exe_log_marker", paramt_int,      sim_exe_log_marker);
   reg_config_param (sec, "exe_log_file",   paramt_str,      sim_exe_log_fn);
   reg_config_param (sec, "exe_log_fn",     paramt_str,      sim_exe_log_fn);
+  reg_config_param (sec, "exe_bin_insn_log",paramt_int,     sim_exe_bin_insn_log);
+  reg_config_param (sec, "exe_bin_insn_log_fn",paramt_str,  sim_exe_bin_insn_log_fn);
+  reg_config_param (sec, "exe_bin_insn_log_file",paramt_str,  sim_exe_bin_insn_log_fn);
   reg_config_param (sec, "clkcycle",       paramt_word,     sim_clkcycle);
 
 }	/* reg_sim_sec() */

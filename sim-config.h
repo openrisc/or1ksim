@@ -86,6 +86,8 @@ struct config
     int exe_log_marker;		/* If nonzero, place markers before */
     /* each exe_log_marker instructions */
     char *exe_log_fn;		/* RTL state comparison filename */
+    int exe_bin_insn_log;       /* Binary dump log of exec. instructions */
+    char* exe_bin_insn_log_fn;  /* Binary dump log of exec. instructions name */
     long clkcycle_ps;		/* Clock duration in ps */
     int strict_npc;		/* JPB. NPC flushes pipeline when changed */
   } sim;
@@ -171,6 +173,7 @@ struct runtime
     FILE *fprof;		/* Profiler file */
     FILE *fmprof;		/* Memory profiler file */
     FILE *fexe_log;		/* RTL state comparison file */
+    FILE *fexe_bin_insn_log;	/* Binary instruction dump/log file */
     FILE *fout;			/* file for standard output */
     char *filename;		/* Original Command Simulator file (CZ) */
     int iprompt;		/* Interactive prompt */
