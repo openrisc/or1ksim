@@ -399,8 +399,12 @@ evalsim_mem32 (oraddr_t memaddr, oraddr_t vaddr)
     }
   else
     {
-      PRINTF ("EXCEPTION: read out of memory (32-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: read out of memory (32-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+      
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 
@@ -425,8 +429,12 @@ evalsim_mem16 (oraddr_t memaddr, oraddr_t vaddr)
     }
   else
     {
-      PRINTF ("EXCEPTION: read out of memory (16-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: read out of memory (16-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 
@@ -451,8 +459,12 @@ evalsim_mem8 (oraddr_t memaddr, oraddr_t vaddr)
     }
   else
     {
-      PRINTF ("EXCEPTION: read out of memory (8-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: read out of memory (8-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 
@@ -526,8 +538,8 @@ eval_direct32 (oraddr_t memaddr, int through_mmu, int through_dc)
 	return mem->direct_ops.readfunc32 (phys_memaddr & mem->size_mask,
 					   mem->direct_ops.read_dat32);
       else
-	PRINTF ("ERR: 32-bit read out of memory area: %" PRIxADDR
-		" (physical: %" PRIxADDR ")\n", memaddr, phys_memaddr);
+	fprintf (stderr, "ERR: 32-bit read out of memory area: %" PRIxADDR
+		 " (physical: %" PRIxADDR ")\n", memaddr, phys_memaddr);
     }
 
   return 0;
@@ -635,8 +647,8 @@ eval_direct16 (oraddr_t memaddr, int through_mmu, int through_dc)
 	return mem->direct_ops.readfunc16 (phys_memaddr & mem->size_mask,
 					   mem->direct_ops.read_dat16);
       else
-	PRINTF ("ERR: 16-bit read out of memory area: %" PRIxADDR
-		" (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
+	fprintf (stderr, "ERR: 16-bit read out of memory area: %" PRIxADDR
+		 " (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
     }
 
   return 0;
@@ -695,8 +707,8 @@ eval_direct8 (oraddr_t memaddr, int through_mmu, int through_dc)
 	return mem->direct_ops.readfunc8 (phys_memaddr & mem->size_mask,
 					  mem->direct_ops.read_dat8);
       else
-	PRINTF ("ERR: 8-bit read out of memory area: %" PRIxADDR
-		" (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
+	fprintf (stderr, "ERR: 8-bit read out of memory area: %" PRIxADDR
+		 " (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
     }
 
   return 0;
@@ -724,8 +736,12 @@ setsim_mem32 (oraddr_t memaddr, oraddr_t vaddr, uint32_t value)
     }
   else
     {
-      PRINTF ("EXCEPTION: write out of memory (32-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: write out of memory (32-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 }
@@ -752,8 +768,12 @@ setsim_mem16 (oraddr_t memaddr, oraddr_t vaddr, uint16_t value)
     }
   else
     {
-      PRINTF ("EXCEPTION: write out of memory (16-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: write out of memory (16-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 }
@@ -780,8 +800,12 @@ setsim_mem8 (oraddr_t memaddr, oraddr_t vaddr, uint8_t value)
     }
   else
     {
-      PRINTF ("EXCEPTION: write out of memory (8-bit access to %" PRIxADDR
-	      ")\n", memaddr);
+      if (config.sim.report_mem_errs)
+	{
+	  PRINTF ("EXCEPTION: write out of memory (8-bit access to %" PRIxADDR
+		  ")\n", memaddr);
+	}
+
       except_handle (EXCEPT_BUSERR, vaddr);
     }
 }
@@ -862,7 +886,7 @@ set_direct32 (oraddr_t memaddr, uint32_t value, int through_mmu,
 	mem->direct_ops.writefunc32 (phys_memaddr & mem->size_mask, value,
 				     mem->direct_ops.write_dat32);
       else
-	PRINTF ("ERR: 32-bit write out of memory area: %" PRIxADDR
+	fprintf (stderr, "ERR: 32-bit write out of memory area: %" PRIxADDR
 		" (physical: %" PRIxADDR ")\n", memaddr, phys_memaddr);
     }
 
@@ -943,8 +967,8 @@ set_direct16 (oraddr_t memaddr, uint16_t value, int through_mmu,
 	mem->direct_ops.writefunc16 (phys_memaddr & mem->size_mask, value,
 				     mem->direct_ops.write_dat16);
       else
-	PRINTF ("ERR: 16-bit write out of memory area: %" PRIxADDR
-		" (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
+	fprintf (stderr, "ERR: 16-bit write out of memory area: %" PRIxADDR
+		 " (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
     }
 
   if (cur_area && cur_area->log)
@@ -1010,8 +1034,8 @@ set_direct8 (oraddr_t memaddr, uint8_t value, int through_mmu, int through_dc)
 	mem->direct_ops.writefunc8 (phys_memaddr & mem->size_mask, value,
 				    mem->direct_ops.write_dat8);
       else
-	PRINTF ("ERR: 8-bit write out of memory area: %" PRIxADDR
-		" (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
+	fprintf (stderr, "ERR: 8-bit write out of memory area: %" PRIxADDR
+		 " (physical: %" PRIxADDR "\n", memaddr, phys_memaddr);
     }
 
   if (cur_area && cur_area->log)

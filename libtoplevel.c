@@ -51,11 +51,11 @@
 /*---------------------------------------------------------------------------*/
 /*!Initialize the simulator. 
 
-   Allows specification of an (optional) config file and an image file. Builds
-   up dummy argc/argv to pass to the existing argument parser.
+   The user can pass in any arguments acceptable to the standalone
+   simulator. Not all make any sense in a library environment.
 
-   @param[in] config_file  Or1ksim configuration file name
-   @param[in] image_file   The program image to execute
+   @param[in] argc         Size of argument vector
+   @param[in] argv         Argument vector
    @param[in] class_ptr    Pointer to a C++ class instance (for use when
                            called by C++)
    @param[in] upr          Upcall routine for reads
@@ -64,8 +64,8 @@
    @return  0 on success and an error code on failure                        */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_init (const char *config_file,
-	      const char *image_file,
+or1ksim_init (int         argc,
+	      char       *argv[],
 	      void       *class_ptr,
 	      int       (*upr) (void              *class_ptr,
 				unsigned long int  addr,
@@ -78,24 +78,12 @@ or1ksim_init (const char *config_file,
 				unsigned char      wdata[],
 				int                data_len))
 {
-  int   dummy_argc;
-  char *dummy_argv[4];
-
-  /* Dummy argv array. Varies depending on whether an image file is
-     specified. */
-  dummy_argv[0] = "libsim";
-  dummy_argv[1] = "-f";
-  dummy_argv[2] = (char *) ((NULL != config_file) ? config_file : "sim.cfg");
-  dummy_argv[3] = (char *) image_file;
-
-  dummy_argc = (NULL == image_file) ? 3 : 4;
-
   /* Initialization copied from existing main() */
   srand (getpid ());
   init_defconfig ();
   reg_config_secs ();
 
-  if (parse_args (dummy_argc, dummy_argv))
+  if (parse_args (argc, argv))
     {
       return OR1KSIM_RC_BADINIT;
     }

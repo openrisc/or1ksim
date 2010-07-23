@@ -221,11 +221,11 @@ sim_reset ()
 void
 sim_init ()
 {
-  printf ("Or1ksim " PACKAGE_VERSION "\n" );
+  PRINTFQ ("Or1ksim " PACKAGE_VERSION "\n" );
   init_labels ();
   init_breakpoints ();
   initstats ();
-  build_automata ();
+  build_automata (config.sim.quiet);
 
 #if DYNAMIC_EXECUTION
   /* Note: This must be called before the scheduler is used */

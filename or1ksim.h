@@ -47,8 +47,8 @@ enum  or1ksim_rc {
 extern "C" {
 #endif
 
-int  or1ksim_init (const char *config_file,
-		   const char *image_file,
+int  or1ksim_init (int         argc,
+		   char       *argv[],
 		   void       *class_ptr,
 		   int       (*upr) (void              *class_ptr,
 				     unsigned long int  addr,

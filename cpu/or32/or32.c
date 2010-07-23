@@ -983,10 +983,13 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
   return cur;
 }
 
-/* Constructs new automata based on or32_opcodes array.  */
+/* -------------------------------------------------------------------------- */
+/*!Constructs new automata based on or32_opcodes array.
 
+   @param[in] quiet  If non-zero (TRUE) do not print informational messages. */
+/* -------------------------------------------------------------------------- */
 void
-build_automata ()
+build_automata (int  quiet)
 {
   int i;
   unsigned long *end;
@@ -1001,7 +1004,10 @@ build_automata ()
   nuncovered = num_opcodes;
 
 #ifdef HAVE_EXECUTION
-  printf ("Building automata... ");
+  if (!quiet)
+    {
+      printf ("Building automata... ");
+    }
 #endif
 
   /* Build temporary information about instructions.  */
@@ -1026,11 +1032,17 @@ build_automata ()
       exit (1);
     }
 #ifdef HAVE_EXECUTION
-  printf ("done, num uncovered: %i/%i.\n", nuncovered, num_opcodes);
+  if (!quiet)
+    {
+      printf ("done, num uncovered: %i/%i.\n", nuncovered, num_opcodes);
+    }
 #endif
 
 #ifdef HAVE_EXECUTION
-  printf ("Parsing operands data... ");
+  if (!quiet)
+    {
+      printf ("Parsing operands data... ");
+    }
 #endif
   op_data =
     (struct insn_op_struct *) malloc (MAX_OP_TABLE_SIZE *
@@ -1051,7 +1063,10 @@ build_automata ()
 	}
     }
 #ifdef HAVE_EXECUTION
-  printf ("done.\n");
+  if (!quiet)
+    {
+      printf ("done.\n");
+    }
 #endif
 }
 

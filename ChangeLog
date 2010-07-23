@@ -1,12 +1,44 @@
-2010-07-17  Julius Baxter <julius.baxter@orsoc.se>
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/common/abstract.c (setsim_mem32, setsim_mem16, setsim_mem8)
+	(evalsim_mem32, evalsim_mem16, evalsim_mem8): Only report out of
+	memory writes if --report-memory-errors is set.
+	(set_direct32, set_direct16, set_direct8, eval_direct32)
+	(eval_direct16, eval_direct8): Report memory errors to standard
+	error.
+	* cpu/common/parse.c (readfile_elf, identifyfile, loadcode): Use
+	PRINTFQ for informative messages.
+	* cpu/or1k/opcode/or32.h <build_automata>: Function declaration
+	now takes argument.
+	* cpu/or32/generate.c (main): build_automata takes argument.
+	* cpu/or32/insnset.c <l_nop>: all output from NOP_EXIT is via
+	PRINTFQ.
+	* cpu/or32/or32.c (build_automata). Takes an argument. Only prints
+	informative output if argument is zero.
+	* libtoplevel.c (or1ksim_init): Changed syntax to use full
+	argument vector.
+	* or1ksim.h <or1ksim_init>: Changed prototype.
+	* pic/pic.c (pic_reset): Reset message uses PRINTFQ.
+	* sim-config.c (parse_args): Added new args -q/--quiet and
+	--report-memory-errors.
+	* sim-config.h <struct config>: New fields sim.quiet and
+	sim.report_mem_errs.
+	* toplevel-support.c (sim_init): Identification message is printed
+	using PRINTFQ, call to build_automata takes parameter.
+
+2010-07-17  Julius Baxter  <julius.baxter@orsoc.se>
+
 	* sim-config.c: Adding binary execution trace support
 	* sim-config.h: Adding binary execution trace options to config struct
 	* toplevel.c: do_stats variable now set when binary insn. trace enabled
 	* toplevel-support.c: Added file handling for binary execution trace
 	* cpu/or32/execute.c: Adding binary execution dump function
 	* cpu/common/execute.h: Adding proptoype for binary dump function
-	
-2010-06-31  Jeremy Bennett <jeremy.bennett@embecosm.co>
+
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
 	* argtable2/argtable2.c (arg_print_formatted): Cast argument to
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -17,7 +49,8 @@
 	(rsp_write_mem, rsp_write_mem_bin): Invalidate caches before writing.
 	* NEWS: Updated for new version
 
-2010-06-29  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
 	* cpu/or32/insnset.c <l_nop>: On exit, mark cpu as halted if this
@@ -33,12 +66,14 @@
 	* sim-config.h <struct config>: Added field sim.is_library.
 	<struct runtime>: Added field cpu.halted.
 
-2010-06-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-22  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to 0.4.0.
 	* NEWS: Updated for 0.4.0.
 
-2010-06-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to 0.4.0rc2. New conditional to
 	allow l.xori to have unsigned immediate operand.
@@ -48,7 +83,8 @@
 	option.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date. enable-arith-flag
 	and enable-ov-flag config options removed.
@@ -62,7 +98,8 @@
 	enable-ov-flag config options.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
 	* cpu/or32/generate.c (gen_eval_operands): Generate macro
@@ -74,7 +111,8 @@
 	* cpu/or32/or32.c <or32_opcodes>: l.ror and l.rori enabled.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
 	* cpu/or32/generate.c (generate_header): stdint.h included in header.
@@ -84,26 +122,30 @@
 	* cpu/or32/or32.c <or32_opcodes>: l.mulu enabled.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/insnset.c <l_maci>: Intermediate result computed as 32
 	bits, then sign extended.
 	<l_macrc>: Computation corrected.
 	* cpu/or32/or32.c <or32_opcodes>: l.maci bit pattern corrected.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/insnset.c <l_fl1>: New entry.
 	* cpu/or32/or32.c <or32_opcodes>: l.fl1 enabled.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* peripheral/Makefile.am: mc-defines.h added to sources.
 	* cpu/or32/insnset.c <l_addc>: Updated to handle overflow and
 	exceptions correctly.
 	* cpu/or32/or32.c <or32_opcodes>: l.addic enabled.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-09  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date. Removed
 	enable_ov_flag as option for configuration.
@@ -112,40 +154,47 @@
 	* peripheral/Makefile.am: mc-defines.h added to sources.
 	* NEWS: Updated with new bugs fixed.
 
-2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
 	* peripheral/mc.h: mc_defines.h -> mc-defines.h.
 	* peripherals/mc-defines.h: Renamed from mc_defines.h
 
-2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
+2010-06-08  Julius Baxter  <julius.baxter@orsoc.se>
+
 	* peripherals/mc.h: Moved defines to peripherals/mc_defines.h
 	* peripherals/mc_defines.h: Created.
 
-2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
 	* cpu/or32/insnset.c <l_div, l_divu>: Corrected divide by zero
 	exception. Set carry flag on divide by zero.
 	* NEWS: Updated with bugs fixed.
 
-2010-06-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-01  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/generate.c (generate_header): Include math.h.
 	* cpu/or32/insnset.c <l_lws>: Added definition.
 	* cpu/or32/insnset.c <lf_rem_s>: Corrected implementation.
 	* cpu/or32/or32.c <or32_opcodes>: Made l.lws valid, rather than
 	ignored.
 
-2010-05-31  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-31  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/insnset.c <lf_cust2, lf_cust3, lf_cust4>: Removed since
 	invalid.
 
-2010-05-25  Julius Baxter <julius.baxter@orsoc.se>
+2010-05-25  Julius Baxter  <julius.baxter@orsoc.se>
+
 	* profiler.c: PROF_DEBUG added as symbol, MAX_STACK increased.
 	(prof_acquire): Conditional debugging statements added.
 	* profiler.h: MAX_FUNCS increased.
 
-2010-05-25  Jungsook yang <jungsook.yang@uci.edu>
+2010-05-25  Jungsook yang  <jungsook.yang@uci.edu>
+
 	* cpu/common/labels.c (add_label): Improved commenting.
 	* cpu/or32/generate.c (generate_header): extend typedef generation
 	for FP opcodes.
@@ -173,7 +222,8 @@
 	* sim-config.c (init_defconfig): config.cpu.hardfloat initialized.
 	* sim-config.h <struct config>: cpu.hardfloat field added.
 
-2010-05-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/common/abstract.c (reg_mem_area): Remove debugging printf ().
 	* peripheral/generic.c (generic_read_byte): Pass class ptr to upcall.
 	(generic_write_byte): Pass class ptr to upcall.
@@ -182,15 +232,18 @@
 	(generic_read_word): Pass class ptr to upcall.
 	(generic_write_word): Pass class ptr to upcall.
 
-2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	configure.ac: Date of version updated.
 	configure: Regenerated.
 
-2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (wishbone_write): Corrected writing when invalid
 	address.
 
-2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (go_command_read): Change in calling convention to
 	spr_read and wishbone_read.
 	(go_command_write): Change in calling convention to spr_write () and
@@ -202,7 +255,8 @@
 	(wishbone_read): Correcly handle under- and over-run.
 	(wishbone_write): Correcly handle under- and over-run.
 
-2010-05-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (construct_response): Return type changed to void.
 	(go_command): Number of bits passed as arg and on to subsidiary
 	functions. Return type changed to void. Error message with invalid
@@ -258,14 +312,16 @@
 	* or1ksim.h: Proforma for or1ksim_jtag_shift_ir and
 	or1ksim_jtag_shift_ir changed to include number of bits in reg.
 
-2010-05-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (validate_spr_fields): More concise warnings,
 	corrected length to 4, not 1.
 	(reverse_bits): Fixed typo in one constant.
 	* cpu/or1k/sprs.c (mtspr): Undocumented audio SPRs 0xfffd-0xffff
 	and associated static vars "fo" and "audio_cnt" removed.
 
-2010-05-12  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-12  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (go_command_read): Ensure null bytes set if no data
 	due to error and correct CRC calcuated. Give warning for length of
 	zero as well as too long.
@@ -282,7 +338,8 @@
 	(write_command): Warnings in terms of bytes requested, not actual
 	field. Separate warning for zero.
 
-2010-05-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (validate_spr_fields): Check for length changed to
 	4 bytes (was 1 word).
 	(module_select): Save module ID, even if invalid.
@@ -290,7 +347,8 @@
 	module undefined.
 	(wishbone_read): Corrected shifts by bit-off for JTAG bytes.
 
-2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/jtag.c (module_select): Corrected parenthesis for
 	computation of crc_in.
 	(construct_response): Corrected parenthesis for computation of
@@ -309,7 +367,8 @@
 	(wishbone_write); Correctly compute value of byte when bit-off is
 	not zero (shift MS bits left not right).
 
-2010-05-02  Mark Jarvin <mark.jarvin@opencores.org>
+2010-05-02  Mark Jarvin  <mark.jarvin@opencores.org>
+
 	* debug/jtag.c (go_command_read): Initialize crc_out at
 	declaration.
 	* cpu/or32/generate.c (output_function): Close file if fgets ()
@@ -319,7 +378,8 @@
 	generator machine.
 	* port/strndup.c: also include stdlib.h and string.h.
 
-2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.h <or1ksim_init>: Upcall arguments redefined.
 	* libtoplevel.c (or1ksim_init): Upcall arguments redefined.
 	* sim-config.h <struct config.ext>: definition of read_up and
@@ -330,7 +390,8 @@
 	(generic_write_hw, generic_read_word, generic_write_word): Changed
 	to use new upcall interface.
 
-2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-22  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* sim-config.c (read_script_file): Check cur_section is defined
 	before dereferencing to identify parameter.
 	* peripheral/generic.c (generic_read_byte, generic_write_byte)
@@ -338,23 +399,28 @@
 	(generic_read_word, generic_write_word): Use upcall availability
 	as test for upcall.
 
-2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* NEWS: updated
 	* mprofile.c (main_mprofiler): Bug 1710 fixed.
 
-2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* NEWS: updated
 	* peripheral/ps2kbd.c (kbd_reset): Bug 1723 fixed.
 
-2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* AUTHORS: Corrected spelling of Mark Jarvin.
 	* debug/rsp-server.c (rsp_get_client): Set len before calling
 	  accept ().
 
-2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cache/icache-model.c (ic_end_sec): Use -1 as the invalid tag value.
 
-2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* doc/or1ksim.texi: Updated with new testing instructions.
 	* README: Updated.
 	* configure.ac: Check for rl_event_hook declaration.
@@ -363,7 +429,8 @@
 	* peripheral/atadevice.c: Added conditional includes for Apple	MAC.
 	* port/strndup.c: Include stddef.h to define size_t.
 
-2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or1k/spr-defs.h: NOP_PRINTF removed.
 	* support/simprintf.h, support/simprintf.h: Deleted
 	* support/dbchs.h: simprintf channel removed.
@@ -393,27 +460,32 @@
 	* cuc/bb.c (detect_bb): Array bound check added
 	* cuc/timings.c (load_timing_table): index initialized.
 
-2010-04-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* COPYING: Updated to v3.
 	* peripheral/gpio.c: #defines transfered to gpio.h
 	* peripheral/gpio.h: #defines transfered from gpio.c
 	* peripheral/mc.c: #defines transfered to mc.h
 	* peripheral/mc.h: #defines transfered from mc.c
 
-2010-04-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/insnset.c: Added support for new timing NOPs.
 	* cpu/or1k/spr-defs.h: NOP_GET_TICKS and NOP_GET_PS added.
 
-2010-04-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* peripheral/eth.c: #defines transfered to eth.h
 	* peripheral/eth.h: #defines transfered from eth.c
 
-2009-03-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2009-03-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* README: Reference to installation instructions updated
 	* NEWS: Updated for release 0.3.0
 	* doc/or1ksim.texi: Copyright date updated
 
-2009-02-24  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2009-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure.ac: Version number upped
 	* cpu/common/execute.h: cpu_state.npc_not_valid added
 	* cpu/or1k/spr-defs.h: SPR_DRR_FPE added
@@ -432,21 +504,25 @@
 	functionality added.
 	* toplevel-support.c (sim_init): Version number printed out
 
-2008-11-17  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-11-17  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* sim-config.c: MERROR deleted (not used). WARNING replaced by
 	explicit fprintf calls.
 	* sim-config.h, sim-config.c, peripheral/16450.c: CONFIG_ERROR
 	replaced by fprintf.
 
-2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-11-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* debug/gdbcomm.c (get_server_socket): server_ip flag getting by
 	fcntl corrected (wrong syntax used for GETFL).
 
-2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-11-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* doc/or1ksim.texi: Documentation of the various configuration
 	options added.
 
-2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-11-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or32/op-mftspr-op.h, cpu/or32/op.c, cpu/or32/dyn32-defs.h,
 	cpu/or32/def_op_t.h, cpu/or32/op-support.c, cpu/or32/op-swhb-op.h,
 	cpu/or32/dyn-rec.c, cpu/or32/execute.c, cpu/or32/op-arith-op.h,
@@ -455,14 +531,16 @@
 	Numerous changes to ensure compilation succeeds with
 	DYNAMIC_EXECUTION.
 
-2008-11-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-11-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* cpu/or1k/opcode/or32.h: Change include of simple32_defs.h to
 	simple32-defs.h and dyn32_defs.h to dyn32-defs.h
 	* cpu/or32/simple32-defs.h: Made conditional and added include of
 	* cpu/or32/Makefile.am: For simple execution removed insnset.c
 	from the sources and added it to EXTRA sources.
 
-2008-10-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-10-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure.ac: Corrected gcc args for --enabled-profiling
 	* cpu/common/stats.h, cpu/common/stats.c: Moved definition of
 	RAW_RANGE to stats.h from stats.c. Made declaration of raw_stats
@@ -470,7 +548,8 @@
 	* cpu/common/stats.c (printstats): Changed MAX_RANGE to RAW_RANGE
 	* cpu/or32/execute.c (evalsim_reg): Changed MAX_RAW_RANGE to RAW_RANGE
 
-2008-10-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-10-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* all: Removed redundant headers added missing GPL statements,
 	formatted to GNU standard. Made all non-global functions and top
 	level variables	explicitly static, eliminated most typedefs.
@@ -563,11 +642,8 @@
 	generate.c to or32.c, renamed or32_debug and declared static, to
 	avoid confusion with main debug function in toplevel-support.c.
 
-	
+2008-09-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
-	
-
-2008-09-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* argtable2: This directory is a direct inclusion of the argtable2
 	library <argtable.sourceforge.net>
 	* artable2/Makefile.am: Modified so the library and header are not
@@ -584,12 +660,12 @@
 	* sim-config.c (parse_args): profile and mprofile options on
 	command line removed.
 
-2008-09-07  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* toplevel_support.c, sim-config.c, support/dumpverilog.c:
 	or1ksim_ver replaced by PACKAGE_VERSION
 
-2008-09-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-09-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* AUTHORS: Added Jeremy Bennett
 	* bpb/Makefile.am: Updated to use libtool libraries
@@ -628,7 +704,7 @@
 	* toplevel_support.c: New file
 	* vapi/Makefile.am: Updated to use libtool libraries
 
-2008-09-04 15:04	Jeremy Bennett <jeremy.bennett@embecosm.com>
+2008-09-04 Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* bpb/Makefile.am: Added header to SOURCES, so included in TAGS
 	file

@@ -354,7 +354,6 @@ run_libsim "JTAG WRITE_CONTROL CPU0 reset"                     \
           "Execution step completed OK."                       \
           "Processing WRITE_CONTROL."                          \
           "  shifting in:  0x000000000059613d0e00000000000024" \
-          "Resetting PIC."                                     \
           "  shifted out:  0x164841bc600000000000000000000000" \
           "  status:       0x0"                                \
           "  time taken:"                                      \
@@ -382,7 +381,6 @@ run_libsim "JTAG WRITE_CONTROL CPU0 stall and reset"           \
           "Execution step completed OK."                       \
           "Processing WRITE_CONTROL."                          \
           "  shifting in:  0x0000000001c61b4e3600000000000064" \
-          "Resetting PIC."                                     \
           "  shifted out:  0x164841bc600000000000000000000000" \
           "  status:       0x0"                                \
           "  time taken:"                                      \
@@ -416,7 +414,6 @@ run_libsim "JTAG WRITE_CONTROL CPU0 stall then reset"           \
           "Execution step completed with breakpoint."          \
           "Processing WRITE_CONTROL."                          \
           "  shifting in:  0x000000000059613d0e00000000000024" \
-          "Resetting PIC."                                     \
           "  shifted out:  0x164841bc600000000000000000000000" \
           "  status:       0x0"                                \
           "  time taken:"                                      \

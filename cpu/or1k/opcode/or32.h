@@ -188,7 +188,7 @@ extern int insn_index PARAMS((char *insn));
 extern CONST char *insn_name PARAMS ((int index));
 
 /* MM: Constructs new FSM, based on or32_opcodes.  */ 
-extern void build_automata PARAMS ((void));
+extern void build_automata PARAMS ((int  quiet));
 
 /* MM: Destructs FSM.  */ 
 extern void destruct_automata PARAMS ((void));

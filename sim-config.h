@@ -46,7 +46,11 @@
 /* Number of cycles between checks to runtime.sim.iprompt */
 #define CHECK_INT_TIME 100000
 
+/* Print to the defined output stream */
 #define PRINTF(x...) fprintf (runtime.sim.fout, x)
+
+/* Print only if we are not running silently */
+#define PRINTFQ(x...) if (!config.sim.quiet) { fprintf (runtime.sim.fout, x); }
 
 /*! Data structure for configuration data */
 struct config
@@ -90,6 +94,8 @@ struct config
     char* exe_bin_insn_log_fn;  /* Binary dump log of exec. instructions name */
     long clkcycle_ps;		/* Clock duration in ps */
     int strict_npc;		/* JPB. NPC flushes pipeline when changed */
+    int  quiet;			/* Minimize message output */
+    int  report_mem_errs;	/* Report out of memory accesses */
   } sim;
 
   struct

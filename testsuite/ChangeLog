@@ -1,35 +1,66 @@
-2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-07-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/except-test.exp: Output no longer reports out of
+	memory exceptions.
+	* libsim.tests/jtag-write-control.exp
+	<JTAG WRITE_CONTROL CPU0 reset>: No PIC reset.
+	<JTAG WRITE_CONTROL CPU0 stall and reset>: No PIC reset.
+	<JTAG WRITE_CONTROL CPU0 stall then reset>: No PIC reset.
+	* libsim.tests/upcalls.exp <upcalls - basic, upcalls - misaligned>:
+	No output from exit.
+	* test-code/lib-iftest/lib-iftest.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-inttest/lib-inttest-edge.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-inttest/lib-inttest-level.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-jtag/lib-jtag.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-jtag/lib-jtag-full.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-upcalls/lib-upcalls.c (main): New interface to
+	or1ksim_init.
+
+2010-06-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Added tests for l.mfspr and
 	l.mtspr, l.sub, logical and shift instructions.
 
-2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Modified output from RANGE
 	exception. Added tests for jump and rotate right instructions.
 
-2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Added multiplication
 	tests. Extended divistion tests. Changed output to match new
 	format from existing tests.
 	* README: Updated with new tests.
 
-2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Added MAC tests.
 	* or1ksim.tests/mul.exp: Corrected erroneous expected results.
 	* README: Updated with new tests.
 
-2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Added find tests.
 	* README: Updated with new tests.
 
-2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Extended addition tests.
 	* README: Updated with new tests.
 
-2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-09  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.exp: Added division and addition tests.
 	* README: Updated with new tests.
 
-2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/inst-set-test.cfg: Created.
 	* or1ksim.tests/inst-set-test.exp: Created.
 	* or1ksim.tests/Makefile.am: Updated to reflect added and deleted
@@ -39,13 +70,15 @@
 	inst-set-test.ex).
 	* README: Updated to reflect new structure.
 
-2010-06-03  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/fp.exp: Removed timeout change
 	* or1ksim.tests/lws-test.exp: Created.
 	* or1ksim/test/Makefile.am: Added lws-test & config.
 	* or1ksim/test/Makefile.in: Regenerated.
 
-2010-06-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-06-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* lib/or1ksim.exp: Use same matching as libsim.exp, treat each
 	match as a pass.
 	* or1ksim/test/basic.exp: Unreported test entries marked.
@@ -74,7 +107,8 @@
 	* or1ksim/test/mycompress.exp: Unreported test entries marked.
 	* or1ksim/test/tick.exp: Unreported test entries marked.
 
-2010-05-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* lib/libsim.exp (run_libsim): Expect clause corrected to detect
 	all unexpected warning/errors.
 	* libsim.tests/jtag-go-command-read.exp
@@ -86,17 +120,20 @@
 	<JTAG WRITE_COMMAND CPU0 read words>: Missing error added.
 	<JTAG WRITE_COMMAND CPU0 access type 7>: Missing error added.
 
-2010-05-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/Makefile.am: upcalls.exp added to distribution.
 	* libsim.tests/Makefile.in: Regenerated.
 
-2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/default.cfg: Disabled MC, replaced with memory block
 	and set CPU to take vectors at high address.
 	* test-code/lib-jtag/lib-jtag-full.c: Increase time quanta to 3ms to
 	allow time for messages.
 
-2010-05-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/Makefile.am: Added new test files to dist
 	* libsim.tests/Makefile: Regenerated.
 	* libsim.tests/jtag-go-command-read.exp: New file.
@@ -114,7 +151,8 @@
 	with bit lengths.
 
 
-2010-05-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/jtag-read-command.exp: Better test naming.
 	* libsim.tests/jtag-select-module.exp: Better test naming.
 	* libsim.tests/jtag-write-command.exp: Better test naming.
@@ -126,7 +164,8 @@
 	<SELECT_MODULE READ_COMMAND module 14>: Check for correct access
 	type.
 
-2010-05-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/default.cfg: Add memory block at top of memory.
 	* libsim.tests/lib-jtag-full.c: Corrected some error messages.
 	* libsim.tests/Makefile.am: Added new JTAG test files.
@@ -138,7 +177,8 @@
 	* test-code/lib-jtag/lib-jtag-full.c (process_read_command):
 	Corrected printout of access_type.
 
-2010-05-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* configure.ac: lib-jtag/Makefile.am added as output
 	* configure: Regenerated
 	* libsim.tests/jtag-basic.exp: Created for low level JTAG tests.
@@ -156,24 +196,28 @@
 	* test-code/Makefile.am: lib-jtag added as subdir
 	* test-code/Makefile.in: Regenerated.
 
-2010-05-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* test-code/lib-upcalls/lib-upcalls.c (main): Commenting corrected.
 
-2010-05-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-05-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* global-conf.exp: Renamed from default-global-conf.exp.
 	* lib/or1ksim.exp (run_or1ksim): Use $srcdir instead of
 	environment variable and use $objdir.
 	* lib/or1ksim.exp (run_libsim): Use $srcdir instead of
 	environment variable and use $objdir.
 
-2010-04-30  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* lib/or1ksim.exp (run_or1ksim): Make timeout return UNRESOLVED
 	rather than FAIL.
 	* lib/libsim.exp (run libsim): Make timeout return UNRESOLVED
 	rather than FAIL.
 	* or1ksim.tests/fbtest.exp: Restore timeout correctly.
 
-2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/upcalls.exp: Created.
 	* libsim.tests/upcalls.cfg: Created.
 	* test-code/lib-upcalls/lib-upcalls.c: Changed to use new upcall
@@ -182,7 +226,8 @@
 	* test-code/lib-inttest/lib-inttest-level.c: Changed to use new
 	upcall interface.
 
-2010-04-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* libsim.tests/int-level.exp: Created.
 	* test-code/lib-upcalls: Created.
 	* test-code/lib-upcalls/lib-upcalls.c: Created.
@@ -191,30 +236,35 @@
 	function to print chars more clearly.
 	* or1ksim.tests/kbd.exp: Updated for new test output format.
 
-2010-04-23  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* test-code/lib-inttest/lib-inttest-level.c: Created.
 	* Makefile.am: Updated for new tests
 	* Makefile.in: Regenerated.
 	* README: Updated for new library test results.
 
-2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-22  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/cbasic.exp: Errors due to buggy printf fixed.
 	* or1ksim.tests/mmu.exp: Errors due to buggy printf fixed.
 	* or1ksim.tests/mul.exp: Errors due to buggy printf fixed.
 
-2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* test-code-or1k: Renamed from test-code.
 	* configure.ac, configure: Moved to test-code-or1k.
 	* AUTHORS, NEWS, INSTALL, COPYING: Moved to test-code-or1k.
 
-2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* test-code/support/spr-defs.h: NOP_PRINTF definition removed.
 	* test-code/except-test/except-test.c (illegal_insn_test):
   	  Generate and check a correct sequence for illegal instruction.
 	* test-code/except-test/except-test.c (except_priority_test):
 	  Generate a properly illegal instruction.
 
-2010-04-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+2010-04-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* AUTHORS: Created to refer to parent file.
 	* config: Directory for board configurations.
 	* config/unix.exp: Created.

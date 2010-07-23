@@ -45,8 +45,7 @@ run_libsim "upcalls - basic"                                       \
           "Read half word at 0x98000008 = 0xcafe."                 \
           "Read half word at 0x9800000a = 0xbabe."                 \
           "All done."                                              \
-          "report(0xdeaddead);"                                    \
-          "exit(0)"]                                               \
+          "report(0xdeaddead);"]                                   \
     "lib-upcalls/lib-upcalls" "upcalls.cfg" "upcalls/upcall-basic" \
     "14" "32"
 
@@ -72,7 +71,6 @@ run_libsim "upcalls - misaligned"                                       \
           "Reading full word at 0x98000012: misalignment exception."    \
           "Reading full word at 0x98000017: misalignment exception."    \
           "Read full word at 0x9800001c = 0xbaadbabe."                  \
-          "report(0xdeaddead);"                                         \
-          "exit(0)"]                                                    \
+          "report(0xdeaddead);"]                                        \
     "lib-upcalls/lib-upcalls" "upcalls.cfg" "upcalls/upcall-misaligned" \
     "8" "32"

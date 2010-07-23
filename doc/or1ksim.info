@@ -1,5 +1,5 @@
-This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
-4.13 from ../../or1ksim/doc/or1ksim.texi.
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
+../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-06-31.tar.bz2
+     tar jxf or1ksim-2010-07-23.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-06-31/configure --target=or32-uclinux ...
+     ../or1ksim-2010-07-23/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -258,7 +258,7 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 =============================
 
 The following problems and issues are known about with Or1ksim
-2010-06-31.  The OpenRISC tracker may be used to see the current state
+2010-07-23.  The OpenRISC tracker may be used to see the current state
 of these issues and to raise new problems and feature requests.  It may
 be found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
 
@@ -933,8 +933,8 @@ appear only once.  The following parameters may be specified.
      format. This is helpful for off-line dynamic execution analysis.
 
           Note: Execution logs can be _very_ big. For example, while
-          booting the Linux kernel, version 2.6.34, a log file
-          1.2Gbytes in size was generated.
+          booting the Linux kernel, version 2.6.34, a log file 1.2GB in
+          size was generated.
 
 `exe_bin_insn_log_file = FILENAME'
      Filename for the binary execution log filename if
@@ -4326,55 +4326,55 @@ Index
 
 
 Tag Table:
-Node: Top830
-Node: Installation1240
-Node: Preparation1487
-Node: Configuring the Build1782
-Node: Build and Install7896
-Node: Known Issues8742
-Node: Usage11804
-Node: Standalone Simulator12018
-Node: Profiling Utility14921
-Node: Memory Profiling Utility15831
-Node: Simulator Library17196
-Node: Configuration24974
-Node: Configuration File Format25583
-Node: Configuration File Preprocessing25875
-Node: Configuration File Syntax26246
-Node: Simulator Configuration29031
-Node: Simulator Behavior29322
-Node: Verification API Configuration33855
-Node: CUC Configuration35795
-Node: Core OpenRISC Configuration37712
-Node: CPU Configuration38214
-Node: Memory Configuration42332
-Node: Memory Management Configuration48790
-Node: Cache Configuration51167
-Node: Interrupt Configuration53553
-Node: Power Management Configuration54289
-Node: Branch Prediction Configuration55566
-Node: Debug Interface Configuration56926
-Node: Peripheral Configuration61146
-Node: Memory Controller Configuration61772
-Node: UART Configuration65186
-Node: DMA Configuration68705
-Node: Ethernet Configuration70572
-Node: GPIO Configuration74548
-Node: Display Interface Configuration76181
-Node: Frame Buffer Configuration78490
-Node: Keyboard Configuration80354
-Node: Disc Interface Configuration82592
-Node: Generic Peripheral Configuration87535
-Node: Interactive Command Line89830
-Node: Verification API96804
-Node: Code Internals101234
-Node: Coding Conventions101817
-Node: Global Data Structures106244
-Node: Concepts108901
-Ref: Output Redirection109046
-Node: Internal Debugging109585
-Node: Regression Testing110109
-Node: GNU Free Documentation License113904
-Node: Index136311
+Node: Top814
+Node: Installation1224
+Node: Preparation1471
+Node: Configuring the Build1766
+Node: Build and Install7880
+Node: Known Issues8726
+Node: Usage11788
+Node: Standalone Simulator12002
+Node: Profiling Utility14905
+Node: Memory Profiling Utility15815
+Node: Simulator Library17180
+Node: Configuration24958
+Node: Configuration File Format25567
+Node: Configuration File Preprocessing25859
+Node: Configuration File Syntax26230
+Node: Simulator Configuration29015
+Node: Simulator Behavior29306
+Node: Verification API Configuration33835
+Node: CUC Configuration35775
+Node: Core OpenRISC Configuration37692
+Node: CPU Configuration38194
+Node: Memory Configuration42312
+Node: Memory Management Configuration48770
+Node: Cache Configuration51147
+Node: Interrupt Configuration53533
+Node: Power Management Configuration54269
+Node: Branch Prediction Configuration55546
+Node: Debug Interface Configuration56906
+Node: Peripheral Configuration61126
+Node: Memory Controller Configuration61752
+Node: UART Configuration65166
+Node: DMA Configuration68685
+Node: Ethernet Configuration70552
+Node: GPIO Configuration74528
+Node: Display Interface Configuration76161
+Node: Frame Buffer Configuration78470
+Node: Keyboard Configuration80334
+Node: Disc Interface Configuration82572
+Node: Generic Peripheral Configuration87515
+Node: Interactive Command Line89810
+Node: Verification API96784
+Node: Code Internals101214
+Node: Coding Conventions101797
+Node: Global Data Structures106224
+Node: Concepts108881
+Ref: Output Redirection109026
+Node: Internal Debugging109565
+Node: Regression Testing110089
+Node: GNU Free Documentation License113884
+Node: Index136291
 
 End Tag Table

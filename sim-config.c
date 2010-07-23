@@ -282,13 +282,15 @@ parse_args (int argc, char *argv[])
   struct arg_int *srv;
   struct arg_str *dbg;
   struct arg_lit *command;
+  struct arg_lit *quiet;
+  struct arg_lit *report_mem_errs;
   struct arg_lit *strict_npc;
   struct arg_lit *profile;
   struct arg_lit *mprofile;
   struct arg_file *load_file;
   struct arg_end *end;
 
-  void *argtab[12];
+  void *argtab[14];
   int nerrors;
 
   /* Specify each argument, with fall back values */
@@ -303,6 +305,9 @@ parse_args (int argc, char *argv[])
   srv->hdr.flag |= ARG_HASOPTVALUE;
   dbg = arg_str0 ("d", "debug-config", "<str>", "Debug config string");
   command = arg_lit0 ("i", "interactive", "launch interactive prompt");
+  quiet = arg_lit0 ("q", "quiet", "minimal message output");
+  report_mem_errs = arg_lit0 (NULL, "report-memory-errors",
+			      "Report out of memory accesses");
   strict_npc = arg_lit0 (NULL, "strict-npc", "setting NPC flushes pipeline");
   profile = arg_lit0 (NULL, "enable-profile", "enable profiling");
   mprofile = arg_lit0 (NULL, "enable-mprofile", "enable memory profiling");
@@ -317,11 +322,13 @@ parse_args (int argc, char *argv[])
   argtab[ 4] = srv;
   argtab[ 5] = dbg;
   argtab[ 6] = command;
-  argtab[ 7] = strict_npc;
-  argtab[ 8] = profile;
-  argtab[ 9] = mprofile;
-  argtab[10] = load_file;
-  argtab[11] = end;
+  argtab[ 7] = quiet;
+  argtab[ 8] = report_mem_errs;
+  argtab[ 9] = strict_npc;
+  argtab[10] = profile;
+  argtab[11] = mprofile;
+  argtab[12] = load_file;
+  argtab[13] = end;
 
   /* Parse */
   nerrors = arg_parse (argc, argv, argtab);
@@ -399,6 +406,12 @@ parse_args (int argc, char *argv[])
 
   /* Interactive operation */
   runtime.sim.iprompt = command->count;
+
+  /* Request for quiet running */
+  config.sim.quiet = quiet->count;
+
+  /* Request for quiet running */
+  config.sim.report_mem_errs = report_mem_errs->count;
 
   /* Request for strict NPC behavior (flush the pipeline on change) */
   config.sim.strict_npc = strict_npc->count;

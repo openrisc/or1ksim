@@ -550,12 +550,12 @@ INSTRUCTION (l_nop) {
     case NOP_NOP:
       break;
     case NOP_EXIT:
-      PRINTF("exit(%"PRIdREG")\n", evalsim_reg (3));
-      fprintf(stderr, "@reset : cycles %lld, insn #%lld\n",
+      PRINTFQ("exit(%"PRIdREG")\n", evalsim_reg (3));
+      PRINTFQ("@reset : cycles %lld, insn #%lld\n",
               runtime.sim.reset_cycles, runtime.cpu.reset_instructions);
-      fprintf(stderr, "@exit  : cycles %lld, insn #%lld\n", runtime.sim.cycles,
+      PRINTFQ("@exit  : cycles %lld, insn #%lld\n", runtime.sim.cycles,
               runtime.cpu.instructions);
-      fprintf(stderr, " diff  : cycles %lld, insn #%lld\n",
+      PRINTFQ(" diff  : cycles %lld, insn #%lld\n",
               runtime.sim.cycles - runtime.sim.reset_cycles,
               runtime.cpu.instructions - runtime.cpu.reset_instructions);
       if (config.sim.is_library)

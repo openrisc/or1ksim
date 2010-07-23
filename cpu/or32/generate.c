@@ -417,7 +417,7 @@ int main (int argc, char *argv[])
     exit (1);
   }
 
-  build_automata ();
+  build_automata (0);
   if (generate_header (fo)) {
     fprintf (stderr, "generate_header\n");
     return 1;

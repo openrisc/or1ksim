@@ -249,9 +249,23 @@ main (int   argc,
   next_raise = 0;
   next_clear = 0;
 
+  /* Dummy argv array to pass arguments to or1ksim_init. Varies depending on
+     whether an image file is specified. */
+  int   dummy_argc;
+  char *dummy_argv[5];
+
+  dummy_argv[0] = "libsim";
+  dummy_argv[1] = "-q";
+  dummy_argv[2] = "-f";
+  dummy_argv[3] = argv[1];
+  dummy_argv[4] = argv[2];
+
+  dummy_argc = 5;
+
   /* Initialize the program. Put the initialization message afterwards, or it
      will get swamped by the Or1ksim header. */
-  if (0 == or1ksim_init (argv[1], argv[2], NULL, &read_upcall, &write_upcall))
+  if (0 == or1ksim_init (dummy_argc, dummy_argv, NULL, &read_upcall,
+			 &write_upcall))
     {
       printf ("Initalization succeeded.\n");
     }

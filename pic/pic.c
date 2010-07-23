@@ -55,7 +55,7 @@ struct pic *pic_state = &pic_state_int;
 void
 pic_reset (void)
 {
-  PRINTF ("Resetting PIC.\n");
+  PRINTFQ ("Resetting PIC.\n");
   cpu_state.sprs[SPR_PICMR] = 0;
   cpu_state.sprs[SPR_PICPR] = 0;
   cpu_state.sprs[SPR_PICSR] = 0;

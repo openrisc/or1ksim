@@ -125,7 +125,7 @@ translate (oraddr_t  laddr,
 	{
 	  /* Page modified */
 	  set_direct32 (transl_table + i + 8, -2, 0, 0);
-	  PRINTF ("found paddr=%" PRIx32 "\n",
+	  PRINTFQ ("found paddr=%" PRIx32 "\n",
 		  eval_direct32 (transl_table + i + 4, 0, 0) |
 		  (laddr & (PAGE_SIZE - 1)));
 	  return  (oraddr_t) eval_direct32 (transl_table + i + 4, 0, 0) |
@@ -144,12 +144,12 @@ translate (oraddr_t  laddr,
 	  set_direct32 (transl_table + i + 4, (i / 16) * PAGE_SIZE, 0, 0);
 	  /* Page modified */
 	  set_direct32 (transl_table + i + 8, -2, 0, 0);
-	  PRINTF ("newly allocated ppn=%" PRIx32 "\n",
+	  PRINTFQ ("newly allocated ppn=%" PRIx32 "\n",
 		  eval_direct32 (transl_table + i + 4, 0, 0));
-	  PRINTF ("newly allocated .ppn=%" PRIxADDR "\n", transl_table + i + 4);
-	  PRINTF ("newly allocated ofs=%" PRIxADDR "\n",
+	  PRINTFQ ("newly allocated .ppn=%" PRIxADDR "\n", transl_table + i + 4);
+	  PRINTFQ ("newly allocated ofs=%" PRIxADDR "\n",
 		  (laddr & (PAGE_SIZE - 1)));
-	  PRINTF ("newly allocated paddr=%" PRIx32 "\n",
+	  PRINTFQ ("newly allocated paddr=%" PRIx32 "\n",
 		  eval_direct32 (transl_table + i + 4, 0,
 				 0) | (laddr & (PAGE_SIZE - 1)));
 	  return  (oraddr_t) eval_direct32 (transl_table + i + 4, 0, 0) |
@@ -160,7 +160,7 @@ translate (oraddr_t  laddr,
   /* If we come this far then all phy memory is used and we can't find our
      page nor allocate new page. */
   transl_error = 1;
-  PRINTF ("can't translate %" PRIxADDR "\n", laddr);
+  PRINTFQ ("can't translate %" PRIxADDR "\n", laddr);
   exit (1);
 
   return  -1;
@@ -363,11 +363,11 @@ readfile_coff (char  *filename,
 	  perror ("readfile_coff");
 	  exit (1);
 	}
-      PRINTF ("Section: %s,", coffscnhdr.s_name);
-      PRINTF (" paddr: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_paddr));
-      PRINTF (" vaddr: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_vaddr));
-      PRINTF (" size: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_size));
-      PRINTF (" scnptr: 0x%.8lx\n", COFF_LONG_H (coffscnhdr.s_scnptr));
+      PRINTFQ ("Section: %s,", coffscnhdr.s_name);
+      PRINTFQ (" paddr: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_paddr));
+      PRINTFQ (" vaddr: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_vaddr));
+      PRINTFQ (" size: 0x%.8lx,", COFF_LONG_H (coffscnhdr.s_size));
+      PRINTFQ (" scnptr: 0x%.8lx\n", COFF_LONG_H (coffscnhdr.s_scnptr));
 
       sectsize = COFF_LONG_H (coffscnhdr.s_size);
       ++firstthree;
@@ -396,18 +396,18 @@ readfile_coff (char  *filename,
     }
   if (firstthree < 3)
     {
-      PRINTF ("One or more missing sections. At least");
-      PRINTF (" three sections expected (.text, .data, .bss).\n");
+      PRINTFQ ("One or more missing sections. At least");
+      PRINTFQ (" three sections expected (.text, .data, .bss).\n");
       exit (1);
     }
   if (firstthree > 3)
     {
-      PRINTF ("Warning: one or more extra sections. These");
-      PRINTF (" sections were handled as .data sections.\n");
+      PRINTFQ ("Warning: one or more extra sections. These");
+      PRINTFQ (" sections were handled as .data sections.\n");
     }
 
   fclose (inputfs);
-  PRINTF ("Finished loading COFF.\n");
+  PRINTFQ ("Finished loading COFF.\n");
   return;
 
 }	/* readfile_coff () */
@@ -492,7 +492,7 @@ readsyms_coff (char *filename, uint32_t symptr, uint32_t syms)
     }
 
   fclose (inputfs);
-  PRINTF ("Finished loading symbols.\n");
+  PRINTFQ ("Finished loading symbols.\n");
   return;
 }
 
@@ -694,13 +694,18 @@ readfile_elf (char *filename)
 
 
 	  if (ELF_LONG_H (elf_spnt->sh_name) && s_str)
-	    PRINTF ("Section: %s,", &s_str[ELF_LONG_H (elf_spnt->sh_name)]);
+	    {
+	      PRINTFQ ("Section: %s,", &s_str[ELF_LONG_H (elf_spnt->sh_name)]);
+	    }
 	  else
-	    PRINTF ("Section: noname,");
-	  PRINTF (" vaddr: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_addr));
-	  PRINTF (" paddr: 0x%" PRIx32, padd);
-	  PRINTF (" offset: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_offset));
-	  PRINTF (" size: 0x%.8lx\n", ELF_LONG_H (elf_spnt->sh_size));
+	    {
+	      PRINTFQ ("Section: noname,");
+	    }
+
+	  PRINTFQ (" vaddr: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_addr));
+	  PRINTFQ (" paddr: 0x%" PRIx32, padd);
+	  PRINTFQ (" offset: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_offset));
+	  PRINTFQ (" size: 0x%.8lx\n", ELF_LONG_H (elf_spnt->sh_size));
 
 	  freemem = padd;
 	  sectsize = ELF_LONG_H (elf_spnt->sh_size);
@@ -777,19 +782,19 @@ identifyfile (char *filename)
       if (COFF_SHORT_H (coffhdr.f_magic) == 0x17a)
 	{
 	  uint32_t opthdr_size;
-	  PRINTF ("COFF magic: 0x%.4x\n", COFF_SHORT_H (coffhdr.f_magic));
-	  PRINTF ("COFF flags: 0x%.4x\n", COFF_SHORT_H (coffhdr.f_flags));
-	  PRINTF ("COFF symptr: 0x%.8lx\n", COFF_LONG_H (coffhdr.f_symptr));
+	  PRINTFQ ("COFF magic: 0x%.4x\n", COFF_SHORT_H (coffhdr.f_magic));
+	  PRINTFQ ("COFF flags: 0x%.4x\n", COFF_SHORT_H (coffhdr.f_flags));
+	  PRINTFQ ("COFF symptr: 0x%.8lx\n", COFF_LONG_H (coffhdr.f_symptr));
 	  if ((COFF_SHORT_H (coffhdr.f_flags) & COFF_F_EXEC) != COFF_F_EXEC)
 	    {
-	      PRINTF ("This COFF is not an executable.\n");
+	      PRINTFQ ("This COFF is not an executable.\n");
 	      exit (1);
 	    }
 	  opthdr_size = COFF_SHORT_H (coffhdr.f_opthdr);
 	  if (opthdr_size != sizeof (COFF_AOUTHDR))
 	    {
-	      PRINTF ("COFF optional header is missing or not recognized.\n");
-	      PRINTF ("COFF f_opthdr: 0x%" PRIx32 "\n", opthdr_size);
+	      PRINTFQ ("COFF optional header is missing or not recognized.\n");
+	      PRINTFQ ("COFF f_opthdr: 0x%" PRIx32 "\n", opthdr_size);
 	      exit (1);
 	    }
 	  fclose (inputfs);
@@ -800,7 +805,7 @@ identifyfile (char *filename)
 	}
       else
 	{
-	  PRINTF ("Not COFF file format\n");
+	  PRINTFQ ("Not COFF file format\n");
 	  fseek (inputfs, 0, SEEK_SET);
 	}
     }
@@ -809,13 +814,13 @@ identifyfile (char *filename)
       if (elfhdr.e_ident[0] == 0x7f && elfhdr.e_ident[1] == 0x45
 	  && elfhdr.e_ident[2] == 0x4c && elfhdr.e_ident[3] == 0x46)
 	{
-	  PRINTF ("ELF type: 0x%.4x\n", ELF_SHORT_H (elfhdr.e_type));
-	  PRINTF ("ELF machine: 0x%.4x\n", ELF_SHORT_H (elfhdr.e_machine));
-	  PRINTF ("ELF version: 0x%.8lx\n", ELF_LONG_H (elfhdr.e_version));
-	  PRINTF ("ELF sec = %d\n", ELF_SHORT_H (elfhdr.e_shnum));
+	  PRINTFQ ("ELF type: 0x%.4x\n", ELF_SHORT_H (elfhdr.e_type));
+	  PRINTFQ ("ELF machine: 0x%.4x\n", ELF_SHORT_H (elfhdr.e_machine));
+	  PRINTFQ ("ELF version: 0x%.8lx\n", ELF_LONG_H (elfhdr.e_version));
+	  PRINTFQ ("ELF sec = %d\n", ELF_SHORT_H (elfhdr.e_shnum));
 	  if (ELF_SHORT_H (elfhdr.e_type) != ET_EXEC)
 	    {
-	      PRINTF ("This ELF is not an executable.\n");
+	      PRINTFQ ("This ELF is not an executable.\n");
 	      exit (1);
 	    }
 	  fclose (inputfs);
@@ -824,7 +829,7 @@ identifyfile (char *filename)
 	}
       else
 	{
-	  PRINTF ("Not ELF file format.\n");
+	  PRINTFQ ("Not ELF file format.\n");
 	  fseek (inputfs, 0, SEEK_SET);
 	}
     }
@@ -857,22 +862,22 @@ loadcode (char *filename, oraddr_t startaddr, oraddr_t virtphy_transl)
   transl_error = 0;
   transl_table = virtphy_transl;
   freemem      = startaddr;
-  PRINTF ("loadcode: filename %s  startaddr=%" PRIxADDR "  virtphy_transl=%"
+  PRINTFQ ("loadcode: filename %s  startaddr=%" PRIxADDR "  virtphy_transl=%"
 	  PRIxADDR "\n", filename, startaddr, virtphy_transl);
   identifyfile (filename);
 
 #if IMM_STATS
   {
     int i = 0, a = 0, b = 0, c = 0;
-    PRINTF ("index:arith/branch/jump\n");
+    PRINTFQ ("index:arith/branch/jump\n");
     for (i = 0; i < 33; i++)
-      PRINTF ("%2i:\t%3.0f%% / %3.0f%%/ %3.0f%%\t%5i / %5i / %5i\n", i,
+      PRINTFQ ("%2i:\t%3.0f%% / %3.0f%%/ %3.0f%%\t%5i / %5i / %5i\n", i,
 	      100. * (a += bcnt[i][0]) / bsum[0], 100. * (b +=
 							  bcnt[i][1]) /
 	      bsum[1], 100. * (c +=
 			       bcnt[i][2]) / bsum[2], bcnt[i][0],
 	      bcnt[i][1], bcnt[i][2]);
-    PRINTF ("\nsum %i %i %i\n", bsum[0], bsum[1], bsum[2]);
+    PRINTFQ ("\nsum %i %i %i\n", bsum[0], bsum[1], bsum[2]);
   }
 #endif
 
