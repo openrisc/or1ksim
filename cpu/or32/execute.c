@@ -54,7 +54,8 @@
 #include "branch-predict.h"
 #include "sprs.h"
 #include "rsp-server.h"
-
+#include <fenv.h> // Floating point environment for FPU instructions
+#include "execute-fp.h"
 
 /* Includes and macros for simple execution */
 #if SIMPLE_EXECUTION
@@ -106,6 +107,16 @@ static int sbuf_prev_cycles = 0;
 /* Variables used throughout this file to share information */
 static int  breakpoint;
 static int  next_delay_insn;
+
+/* Functions to configure the host machine's FPU before doing simulated OR1k
+   FP ops, handle flags and restore things when it's done. One for before and
+   one for afterwards.
+*/
+void fp_set_or1k_rm(void);
+void fp_set_flags_restore_host_rm(void);
+
+/* A place to store the host's FPU rounding mode while OR1k's is used */
+int host_fp_rm;
 
 /* Forward declaration of static functions */
 #if !(DYNAMIC_EXECUTION)
@@ -1048,6 +1059,73 @@ exec_main ()
 	}
     }
 }	/* exec_main() */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Floating point operation setup function
+
+   Save host rounding mode, set it to OR1K's according to FPCSR
+   This function should be called before performing any FP instructions to
+   ensure the OR1K's rounding mode is installed in the host
+                                                                             */
+/*---------------------------------------------------------------------------*/
+ void fp_set_or1k_rm(void)
+ {
+   // Set OR1K's RM in host machine
+   // First save host RM to restore it later
+   host_fp_rm = fegetround();
+   // Now map OR1K RM to host RM
+   int or1k_rm = 0;
+   switch(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_RM)
+     {
+     case FPCSR_RM_RN:
+       or1k_rm = FE_TONEAREST;
+       break;
+     case FPCSR_RM_RZ:
+       or1k_rm = FE_TOWARDZERO;
+       break;
+     case FPCSR_RM_RIP:
+       or1k_rm = FE_UPWARD;
+       break;
+     case FPCSR_RM_RIN:
+       or1k_rm = FE_TOWARDZERO;
+       break;
+     }
+   // Now set this RM for the host
+   fesetround(or1k_rm); // TODO - check for nonzero return here, if RM not
+                        // able to be set, maybe warn user
+ }
+
+/*---------------------------------------------------------------------------*/
+/*!Floating point operation flag set and host restore function
+
+  Copy flags from floating point op into OR1K's FPCSR, and restore the host's
+  rounding mode.
+                                                                             */
+/*---------------------------------------------------------------------------*/
+void fp_set_flags_restore_host_rm(void)
+ {
+   // Check FP flags on host, convert to OR1K FPCSR bits
+   // First clear all flags in OR1K FPCSR
+   cpu_state.sprs[SPR_FPCSR] &= ~SPR_FPCSR_ALLF;
+
+   // Test host flags, set appropriate OR1K flags
+   if (fetestexcept(FE_DIVBYZERO)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_DZF;
+   if (fetestexcept(FE_INEXACT)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IXF;
+   if (fetestexcept(FE_INVALID)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IVF;
+   if (fetestexcept(FE_OVERFLOW)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_OVF;
+   if (fetestexcept(FE_UNDERFLOW)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_UNF;
+   
+   // Restore the hosts's rounding mode
+   fesetround(host_fp_rm);
+   
+   // TODO: Call FP exception is FPEE set and any of the flags were set
+   /*
+     if ((cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_FPEE) &
+     (|(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_ALLF)))
+     except_handle (EXCEPT_FPE, cpu_state.iqueue.insn_addr);
+   */
+ }
 
 #if COMPLEX_EXECUTION
 

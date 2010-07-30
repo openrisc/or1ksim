@@ -237,6 +237,11 @@ uorreg_t mfspr(const uint16_t regno)
   case SPR_TTCR:
     ret = spr_read_ttcr();
     break;
+  case SPR_FPCSR:
+    // If hard floating point is disabled - return 0
+    if (!config.cpu.hardfloat)
+      ret = 0;
+    break;
   default:
     /* Links to GPRS */
     if(regno >= 0x0400 && regno < 0x0420)

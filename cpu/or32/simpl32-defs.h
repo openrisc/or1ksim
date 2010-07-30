@@ -86,7 +86,6 @@ extern void l_trap PARAMS((struct iqueue_entry *)); /* CZ 21/06/01 */
 extern void l_macrc PARAMS((struct iqueue_entry *));
 extern void l_mac PARAMS((struct iqueue_entry *));
 extern void l_msb PARAMS((struct iqueue_entry *));
-extern void l_invalid PARAMS((struct iqueue_entry *));
 extern void l_cmov PARAMS ((struct iqueue_entry *));
 extern void l_ff1 PARAMS ((struct iqueue_entry *));
 extern void l_cust1 PARAMS ((struct iqueue_entry *));

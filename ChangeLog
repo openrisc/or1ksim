@@ -1,3 +1,13 @@
+2010-07-30  Julius Baxter <julius.baxter@orsoc.se>
+	* cpu/or32/execute-fp.h: Added for inclusion by generated execute code
+	* cpu/or32/execute.c: Added floating point support functions
+	* cpu/or32/simpl32-defs.h: removed duplicate l_invalid() defn.
+	* cpu/or32/insnset.c: Add calls to floating point support funcs.
+	* cpu/or32/generate.c: Added ability to configure includes for execgen
+	* cpu/or1k/sprs.c: Added FPCSR returning 0 when no hardfloat
+	* cpu/or1k/spr-defs.h: Added FP group and FPCSR addr and bits defines
+	* testsuite/test-code-or1k/support/spr-defs.h: ditto
+	
 2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
 
 	* configure: Regenerated.
