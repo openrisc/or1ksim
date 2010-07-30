@@ -299,10 +299,10 @@ reg_bpb_sec ()
 {
   struct config_section *sec = reg_config_sec ("bpb", NULL, NULL);
 
-  reg_config_param (sec, "enabled", paramt_int, bpb_enabled);
-  reg_config_param (sec, "btic", paramt_int, bpb_btic);
-  reg_config_param (sec, "sbp_bnf_fwd", paramt_int, bpb_sbp_bnf_fwd);
-  reg_config_param (sec, "sbp_bf_fwd", paramt_int, bpb_sbp_bf_fwd);
-  reg_config_param (sec, "missdelay", paramt_int, bpb_missdelay);
-  reg_config_param (sec, "hitdelay", paramt_int, bpb_hitdelay);
+  reg_config_param (sec, "enabled",     PARAMT_INT, bpb_enabled);
+  reg_config_param (sec, "btic",        PARAMT_INT, bpb_btic);
+  reg_config_param (sec, "sbp_bnf_fwd", PARAMT_INT, bpb_sbp_bnf_fwd);
+  reg_config_param (sec, "sbp_bf_fwd",  PARAMT_INT, bpb_sbp_bf_fwd);
+  reg_config_param (sec, "missdelay",   PARAMT_INT, bpb_missdelay);
+  reg_config_param (sec, "hitdelay",    PARAMT_INT, bpb_hitdelay);
 }

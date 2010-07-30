@@ -856,7 +856,7 @@ Add the library directory to @file{/etc/ld.so.conf}
 through the @code{-f} parameter to the @value{OR1KSIM} command, or passed as a
 string when initializing the @value{OR1KSIM} library.  If no file is specified,
 the default @file{sim.cfg} is used.  The file is looked for first in the
-current directory, then in the @file{$HOME/.or1k} directory of the user.
+current directory, then in the @file{$HOME/.or1ksim} directory of the user.
 
 @menu
 * Configuration File Format::
@@ -881,12 +881,6 @@ The configuration file is a plain text file.
 
 The configuration file may include C style comments (i.e.  delimited by
 @code{/*} and @code{*/}).
-
-Configure files may be included, using
-
-@example
-include @var{filename_to_include}
-@end example
 
 @node Configuration File Syntax
 @subsection Configuration File Syntax

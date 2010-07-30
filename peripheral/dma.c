@@ -652,8 +652,8 @@ reg_dma_sec (void)
   struct config_section *sec =
     reg_config_sec ("dma", dma_sec_start, dma_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, dma_enabled);
-  reg_config_param (sec, "baseaddr", paramt_addr, dma_baseaddr);
-  reg_config_param (sec, "irq", paramt_int, dma_irq);
-  reg_config_param (sec, "vapi_id", paramt_addr, dma_vapi_id);
+  reg_config_param (sec, "enabled",  PARAMT_INT, dma_enabled);
+  reg_config_param (sec, "baseaddr", PARAMT_ADDR, dma_baseaddr);
+  reg_config_param (sec, "irq",      PARAMT_INT, dma_irq);
+  reg_config_param (sec, "vapi_id",  PARAMT_ADDR, dma_vapi_id);
 }

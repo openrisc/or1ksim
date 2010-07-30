@@ -39,7 +39,7 @@
 #include "execute.h"
 
 
-#define WARNING(s) fprintf (stderr, "Warning: config.%s: %s\n", cur_section->name, (s))
+#define WARNING(s) fprintf (stderr, "Warning: config.cpu: %s\n", (s))
 
 /*---------------------------------------------------------------------------*/
 /*!Set the CPU version
@@ -226,16 +226,16 @@ reg_cpu_sec ()
 {
   struct config_section *sec = reg_config_sec ("cpu", NULL, NULL);
 
-  reg_config_param (sec, "ver",         paramt_int, cpu_ver);
-  reg_config_param (sec, "cfg",         paramt_int, cpu_cfg);
-  reg_config_param (sec, "rev",         paramt_int, cpu_rev);
-  reg_config_param (sec, "upr",         paramt_int, cpu_upr);
-  reg_config_param (sec, "cfgr",        paramt_int, cpu_cfgr);
-  reg_config_param (sec, "sr",          paramt_int, cpu_sr);
-  reg_config_param (sec, "superscalar", paramt_int, cpu_superscalar);
-  reg_config_param (sec, "hazards",     paramt_int, cpu_hazards);
-  reg_config_param (sec, "dependstats", paramt_int, cpu_dependstats);
-  reg_config_param (sec, "sbuf_len",    paramt_int, cpu_sbuf_len);
-  reg_config_param (sec, "hardfloat",   paramt_int, cpu_hardfloat);
+  reg_config_param (sec, "ver",         PARAMT_INT, cpu_ver);
+  reg_config_param (sec, "cfg",         PARAMT_INT, cpu_cfg);
+  reg_config_param (sec, "rev",         PARAMT_INT, cpu_rev);
+  reg_config_param (sec, "upr",         PARAMT_INT, cpu_upr);
+  reg_config_param (sec, "cfgr",        PARAMT_INT, cpu_cfgr);
+  reg_config_param (sec, "sr",          PARAMT_INT, cpu_sr);
+  reg_config_param (sec, "superscalar", PARAMT_INT, cpu_superscalar);
+  reg_config_param (sec, "hazards",     PARAMT_INT, cpu_hazards);
+  reg_config_param (sec, "dependstats", PARAMT_INT, cpu_dependstats);
+  reg_config_param (sec, "sbuf_len",    PARAMT_INT, cpu_sbuf_len);
+  reg_config_param (sec, "hardfloat",   PARAMT_INT, cpu_hardfloat);
 
 }	/* reg_cpu_sec() */

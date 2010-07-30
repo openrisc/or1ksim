@@ -471,15 +471,15 @@ reg_memory_sec (void)
   struct config_section *sec = reg_config_sec ("memory", memory_sec_start,
 					       memory_sec_end);
 
-  reg_config_param (sec, "type", paramt_word, memory_type);
-  reg_config_param (sec, "random_seed", paramt_int, memory_random_seed);
-  reg_config_param (sec, "pattern", paramt_int, memory_pattern);
-  reg_config_param (sec, "baseaddr", paramt_addr, memory_baseaddr);
-  reg_config_param (sec, "size", paramt_int, memory_size);
-  reg_config_param (sec, "name", paramt_str, memory_name);
-  reg_config_param (sec, "ce", paramt_int, memory_ce);
-  reg_config_param (sec, "mc", paramt_int, memory_mc);
-  reg_config_param (sec, "delayr", paramt_int, memory_delayr);
-  reg_config_param (sec, "delayw", paramt_int, memory_delayw);
-  reg_config_param (sec, "log", paramt_str, memory_log);
+  reg_config_param (sec, "type",        PARAMT_WORD, memory_type);
+  reg_config_param (sec, "random_seed", PARAMT_INT, memory_random_seed);
+  reg_config_param (sec, "pattern",     PARAMT_INT, memory_pattern);
+  reg_config_param (sec, "baseaddr",    PARAMT_ADDR, memory_baseaddr);
+  reg_config_param (sec, "size",        PARAMT_INT, memory_size);
+  reg_config_param (sec, "name",        PARAMT_STR, memory_name);
+  reg_config_param (sec, "ce",          PARAMT_INT, memory_ce);
+  reg_config_param (sec, "mc",          PARAMT_INT, memory_mc);
+  reg_config_param (sec, "delayr",      PARAMT_INT, memory_delayr);
+  reg_config_param (sec, "delayw",      PARAMT_INT, memory_delayw);
+  reg_config_param (sec, "log",         PARAMT_STR, memory_log);
 }

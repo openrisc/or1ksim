@@ -693,12 +693,12 @@ reg_generic_sec (void)
 					       generic_sec_start,
 					       generic_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, generic_enabled);
-  reg_config_param (sec, "byte_enabled", paramt_int, generic_byte_enabled);
-  reg_config_param (sec, "hw_enabled", paramt_int, generic_hw_enabled);
-  reg_config_param (sec, "word_enabled", paramt_int, generic_word_enabled);
-  reg_config_param (sec, "name", paramt_str, generic_name);
-  reg_config_param (sec, "baseaddr", paramt_addr, generic_baseaddr);
-  reg_config_param (sec, "size", paramt_int, generic_size);
+  reg_config_param (sec, "enabled",      PARAMT_INT, generic_enabled);
+  reg_config_param (sec, "byte_enabled", PARAMT_INT, generic_byte_enabled);
+  reg_config_param (sec, "hw_enabled",   PARAMT_INT, generic_hw_enabled);
+  reg_config_param (sec, "word_enabled", PARAMT_INT, generic_word_enabled);
+  reg_config_param (sec, "name",         PARAMT_STR, generic_name);
+  reg_config_param (sec, "baseaddr",     PARAMT_ADDR, generic_baseaddr);
+  reg_config_param (sec, "size",         PARAMT_INT, generic_size);
 
 }				/* reg_generic_sec */

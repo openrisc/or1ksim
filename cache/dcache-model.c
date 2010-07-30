@@ -522,13 +522,13 @@ reg_dc_sec (void)
 {
   struct config_section *sec = reg_config_sec ("dc", NULL, NULL);
 
-  reg_config_param (sec, "enabled", paramt_int, dc_enabled);
-  reg_config_param (sec, "nsets", paramt_int, dc_nsets);
-  reg_config_param (sec, "nways", paramt_int, dc_nways);
-  reg_config_param (sec, "blocksize", paramt_int, dc_blocksize);
-  reg_config_param (sec, "ustates", paramt_int, dc_ustates);
-  reg_config_param (sec, "load_hitdelay", paramt_int, dc_load_hitdelay);
-  reg_config_param (sec, "load_missdelay", paramt_int, dc_load_missdelay);
-  reg_config_param (sec, "store_hitdelay", paramt_int, dc_store_hitdelay);
-  reg_config_param (sec, "store_missdelay", paramt_int, dc_store_missdelay);
+  reg_config_param (sec, "enabled",         PARAMT_INT, dc_enabled);
+  reg_config_param (sec, "nsets",           PARAMT_INT, dc_nsets);
+  reg_config_param (sec, "nways",           PARAMT_INT, dc_nways);
+  reg_config_param (sec, "blocksize",       PARAMT_INT, dc_blocksize);
+  reg_config_param (sec, "ustates",         PARAMT_INT, dc_ustates);
+  reg_config_param (sec, "load_hitdelay",   PARAMT_INT, dc_load_hitdelay);
+  reg_config_param (sec, "load_missdelay",  PARAMT_INT, dc_load_missdelay);
+  reg_config_param (sec, "store_hitdelay",  PARAMT_INT, dc_store_hitdelay);
+  reg_config_param (sec, "store_missdelay", PARAMT_INT, dc_store_missdelay);
 }

@@ -425,9 +425,9 @@ reg_gpio_sec (void)
   struct config_section *sec =
     reg_config_sec ("gpio", gpio_sec_start, gpio_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, gpio_enabled);
-  reg_config_param (sec, "baseaddr", paramt_addr, gpio_baseaddr);
-  reg_config_param (sec, "irq", paramt_int, gpio_irq);
-  reg_config_param (sec, "vapi_id", paramt_int, gpio_base_vapi_id);
-  reg_config_param (sec, "base_vapi_id", paramt_int, gpio_base_vapi_id);
+  reg_config_param (sec, "enabled",      PARAMT_INT, gpio_enabled);
+  reg_config_param (sec, "baseaddr",     PARAMT_ADDR, gpio_baseaddr);
+  reg_config_param (sec, "irq",          PARAMT_INT, gpio_irq);
+  reg_config_param (sec, "vapi_id",      PARAMT_INT, gpio_base_vapi_id);
+  reg_config_param (sec, "base_vapi_id", PARAMT_INT, gpio_base_vapi_id);
 }

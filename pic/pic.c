@@ -178,7 +178,7 @@ reg_pic_sec ()
 {
   struct config_section *sec = reg_config_sec ("pic", NULL, NULL);
 
-  reg_config_param (sec, "enabled",      paramt_int, pic_enabled);
-  reg_config_param (sec, "edge_trigger", paramt_int, pic_edge_trigger);
+  reg_config_param (sec, "enabled",      PARAMT_INT, pic_enabled);
+  reg_config_param (sec, "edge_trigger", PARAMT_INT, pic_edge_trigger);
 
 }	/* reg_pic_sec() */

@@ -66,27 +66,192 @@
 #include "argtable2.h"
 
 
+/*! A structure used to represent possible parameters in a section. */
+struct config_param
+{
+  char                 *name;				/* param name */
+  enum param_t          type;				/* param type */
+  void                (*func) (union param_val  val,	/* Setter function */
+		  	       void            *dat);
+  struct config_param  *next;				/* Next param in list */
+
+};	/* struct config_param */
+
+
+/*! Config file line count */
+static int  line_number;
+
+/*! The global configuration data structure */
 struct config config;
+
+/*! The global runtime status data structure */
 struct runtime runtime;
 
-struct config_section *cur_section;
-
-struct config_section *sections = NULL;
-
-/* Forward declarations */
-static void read_script_file (const char *filename);
+/*! Master list of sections it is possible to configure. */
+static struct config_section *section_master_list = NULL;
 
 
+/* -------------------------------------------------------------------------- */
+/*!Register a parameter for a section
 
-/*---------------------------------------------------------------------------*/
+   Add a new parameter to the list of parameters that may be set for a given
+   section.
+
+   @param[in] sec       The section containing the parameter.
+   @param[in] param     Name of the parameter
+   @param[in] type      Type of the parameter
+   @param[in] param_cb  Call back function to set this parameter.             */
+/* -------------------------------------------------------------------------- */
+void
+reg_config_param (struct config_section  *sec,
+		  const char             *param,
+		  enum param_t            type,
+		  void                  (*param_cb) (union param_val,
+						     void *))
+{
+  struct config_param *new = malloc (sizeof (struct config_param));
+
+  if (!new)
+    {
+      fprintf (stderr, "ERROR: Out-of-memory allocating parameter: exiting,\n");
+      exit (1);
+    }
+
+  if (!(new->name = strdup (param)))
+    {
+      fprintf (stderr, "ERROR: Out-of-memory allocating parameter name: "
+	       "exiting,\n");
+      exit (1);
+    }
+
+  /* Set up the parameter */
+  new->func = param_cb;
+  new->type = type;
+
+  /* Insert on head of list */
+  new->next = sec->params;
+  sec->params = new;
+
+}	/* reg_config_param () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Register a new section.
+
+   Add a new section to the list of sections that may be found in a config
+   file.
+
+   @param[in] section    The name of the new section.
+   @param[in] sec_start  Function to call at start of section configuration
+                         (or NULL if none)
+   @param[in] sec_end    Function to call at end of section configuration
+                         (or NULL if none). Returns pointer to an arbitrary
+                         data structure.
+
+   @return  A pointer to the section data structure for the new section.      */
+/* -------------------------------------------------------------------------- */
+struct config_section *
+reg_config_sec (const char   *section,
+		void       *(*sec_start) (void),
+		void        (*sec_end) (void *))
+{
+  struct config_section *new = malloc (sizeof (struct config_section));
+
+  if (!new)
+    {
+      fprintf (stderr, "ERROR: Out-of-memory allocating section: exiting,\n");
+      exit (1);
+    }
+
+  if (!(new->name = strdup (section)))
+    {
+      fprintf (stderr, "ERROR: Out-of-memory allocating section name: "
+	       "exiting,\n");
+      exit (1);
+    }
+
+  /* Set up the section */
+  new->next      = section_master_list;
+  new->sec_start = sec_start;
+  new->sec_end   = sec_end;
+  new->params    = NULL;
+
+  /* Insert the section */
+  section_master_list = new;
+
+  return new;
+
+}	/* reg_config_sec () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Look up a section
+
+   Given a section name, return the data structure describing that section.
+
+   @param[in] name  The section to look for.
+
+   @return  A pointer to the section config data structure, or NULL if the
+            section is not found                                              */
+/* -------------------------------------------------------------------------- */
+static struct config_section *
+lookup_section (char *name)
+{
+  struct config_section *cur = NULL;
+
+  for (cur = section_master_list; NULL != cur; cur = cur->next)
+    {
+      if (strcmp (cur->name, name) == 0)
+	{
+	  break;
+	}
+    }
+
+  return  cur;
+
+}	/* lookup_section () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Look up a parameter for a section
+
+   Given a parameter name and a section data structure, return the data
+   structure describing that parameter
+
+   @param[in] name  The parameter to look for.
+   @param[in] sec   The section containing the parameter.
+
+   @return  A pointer to the parameter config data structure, or NULL if the
+            parameter is not found                                            */
+/* -------------------------------------------------------------------------- */
+static struct config_param *
+lookup_param (char                  *name,
+	      struct config_section *sec)
+{
+  struct config_param *param = NULL;
+
+  for (param = sec->params; NULL != param; param = param->next)
+    {
+      if (strcmp (param->name, name) == 0)
+	{
+	  break;
+	}
+    }
+
+  return  param;
+
+}	/* lookup_param () */
+
+
+/* -------------------------------------------------------------------------- */
 /*!Set default configuration parameters for fixed components
 
    These values are held in the global config variable. Parameter orders
    match the order in the corresponding section registration function and
    documentation.
 
-   Also set some starting values for runtime elements.                       */
-/*---------------------------------------------------------------------------*/
+   Also set some starting values for runtime elements.                        */
+/* -------------------------------------------------------------------------- */
 void
 init_defconfig ()
 {
@@ -262,6 +427,495 @@ init_defconfig ()
 }	/* init_defconfig() */
 
 
+/* -------------------------------------------------------------------------- */
+/*!Set a configuration parameter.
+
+   We have a string representing the value, and a data structure representing
+   the particular parameter. Break out the value and call the setter function
+   to set its value in the section.
+
+   The value text is guaranteed to have no leading or trailing whitespace.
+
+   @param[in] cur_section  Spec of the section currently being configured.
+   @param[in] param        Spec of the parameter we are setting.
+   @param[in] val_text     The parameter value text			      */
+/* -------------------------------------------------------------------------- */
+static void
+set_config_param (struct config_section *cur_section,
+		  struct config_param   *param,
+		  char                  *val_text)
+{
+  union param_val  val;
+
+  /* Break out the different parameter types */
+  switch (param->type)
+    {
+    case PARAMT_NONE:
+      break;
+
+    case PARAMT_INT:
+      val.int_val = strtol (val_text, NULL, 0);
+      break;
+
+    case PARAMT_LONGLONG:
+      val.longlong_val = strtoll (val_text, NULL, 0);
+      break;
+
+    case PARAMT_ADDR:
+      val.addr_val = strtoul (val_text, NULL, 0);
+      break;
+
+    case PARAMT_WORD:
+    case PARAMT_STR:
+      /* Word and string are the same thing by now. */
+      val.str_val = val_text;
+      break;
+    }
+
+  /* Call the setter function */
+  param->func (val, cur_section->dat);
+
+}	/* set_config_param () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Scan the next word, skipping any preceding space.
+
+   A word is anything that is not white space, except where the white space is
+   within quotation marks. Return the number of newlines we have to skip.
+
+   @param[in] f     The file handle to read from
+   @param[in] word  A buffer in which to store the word.
+
+   @return  The text of the next entity or NULL at end of file. Note strings
+            have their quotation marks removed.                               */
+/* -------------------------------------------------------------------------- */
+static char *
+next_word (FILE *f,
+	   char  word[])
+{
+  int  c;
+  int  i;
+
+  /* Skip the whitespace */
+  do
+    {
+      c = fgetc (f);
+
+      line_number += ('\n' == c) ? 1: 0;
+    }
+  while ((EOF != c) && isspace (c));
+
+  /* Get the word> Special treatment if it is a string. */
+  if ('"' == c)
+    {
+      /* We have a string. Skip the opening quote. */
+      c = fgetc (f);
+
+      for (i = 0; i < (STR_SIZE - 1); i++)
+	{
+	  if ('"' == c)
+	    {
+	      c = fgetc (f);		/* So ungetc works */
+	      break;			/* End of the string */
+	    }
+	  else if ('\n' == c)
+	    {
+	      line_number++;
+	    }
+	  else if (EOF == c)
+	    {
+	      fprintf (stderr, "ERROR: EOF in middle of string: exiting.\n");
+	      exit (1);
+	    }
+
+	  word[i] = c;
+	  c = fgetc (f);
+	}
+
+      /* Skip the closing quote */
+      c = fgetc (f);
+    }
+  else
+    {
+      /* We have a space delimited word */
+      for (i = 0; i < (STR_SIZE - 1); i++)
+	{
+	  if ((EOF == c) || isspace (c))
+	    {
+	      break;			/* End of the word */
+	    }
+
+	  word[i] = c;
+	  c = fgetc (f);
+	}
+    }
+
+  word[i] = '\0';			/* Terminate the word */
+
+  if ((STR_SIZE - 1) == i)
+    {
+      word[10]= '\0';
+      fprintf (stderr,
+	       "ERROR: Symbol beginning %s on line %d too long: exiting.\n",
+	       word, line_number);
+      exit (1);
+    }
+
+  ungetc (c, f);			/* Ready for next time */
+
+  return  (0 == i) ? NULL : word;
+
+}	/* next_word () */
+	 
+
+/* -------------------------------------------------------------------------- */
+/*!Read the next lexeme from the a config file.
+
+   At this stage we are just breaking things out into space delimited
+   entities, stripping out comments.
+
+   @param[in] f       The file handle to read from
+   @param[in] lexeme  A buffer in which to store the lexeme.
+
+   @return  The text of the next entity or NULL at end of file.               */
+/* -------------------------------------------------------------------------- */
+static char *
+next_lexeme (FILE *f,
+	     char  lexeme[])
+{
+  if (NULL == next_word (f, lexeme))
+    {
+      return  NULL;
+    }
+
+  /* Skip any comments */
+  while (0 ==strncmp (lexeme, "/*", 2))
+    {
+      /* Look for the closing '*' and '/'. */
+      char  c0 = '\0';
+      char  c1 = '\0';
+
+      while (('*' != c0) || ('/' != c1))
+	{
+	  c0 = c1;
+	  c1 = fgetc (f);
+
+	  line_number += ('\n' == c1) ? 1 : 0;
+
+	  /* We assume if we hit EOF we have a serious problem and die. */
+	  if (feof (f))
+	    {
+	      fprintf (stderr, "ERROR: Comment reached EOF.\n");
+	      exit (1);
+	    }
+	}
+
+      /* Get the next lexeme */
+      if (NULL == next_word (f, lexeme))
+	{
+	  return  NULL;
+	}
+    }
+
+  return  lexeme;
+
+}	/* next_lexeme () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Read configuration from a script file.
+
+   The syntax of script file is:
+
+     [section x
+       [param [=] value]+
+     end]*
+   
+   Example:
+
+     section mc
+       enabled = 1
+       POC     = 0x47892344
+     end
+   
+   The config file is searched for first in the local directory, then in
+   ${HOME}/.or1ksim, then (for backwards compatibility) in ${HOME}/.or1ksim.
+
+   If the file is not found, then a rude message is printed. The system will
+   just use default values.
+
+   @param[in] filename  The configuration file to use.                        */
+/* -------------------------------------------------------------------------- */
+static void
+read_script_file (const char *filename)
+{
+  FILE *f;
+  char *home = getenv ("HOME");
+  char  ctmp1[STR_SIZE];
+  char  ctmp2[STR_SIZE];
+  char *dir;
+
+  /* Attempt to open the config file. If we fail, give up with a rude
+     message. */
+  sprintf (ctmp1, "%s/.or1ksim/%s", home, filename);
+  sprintf (ctmp2, "%s/.or1k/%s", home, filename);
+
+  if (NULL != (f = fopen (filename, "r")))
+    {
+      dir = ".";
+    }
+  else if (home && (NULL != (f = fopen (ctmp1, "r"))))
+    {
+      dir = ctmp1;
+    }
+  else if (home && (NULL != (f = fopen (ctmp2, "r"))))
+    {
+      dir = ctmp2;
+    }
+  else
+    {
+      fprintf (stderr, "Warning: Failed to open script file \"%s\". Ignored.\n",
+	       filename);
+      return;
+    }
+
+  /* Log the config file we have just opened if required. */
+  if (config.sim.verbose)
+    {
+      PRINTF ("Reading script file from \"%s/%s\"...\n", dir, filename);
+    }
+
+  /* Process the config file. */
+  char lexeme[STR_SIZE];		/* Next entity from the input */
+  int  in_section_p = 0;		/* Are we processing a section */
+
+  struct config_section *cur_section = NULL;	/* Section being processed */
+
+  line_number = 1;
+
+  while (NULL != next_lexeme (f, lexeme))
+    {
+      /* Get the next symbol. Four possibilities.
+
+	 1. It's "section". Only if we are not currently in a section. Process
+	    the start of a section.
+
+	 2. It's "end". Only if we are currently in a section. Process the end
+	    of a section.
+
+	 3. Anything else while we are in a section. Assume it is a parameter
+	    for the current section.
+
+	 4. Anything else. An error.
+      */
+      if (!in_section_p && (0 == strcmp (lexeme, "section")))
+	{
+	  /* We have the start of a section */
+	  if (NULL == next_lexeme (f, lexeme))
+	    {
+	      fprintf (stderr, "ERROR: %s/%s: Section name required at line "
+		       "%d. Exiting\n", dir, filename, line_number);
+	      exit (1);
+	    }
+
+	  cur_section = lookup_section (lexeme);
+
+	  if (NULL != cur_section)
+	    {
+	      /* Valid section, run its startup code, with any data saved. */
+	      cur_section->dat = NULL;
+
+	      if (cur_section->sec_start)
+		{
+		  cur_section->dat = cur_section->sec_start ();
+		}
+
+	      in_section_p = 1;		/* Now in a section */
+	    }
+	  else
+	    {
+	      /* Skip an unrecognized section with a warning. */
+	      fprintf (stderr, "Warning: %s/%s: Unrecognized section: %s at "
+		       "line %d: ignoring.\n", dir, filename, lexeme,
+		       line_number);
+
+	      /* just skip section */
+	      while (NULL != next_lexeme (f, lexeme))
+		{
+		  if (strcmp (lexeme, "end"))
+		    {
+		      break;
+		    }
+		}
+	    }
+	}
+      else if (in_section_p && strcmp (lexeme, "end") == 0)
+	{
+	  /* End of section. Run the end of section code */
+	  if (cur_section->sec_end)
+	    {
+	      cur_section->sec_end (cur_section->dat);
+	    }
+
+	  in_section_p = 0;		/* Not in a section any more */
+	}
+      else if (in_section_p)
+	{
+	  /* We're in a section, so this must be a parameter. */
+	  struct config_param *param;
+	  char                *param_val;
+
+	  param = lookup_param (lexeme, cur_section);
+
+	  /* If we didn't recognize, then warn and skip to end of line/file) */
+	  if (NULL == param)
+	    {
+	      fprintf (stderr, "Warning: %s/%s: Unrecognized parameter: %s at "
+		       "line %d; ignored.\n", dir, filename, lexeme,
+		       line_number);
+
+	      /* Skip to end of line */
+	      while (( '\n' != fgetc (f)) || feof (f))
+		;
+
+	      line_number++;
+	      continue;			/* Start looking again */
+	    }
+	  
+	  /* Get the argument if one is expected. */
+	  if (PARAMT_NONE != param->type)
+	    {
+	      param_val = next_lexeme (f, lexeme);
+
+	      if (NULL == param_val)
+		{
+		  fprintf (stderr, "Warning: %s/%s: No argument to parameter "
+			   "%s at line %d; ignored.\n", dir, filename,
+			   param->name, line_number);
+
+		  /* Skip to end of line */
+		  while (( '\n' != fgetc (f)) || feof (f))
+		    ;
+
+		  line_number++;
+		  continue;			/* Start looking again */
+		}
+	      
+	      /* We allow an optional '=' */
+	      if (0 == strcmp (lexeme, "="))
+		{
+		  param_val = next_lexeme (f, lexeme);
+
+		  if (NULL == param_val)
+		    {
+		      fprintf (stderr, "Warning: %s/%s: No argument to "
+			       "parameter %s at line %d; ignored.\n", dir,
+			       filename, param->name, line_number);
+
+		      /* Skip to end of line */
+		      while (( '\n' != fgetc (f)) || feof (f))
+			;
+
+		      line_number++;
+		      continue;			/* Start looking again */
+		    }
+		}
+	    }
+	  else
+	    {
+	      /* No argument */
+	      param_val = NULL;
+	    }
+
+	  /* Apply the parameter */
+	  set_config_param (cur_section, param, param_val);
+	}
+      else
+	{
+	  /* We're not in a section, so we don't know what we have */
+	  fprintf (stderr, "Warning: %s/%s: Unrecognized config file contents "
+		   " at line %d: ignored.\n", dir, filename, line_number);
+
+	  /* Skip to end of line */
+	  while (( '\n' != fgetc (f)) || feof (f))
+	    ;
+
+	  line_number++;
+	  continue;			/* Start looking again */
+	}
+    }
+
+  fclose (f);		/* All done */
+
+}	/* read_script_file () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Allocate a memory block
+
+   We can request a block of memory be allocated from the command line, rather
+   than in a configuration file. It will be allocated, starting at address
+   zero.
+
+   The memory size may be presented in any format recognized by strtol,
+   optionally followed by "G" or "g", "M" or "m" or "K" or "k" for giga, mega
+   and kilo bytes respectively, and leading to mutliplcation by 2^30, 2^20 and
+   2^10 respectively.
+
+   This is intended for simple use of the simulator in tool chain
+   verification, where the detailed memory behavior does not matter.
+
+   @param[in] size  Memory size.                                             */
+/*---------------------------------------------------------------------------*/
+static void
+alloc_memory_block (const char *size)
+{
+  /* Sort out the memory size. */
+  unsigned long int  multiplier;
+  int                last_ch = strlen (size) - 1;
+
+  switch (size[last_ch])
+    {
+    case 'G': case 'g': multiplier = 0x40000000UL; break;
+    case 'M': case 'm': multiplier =   0x100000UL; break;
+    case 'K': case 'k': multiplier =      0x400UL; break;
+    default:            multiplier =        0x1UL; break;
+    }
+  unsigned long int  mem_size = strtoul (size, NULL, 0) * multiplier;
+
+  if (0 == mem_size)
+    {
+      fprintf (stderr, "Warning: Memory size %s not recognized: ignored.\n",
+	       size);
+      return;
+    }
+
+  if (mem_size > 0xffffffff)
+    {
+      fprintf (stderr, "Warning: Memory size %s too large: ignored.\n",
+	       size);
+      return;
+    }
+
+  /* Turn the memory size back into a decimal string and allocate it */
+  char str_size[11];
+  sprintf (str_size, "%lu\n", mem_size);
+
+  struct config_section *sec = lookup_section ("memory");
+
+  sec->dat = sec->sec_start ();
+
+  set_config_param (sec, lookup_param ("name", sec),     "Default RAM");
+  set_config_param (sec, lookup_param ("type", sec),     "unknown");
+  set_config_param (sec, lookup_param ("baseaddr", sec), "0");
+  set_config_param (sec, lookup_param ("size", sec),     str_size);
+
+  sec->sec_end (sec->dat);
+  
+}	/* alloc_memory_block () */
+
+
 /*---------------------------------------------------------------------------*/
 /*! Parse the arguments for the standalone simulator
 
@@ -275,23 +929,22 @@ init_defconfig ()
 int
 parse_args (int argc, char *argv[])
 {
-  struct arg_lit *vercop;
-  struct arg_lit *help;
+  struct arg_lit  *vercop;
+  struct arg_lit  *help;
   struct arg_file *cfg_file;
-  struct arg_lit *nosrv;
-  struct arg_int *srv;
-  struct arg_str *dbg;
-  struct arg_lit *command;
-  struct arg_lit *quiet;
-  struct arg_lit *report_mem_errs;
-  struct arg_lit *strict_npc;
-  struct arg_lit *profile;
-  struct arg_lit *mprofile;
+  struct arg_lit  *nosrv;
+  struct arg_int  *srv;
+  struct arg_str  *mem;
+  struct arg_str  *dbg;
+  struct arg_lit  *command;
+  struct arg_lit  *quiet;
+  struct arg_lit  *verbose;
+  struct arg_lit  *report_mem_errs;
+  struct arg_lit  *strict_npc;
+  struct arg_lit  *profile;
+  struct arg_lit  *mprofile;
   struct arg_file *load_file;
-  struct arg_end *end;
-
-  void *argtab[14];
-  int nerrors;
+  struct arg_end  *end;
 
   /* Specify each argument, with fall back values */
   vercop = arg_lit0 ("v", "version", "version and copyright notice");
@@ -303,9 +956,11 @@ parse_args (int argc, char *argv[])
   srv = arg_int0 (NULL, "srv", "<n>", "port number (default random)");
   srv->ival[0] = rand () % (65536 - 49152) + 49152;
   srv->hdr.flag |= ARG_HASOPTVALUE;
+  mem = arg_str0 ("m", "memory", "<n>", "add memory block of <n> bytes");
   dbg = arg_str0 ("d", "debug-config", "<str>", "Debug config string");
   command = arg_lit0 ("i", "interactive", "launch interactive prompt");
   quiet = arg_lit0 ("q", "quiet", "minimal message output");
+  verbose = arg_lit0 ("V", "verbose", "verbose message output");
   report_mem_errs = arg_lit0 (NULL, "report-memory-errors",
 			      "Report out of memory accesses");
   strict_npc = arg_lit0 (NULL, "strict-npc", "setting NPC flushes pipeline");
@@ -314,24 +969,27 @@ parse_args (int argc, char *argv[])
   load_file = arg_file0 (NULL, NULL, "<file>", "OR32 executable");
   end = arg_end (20);
 
-  /* Set up the argument table */
-  argtab[ 0] = vercop;
-  argtab[ 1] = help;
-  argtab[ 2] = cfg_file;
-  argtab[ 3] = nosrv;
-  argtab[ 4] = srv;
-  argtab[ 5] = dbg;
-  argtab[ 6] = command;
-  argtab[ 7] = quiet;
-  argtab[ 8] = report_mem_errs;
-  argtab[ 9] = strict_npc;
-  argtab[10] = profile;
-  argtab[11] = mprofile;
-  argtab[12] = load_file;
-  argtab[13] = end;
+  /* The argument table */
+  void *argtab[] = {
+    vercop,
+    help,
+    cfg_file,
+    nosrv,
+    srv,
+    mem,
+    dbg,
+    command,
+    quiet,
+    verbose,
+    report_mem_errs,
+    strict_npc,
+    profile,
+    mprofile,
+    load_file,
+    end };
 
   /* Parse */
-  nerrors = arg_parse (argc, argv, argtab);
+  int  nerrors = arg_parse (argc, argv, argtab);
 
   /* Special case here is if help or version is specified, we ignore any other
      errors and just print the help or version information and then give up. */
@@ -365,15 +1023,43 @@ parse_args (int argc, char *argv[])
       return 1;
     }
 
-  /* Process config file next, so any other command args will override */
-  if (0 == cfg_file->count)
+  /* Request for quiet running */
+  config.sim.quiet = quiet->count;
+
+  /* Request for verbose running. Not sensible to use with quiet as well. */
+  if (quiet->count && verbose->count)
     {
-      fprintf (stderr,
-	       "Warning: No config file given, default configuration used\n");
+      fprintf (stderr, "Warning: Cannot specify both --verbose and --quiet: "
+	       "--vervose ignored.\n");
+      config.sim.verbose = 0;
+    }
+  else
+    {
+      config.sim.verbose = verbose->count;
     }
 
-  read_script_file (cfg_file->filename[0]);
+  /* Request for memory errors */
+  config.sim.report_mem_errs = report_mem_errs->count;
 
+  /* Process config file next (if given), so any other command args will
+     override */
+  if (0 == cfg_file->count)
+    {
+      if (config.sim.verbose)
+	{
+	  fprintf (stderr, "Default configuration used\n");
+	}
+    }
+  else
+    {
+      read_script_file (cfg_file->filename[0]);
+    }
+
+  /* Allocate a memory block */
+  if (mem->count > 0)
+    {
+      alloc_memory_block (mem->sval[0]);
+    }
 
   /* Remote debug server */
   if (nosrv->count > 0)
@@ -406,12 +1092,6 @@ parse_args (int argc, char *argv[])
 
   /* Interactive operation */
   runtime.sim.iprompt = command->count;
-
-  /* Request for quiet running */
-  config.sim.quiet = quiet->count;
-
-  /* Request for quiet running */
-  config.sim.report_mem_errs = report_mem_errs->count;
 
   /* Request for strict NPC behavior (flush the pipeline on change) */
   config.sim.strict_npc = strict_npc->count;
@@ -477,29 +1157,23 @@ print_config ()
     }
 }
 
-struct config_param
-{
-  char *name;
-  enum param_t type;
-  void (*func) (union param_val, void *dat);
-  struct config_param *next;
-};
-
-void
-base_include (union param_val val, void *dat)
-{
-  read_script_file (val.str_val);
-  cur_section = NULL;
-}
-
-/*---------------------------------------------[ Simulator configuration ]---*/
+/* Simulator configuration */
 
 
-void
-sim_verbose (union param_val val, void *dat)
+/*---------------------------------------------------------------------------*/
+/*!Turn on verbose messages.
+
+   @param[in] val  Non-zero (TRUE) to turn on verbose messages, zero (FALSE)
+                   otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_verbose (union param_val  val,
+	     void            *dat)
 {
   config.sim.verbose = val.int_val;
-}
+
+}	/* sim_verbose () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -511,7 +1185,7 @@ sim_verbose (union param_val val, void *dat)
    @param[in] val  The value to use
    @param[in] dat  The config data structure (not used here)                 */
 /*---------------------------------------------------------------------------*/
-void
+static void
 sim_debug (union param_val  val,
 	   void            *dat)
 {
@@ -534,14 +1208,30 @@ sim_debug (union param_val  val,
 }	/* sim_debug() */
 
 
-void
-sim_profile (union param_val val, void *dat)
+/*---------------------------------------------------------------------------*/
+/*!Turn on profiling
+
+   @param[in] val  Non-zero (TRUE) to turn on profiling, zero (FALSE) otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_profile (union param_val  val,
+	     void            *dat)
 {
   config.sim.profile = val.int_val;
-}
 
-void
-sim_prof_fn (union param_val val, void *dat)
+}	/* sim_profile () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify the profiling file name.
+
+   @param[in] val  The profiling file name
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_prof_fn (union param_val  val,
+	     void            *dat)
 {
   if (NULL != config.sim.prof_fn)
     {
@@ -549,15 +1239,33 @@ sim_prof_fn (union param_val val, void *dat)
     }
 
   config.sim.prof_fn = strdup(val.str_val);
-}
 
-void
-sim_mprofile (union param_val val, void *dat)
+}	/* sim_prof_fn () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Turn on memory profiling
+
+   @param[in] val  Non-zero (TRUE) to turn on memory profiling, zero (FALSE)
+                   otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_mprofile (union param_val  val,
+	      void            *dat)
 {
   config.sim.mprofile = val.int_val;
-}
 
-void
+}	/* sim_mprofile () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify the memory profiling file name.
+
+   @param[in] val  The memory profiling file name
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
 sim_mprof_fn (union param_val val, void *dat)
 {
   if (NULL != config.sim.mprof_fn)
@@ -566,19 +1274,37 @@ sim_mprof_fn (union param_val val, void *dat)
     }
 
   config.sim.mprof_fn = strdup (val.str_val);
-}
 
-void
-sim_history (union param_val val, void *dat)
+}	/* sim_mprof_fn () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Turn on execution tracking.
+
+   @param[in] val  Non-zero (TRUE) to turn on tracking, zero (FALSE) otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_history (union param_val  val,
+	     void            *dat)
 {
   config.sim.history = val.int_val;
 }
 
-void
-sim_exe_log (union param_val val, void *dat)
+
+/*---------------------------------------------------------------------------*/
+/*!Record an execution log
+
+   @param[in] val  Non-zero (TRUE) to turn on logging, zero (FALSE) otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_exe_log (union param_val  val,
+	     void            *dat)
 {
   config.sim.exe_log = val.int_val;
-}
+
+}	/* sim_exe_log () */
 
 /*---------------------------------------------------------------------------*/
 /*!Set the execution log type
@@ -589,7 +1315,7 @@ sim_exe_log (union param_val val, void *dat)
    @param[in] val  The value to use
    @param[in] dat  The config data structure (not used here)                 */
 /*---------------------------------------------------------------------------*/
-void
+static void
 sim_exe_log_type (union param_val  val,
 		  void            *dat)
 {
@@ -617,25 +1343,64 @@ sim_exe_log_type (union param_val  val,
 }	/* sim_exe_log_type() */
 
 
-void
-sim_exe_log_start (union param_val val, void *dat)
+/*---------------------------------------------------------------------------*/
+/*!Set the execution log start address
+
+   Address at which to start logging.
+
+   @param[in] val  The value to use
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_exe_log_start (union param_val  val,
+		   void            *dat)
 {
   config.sim.exe_log_start = val.longlong_val;
-}
 
-void
-sim_exe_log_end (union param_val val, void *dat)
+}	/* sim_exe_log_start () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Set the execution log end address
+
+   Address at which to end logging.
+
+   @param[in] val  The value to use
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_exe_log_end (union param_val  val,
+		 void            *dat)
 {
   config.sim.exe_log_end = val.longlong_val;
-}
 
-void
-sim_exe_log_marker (union param_val val, void *dat)
+}	/* sim_exe_log_end () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify number of instruction between printing horizontal markers
+
+   Control of log format
+
+   @param[in] val  The value to use
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+sim_exe_log_marker (union param_val  val,
+		    void            *dat)
 {
   config.sim.exe_log_marker = val.int_val;
-}
 
-void
+}	/* sim_exe_log_marker () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify the execution log file name.
+
+   @param[in] val  The execution log file name
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
 sim_exe_log_fn (union param_val val, void *dat)
 {
   if (NULL != config.sim.exe_log_fn)
@@ -644,15 +1409,31 @@ sim_exe_log_fn (union param_val val, void *dat)
     }
 
   config.sim.exe_log_fn = strdup (val.str_val);
-}
 
-void
+}	/* sim_exe_log_fn () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Turn on binary instruction logging
+
+   @param[in] val  Non-zero (TRUE) to turn on logging, zero (FALSE) otherwise.
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
 sim_exe_bin_insn_log (union param_val val, void *dat)
 {
   config.sim.exe_bin_insn_log = val.int_val;
-}
 
-void
+}	/* sim_exe_bin_insn_log () */
+
+
+/*---------------------------------------------------------------------------*/
+/*!Specify the binary instruction log file name.
+
+   @param[in] val  The binary instruction log file name
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
 sim_exe_bin_insn_log_fn (union param_val val, void *dat)
 {
   if (NULL != config.sim.exe_bin_insn_log_fn)
@@ -661,10 +1442,8 @@ sim_exe_bin_insn_log_fn (union param_val val, void *dat)
     }
 
   config.sim.exe_bin_insn_log_fn = strdup (val.str_val);
-}
 
-
-
+}	/* sim_exe_bin_insn_log_fn () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -742,36 +1521,44 @@ reg_sim_sec ()
 {
   struct config_section *sec = reg_config_sec ("sim", NULL, NULL);
 
-  reg_config_param (sec, "verbose",        paramt_int,      sim_verbose);
-  reg_config_param (sec, "debug",          paramt_int,      sim_debug);
-  reg_config_param (sec, "profile",        paramt_int,      sim_profile);
-  reg_config_param (sec, "prof_file",      paramt_str,      sim_prof_fn);
-  reg_config_param (sec, "prof_fn",        paramt_str,      sim_prof_fn);
-  reg_config_param (sec, "mprofile",       paramt_int,      sim_mprofile);
-  reg_config_param (sec, "mprof_file",     paramt_str,      sim_mprof_fn);
-  reg_config_param (sec, "mprof_fn",       paramt_str,      sim_mprof_fn);
-  reg_config_param (sec, "history",        paramt_int,      sim_history);
-  reg_config_param (sec, "exe_log",        paramt_int,      sim_exe_log);
-  reg_config_param (sec, "exe_log_type",   paramt_word,     sim_exe_log_type);
-  reg_config_param (sec, "exe_log_start",  paramt_longlong, sim_exe_log_start);
-  reg_config_param (sec, "exe_log_end",    paramt_longlong, sim_exe_log_end);
-  reg_config_param (sec, "exe_log_marker", paramt_int,      sim_exe_log_marker);
-  reg_config_param (sec, "exe_log_file",   paramt_str,      sim_exe_log_fn);
-  reg_config_param (sec, "exe_log_fn",     paramt_str,      sim_exe_log_fn);
-  reg_config_param (sec, "exe_bin_insn_log",paramt_int,     sim_exe_bin_insn_log);
-  reg_config_param (sec, "exe_bin_insn_log_fn",paramt_str,  sim_exe_bin_insn_log_fn);
-  reg_config_param (sec, "exe_bin_insn_log_file",paramt_str,  sim_exe_bin_insn_log_fn);
-  reg_config_param (sec, "clkcycle",       paramt_word,     sim_clkcycle);
+  reg_config_param (sec, "verbose",        PARAMT_INT,      sim_verbose);
+  reg_config_param (sec, "debug",          PARAMT_INT,      sim_debug);
+  reg_config_param (sec, "profile",        PARAMT_INT,      sim_profile);
+  reg_config_param (sec, "prof_file",      PARAMT_STR,      sim_prof_fn);
+  reg_config_param (sec, "prof_fn",        PARAMT_STR,      sim_prof_fn);
+  reg_config_param (sec, "mprofile",       PARAMT_INT,      sim_mprofile);
+  reg_config_param (sec, "mprof_file",     PARAMT_STR,      sim_mprof_fn);
+  reg_config_param (sec, "mprof_fn",       PARAMT_STR,      sim_mprof_fn);
+  reg_config_param (sec, "history",        PARAMT_INT,      sim_history);
+  reg_config_param (sec, "exe_log",        PARAMT_INT,      sim_exe_log);
+  reg_config_param (sec, "exe_log_type",   PARAMT_WORD,     sim_exe_log_type);
+  reg_config_param (sec, "exe_log_start",  PARAMT_LONGLONG, sim_exe_log_start);
+  reg_config_param (sec, "exe_log_end",    PARAMT_LONGLONG, sim_exe_log_end);
+  reg_config_param (sec, "exe_log_marker", PARAMT_INT,      sim_exe_log_marker);
+  reg_config_param (sec, "exe_log_file",   PARAMT_STR,      sim_exe_log_fn);
+  reg_config_param (sec, "exe_log_fn",     PARAMT_STR,      sim_exe_log_fn);
+
+  reg_config_param (sec, "exe_bin_insn_log",      PARAMT_INT,
+		    sim_exe_bin_insn_log);
+  reg_config_param (sec, "exe_bin_insn_log_fn",   PARAMT_STR,
+		    sim_exe_bin_insn_log_fn);
+  reg_config_param (sec, "exe_bin_insn_log_file", PARAMT_STR,
+		    sim_exe_bin_insn_log_fn);
+
+  reg_config_param (sec, "clkcycle",       PARAMT_WORD,     sim_clkcycle);
 
 }	/* reg_sim_sec() */
 
 
-void
-reg_config_secs (void)
-{
-  reg_config_param (reg_config_sec ("base", NULL, NULL), "include",
-		    paramt_str, base_include);
+/*---------------------------------------------------------------------------*/
+/*!Register all the possible sections which we support.
 
+   Each section type provides a registration function. This returns a struct
+   config_section, which in turn contains a list of config_params.           */
+/*---------------------------------------------------------------------------*/
+void
+reg_config_secs ()
+{
   reg_generic_sec ();		/* JPB */
   reg_sim_sec ();
   reg_cpu_sec ();
@@ -797,271 +1584,20 @@ reg_config_secs (void)
   reg_cuc_sec ();
 }
 
-void
-reg_config_param (struct config_section *sec, const char *param,
-		  enum param_t type,
-		  void (*param_cb) (union param_val, void *))
-{
-  struct config_param *new = malloc (sizeof (struct config_param));
-
-  if (!new)
-    {
-      fprintf (stderr, "Out-of-memory\n");
-      exit (1);
-    }
-
-  if (!(new->name = strdup (param)))
-    {
-      fprintf (stderr, "Out-of-memory\n");
-      exit (1);
-    }
-
-  new->func = param_cb;
-  new->type = type;
-
-  new->next = sec->params;
-  sec->params = new;
-}
-
-struct config_section *
-reg_config_sec (const char *section,
-		void *(*sec_start) (void), void (*sec_end) (void *))
-{
-  struct config_section *new = malloc (sizeof (struct config_section));
-
-  if (!new)
-    {
-      fprintf (stderr, "Out-of-memory\n");
-      exit (1);
-    }
-
-  if (!(new->name = strdup (section)))
-    {
-      fprintf (stderr, "Out-of-memory\n");
-      exit (1);
-    }
-
-  new->next = sections;
-  new->sec_start = sec_start;
-  new->sec_end = sec_end;
-  new->params = NULL;
-
-  sections = new;
-
-  return new;
-}
-
-static void
-switch_param (char *param, struct config_param *cur_param)
-{
-  char *end_p;
-  union param_val val;
-
-  /* Skip over an = sign if it exists */
-  if (*param == '=')
-    {
-      param++;
-      while (*param && isspace (*param))
-	param++;
-    }
-
-  switch (cur_param->type)
-    {
-    case paramt_int:
-      val.int_val = strtol (param, NULL, 0);
-      break;
-    case paramt_longlong:
-      val.longlong_val = strtoll (param, NULL, 0);
-      break;
-    case paramt_addr:
-      val.addr_val = strtoul (param, NULL, 0);
-      break;
-    case paramt_str:
-      if (*param != '"')
-	{
-	  fprintf (stderr,
-		   "Warning: String value for parameter expected: ignored\n");
-	  return;
-	}
-
-      param++;
-      end_p = param;
-      while (*end_p && (*end_p != '"'))
-	end_p++;
-      *end_p = '\0';
-      val.str_val = param;
-      break;
-    case paramt_word:
-      end_p = param;
-      while (*end_p && !isspace (*end_p))
-	end_p++;
-      *end_p = '\0';
-      val.str_val = param;
-      break;
-    case paramt_none:
-      break;
-    }
-
-  cur_param->func (val, cur_section->dat);
-}
-
-/* Read environment from a script file. Does not fail - assumes default configuration instead.
-   The syntax of script file is:
-   param = value
-   section x
-     data
-     param = value
-   end
-   
-   Example:
-   section mc
-     memory_table_file = sim.mem
-     enable = 1
-     POC = 0x47892344
-   end
-   
- */
-
-static void
-read_script_file (const char *filename)
-{
-  FILE *f;
-  char *home = getenv ("HOME");
-  char ctmp[STR_SIZE];
-  int local = 1;
-  cur_section = NULL;
-
-  sprintf (ctmp, "%s/.or1k/%s", home, filename);
-  if ((f = fopen (filename, "rt")) || (home && (f = fopen (ctmp, "rt"))))
-    {
-      if (config.sim.verbose)
-	PRINTF ("Reading script file from '%s'...\n",
-		local ? filename : ctmp);
-
-      while (!feof (f))
-	{
-	  char param[STR_SIZE];
-	  if (fscanf (f, "%s ", param) != 1)
-	    break;
-	  /* Is this a section? */
-	  if (strcmp (param, "section") == 0)
-	    {
-	      struct config_section *cur;
-	      cur_section = NULL;
-	      if (fscanf (f, "%s\n", param) != 1)
-		{
-		  fprintf (stderr, "%s: ERROR: Section name required.\n",
-			   local ? filename : ctmp);
-		  exit (1);
-		}
-	      for (cur = sections; cur; cur = cur->next)
-		if (strcmp (cur->name, param) == 0)
-		  {
-		    cur_section = cur;
-		    break;
-		  }
-	      if (!cur)
-		{
-		  fprintf (stderr,
-			   "Warning: Unknown config section: %s; ignoring.\n",
-			   param);
-		  /* just skip section */
-		  while (fscanf (f, "%s\n", param) == 1
-			 && strcmp (param, "end"));
-		}
-	      else
-		{
-		  cur->dat = NULL;
-		  if (cur->sec_start)
-		    cur->dat = cur->sec_start ();
-		}
-	    }
-	  else if (strcmp (param, "end") == 0)
-	    {
-	      if (cur_section->sec_end)
-		cur_section->sec_end (cur_section->dat);
-	      cur_section = NULL;
-	    }
-	  else if (strncmp (param, "/*", 2) == 0)
-	    {
-	      char c0 = 0, c1 = 0;
-	      while (c0 != '*' || c1 != '/')
-		{
-		  c0 = c1;
-		  c1 = fgetc (f);
-		  if (feof (f))
-		    {
-		      fprintf (stderr, "%s: ERROR: Comment reached EOF.\n",
-			       local ? filename : ctmp);
-		      exit (1);
-		    }
-		}
-	    }
-	  else
-	    {
-	      struct config_param *cur_param = NULL;
-	      char *cur_p;
-	      /* If we have a corrupt file, this could be encountered outside
-		 a section. So make sure cur_section is defined. */
-	      if (cur_section)
-		{
-		  for (cur_param = cur_section->params; cur_param;
-		       cur_param = cur_param->next)
-		    {
-		      if (strcmp (cur_param->name, param) == 0)
-			{
-			  break;
-			}
-		    }
-		}
-	      if (!cur_param)
-		{
-		  fprintf (stderr, "Warning: Invalid parameter: %s; ignored\n",
-			   param);
-		  while (fgetc (f) != '\n' || feof (f));
-		  continue;
-		}
-
-	      if (cur_param->type == paramt_none)
-		continue;
-
-	      /* Parse parameter value */
-	      cur_p = fgets (param, STR_SIZE, f);
-
-	      while (*cur_p && isspace (*cur_p))
-		cur_p++;
-
-	      switch_param (cur_p, cur_param);
-	    }
-	}
-      fclose (f);
-    }
-  else if (config.sim.verbose)
-    fprintf (stderr,
-	     "Warning: Cannot read script file from '%s' of '%s'.\n",
-	     filename, ctmp);
-}
-
 /* Utility for execution of set sim command.  */
 static int
 set_config (int argc, char **argv)
 {
-  struct config_section *cur;
-  struct config_param *cur_param;
+  struct config_section *cur_section;
+  struct config_param *param;
 
   if (argc < 2)
     return 1;
 
   PRINTF ("sec:%s\n", argv[1]);
-  cur_section = NULL;
-  for (cur = sections; cur; cur = cur->next)
-    if (strcmp (cur->name, argv[1]) == 0)
-      {
-	cur_section = cur;
-	break;
-      }
+  cur_section = lookup_section (argv[1]);
 
-  if (!cur_section)
+  if (NULL == cur_section)
     return 1;
 
   if (argc < 3)
@@ -1069,23 +1605,23 @@ set_config (int argc, char **argv)
 
   PRINTF ("item:%s\n", argv[2]);
   {
-    for (cur_param = cur->params; cur_param; cur_param = cur_param->next)
-      if (strcmp (cur_param->name, argv[2]) == 0)
+    for (param = cur_section->params; param; param = param->next)
+      if (strcmp (param->name, argv[2]) == 0)
 	{
 	  break;
 	}
-    if (!cur_param)
+    if (!param)
       return 2;
 
     /* Parse parameter value */
-    if (cur_param->type)
+    if (param->type)
       {
 	if (argc < 4)
 	  return 3;
 	PRINTF ("params:%s\n", argv[3]);
       }
 
-    switch_param (argv[3], cur_param);
+    set_config_param (cur_section, param, argv[3]);
   }
   return 0;
 }
@@ -1095,23 +1631,24 @@ void
 set_config_command (int argc, char **argv)
 {
   struct config_section *cur;
-  struct config_param *cur_param;
+  struct config_param *param;
 
   switch (set_config (argc, argv))
     {
     case 1:
       PRINTF
 	("Invalid or missing section name.  One of valid sections must be specified:\n");
-      for (cur = sections; cur; cur = cur->next)
+      for (cur = section_master_list; cur; cur = cur->next)
 	PRINTF ("%s ", cur->name);
       PRINTF ("\n");
       break;
     case 2:
+      cur = lookup_section (argv[1]);
       PRINTF
 	("Invalid or missing item name.  One of valid items must be specified:\n");
-      for (cur_param = cur_section->params; cur_param;
-	   cur_param = cur_param->next)
-	PRINTF ("%s ", cur_param->name);
+      for (param = cur->params; param;
+	   param = param->next)
+	PRINTF ("%s ", param->name);
       PRINTF ("\n");
       break;
     case 3:

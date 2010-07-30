@@ -63,8 +63,6 @@ int  or1ksim_init (int         argc,
 
 int  or1ksim_run (double  duration);
 
-int  or1ksim_step ();
-
 void  or1ksim_reset_duration (double duration);
 
 void  or1ksim_set_time_point ();
@@ -92,22 +90,27 @@ double  or1ksim_jtag_shift_dr (unsigned char *jreg,
 			       int            num_bits);
 
 /* Access to simulator state */
-int  or1ksim_read_mem (unsigned char *buf,
-		       unsigned int   addr,
+int  or1ksim_read_mem (unsigned int   addr,
+		       unsigned char *buf,
 		       int            len);
 
-int  or1ksim_write_mem (unsigned char *buf,
-			unsigned int   addr,
+int  or1ksim_write_mem (unsigned int   addr,
+			unsigned char *buf,
 			int            len);
 
-int  or1ksim_read_reg (unsigned char *buf,
-		       int            regnum,
-		       int            len);
+int  or1ksim_read_spr (int            sprnum,
+		       unsigned int  *sprval_ptr);
 
-int  or1ksim_write_reg (unsigned char *buf,
-			int            regnum,
-			int            len);
+int  or1ksim_write_spr (int           sprnum,
+			unsigned int  sprval);
+    
+int  or1ksim_read_reg (int           regnum,
+		       unsigned int *regval_ptr);
 
+int  or1ksim_write_reg (int           regnum,
+			unsigned int  regval);
+
+void  or1ksim_set_stall_state (int  state);
 
 #ifdef __cplusplus
 }

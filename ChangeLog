@@ -2,6 +2,82 @@
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
+	* config/dcache-model.c (reg_dc_sec): Upper case enumeration
+	elements.
+	* config/icache-model.c (reg_ic_sec): Upper case enumeration
+	elements.
+	* cpu/or1k/spr-defs.h <System control and status group>: Add
+	SPR_GPR_BASE.
+	* debug/debug-unit.c (reg_debug_sec): Upper case enumeration
+	elements.
+	* sim-config.h <enum param_t>: Upper case enumeration elements.
+	* doc/or1ksim.texi: Delete reference to using include files.
+	* cuc/cuc.c (reg_cuc_sec): Upper case enumeration elements.
+	* or1ksim.h <or1ksim_read_mem, or1ksim_write_mem>: Argument order
+	changed.
+	<or1ksim_read_reg, or1ksim_write_reg>: Argument as value, not
+	buffer.
+	<or1ksim_read_spr, or1ksim_write_spr, or1ksim_set_stall_state>:
+	Added.
+	* NEWS: Updated with new features.
+	* peripheral/gpio.c (reg_gpio_sec): Upper case enumeration
+	elements.
+	* peripheral/mc.c (reg_mc_sec): Upper case enumeration elements.
+	* peripheral/generic.c (reg_generic_sec): Upper case enumeration
+	elements.
+	* peripheral/eth.c (reg_eth_sec): Upper case enumeration
+	elements.
+	* peripheral/kbd.c (reg_kbd_sec): Upper case enumeration
+	elements.
+	* peripheral/fb.c (reg_fb_sec): Upper case enumeration elements.
+	* peripheral/dma.c (reg_dma_sec): Upper case enumeration
+	elements.
+	* peripheral/ata.c (reg_ata_sec): Upper case enumeration
+	elements.
+	* peripheral/memory.c (reg_memory_sec): Upper case enumeration
+	elements.
+	* peripheral/vga.c (reg_vga_sec): Upper case enumeration
+	elements.
+	* peripheral/uart.c (reg_uart_sec): Upper case enumeration
+	elements.
+	* mmu/dmmu.c (reg_dmmu_sec): Upper case enumeration elements.
+	* mmu/immu.c (reg_immu_sec): Upper case enumeration elements.
+	* vapi/vapi.c (reg_vapi_sec): Upper case enumeration elements.
+	* bpb/branch-predict.c (reg_bpb_sec): Upper case enumeration
+	elements.
+	* cpu-config.c (reg_cpu_sec): Upper case enumeration elements.
+	* libtoplevel.c: Include debug-unit.h, spr-defs.h and sprs.h
+	headers.
+	(or1ksim_step): Deleted.
+	(or1ksim_read_mem, or1ksim_write_mem): Argument order
+	changed.
+	(or1ksim_read_reg, or1ksim_write_reg): Argument as value, not
+	buffer. Mapped to SPR read/write calls.
+	(or1ksim_read_spr, or1ksim_write_spr, or1ksim_set_stall_state):
+	Created.
+	* pic/pic.c (reg_pic_sec): Upper case enumeration elements.
+	* pm/pm.c (reg_pm_sec): Upper case enumeration elements.
+	* sim-config.c <cur_sections>: Global variable deleted and
+	replaced by local arguments.
+	<section_master_list>: Renamed from sections.
+	<read_script_file>: Forward declaration deleted.
+	(lookup_section, lookup_param): Created.
+	(set_config_param): Renamed from switch_param. Simplified - no
+	preceding blanks and string and word representations are
+	identical.
+	(next_word, next_lexeme): Created.
+	(read_script_file): Also search ~/.or1ksim. Use new functions to
+	get lexemes and to lookup sections and parameters.
+	(alloc_memory_block): Created.
+	(parse_args): New arguments -q/--quiet, --report-memory-errors,
+	-m/--memory. No use of sim.cfg as default config file.
+	(reg_sim_sec): Upper case enumeration elements.
+	(set_config): Use new section and parameter lookup functions.
+
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
 	* cpu/common/abstract.c (setsim_mem32, setsim_mem16, setsim_mem8)
 	(evalsim_mem32, evalsim_mem16, evalsim_mem8): Only report out of
 	memory writes if --report-memory-errors is set.

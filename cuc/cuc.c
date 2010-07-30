@@ -1181,10 +1181,10 @@ reg_cuc_sec ()
 {
   struct config_section *sec = reg_config_sec ("cuc", NULL, NULL);
 
-  reg_config_param (sec, "memory_order", paramt_word, cuc_memory_order);
-  reg_config_param (sec, "calling_convention", paramt_int, cuc_calling_conv);
-  reg_config_param (sec, "enable_bursts", paramt_int, cuc_enable_bursts);
-  reg_config_param (sec, "no_multicycle", paramt_int, cuc_no_multicycle);
-  reg_config_param (sec, "timings_file", paramt_str, cuc_timings_fn);
-  reg_config_param (sec, "timings_fn", paramt_str, cuc_timings_fn);
+  reg_config_param (sec, "memory_order",       PARAMT_WORD, cuc_memory_order);
+  reg_config_param (sec, "calling_convention", PARAMT_INT, cuc_calling_conv);
+  reg_config_param (sec, "enable_bursts",      PARAMT_INT, cuc_enable_bursts);
+  reg_config_param (sec, "no_multicycle",      PARAMT_INT, cuc_no_multicycle);
+  reg_config_param (sec, "timings_file",       PARAMT_STR, cuc_timings_fn);
+  reg_config_param (sec, "timings_fn",         PARAMT_STR, cuc_timings_fn);
 }

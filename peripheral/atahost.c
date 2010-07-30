@@ -710,31 +710,31 @@ reg_ata_sec ()
   struct config_section *sec =
     reg_config_sec ("ata", ata_sec_start, ata_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, ata_enabled);
-  reg_config_param (sec, "baseaddr", paramt_addr, ata_baseaddr);
-  reg_config_param (sec, "irq", paramt_int, ata_irq);
-  reg_config_param (sec, "dev_id", paramt_int, ata_dev_id);
-  reg_config_param (sec, "rev", paramt_int, ata_rev);
+  reg_config_param (sec, "enabled",        PARAMT_INT, ata_enabled);
+  reg_config_param (sec, "baseaddr",       PARAMT_ADDR, ata_baseaddr);
+  reg_config_param (sec, "irq",            PARAMT_INT, ata_irq);
+  reg_config_param (sec, "dev_id",         PARAMT_INT, ata_dev_id);
+  reg_config_param (sec, "rev",            PARAMT_INT, ata_rev);
 
-  reg_config_param (sec, "pio_mode0_t1", paramt_int, ata_pio_mode0_t1);
-  reg_config_param (sec, "pio_mode0_t2", paramt_int, ata_pio_mode0_t2);
-  reg_config_param (sec, "pio_mode0_t4", paramt_int, ata_pio_mode0_t4);
-  reg_config_param (sec, "pio_mode0_teoc", paramt_int, ata_pio_mode0_teoc);
+  reg_config_param (sec, "pio_mode0_t1",   PARAMT_INT, ata_pio_mode0_t1);
+  reg_config_param (sec, "pio_mode0_t2",   PARAMT_INT, ata_pio_mode0_t2);
+  reg_config_param (sec, "pio_mode0_t4",   PARAMT_INT, ata_pio_mode0_t4);
+  reg_config_param (sec, "pio_mode0_teoc", PARAMT_INT, ata_pio_mode0_teoc);
 
-  reg_config_param (sec, "dma_mode0_tm", paramt_int, ata_dma_mode0_tm);
-  reg_config_param (sec, "dma_mode0_td", paramt_int, ata_dma_mode0_td);
-  reg_config_param (sec, "dma_mode0_teoc", paramt_int, ata_dma_mode0_teoc);
+  reg_config_param (sec, "dma_mode0_tm",   PARAMT_INT, ata_dma_mode0_tm);
+  reg_config_param (sec, "dma_mode0_td",   PARAMT_INT, ata_dma_mode0_td);
+  reg_config_param (sec, "dma_mode0_teoc", PARAMT_INT, ata_dma_mode0_teoc);
 
-  reg_config_param (sec, "device", paramt_int, ata_start_device);
-  reg_config_param (sec, "enddevice", paramt_int, ata_enddevice);
+  reg_config_param (sec, "device",         PARAMT_INT, ata_start_device);
+  reg_config_param (sec, "enddevice",      PARAMT_INT, ata_enddevice);
 
-  reg_config_param (sec, "type", paramt_int, ata_type);
-  reg_config_param (sec, "file", paramt_str, ata_file);
-  reg_config_param (sec, "size", paramt_int, ata_size);
-  reg_config_param (sec, "packet", paramt_int, ata_packet);
-  reg_config_param (sec, "heads", paramt_int, ata_heads);
-  reg_config_param (sec, "sectors", paramt_int, ata_sectors);
-  reg_config_param (sec, "firmware", paramt_str, ata_firmware);
-  reg_config_param (sec, "mwdma", paramt_int, ata_mwdma);
-  reg_config_param (sec, "pio", paramt_int, ata_pio);
+  reg_config_param (sec, "type",           PARAMT_INT, ata_type);
+  reg_config_param (sec, "file",           PARAMT_STR, ata_file);
+  reg_config_param (sec, "size",           PARAMT_INT, ata_size);
+  reg_config_param (sec, "packet",         PARAMT_INT, ata_packet);
+  reg_config_param (sec, "heads",          PARAMT_INT, ata_heads);
+  reg_config_param (sec, "sectors",        PARAMT_INT, ata_sectors);
+  reg_config_param (sec, "firmware",       PARAMT_STR, ata_firmware);
+  reg_config_param (sec, "mwdma",          PARAMT_INT, ata_mwdma);
+  reg_config_param (sec, "pio",            PARAMT_INT, ata_pio);
 }

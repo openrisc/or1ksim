@@ -699,7 +699,7 @@ Or1ksim is configured through a configuration file.  This is specified
 through the `-f' parameter to the Or1ksim command, or passed as a
 string when initializing the Or1ksim library.  If no file is specified,
 the default `sim.cfg' is used.  The file is looked for first in the
-current directory, then in the `$HOME/.or1k' directory of the user.
+current directory, then in the `$HOME/.or1ksim' directory of the user.
 
 * Menu:
 
@@ -729,10 +729,6 @@ File: or1ksim.info,  Node: Configuration File Preprocessing,  Next: Configuratio
 
 The configuration file may include C style comments (i.e.  delimited by
 `/*' and `*/').
-
-Configure files may be included, using
-
-     include FILENAME_TO_INCLUDE
 
 
 File: or1ksim.info,  Node: Configuration File Syntax,  Prev: Configuration File Preprocessing,  Up: Configuration File Format
@@ -4338,43 +4334,43 @@ Node: Profiling Utility14905
 Node: Memory Profiling Utility15815
 Node: Simulator Library17180
 Node: Configuration24958
-Node: Configuration File Format25567
-Node: Configuration File Preprocessing25859
-Node: Configuration File Syntax26230
-Node: Simulator Configuration29015
-Node: Simulator Behavior29306
-Node: Verification API Configuration33835
-Node: CUC Configuration35775
-Node: Core OpenRISC Configuration37692
-Node: CPU Configuration38194
-Node: Memory Configuration42312
-Node: Memory Management Configuration48770
-Node: Cache Configuration51147
-Node: Interrupt Configuration53533
-Node: Power Management Configuration54269
-Node: Branch Prediction Configuration55546
-Node: Debug Interface Configuration56906
-Node: Peripheral Configuration61126
-Node: Memory Controller Configuration61752
-Node: UART Configuration65166
-Node: DMA Configuration68685
-Node: Ethernet Configuration70552
-Node: GPIO Configuration74528
-Node: Display Interface Configuration76161
-Node: Frame Buffer Configuration78470
-Node: Keyboard Configuration80334
-Node: Disc Interface Configuration82572
-Node: Generic Peripheral Configuration87515
-Node: Interactive Command Line89810
-Node: Verification API96784
-Node: Code Internals101214
-Node: Coding Conventions101797
-Node: Global Data Structures106224
-Node: Concepts108881
-Ref: Output Redirection109026
-Node: Internal Debugging109565
-Node: Regression Testing110089
-Node: GNU Free Documentation License113884
-Node: Index136291
+Node: Configuration File Format25570
+Node: Configuration File Preprocessing25862
+Node: Configuration File Syntax26159
+Node: Simulator Configuration28944
+Node: Simulator Behavior29235
+Node: Verification API Configuration33764
+Node: CUC Configuration35704
+Node: Core OpenRISC Configuration37621
+Node: CPU Configuration38123
+Node: Memory Configuration42241
+Node: Memory Management Configuration48699
+Node: Cache Configuration51076
+Node: Interrupt Configuration53462
+Node: Power Management Configuration54198
+Node: Branch Prediction Configuration55475
+Node: Debug Interface Configuration56835
+Node: Peripheral Configuration61055
+Node: Memory Controller Configuration61681
+Node: UART Configuration65095
+Node: DMA Configuration68614
+Node: Ethernet Configuration70481
+Node: GPIO Configuration74457
+Node: Display Interface Configuration76090
+Node: Frame Buffer Configuration78399
+Node: Keyboard Configuration80263
+Node: Disc Interface Configuration82501
+Node: Generic Peripheral Configuration87444
+Node: Interactive Command Line89739
+Node: Verification API96713
+Node: Code Internals101143
+Node: Coding Conventions101726
+Node: Global Data Structures106153
+Node: Concepts108810
+Ref: Output Redirection108955
+Node: Internal Debugging109494
+Node: Regression Testing110018
+Node: GNU Free Documentation License113813
+Node: Index136220
 
 End Tag Table

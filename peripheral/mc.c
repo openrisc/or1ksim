@@ -436,8 +436,8 @@ reg_mc_sec (void)
   struct config_section *sec =
     reg_config_sec ("mc", mc_sec_start, mc_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, mc_enabled);
-  reg_config_param (sec, "baseaddr", paramt_addr, mc_baseaddr);
-  reg_config_param (sec, "POC", paramt_int, mc_poc);
-  reg_config_param (sec, "index", paramt_int, mc_index);
+  reg_config_param (sec, "enabled",  PARAMT_INT, mc_enabled);
+  reg_config_param (sec, "baseaddr", PARAMT_ADDR, mc_baseaddr);
+  reg_config_param (sec, "POC",      PARAMT_INT, mc_poc);
+  reg_config_param (sec, "index",    PARAMT_INT, mc_index);
 }

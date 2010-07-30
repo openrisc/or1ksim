@@ -512,11 +512,11 @@ reg_ic_sec (void)
   struct config_section *sec =
     reg_config_sec ("ic", ic_start_sec, ic_end_sec);
 
-  reg_config_param (sec, "enabled", paramt_int, ic_enabled);
-  reg_config_param (sec, "nsets", paramt_int, ic_nsets);
-  reg_config_param (sec, "nways", paramt_int, ic_nways);
-  reg_config_param (sec, "blocksize", paramt_int, ic_blocksize);
-  reg_config_param (sec, "ustates", paramt_int, ic_ustates);
-  reg_config_param (sec, "missdelay", paramt_int, ic_missdelay);
-  reg_config_param (sec, "hitdelay", paramt_int, ic_hitdelay);
+  reg_config_param (sec, "enabled",   PARAMT_INT, ic_enabled);
+  reg_config_param (sec, "nsets",     PARAMT_INT, ic_nsets);
+  reg_config_param (sec, "nways",     PARAMT_INT, ic_nways);
+  reg_config_param (sec, "blocksize", PARAMT_INT, ic_blocksize);
+  reg_config_param (sec, "ustates",   PARAMT_INT, ic_ustates);
+  reg_config_param (sec, "missdelay", PARAMT_INT, ic_missdelay);
+  reg_config_param (sec, "hitdelay" , PARAMT_INT, ic_hitdelay);
 }

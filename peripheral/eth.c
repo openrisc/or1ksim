@@ -1306,17 +1306,17 @@ reg_ethernet_sec ()
   struct config_section *sec =
     reg_config_sec ("ethernet", eth_sec_start, eth_sec_end);
 
-  reg_config_param (sec, "enabled",    paramt_int,  eth_enabled);
-  reg_config_param (sec, "baseaddr",   paramt_addr, eth_baseaddr);
-  reg_config_param (sec, "dma",        paramt_int,  eth_dma);
-  reg_config_param (sec, "irq",        paramt_int,  eth_irq);
-  reg_config_param (sec, "rtx_type",   paramt_int,  eth_rtx_type);
-  reg_config_param (sec, "rx_channel", paramt_int,  eth_rx_channel);
-  reg_config_param (sec, "tx_channel", paramt_int,  eth_tx_channel);
-  reg_config_param (sec, "rxfile",     paramt_str,  eth_rxfile);
-  reg_config_param (sec, "txfile",     paramt_str,  eth_txfile);
-  reg_config_param (sec, "sockif",     paramt_str,  eth_sockif);
-  reg_config_param (sec, "vapi_id",    paramt_int,  eth_vapi_id);
+  reg_config_param (sec, "enabled",    PARAMT_INT,  eth_enabled);
+  reg_config_param (sec, "baseaddr",   PARAMT_ADDR, eth_baseaddr);
+  reg_config_param (sec, "dma",        PARAMT_INT,  eth_dma);
+  reg_config_param (sec, "irq",        PARAMT_INT,  eth_irq);
+  reg_config_param (sec, "rtx_type",   PARAMT_INT,  eth_rtx_type);
+  reg_config_param (sec, "rx_channel", PARAMT_INT,  eth_rx_channel);
+  reg_config_param (sec, "tx_channel", PARAMT_INT,  eth_tx_channel);
+  reg_config_param (sec, "rxfile",     PARAMT_STR,  eth_rxfile);
+  reg_config_param (sec, "txfile",     PARAMT_STR,  eth_txfile);
+  reg_config_param (sec, "sockif",     PARAMT_STR,  eth_sockif);
+  reg_config_param (sec, "vapi_id",    PARAMT_INT,  eth_vapi_id);
 
 }	/* reg_ethernet_sec() */
 

@@ -547,9 +547,9 @@ reg_fb_sec ()
   struct config_section *sec =
     reg_config_sec ("fb", fb_sec_start, fb_sec_end);
 
-  reg_config_param (sec, "baseaddr", paramt_addr, fb_baseaddr);
-  reg_config_param (sec, "enabled", paramt_int, fb_enabled);
-  reg_config_param (sec, "refresh_rate", paramt_int, fb_refresh_rate);
-  reg_config_param (sec, "txfile", paramt_str, fb_filename);
-  reg_config_param (sec, "filename", paramt_str, fb_filename);
+  reg_config_param (sec, "baseaddr",     PARAMT_ADDR, fb_baseaddr);
+  reg_config_param (sec, "enabled",      PARAMT_INT,  fb_enabled);
+  reg_config_param (sec, "refresh_rate", PARAMT_INT,  fb_refresh_rate);
+  reg_config_param (sec, "txfile",       PARAMT_STR,  fb_filename);
+  reg_config_param (sec, "filename",     PARAMT_STR,  fb_filename);
 }

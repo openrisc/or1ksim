@@ -450,12 +450,12 @@ reg_vga_sec ()
   struct config_section *sec =
     reg_config_sec ("vga", vga_sec_start, vga_sec_end);
 
-  reg_config_param (sec, "baseaddr", paramt_addr, vga_baseaddr);
-  reg_config_param (sec, "enabled", paramt_int, vga_enabled);
-  reg_config_param (sec, "irq", paramt_int, vga_irq);
-  reg_config_param (sec, "refresh_rate", paramt_int, vga_refresh_rate);
-  reg_config_param (sec, "txfile", paramt_str, vga_filename);
-  reg_config_param (sec, "filename", paramt_str, vga_filename);
+  reg_config_param (sec, "baseaddr",     PARAMT_ADDR, vga_baseaddr);
+  reg_config_param (sec, "enabled",      PARAMT_INT, vga_enabled);
+  reg_config_param (sec, "irq",          PARAMT_INT, vga_irq);
+  reg_config_param (sec, "refresh_rate", PARAMT_INT, vga_refresh_rate);
+  reg_config_param (sec, "txfile",       PARAMT_STR, vga_filename);
+  reg_config_param (sec, "filename",     PARAMT_STR, vga_filename);
 
 }	/* reg_vga_sec() */
 

@@ -558,12 +558,12 @@ reg_dmmu_sec (void)
   struct config_section *sec = reg_config_sec ("dmmu", dmmu_start_sec,
 					       dmmu_end_sec);
 
-  reg_config_param (sec, "enabled", paramt_int, dmmu_enabled);
-  reg_config_param (sec, "nsets", paramt_int, dmmu_nsets);
-  reg_config_param (sec, "nways", paramt_int, dmmu_nways);
-  reg_config_param (sec, "pagesize", paramt_int, dmmu_pagesize);
-  reg_config_param (sec, "entrysize", paramt_int, dmmu_entrysize);
-  reg_config_param (sec, "ustates", paramt_int, dmmu_ustates);
-  reg_config_param (sec, "hitdelay", paramt_int, dmmu_hitdelay);
-  reg_config_param (sec, "missdelay", paramt_int, dmmu_missdelay);
+  reg_config_param (sec, "enabled",   PARAMT_INT, dmmu_enabled);
+  reg_config_param (sec, "nsets",     PARAMT_INT, dmmu_nsets);
+  reg_config_param (sec, "nways",     PARAMT_INT, dmmu_nways);
+  reg_config_param (sec, "pagesize",  PARAMT_INT, dmmu_pagesize);
+  reg_config_param (sec, "entrysize", PARAMT_INT, dmmu_entrysize);
+  reg_config_param (sec, "ustates",   PARAMT_INT, dmmu_ustates);
+  reg_config_param (sec, "hitdelay",  PARAMT_INT, dmmu_hitdelay);
+  reg_config_param (sec, "missdelay", PARAMT_INT, dmmu_missdelay);
 }

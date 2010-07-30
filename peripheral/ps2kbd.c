@@ -757,8 +757,8 @@ reg_kbd_sec ()
   struct config_section *sec =
     reg_config_sec ("kbd", kbd_sec_start, kbd_sec_end);
 
-  reg_config_param (sec, "baseaddr", paramt_addr, kbd_baseaddr);
-  reg_config_param (sec, "enabled", paramt_int, kbd_enabled);
-  reg_config_param (sec, "irq", paramt_int, kbd_irq);
-  reg_config_param (sec, "rxfile", paramt_str, kbd_rxfile);
+  reg_config_param (sec, "baseaddr", PARAMT_ADDR, kbd_baseaddr);
+  reg_config_param (sec, "enabled",  PARAMT_INT, kbd_enabled);
+  reg_config_param (sec, "irq",      PARAMT_INT, kbd_irq);
+  reg_config_param (sec, "rxfile",   PARAMT_STR, kbd_rxfile);
 }

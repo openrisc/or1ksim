@@ -530,12 +530,12 @@ reg_immu_sec (void)
   struct config_section *sec = reg_config_sec ("immu", immu_start_sec,
 					       immu_end_sec);
 
-  reg_config_param (sec, "enabled", paramt_int, immu_enabled);
-  reg_config_param (sec, "nsets", paramt_int, immu_nsets);
-  reg_config_param (sec, "nways", paramt_int, immu_nways);
-  reg_config_param (sec, "pagesize", paramt_int, immu_pagesize);
-  reg_config_param (sec, "entrysize", paramt_int, immu_entrysize);
-  reg_config_param (sec, "ustates", paramt_int, immu_ustates);
-  reg_config_param (sec, "missdelay", paramt_int, immu_missdelay);
-  reg_config_param (sec, "hitdelay", paramt_int, immu_hitdelay);
+  reg_config_param (sec, "enabled",   PARAMT_INT, immu_enabled);
+  reg_config_param (sec, "nsets",     PARAMT_INT, immu_nsets);
+  reg_config_param (sec, "nways",     PARAMT_INT, immu_nways);
+  reg_config_param (sec, "pagesize",  PARAMT_INT, immu_pagesize);
+  reg_config_param (sec, "entrysize", PARAMT_INT, immu_entrysize);
+  reg_config_param (sec, "ustates",   PARAMT_INT, immu_ustates);
+  reg_config_param (sec, "missdelay", PARAMT_INT, immu_missdelay);
+  reg_config_param (sec, "hitdelay",  PARAMT_INT, immu_hitdelay);
 }

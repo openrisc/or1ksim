@@ -1103,12 +1103,12 @@ reg_debug_sec ()
 {
   struct config_section *sec = reg_config_sec ("debug", NULL, NULL);
 
-  reg_config_param (sec, "enabled",     paramt_int, debug_enabled);
-  reg_config_param (sec, "gdb_enabled", paramt_int, debug_gdb_enabled);
-  reg_config_param (sec, "rsp_enabled", paramt_int, debug_rsp_enabled);
-  reg_config_param (sec, "server_port", paramt_int, debug_server_port);
-  reg_config_param (sec, "rsp_port",    paramt_int, debug_rsp_port);
-  reg_config_param (sec, "vapi_id",     paramt_int, debug_vapi_id);
+  reg_config_param (sec, "enabled",     PARAMT_INT, debug_enabled);
+  reg_config_param (sec, "gdb_enabled", PARAMT_INT, debug_gdb_enabled);
+  reg_config_param (sec, "rsp_enabled", PARAMT_INT, debug_rsp_enabled);
+  reg_config_param (sec, "server_port", PARAMT_INT, debug_server_port);
+  reg_config_param (sec, "rsp_port",    PARAMT_INT, debug_rsp_port);
+  reg_config_param (sec, "vapi_id",     PARAMT_INT, debug_vapi_id);
 
 }	/* reg_debug_sec () */
 

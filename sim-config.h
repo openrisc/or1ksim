@@ -252,12 +252,12 @@ union param_val
 /*! Enum of all possible paramter types */
 enum param_t
 {
-  paramt_none = 0,		/* No parameter */
-  paramt_str,			/* String parm enclosed in double quotes (") */
-  paramt_word,			/* String parm NOT enclosed in double quotes */
-  paramt_int,			/* Integer parameter */
-  paramt_longlong,		/* Long long int parameter */
-  paramt_addr			/* Address parameter */
+  PARAMT_NONE = 0,		/* No parameter */
+  PARAMT_STR,			/* String parm enclosed in double quotes (") */
+  PARAMT_WORD,			/* String parm NOT enclosed in double quotes */
+  PARAMT_INT,			/* Integer parameter */
+  PARAMT_LONGLONG,		/* Long long int parameter */
+  PARAMT_ADDR			/* Address parameter */
 };
 
 /* Generic structure for a configuration section */

@@ -783,10 +783,10 @@ reg_vapi_sec (void)
 {
   struct config_section *sec = reg_config_sec ("VAPI", NULL, NULL);
 
-  reg_config_param (sec, "enabled", paramt_int, vapi_enabled);
-  reg_config_param (sec, "server_port", paramt_int, vapi_server_port);
-  reg_config_param (sec, "log_enabled", paramt_int, vapi_log_enabled);
-  reg_config_param (sec, "hide_device_id", paramt_int, vapi_hide_device_id);
-  reg_config_param (sec, "vapi_log_file", paramt_str, vapi_log_fn);
-  reg_config_param (sec, "vapi_log_fn", paramt_str, vapi_log_fn);
+  reg_config_param (sec, "enabled",        PARAMT_INT, vapi_enabled);
+  reg_config_param (sec, "server_port",    PARAMT_INT, vapi_server_port);
+  reg_config_param (sec, "log_enabled",    PARAMT_INT, vapi_log_enabled);
+  reg_config_param (sec, "hide_device_id", PARAMT_INT, vapi_hide_device_id);
+  reg_config_param (sec, "vapi_log_file",  PARAMT_STR, vapi_log_fn);
+  reg_config_param (sec, "vapi_log_fn",    PARAMT_STR, vapi_log_fn);
 }

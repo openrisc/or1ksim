@@ -84,6 +84,6 @@ reg_pm_sec ()
 {
   struct config_section *sec = reg_config_sec ("pm", NULL, NULL);
 
-  reg_config_param (sec, "enabled", paramt_int, pm_enabled);
+  reg_config_param (sec, "enabled", PARAMT_INT, pm_enabled);
 
 }				/* reg_pm_sec() */

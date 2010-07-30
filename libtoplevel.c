@@ -36,10 +36,14 @@
 #include "or1ksim.h"
 #include "sim-config.h"
 #include "toplevel-support.h"
+#include "debug-unit.h"
 #include "sched.h"
 #include "execute.h"
 #include "pic.h"
 #include "jtag.h"
+#include "spr-defs.h"
+#include "sprs.h"
+
 
 /* Indices of GDB registers that are not GPRs. Must match GDB settings! */
 #define MAX_GPRS    32			/*!< Maximum GPRs */
@@ -232,27 +236,6 @@ or1ksim_run (double duration)
   return  OR1KSIM_RC_OK;
 
 }	/* or1ksim_run () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Step the simulator
-
-   This is just a wrapper for the run function, specifying a time
-   corresponding to a single cycle. This will in fact mean that a single
-   instruction is executed, even if takes more than one cycle to execute.
-
-   @todo What happens if an event is triggered - that may mean multiple
-         instructions.
-
-   @return  OR1KSIM_RC_OK if we step to completion, OR1KSIM_RC_BRKPT if we hit
-            a breakpoint (not clear how this can be set without CLI access)  */
-/*---------------------------------------------------------------------------*/
-int
-or1ksim_step ()
-{
-  return  or1ksim_run ((double) config.sim.clkcycle_ps / 1e12);
-
-}	/* or1ksim_step () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -535,15 +518,15 @@ or1ksim_jtag_shift_dr (unsigned char *jreg,
 /*---------------------------------------------------------------------------*/
 /*!Read a block of memory.
 
-   @param[out] buf   Where to put the data.
    @param[in]  addr  The address to read from.
+   @param[out] buf   Where to put the data.
    @param[in]  len   The number of bytes to read.
 
    @return  Number of bytes read, or zero if error.                          */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_read_mem (unsigned char *buf,
-		  unsigned int   addr,
+or1ksim_read_mem (unsigned int   addr,
+		  unsigned char *buf,
 		  int            len)
 {
   int             off;			/* Offset into the memory */
@@ -572,15 +555,15 @@ or1ksim_read_mem (unsigned char *buf,
 /*---------------------------------------------------------------------------*/
 /*!Write a block of memory.
 
-   @param[in] buf   Where to get the data from.
    @param[in] addr  The address to write to.
+   @param[in] buf   Where to get the data from.
    @param[in] len   The number of bytes to write.
 
    @return  Number of bytes written, or zero if error.                       */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_mem (unsigned char *buf,
-		   unsigned int   addr,
+or1ksim_write_mem (unsigned int   addr,
+		   unsigned char *buf,
 		   int            len)
 {
   int             off;			/* Offset into the memory */
@@ -607,54 +590,88 @@ or1ksim_write_mem (unsigned char *buf,
 
 
 /*---------------------------------------------------------------------------*/
+/*!Read a SPR
+
+   @param[in]  sprnum      The SPR to read.
+   @param[out] sprval_ptr  Where to put the data.
+
+   @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_read_spr (int            sprnum,
+		  unsigned int  *sprval_ptr)
+{
+  /* SPR numbers are up to 16 bits long */
+  if ((unsigned int) sprnum <= 0xffff)
+    {
+      *sprval_ptr = (unsigned int) mfspr ((uint16_t) sprnum);
+      return  1;
+    }
+  else
+    {
+      return  0;			/* Silent failure */
+    }
+}	/* or1skim_read_spr () */
+
+    
+/*---------------------------------------------------------------------------*/
+/*!Write a SPR
+
+   @param[in] sprnum  The SPR to write.
+   @param[in] sprval  The data to write.
+
+   @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
+/*---------------------------------------------------------------------------*/
+int
+or1ksim_write_spr (int           sprnum,
+		   unsigned int  sprval)
+{
+  /* SPR numbers are up to 16 bits long */
+  if ((unsigned int) sprnum <= 0xffff)
+    {
+      mtspr ((uint16_t) sprnum, sprval);
+      return  1;
+    }
+  else
+    {
+      return  0;			/* Silent failure */
+    }
+}	/* or1ksim_write_spr () */
+
+    
+/*---------------------------------------------------------------------------*/
 /*!Read a single register
 
    The registers follow the GDB sequence for OR1K: GPR0 through GPR31, PC
    (i.e. SPR NPC) and SR (i.e. SPR SR).
 
-   @param[out] buf     Where to put the data.
-   @param[in]  regnum  The register to read.
-   @param[in]  len     Size of the register in bytes
+   Map to the corresponding SPR.
 
-   @return  Size of the register, or zero if error.                          */
+   @param[in]  regnum      The register to read.
+   @param[out] regval_ptr  Where to put the data.
+
+   @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_read_reg (unsigned char *buf,
-		  int            regnum,
-		  int            len)
+or1ksim_read_reg (int            regnum,
+		  unsigned int  *regval_ptr)
 {
-  unsigned long int *regbuf = (unsigned long *) buf;
-
-  if (4 != len)
-    {
-      return  0;			/* Not 32-bit reg */
-    }
-
-  /* Get the relevant register */
+  /* GPR's */
   if (regnum < MAX_GPRS)
     {
-      *regbuf = cpu_state.reg[regnum];
+      return or1ksim_read_spr (regnum + SPR_GPR_BASE, regval_ptr);
     }
-  else if (PPC_REGNUM == regnum)
+
+  /* SPR's or unknown */
+  switch (regnum)
     {
-      *regbuf = cpu_state.sprs[SPR_PPC];
-    }
-  else if (NPC_REGNUM == regnum)
-    {
-      *regbuf = cpu_state.pc;
-    }
-  else if (SR_REGNUM == regnum)
-    {
-      *regbuf = cpu_state.sprs[SPR_SR];
-    }
-  else
-    {
+    case PPC_REGNUM: return or1ksim_read_spr (SPR_PPC, regval_ptr);
+    case NPC_REGNUM: return or1ksim_read_spr (SPR_NPC, regval_ptr);
+    case SR_REGNUM:  return or1ksim_read_spr (SPR_SR, regval_ptr);
+    default:
       /* Silent error response if we don't know the register */
       return  0;
     }
-
-  return  len;
-
 }	/* or1ksim_read_reg () */
 
     
@@ -662,60 +679,46 @@ or1ksim_read_reg (unsigned char *buf,
 /*!Write a single register
 
    The registers follow the GDB sequence for OR1K: GPR0 through GPR31, PC
-   (i.e. SPR NPC) and SR (i.e. SPR SR). The register is specified as a
-   sequence of bytes in target endian order.
+   (i.e. SPR NPC) and SR (i.e. SPR SR).
 
-   Each byte is packed as a pair of hex digits.
+   Map to the corresponding SPR
 
-   @param[in] buf     Where to get the data from.
+   @param[in] regval  The register to write.
    @param[in] regnum  The register to write.
-   @param[in]  len     Size of the register in bytes
 
-   @return  Size of the register, or zero if error.                          */
+   @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_reg (unsigned char *buf,
-		   int            regnum,
-		   int            len)
+or1ksim_write_reg (int           regnum,
+		   unsigned int  regval)
 {
-  unsigned long int *regbuf = (unsigned long *) buf;
-  unsigned long int  regval = *regbuf;
-
-  if (4 != len)
-    {
-      return  0;			/* Not 32-bit reg */
-    }
-
-  /* Set the relevant register */
+  /* GPR's */
   if (regnum < MAX_GPRS)
     {
-      cpu_state.reg[regnum] =regval;
+      return or1ksim_write_spr (regnum + SPR_GPR_BASE, regval);
     }
-  else if (PPC_REGNUM == regnum)
+
+  /* SPR's or unknown */
+  switch (regnum)
     {
-      cpu_state.sprs[SPR_PPC] = regval;
-    }
-  else if (NPC_REGNUM == regnum)
-    {
-      if (cpu_state.pc != regval)
-	{
-	  cpu_state.pc         = regval;
-	  cpu_state.delay_insn = 0;
-	  pcnext               = regval + 4;
-	}
-    }
-  else if (SR_REGNUM == regnum)
-    {
-      cpu_state.sprs[SPR_SR] = regval;
-    }
-  else
-    {
+    case PPC_REGNUM: return or1ksim_write_spr (SPR_PPC, regval);
+    case NPC_REGNUM: return or1ksim_write_spr (SPR_NPC, regval);
+    case SR_REGNUM:  return or1ksim_write_spr (SPR_SR,  regval);
+    default:
       /* Silent error response if we don't know the register */
       return  0;
     }
-
-  return  len;
-
 }	/* or1ksim_write_reg () */
 
     
+/*---------------------------------------------------------------------------*/
+/*!Set the simulator stall state.
+
+   @param[in] state  The stall state to set.                                 */
+/*---------------------------------------------------------------------------*/
+void
+or1ksim_set_stall_state (int  state)
+{
+  set_stall_state (state ? 1 : 0);
+
+}	/* or1ksim_set_stall_state () */

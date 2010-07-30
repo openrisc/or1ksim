@@ -1334,13 +1334,13 @@ reg_uart_sec (void)
   struct config_section *sec = reg_config_sec ("uart", uart_sec_start,
 					       uart_sec_end);
 
-  reg_config_param (sec, "enabled", paramt_int, uart_enabled);
-  reg_config_param (sec, "baseaddr", paramt_addr, uart_baseaddr);
-  reg_config_param (sec, "irq", paramt_int, uart_irq);
-  reg_config_param (sec, "16550", paramt_int, uart_16550);
-  reg_config_param (sec, "jitter", paramt_int, uart_jitter);
-  reg_config_param (sec, "channel", paramt_str, uart_channel);
-  reg_config_param (sec, "txfile", paramt_str, uart_newway);
-  reg_config_param (sec, "rxfile", paramt_str, uart_newway);
-  reg_config_param (sec, "vapi_id", paramt_int, uart_vapi_id);
+  reg_config_param (sec, "enabled",  PARAMT_INT, uart_enabled);
+  reg_config_param (sec, "baseaddr", PARAMT_ADDR, uart_baseaddr);
+  reg_config_param (sec, "irq",      PARAMT_INT, uart_irq);
+  reg_config_param (sec, "16550",    PARAMT_INT, uart_16550);
+  reg_config_param (sec, "jitter",   PARAMT_INT, uart_jitter);
+  reg_config_param (sec, "channel",  PARAMT_STR, uart_channel);
+  reg_config_param (sec, "txfile",   PARAMT_STR, uart_newway);
+  reg_config_param (sec, "rxfile",   PARAMT_STR, uart_newway);
+  reg_config_param (sec, "vapi_id",  PARAMT_INT, uart_vapi_id);
 }

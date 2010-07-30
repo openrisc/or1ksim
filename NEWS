@@ -8,6 +8,17 @@ New in top of tree
 The library interface is extended to allow registers and memory to be written
 directly. This is to allow direct integration as a simulator in GDB.
 
+The "include" feature of configuration files (which never worked, but no one
+ever noticed) is dropped.
+
+If the configuration file is not found in the local directory, it is searched
+for in the ${HOME}/.or1ksim directory, then (for backwards compatibility) the
+${HOME}/.or1k directory.
+
+There is an option to collect statistics on instruction execution in binary
+form.
+
+
 The following bugs are fixed.
 * Bug 1797: Or1ksim does not compile with GCC 3.4.4 under Cygwin
 * Bug 1795: GDB breakpoints do not work with Icache enabled.
