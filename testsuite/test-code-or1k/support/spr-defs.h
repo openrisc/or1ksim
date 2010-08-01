@@ -41,7 +41,6 @@
 #define SPRGROUP_PM	(8<< MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_PIC	(9<< MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_TT	(10<< MAX_SPRS_PER_GRP_BITS)
-#define SPRGROUP_FPU	(11<< MAX_SPRS_PER_GRP_BITS)
 
 /* System control and status group */
 #define SPR_VR		(SPRGROUP_SYS + 0)
@@ -124,9 +123,6 @@
 /* Tick Timer group */
 #define SPR_TTMR (SPRGROUP_TT + 0)
 #define SPR_TTCR (SPRGROUP_TT + 1)
-
-/* FPU group */
-#define SPR_FPCSR       (SPRGROUP_FPU + 0)
 
 /*
  * Bit definitions for the Version Register
@@ -540,33 +536,6 @@
 #define SPR_TTMR_SR     0x80000000  /* Single run */
 #define SPR_TTMR_CR     0xc0000000  /* Continuous run */
 #define SPR_TTMR_M      0xc0000000  /* Tick mode */
-
-/*
- * Bit definitions for the FP Control Status Register
- *
- */
-#define SPR_FPCSR_FPEE  0x00000001  /* Floating Point Exception Enable */
-#define SPR_FPCSR_RM    0x00000006  /* Rounding Mode */
-#define SPR_FPCSR_OVF   0x00000008  /* Overflow Flag */
-#define SPR_FPCSR_UNF   0x00000010  /* Underflow Flag */
-#define SPR_FPCSR_SNF   0x00000020  /* SNAN Flag */
-#define SPR_FPCSR_QNF   0x00000040  /* QNAN Flag */
-#define SPR_FPCSR_ZF    0x00000080  /* Zero Flag */
-#define SPR_FPCSR_IXF   0x00000100  /* Inexact Flag */
-#define SPR_FPCSR_IVF   0x00000200  /* Invalid Flag */
-#define SPR_FPCSR_INF   0x00000400  /* Infinity Flag */
-#define SPR_FPCSR_DZF   0x00000800  /* Divide By Zero Flag */
-#define SPR_FPCSR_ALLF (SPR_FPCSR_OVF | SPR_FPCSR_UNF | SPR_FPCSR_SNF | \
-			SPR_FPCSR_QNF | SPR_FPCSR_ZF | SPR_FPCSR_IXF |  \
-			SPR_FPCSR_IVF | SPR_FPCSR_INF | SPR_FPCSR_DZF)
-			
-
-
-#define FPCSR_RM_RN (0<<1)
-#define FPCSR_RM_RZ (1<<1)
-#define FPCSR_RM_RIP (2<<1)
-#define FPCSR_RM_RIN (3<<1)
-
 
 /*
  * l.nop constants

@@ -334,7 +334,7 @@ printstats (int which)
 
       for (i = 0; i < SSTATS_LEN; i++)
 	if (sstats[i].cnt_dynamic)
-	  PRINTF ("  %-15s used %6dx (%5.1f%%)\n", insn_name (sstats[i].insn),
+	  PRINTF ("  %-15s used %6dx (%5.1f%%)\n", or1ksim_insn_name (sstats[i].insn),
 		  sstats[i].cnt_dynamic,
 		  (sstats[i].cnt_dynamic * 100.) / SD (all));
 
@@ -353,8 +353,8 @@ printstats (int which)
 	if (dstats[i].cnt_dynamic)
 	  {
 	    char temp[100];
-	    sprintf (temp, "%s, %s ", insn_name (dstats[i].insn1),
-		     insn_name (dstats[i].insn2));
+	    sprintf (temp, "%s, %s ", or1ksim_insn_name (dstats[i].insn1),
+		     or1ksim_insn_name (dstats[i].insn2));
 	    PRINTF ("  %-30s %6dx (%5.1f%%)", temp, dstats[i].cnt_dynamic,
 		    (dstats[i].cnt_dynamic * 100.) / SD (all));
 	    PRINTF ("   depend: %5.1f%%\n",

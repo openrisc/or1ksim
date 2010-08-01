@@ -55,7 +55,6 @@
 #include "sprs.h"
 #include "rsp-server.h"
 #include <fenv.h> // Floating point environment for FPU instructions
-#include "execute-fp.h"
 
 /* Includes and macros for simple execution */
 #if SIMPLE_EXECUTION
@@ -108,15 +107,8 @@ static int sbuf_prev_cycles = 0;
 static int  breakpoint;
 static int  next_delay_insn;
 
-/* Functions to configure the host machine's FPU before doing simulated OR1k
-   FP ops, handle flags and restore things when it's done. One for before and
-   one for afterwards.
-*/
-void fp_set_or1k_rm(void);
-void fp_set_flags_restore_host_rm(void);
-
 /* A place to store the host's FPU rounding mode while OR1k's is used */
-int host_fp_rm;
+static int host_fp_rm;
 
 /* Forward declaration of static functions */
 #if !(DYNAMIC_EXECUTION)
@@ -269,13 +261,13 @@ check_depend (struct iqueue_entry *prev,
   orreg_t                prev_reg_val = 0;
   struct insn_op_struct *opd;
 
-  if (or32_opcodes[prev->insn_index].flags & OR32_W_FLAG
-      && or32_opcodes[next->insn_index].flags & OR32_R_FLAG)
+  if (or1ksim_or32_opcodes[prev->insn_index].flags & OR32_W_FLAG
+      && or1ksim_or32_opcodes[next->insn_index].flags & OR32_R_FLAG)
     {
       return  1;
     }
 
-  opd      = op_start[prev->insn_index];
+  opd      = or1ksim_op_start[prev->insn_index];
   prev_dis = 0;
 
   while (1)
@@ -313,7 +305,7 @@ check_depend (struct iqueue_entry *prev,
     }
 
   /* We search all source operands - if we find confict => return 1 */
-  opd      = op_start[next->insn_index];
+  opd      = or1ksim_op_start[next->insn_index];
   next_dis = 0;
 
   while (1)
@@ -428,8 +420,8 @@ analysis (struct iqueue_entry *current)
 		 check_depend (&cpu_state.icomplet, current));
 
       /* Dynamic, functional units stats. */
-      addfstats (or32_opcodes[cpu_state.icomplet.insn_index].func_unit,
-		 or32_opcodes[current->insn_index].func_unit, 1,
+      addfstats (or1ksim_or32_opcodes[cpu_state.icomplet.insn_index].func_unit,
+		 or1ksim_or32_opcodes[current->insn_index].func_unit, 1,
 		 check_depend (&cpu_state.icomplet, current));
 
       /* Dynamic, single stats. */
@@ -438,18 +430,18 @@ analysis (struct iqueue_entry *current)
 
   if (config.cpu.superscalar)
     {
-      if ((or32_opcodes[current->insn_index].func_unit == it_branch) ||
-	  (or32_opcodes[current->insn_index].func_unit == it_jump))
+      if ((or1ksim_or32_opcodes[current->insn_index].func_unit == it_branch) ||
+	  (or1ksim_or32_opcodes[current->insn_index].func_unit == it_jump))
 	runtime.sim.storecycles += 0;
 
-      if (or32_opcodes[current->insn_index].func_unit == it_store)
+      if (or1ksim_or32_opcodes[current->insn_index].func_unit == it_store)
 	runtime.sim.storecycles += 1;
 
-      if (or32_opcodes[current->insn_index].func_unit == it_load)
+      if (or1ksim_or32_opcodes[current->insn_index].func_unit == it_load)
 	runtime.sim.loadcycles += 1;
 
       /* Pseudo multiple issue benchmark */
-      if ((multissue[or32_opcodes[current->insn_index].func_unit] < 1) ||
+      if ((multissue[or1ksim_or32_opcodes[current->insn_index].func_unit] < 1) ||
 	  (check_depend (&cpu_state.icomplet, current))
 	  || (issued_per_cycle < 1))
 	{
@@ -473,7 +465,7 @@ analysis (struct iqueue_entry *current)
 	  multissue[it_store] = 2;
 	  multissue[it_load] = 2;
 	}
-      multissue[or32_opcodes[current->insn_index].func_unit]--;
+      multissue[or1ksim_or32_opcodes[current->insn_index].func_unit]--;
       issued_per_cycle--;
     }
 
@@ -651,7 +643,7 @@ dump_exe_log ()
 
 	case EXE_LOG_SIMPLE:
 	case EXE_LOG_SOFTWARE:
-	  disassemble_index (cpu_state.iqueue.insn,
+	  or1ksim_disassemble_index (cpu_state.iqueue.insn,
 			     cpu_state.iqueue.insn_index);
 
 	  entry = get_label (insn_addr);
@@ -663,7 +655,7 @@ dump_exe_log ()
 	  if (config.sim.exe_log_type == EXE_LOG_SOFTWARE)
 	    {
 	      struct insn_op_struct *opd =
-		op_start[cpu_state.iqueue.insn_index];
+		or1ksim_op_start[cpu_state.iqueue.insn_index];
 
 	      j = 0;
 	      while (1)
@@ -698,7 +690,7 @@ dump_exe_log ()
 		    }
 		  opd++;
 		}
-	      if (or32_opcodes[cpu_state.iqueue.insn_index].flags & OR32_R_FLAG)
+	      if (or1ksim_or32_opcodes[cpu_state.iqueue.insn_index].flags & OR32_R_FLAG)
 		{
 		  fprintf (runtime.sim.fexe_log, "SR =%" PRIxREG " ",
 			   cpu_state.sprs[SPR_SR]);
@@ -711,7 +703,7 @@ dump_exe_log ()
 		}
 	    }
 	  fprintf (runtime.sim.fexe_log, "%" PRIxADDR " ", insn_addr);
-	  fprintf (runtime.sim.fexe_log, "%s\n", disassembled);
+	  fprintf (runtime.sim.fexe_log, "%s\n", or1ksim_disassembled);
 	}
     }
 }	/* dump_exe_log() */
@@ -1069,7 +1061,8 @@ exec_main ()
    ensure the OR1K's rounding mode is installed in the host
                                                                              */
 /*---------------------------------------------------------------------------*/
- void fp_set_or1k_rm(void)
+static void
+fp_set_or1k_rm(void)
  {
    // Set OR1K's RM in host machine
    // First save host RM to restore it later
@@ -1103,7 +1096,8 @@ exec_main ()
   rounding mode.
                                                                              */
 /*---------------------------------------------------------------------------*/
-void fp_set_flags_restore_host_rm(void)
+static void
+fp_set_flags_restore_host_rm(void)
  {
    // Check FP flags on host, convert to OR1K FPCSR bits
    // First clear all flags in OR1K FPCSR
@@ -1151,7 +1145,7 @@ eval_operand (int            op_no,
 	      unsigned long  insn_index,
 	      uint32_t       insn)
 {
-  struct insn_op_struct *opd = op_start[insn_index];
+  struct insn_op_struct *opd = or1ksim_op_start[insn_index];
   uorreg_t               ret;
 
   while (op_no)
@@ -1213,7 +1207,7 @@ set_operand (int            op_no,
 	     unsigned long  insn_index,
 	     uint32_t       insn)
 {
-  struct insn_op_struct *opd = op_start[insn_index];
+  struct insn_op_struct *opd = or1ksim_op_start[insn_index];
 
   while (op_no)
     {
@@ -1255,7 +1249,7 @@ decode_execute (struct iqueue_entry *current)
 {
   int insn_index;
 
-  current->insn_index = insn_index = insn_decode (current->insn);
+  current->insn_index = insn_index = or1ksim_insn_decode (current->insn);
 
   if (insn_index < 0)
     {
@@ -1263,7 +1257,7 @@ decode_execute (struct iqueue_entry *current)
     }
   else
     {
-      or32_opcodes[insn_index].exec (current);
+      or1ksim_or32_opcodes[insn_index].exec (current);
     }
 
   if (do_stats)

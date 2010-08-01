@@ -225,7 +225,7 @@ sim_init ()
   init_labels ();
   init_breakpoints ();
   initstats ();
-  build_automata (config.sim.quiet);
+  or1ksim_build_automata (config.sim.quiet);
 
 #if DYNAMIC_EXECUTION
   /* Note: This must be called before the scheduler is used */

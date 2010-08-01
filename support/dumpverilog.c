@@ -104,7 +104,7 @@ dumpverilog (char *verilog_modname, oraddr_t from, oraddr_t to)
       if (!(i & 3))
 	{
 	  insn = eval_direct32 (i, 0, 0);
-	  index = insn_decode (insn);
+	  index = or1ksim_insn_decode (insn);
 	  if (index >= 0)
 	    {
 	      if (verify_memoryarea (i) && (tmp = get_label (i)))
@@ -114,15 +114,15 @@ dumpverilog (char *verilog_modname, oraddr_t from, oraddr_t to)
 	      PRINTF ("\n\tmem['h%x] = %d'h%.8" PRIx32 ";", i / DWQ, DW,
 		      eval_direct32 (i, 0, 0));
 
-	      disassemble_insn (insn);
-	      strcpy (dis, disassembled);
+	      or1ksim_disassemble_insn (insn);
+	      strcpy (dis, or1ksim_disassembled);
 
 	      if (strlen (dis) < DISWIDTH)
 		memset (dis + strlen (dis), ' ', DISWIDTH);
 	      dis[DISWIDTH] = '\0';
 	      PRINTF ("\n\tdis['h%x] = {\"%s\"};", i / DWQ, dis);
 	      dis[0] = '\0';
-	      i += insn_len (index) - 1;
+	      i += or1ksim_insn_len (index) - 1;
 	      done = 1;
 	      continue;
 	    }
@@ -170,11 +170,11 @@ dumphex (oraddr_t from, oraddr_t to)
       if (!(i & 3))
 	{
 	  insn = eval_direct32 (i, 0, 0);
-	  index = insn_decode (insn);
+	  index = or1ksim_insn_decode (insn);
 	  if (index >= 0)
 	    {
 	      PRINTF ("%.8" PRIx32 "\n", eval_direct32 (i, 0, 0));
-	      i += insn_len (index) - 1;
+	      i += or1ksim_insn_len (index) - 1;
 	      continue;
 	    }
 	}

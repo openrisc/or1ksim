@@ -185,14 +185,14 @@ bits (uint32_t val)
 static void
 check_insn (uint32_t insn)
 {
-  int insn_index = insn_decode (insn);
-  struct insn_op_struct *opd = op_start[insn_index];
+  int insn_index = or1ksim_insn_decode (insn);
+  struct insn_op_struct *opd = or1ksim_op_start[insn_index];
   uint32_t data = 0;
   int dis = 0;
   const char *name;
   if (!insn || insn_index < 0)
     return;
-  name = insn_name (insn_index);
+  name = or1ksim_insn_name (insn_index);
   if (strcmp (name, "l.nop") == 0 || strcmp (name, "l.sys") == 0)
     return;
 
@@ -237,7 +237,7 @@ check_insn (uint32_t insn)
 		{
 		  data |= movhi;
 		  //PRINTF ("%08x %s\n", data, name);
-		  if (!(or32_opcodes[insn_index].flags & OR32_IF_DELAY))
+		  if (!(or1ksim_or32_opcodes[insn_index].flags & OR32_IF_DELAY))
 		    {
 		      bcnt[bits (data)][0]++;
 		      bsum[0]++;
@@ -301,7 +301,7 @@ addprogram (oraddr_t  address,
 
   if (runtime.sim.filename)
     {
-      freemem += insn_len (insn_decode (insn));
+      freemem += or1ksim_insn_len (or1ksim_insn_decode (insn));
     }
 }	/* addprogram () */
 
@@ -384,7 +384,7 @@ readfile_coff (char  *filename,
 	     && (len = fread (&inputbuf, sizeof (inputbuf), 1, inputfs)))
 	{
 	  insn = COFF_LONG_H (inputbuf);
-	  len = insn_len (insn_decode (insn));
+	  len = or1ksim_insn_len (or1ksim_insn_decode (insn));
 	  if (len == 2)
 	    {
 	      fseek (inputfs, -2, SEEK_CUR);

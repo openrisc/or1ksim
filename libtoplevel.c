@@ -525,9 +525,9 @@ or1ksim_jtag_shift_dr (unsigned char *jreg,
    @return  Number of bytes read, or zero if error.                          */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_read_mem (unsigned int   addr,
-		  unsigned char *buf,
-		  int            len)
+or1ksim_read_mem (unsigned long int  addr,
+		  unsigned char     *buf,
+		  int                len)
 {
   int             off;			/* Offset into the memory */
 
@@ -562,9 +562,9 @@ or1ksim_read_mem (unsigned int   addr,
    @return  Number of bytes written, or zero if error.                       */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_mem (unsigned int   addr,
-		   unsigned char *buf,
-		   int            len)
+or1ksim_write_mem (unsigned long int  addr,
+		   unsigned char     *buf,
+		   int                len)
 {
   int             off;			/* Offset into the memory */
 
@@ -598,8 +598,8 @@ or1ksim_write_mem (unsigned int   addr,
    @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_read_spr (int            sprnum,
-		  unsigned int  *sprval_ptr)
+or1ksim_read_spr (int                sprnum,
+		  unsigned long int *sprval_ptr)
 {
   /* SPR numbers are up to 16 bits long */
   if ((unsigned int) sprnum <= 0xffff)
@@ -623,8 +623,8 @@ or1ksim_read_spr (int            sprnum,
    @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_spr (int           sprnum,
-		   unsigned int  sprval)
+or1ksim_write_spr (int                sprnum,
+		   unsigned long int  sprval)
 {
   /* SPR numbers are up to 16 bits long */
   if ((unsigned int) sprnum <= 0xffff)
@@ -653,8 +653,8 @@ or1ksim_write_spr (int           sprnum,
    @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_read_reg (int            regnum,
-		  unsigned int  *regval_ptr)
+or1ksim_read_reg (int                 regnum,
+		  unsigned long int  *regval_ptr)
 {
   /* GPR's */
   if (regnum < MAX_GPRS)
@@ -689,8 +689,8 @@ or1ksim_read_reg (int            regnum,
    @return  Non-zero (TRUE) on success, zero (FALSE) otherwise.              */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_reg (int           regnum,
-		   unsigned int  regval)
+or1ksim_write_reg (int                regnum,
+		   unsigned long int  regval)
 {
   /* GPR's */
   if (regnum < MAX_GPRS)

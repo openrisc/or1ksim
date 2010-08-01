@@ -1,3 +1,47 @@
+2010-08-01  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or1k/opcode/or32.h <or1ksim_build_automata>: Renamed from
+	build_automata.
+	<l_none, num_opcodes, insn_index>: Deleted.
+	<or1ksim_op_start>: Renamed from op_start.
+	<or1ksim_automata>: Renamed from automata.
+	<or1ksim_ti>: Renamed from ti.
+	<or1ksim_or32_opcodes>: Renamed from or32_opcodes.
+	<or1ksim_disassembled>: Renamed from disassembled.
+	<or1ksim_insn_len>: Renamed from insn_len.
+	<or1ksim_insn_name>: Renamed from insn_name.
+	<or1ksim_destruct_automata>: Renamed from destruct_automata.
+	<or1ksim_insn_decode>: Renamed from insn_decode.
+	<or1ksim_disassemble_insn>: Renamed from disassemble_insn.
+	<or1ksim_disassemble_index>: Renamed from disassemble_index.
+	<or1ksim_extend_imm>: Renamed from extend_imm.
+	<or1ksim_or32_extract>: Renamed from or32_extract
+	* cpu/or32/or32.c, cpu/or32/execute.c, cpu/or32/generate.c,
+	* cpu/common/stats.c, cpu/common/abstract.c, cpu/common/parse.c,
+	* cpu/or1k/opcode/or32.h, cuc/load.c, cuc/cuc.c,
+	* support/dumpverilog.c, toplevel-support.c: Renaming
+	corresponding to changes in cpu/or1k/opcode/or32.h.
+	* cpu/or32/execute-fp.h: Deleted
+	* cpu/or32/generate.c <include_strings>: Remove reference to
+	execute-fp.h
+	* cpu/or32/execute.c <host_fp_rm>: Declared static.
+	(fp_set_flags_restore_host_rm, fp_set_or1k_rm): Declared static,
+	forward declaration removed.
+	* or1ksim.h (or1ksim_read_mem, or1ksim_write_mem): addr arg
+	changed to unsigned long int.
+	(or1ksim_read_spr): sprval_ptr arg changed to unsigned long int *.
+	(or1ksim_write_spr): sprval arg changed to unsigned long int.
+	(or1ksim_read_reg): regval_ptr arg changed to unsigned long int *.
+	(or1ksim_write_reg): regval arg changed to unsigned long int.
+	* libtoplevel.c (or1ksim_read_mem, or1ksim_write_mem): addr arg
+	changed to unsigned long int.
+	(or1ksim_read_spr): sprval_ptr arg changed to unsigned long int *.
+	(or1ksim_write_spr): sprval arg changed to unsigned long int.
+	(or1ksim_read_reg): regval_ptr arg changed to unsigned long int *.
+	(or1ksim_write_reg): regval arg changed to unsigned long int.
+
 2010-07-30  Julius Baxter <julius.baxter@orsoc.se>
 	* cpu/or32/execute-fp.h: Added for inclusion by generated execute code
 	* cpu/or32/execute.c: Added floating point support functions
@@ -7,7 +51,7 @@
 	* cpu/or1k/sprs.c: Added FPCSR returning 0 when no hardfloat
 	* cpu/or1k/spr-defs.h: Added FP group and FPCSR addr and bits defines
 	* testsuite/test-code-or1k/support/spr-defs.h: ditto
-	
+
 2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
 
 	* configure: Regenerated.

@@ -189,17 +189,17 @@ const char *build_insn (unsigned long data, cuc_insn *insn)
 {
   const char *name;
   char *s;
-  int index = insn_decode (data);
+  int index = or1ksim_insn_decode (data);
   struct or32_opcode const *opcode;
   int i, argc = 0;
 
   insn->insn = data;
   insn->index = -1;
   insn->type = 0;
-  name = insn_name (index);
+  name = or1ksim_insn_name (index);
   insn->index = index;
-  disassemble_index (data, index);
-  strcpy (insn->disasm, disassembled);
+  or1ksim_disassemble_index (data, index);
+  strcpy (insn->disasm, or1ksim_disassembled);
   insn->dep = NULL;
   for (i = 0; i < MAX_OPERANDS; i++) insn->opt[i] = OPT_NONE;
   
@@ -207,20 +207,20 @@ const char *build_insn (unsigned long data, cuc_insn *insn)
     fprintf (stderr, "Invalid opcode 0x%08lx!\n", data);
     exit (1);
   }
-  opcode = &or32_opcodes[index];
+  opcode = &or1ksim_or32_opcodes[index];
 
   for (s = opcode->args; *s != '\0'; ++s) {
     switch (*s) {
     case '\0': return name;
     case 'r':
       insn->opt[argc] = OPT_REGISTER | (argc ? 0 : OPT_DEST);
-      insn->op[argc++] = or32_extract(*++s, opcode->encoding, data);
+      insn->op[argc++] = or1ksim_or32_extract(*++s, opcode->encoding, data);
       break;
 
     default:
       if (strchr (opcode->encoding, *s)) {
-        unsigned long imm = or32_extract (*s, opcode->encoding, data);
-        imm = extend_imm(imm, *s);
+        unsigned long imm = or1ksim_or32_extract (*s, opcode->encoding, data);
+        imm = or1ksim_extend_imm(imm, *s);
         insn->opt[argc] = OPT_CONST;
         insn->op[argc++] = imm;
       }
@@ -436,7 +436,7 @@ int cuc_load (char *in_fn)
     if (func_return) func_return++;
     //PRINTF ("%s\n", name);
 
-    if (or32_opcodes[insn[i].index].flags & OR32_IF_DELAY) {
+    if (or1ksim_or32_opcodes[insn[i].index].flags & OR32_IF_DELAY) {
       int f;
       if (strcmp (name, "l.bnf") == 0) f = 1;
       else if (strcmp (name, "l.bf") == 0) f = 0;

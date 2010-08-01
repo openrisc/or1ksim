@@ -57,11 +57,7 @@
 #  include "simpl32-defs.h"
 # elif DYNAMIC_EXECUTION
 #  include "dyn32-defs.h"
-# else
-extern void l_none PARAMS((void));
 # endif
-#else
-extern void l_none PARAMS((void));
 #endif
 
 
@@ -149,7 +145,7 @@ struct or32_opcode {
 extern struct insn_op_struct {
   unsigned long type;
   unsigned long data;
-} **op_start;
+} **or1ksim_op_start;
 
 /* Leaf flag used in automata building */
 #define LEAF_FLAG         (0x80000000)
@@ -161,57 +157,44 @@ struct temp_insn_struct
   int in_pass;
 };
 
-extern unsigned long *automata;
-extern struct temp_insn_struct *ti;
+extern unsigned long *or1ksim_automata;
+extern struct temp_insn_struct *or1ksim_ti;
 
-extern CONST struct or32_letter or32_letters[];
+extern CONST struct  or32_opcode  or1ksim_or32_opcodes[];
 
-extern CONST struct  or32_opcode or32_opcodes[];
-
-extern CONST int num_opcodes;
-
-extern char *disassembled;
+extern char *or1ksim_disassembled;
 
 /* Calculates instruction length in bytes.  Always 4 for OR32. */
-extern int insn_len PARAMS((int insn_index));
-
-/* Is individual insn's operand signed or unsigned? */
-extern int letter_signed PARAMS((char l));
-
-/* Number of letters in the individual lettered operand. */
-extern int letter_range PARAMS((char l));
-
-/* MM: Returns index of given instruction name.  */
-extern int insn_index PARAMS((char *insn));
+extern int or1ksim_insn_len PARAMS((int insn_index));
 
 /* MM: Returns instruction name from index.  */
-extern CONST char *insn_name PARAMS ((int index));
+extern CONST char *or1ksim_insn_name PARAMS ((int index));
 
-/* MM: Constructs new FSM, based on or32_opcodes.  */ 
-extern void build_automata PARAMS ((int  quiet));
+/* MM: Constructs new FSM, based on or1ksim_or32_opcodes.  */ 
+extern void or1ksim_build_automata PARAMS ((int  quiet));
 
 /* MM: Destructs FSM.  */ 
-extern void destruct_automata PARAMS ((void));
+extern void or1ksim_destruct_automata PARAMS ((void));
 
-/* MM: Decodes instruction using FSM.  Call build_automata first.  */
-extern int insn_decode PARAMS((unsigned int insn));
+/* MM: Decodes instruction using FSM.  Call or1ksim_build_automata first.  */
+extern int or1ksim_insn_decode PARAMS((unsigned int insn));
 
 /* Disassemble one instruction from insn to disassemble.
    Return the size of the instruction.  */
-int disassemble_insn (unsigned long insn);
+extern int or1ksim_disassemble_insn (unsigned long insn);
 
 /* Disassemble one instruction from insn index.
    Return the size of the instruction.  */
-int disassemble_index (unsigned long insn, int index);
+int or1ksim_disassemble_index (unsigned long insn, int index);
 
 /* FOR INTERNAL USE ONLY */
 /* Automatically does zero- or sign- extension and also finds correct
    sign bit position if sign extension is correct extension. Which extension
    is proper is figured out from letter description. */
-unsigned long extend_imm(unsigned long imm, char l);
+unsigned long or1ksim_extend_imm(unsigned long imm, char l);
 
 /* Extracts value from opcode */
-unsigned long or32_extract(char param_ch, char *enc_initial, unsigned long insn);
+unsigned long or1ksim_or32_extract(char param_ch, char *enc_initial, unsigned long insn);
 
 #endif
 

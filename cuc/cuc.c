@@ -592,11 +592,11 @@ extract_function (char *out_fn, unsigned long start_addr)
   do
     {
       unsigned long d = eval_direct32 (a, 0, 0);
-      int index = insn_decode (d);
+      int index = or1ksim_insn_decode (d);
       assert (index >= 0);
       if (x)
 	x++;
-      if (strcmp (insn_name (index), "l.jr") == 0)
+      if (strcmp (or1ksim_insn_name (index), "l.jr") == 0)
 	x = 1;
       a += 4;
       fprintf (fo, "%08lx\n", d);

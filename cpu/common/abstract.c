@@ -1190,14 +1190,14 @@ disassemble_memory (oraddr_t from, oraddr_t to, int nl)
       if (verify_memoryarea (i))
 	{
 	  uint32_t insn = eval_direct32 (i, 0, 0);
-	  int index = insn_decode (insn);
+	  int index = or1ksim_insn_decode (insn);
 
 	  PRINTF ("%08" PRIx32 " ", insn);
 
 	  if (index >= 0)
 	    {
-	      disassemble_insn (insn);
-	      PRINTF (" %s", disassembled);
+	      or1ksim_disassemble_insn (insn);
+	      PRINTF (" %s", or1ksim_disassembled);
 	    }
 	  else
 	    {

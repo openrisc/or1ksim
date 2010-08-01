@@ -89,7 +89,7 @@ CONST struct or32_letter or32_letters[] = {
 # define EFI EFN
 #endif /* HAVE_EXECUTION */
 
-CONST struct or32_opcode or32_opcodes[] = {
+CONST struct or32_opcode or1ksim_or32_opcodes[] = {
 
   {"l.j", "N", "00 0x0  NNNNN NNNNN NNNN NNNN NNNN NNNN",
    EF (l_j), OR32_IF_DELAY, it_jump},
@@ -576,19 +576,19 @@ CONST struct or32_opcode or32_opcodes[] = {
 #undef EFN
 #undef EF
 
-CONST int num_opcodes =
-  ((sizeof (or32_opcodes)) / (sizeof (struct or32_opcode))) - 1;
+static CONST int NUM_OPCODES =
+  ((sizeof (or1ksim_or32_opcodes)) / (sizeof (struct or32_opcode))) - 1;
 
 /* Calculates instruction length in bytes. Always 4 for OR32. */
 int
-insn_len (int insn_index)
+or1ksim_insn_len (int insn_index)
 {
   insn_index = 0;		/* Just to get rid that warning.  */
   return 4;
 }
 
 /* Is individual insn's operand signed or unsigned? */
-int
+static int
 letter_signed (char l)
 {
   CONST struct or32_letter *pletter;
@@ -605,7 +605,7 @@ letter_signed (char l)
 static int range_cache[256] = { 0 };
 
 /* Number of letters in the individual lettered operand. */
-int
+static int
 letter_range (char l)
 {
   CONST struct or32_opcode *pinsn;
@@ -616,7 +616,7 @@ letter_range (char l)
   if ((range = range_cache[(unsigned char) l]))
     return range;
 
-  for (pinsn = or32_opcodes; strlen (pinsn->name); pinsn++)
+  for (pinsn = or1ksim_or32_opcodes; strlen (pinsn->name); pinsn++)
     {
       if (strchr (pinsn->encoding, l))
 	{
@@ -633,51 +633,20 @@ letter_range (char l)
   exit (1);
 }
 
-/* MM: Returns index of given instruction name.  */
-int
-insn_index (char *insn)
-{
-  int i, found = -1;
-  for (i = 0; i < num_opcodes; i++)
-    if (!strcmp (or32_opcodes[i].name, insn))
-      {
-	found = i;
-	break;
-      }
-  return found;
-}
-
 /* Returns name of the specified instruction index */
 CONST char *
-insn_name (int index)
+or1ksim_insn_name (int index)
 {
-  if (index >= 0 && index < num_opcodes)
-    return or32_opcodes[index].name;
+  if (index >= 0 && index < NUM_OPCODES)
+    return or1ksim_or32_opcodes[index].name;
   else
     return "???";
 }
 
-#if defined(HAVE_EXECUTION) && SIMPLE_EXECUTION
-void
-l_none (struct iqueue_entry *current)
-{
-}
-#elif defined(HAVE_EXECUTION) && DYNAMIC_EXECUTION
-void
-l_none (struct op_queue *opq, int *param_t, int delay_slot)
-{
-}
-#else
-void
-l_none ()
-{
-}
-#endif
-
 /*** Finite automata for instruction decoding building code ***/
 
 /* Find symbols in encoding.  */
-unsigned long
+static unsigned long
 insn_extract (param_ch, enc_initial)
      char param_ch;
      char *enc_initial;
@@ -719,14 +688,16 @@ insn_extract (param_ch, enc_initial)
 # define MIN(x,y)          ((x) < (y) ? (x) : (y))
 #endif
 
-unsigned long *automata;
+unsigned long *or1ksim_automata;
 int nuncovered;
 int curpass = 0;
 
 /* MM: Struct that holds runtime build information about instructions.  */
-struct temp_insn_struct *ti;
+struct temp_insn_struct *or1ksim_ti;
 
-struct insn_op_struct *op_data, **op_start;
+static struct insn_op_struct *op_data;
+
+struct insn_op_struct **or1ksim_op_start;
 
 static void
 or32_debug (int level, const char *format, ...)
@@ -754,10 +725,10 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
   unsigned long cur_mask = mask;
   unsigned long *next;
 
-  for (i = 0; i < num_opcodes; i++)
-    if (ti[i].in_pass == pass)
+  for (i = 0; i < NUM_OPCODES; i++)
+    if (or1ksim_ti[i].in_pass == pass)
       {
-	cur_mask &= ti[i].insn_mask;
+	cur_mask &= or1ksim_ti[i].insn_mask;
 	ninstr++;
 	last_match = i;
       }
@@ -768,8 +739,8 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
   if (ninstr == 1)
     {
       /* Leaf holds instruction index. */
-      or32_debug (8, "%i>I%i %s\n", cur - automata, last_match,
-	     or32_opcodes[last_match].name);
+      or32_debug (8, "%i>I%i %s\n", cur - or1ksim_automata, last_match,
+	     or1ksim_or32_opcodes[last_match].name);
       *cur = LEAF_FLAG | last_match;
       cur++;
       nuncovered--;
@@ -801,14 +772,14 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	{
 	  fprintf (stderr, "%i instructions match mask 0x%08X:\n", ninstr,
 		   mask);
-	  for (i = 0; i < num_opcodes; i++)
-	    if (ti[i].in_pass == pass)
-	      fprintf (stderr, "%s ", or32_opcodes[i].name);
+	  for (i = 0; i < NUM_OPCODES; i++)
+	    if (or1ksim_ti[i].in_pass == pass)
+	      fprintf (stderr, "%s ", or1ksim_or32_opcodes[i].name);
 
 	  fprintf (stderr, "\n");
 	  exit (1);
 	}
-      or32_debug (8, "%i> #### %i << %i (%i) ####\n", cur - automata, best_len,
+      or32_debug (8, "%i> #### %i << %i (%i) ####\n", cur - or1ksim_automata, best_len,
 	     best_first, ninstr);
       *cur = best_first;
       cur++;
@@ -824,25 +795,25 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	  int j;
 	  unsigned long *c;
 	  curpass++;
-	  for (j = 0; j < num_opcodes; j++)
-	    if (ti[j].in_pass == pass
-		&& ((ti[j].insn >> best_first) & cur_mask) ==
+	  for (j = 0; j < NUM_OPCODES; j++)
+	    if (or1ksim_ti[j].in_pass == pass
+		&& ((or1ksim_ti[j].insn >> best_first) & cur_mask) ==
 		(unsigned long) i
-		&& ((ti[j].insn_mask >> best_first) & cur_mask) == cur_mask)
-	      ti[j].in_pass = curpass;
+		&& ((or1ksim_ti[j].insn_mask >> best_first) & cur_mask) == cur_mask)
+	      or1ksim_ti[j].in_pass = curpass;
 
 	  or32_debug (9, "%08X %08lX %i\n", mask, cur_mask, best_first);
 	  c = cover_insn (cur, curpass, mask & (~(cur_mask << best_first)));
 	  if (c)
 	    {
-	      or32_debug (8, "%i> #%X -> %u\n", next - automata, i,
-		     cur - automata);
-	      *next = cur - automata;
+	      or32_debug (8, "%i> #%X -> %u\n", next - or1ksim_automata, i,
+		     cur - or1ksim_automata);
+	      *next = cur - or1ksim_automata;
 	      cur = c;
 	    }
 	  else
 	    {
-	      or32_debug (8, "%i> N/A\n", next - automata);
+	      or32_debug (8, "%i> N/A\n", next - or1ksim_automata);
 	      *next = 0;
 	    }
 	  next++;
@@ -866,7 +837,7 @@ num_ones (unsigned long value)
 }
 
 /* Utility function, which converts parameters from or32_opcode format to more binary form.  
-   Parameters are stored in ti struct.  */
+   Parameters are stored in or1ksim_ti struct.  */
 
 static struct insn_op_struct *
 parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
@@ -984,24 +955,24 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
 }
 
 /* -------------------------------------------------------------------------- */
-/*!Constructs new automata based on or32_opcodes array.
+/*!Constructs new automata based on or1ksim_or32_opcodes array.
 
    @param[in] quiet  If non-zero (TRUE) do not print informational messages. */
 /* -------------------------------------------------------------------------- */
 void
-build_automata (int  quiet)
+or1ksim_build_automata (int  quiet)
 {
   int i;
   unsigned long *end;
   struct insn_op_struct *cur;
 
-  automata =
+  or1ksim_automata =
     (unsigned long *) malloc (MAX_AUTOMATA_SIZE * sizeof (unsigned long));
-  ti =
+  or1ksim_ti =
     (struct temp_insn_struct *) malloc (sizeof (struct temp_insn_struct) *
-					num_opcodes);
+					NUM_OPCODES);
 
-  nuncovered = num_opcodes;
+  nuncovered = NUM_OPCODES;
 
 #ifdef HAVE_EXECUTION
   if (!quiet)
@@ -1011,22 +982,22 @@ build_automata (int  quiet)
 #endif
 
   /* Build temporary information about instructions.  */
-  for (i = 0; i < num_opcodes; i++)
+  for (i = 0; i < NUM_OPCODES; i++)
     {
       unsigned long ones, zeros;
-      char *encoding = or32_opcodes[i].encoding;
+      char *encoding = or1ksim_or32_opcodes[i].encoding;
       ones = insn_extract ('1', encoding);
       zeros = insn_extract ('0', encoding);
-      ti[i].insn_mask = ones | zeros;
-      ti[i].insn = ones;
-      ti[i].in_pass = curpass = 0;
-      /*debug(9, "%s: %s %08X %08X\n", or32_opcodes[i].name,
-         or32_opcodes[i].encoding, ti[i].insn_mask, ti[i].insn); */
+      or1ksim_ti[i].insn_mask = ones | zeros;
+      or1ksim_ti[i].insn = ones;
+      or1ksim_ti[i].in_pass = curpass = 0;
+      /*debug(9, "%s: %s %08X %08X\n", or1ksim_or32_opcodes[i].name,
+         or1ksim_or32_opcodes[i].encoding, or1ksim_ti[i].insn_mask, or1ksim_ti[i].insn); */
     }
 
   /* Until all are covered search for best criteria to separate them.  */
-  end = cover_insn (automata, curpass, 0xFFFFFFFF);
-  if (end - automata > MAX_AUTOMATA_SIZE)
+  end = cover_insn (or1ksim_automata, curpass, 0xFFFFFFFF);
+  if (end - or1ksim_automata > MAX_AUTOMATA_SIZE)
     {
       fprintf (stderr, "Automata too large. Increase MAX_AUTOMATA_SIZE.");
       exit (1);
@@ -1034,7 +1005,7 @@ build_automata (int  quiet)
 #ifdef HAVE_EXECUTION
   if (!quiet)
     {
-      printf ("done, num uncovered: %i/%i.\n", nuncovered, num_opcodes);
+      printf ("done, num uncovered: %i/%i.\n", nuncovered, NUM_OPCODES);
     }
 #endif
 
@@ -1047,14 +1018,14 @@ build_automata (int  quiet)
   op_data =
     (struct insn_op_struct *) malloc (MAX_OP_TABLE_SIZE *
 				      sizeof (struct insn_op_struct));
-  op_start =
-    (struct insn_op_struct **) malloc (num_opcodes *
+  or1ksim_op_start =
+    (struct insn_op_struct **) malloc (NUM_OPCODES *
 				       sizeof (struct insn_op_struct *));
   cur = op_data;
-  for (i = 0; i < num_opcodes; i++)
+  for (i = 0; i < NUM_OPCODES; i++)
     {
-      op_start[i] = cur;
-      cur = parse_params (&or32_opcodes[i], cur);
+      or1ksim_op_start[i] = cur;
+      cur = parse_params (&or1ksim_or32_opcodes[i], cur);
       if (cur - op_data > MAX_OP_TABLE_SIZE)
 	{
 	  fprintf (stderr,
@@ -1071,24 +1042,24 @@ build_automata (int  quiet)
 }
 
 void
-destruct_automata ()
+or1ksim_destruct_automata ()
 {
-  free (ti);
-  free (automata);
+  free (or1ksim_ti);
+  free (or1ksim_automata);
   free (op_data);
-  free (op_start);
+  free (or1ksim_op_start);
 }
 
 /* Decodes instruction and returns instruction index.  */
 int
-insn_decode (unsigned int insn)
+or1ksim_insn_decode (unsigned int insn)
 {
-  unsigned long *a = automata;
+  unsigned long *a = or1ksim_automata;
   int i;
   while (!(*a & LEAF_FLAG))
     {
       unsigned int first = *a;
-      //debug(9, "%i ", a - automata);
+      //debug(9, "%i ", a - or1ksim_automata);
       a++;
       i = (insn >> first) & *a;
       a++;
@@ -1097,28 +1068,28 @@ insn_decode (unsigned int insn)
 	  //debug(9, "XXX\n", i);
 	  return -1;
 	}
-      a = automata + *(a + i);
+      a = or1ksim_automata + *(a + i);
     }
   i = *a & ~LEAF_FLAG;
   //debug(9, "%i\n", i);
   /* Final check - do we have direct match?
-     (based on or32_opcodes this should be the only possibility,
+     (based on or1ksim_or32_opcodes this should be the only possibility,
      but in case of invalid/missing instruction we must perform a check)  */
-  if ((ti[i].insn_mask & insn) == ti[i].insn)
+  if ((or1ksim_ti[i].insn_mask & insn) == or1ksim_ti[i].insn)
     return i;
   else
     return -1;
 }
 
 static char disassembled_str[50];
-char *disassembled = &disassembled_str[0];
+char *or1ksim_disassembled = &disassembled_str[0];
 
 /* Automagically does zero- or sign- extension and also finds correct
    sign bit position if sign extension is correct extension. Which extension
    is proper is figured out from letter description. */
 
 unsigned long
-extend_imm (unsigned long imm, char l)
+or1ksim_extend_imm (unsigned long imm, char l)
 {
   unsigned long mask;
   int letter_bits;
@@ -1137,7 +1108,7 @@ extend_imm (unsigned long imm, char l)
 }
 
 unsigned long
-or32_extract (param_ch, enc_initial, insn)
+or1ksim_or32_extract (param_ch, enc_initial, insn)
      char param_ch;
      char *enc_initial;
      unsigned long insn;
@@ -1158,7 +1129,7 @@ or32_extract (param_ch, enc_initial, insn)
       }
 
 #if DEBUG
-  printf ("or32_extract: %x ", param_pos);
+  printf ("or1ksim_or32_extract: %x ", param_pos);
 #endif
   opc_pos = 32;
   for (enc = enc_initial; *enc != '\0';)
@@ -1226,7 +1197,7 @@ or32_print_register (dest, param_ch, encoding, insn)
      char *encoding;
      unsigned long insn;
 {
-  int regnum = or32_extract (param_ch, encoding, insn);
+  int regnum = or1ksim_or32_extract (param_ch, encoding, insn);
 
   sprintf (dest, "r%d", regnum);
   while (*dest)
@@ -1243,9 +1214,9 @@ or32_print_immediate (dest, param_ch, encoding, insn)
      char *encoding;
      unsigned long insn;
 {
-  int imm = or32_extract (param_ch, encoding, insn);
+  int imm = or1ksim_or32_extract (param_ch, encoding, insn);
 
-  imm = extend_imm (imm, param_ch);
+  imm = or1ksim_extend_imm (imm, param_ch);
 
   if (letter_signed (param_ch))
     {
@@ -1265,24 +1236,24 @@ or32_print_immediate (dest, param_ch, encoding, insn)
    Return the size of the instruction.  */
 
 int
-disassemble_insn (insn)
+or1ksim_disassemble_insn (insn)
      unsigned long insn;
 {
-  return disassemble_index (insn, insn_decode (insn));
+  return or1ksim_disassemble_index (insn, or1ksim_insn_decode (insn));
 }
 
 /* Disassemble one instruction from insn index.
    Return the size of the instruction.  */
 
 int
-disassemble_index (insn, index)
+or1ksim_disassemble_index (insn, index)
      unsigned long insn;
      int index;
 {
-  char *dest = disassembled;
+  char *dest = or1ksim_disassembled;
   if (index >= 0)
     {
-      struct or32_opcode const *opcode = &or32_opcodes[index];
+      struct or32_opcode const *opcode = &or1ksim_or32_opcodes[index];
       char *s;
 
       strcpy (dest, opcode->name);
@@ -1296,7 +1267,7 @@ disassemble_index (insn, index)
 	  switch (*s)
 	    {
 	    case '\0':
-	      return insn_len (insn);
+	      return or1ksim_insn_len (insn);
 
 	    case 'r':
 	      dest = or32_print_register (dest, *++s, opcode->encoding, insn);
@@ -1321,5 +1292,5 @@ disassemble_index (insn, index)
       while (*dest)
 	dest++;
     }
-  return insn_len (insn);
+  return or1ksim_insn_len (insn);
 }
