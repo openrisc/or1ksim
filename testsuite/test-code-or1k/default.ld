@@ -43,6 +43,7 @@ SECTIONS
 	*(.except-text)
         *(.text)
         *(.rodata)
+        *(.rodata.*)
 	_reset_vector = DEFINED (_reset_vector) ? _reset_vector : 0x00000100;
         _src_beg = .;
         } > flash

@@ -1,4 +1,32 @@
-/* spr_defs.h -- Defines OR1K architecture specific special-purpose registers
+/* ipc.h.  Microkernel IPC header for Or1ksim
+	
+   Copyright (C) 2000 Damjan Lampret
+   Copyright (C) 2008, 2010 Embecosm Limited
+   
+   Contributor Damjan Lampret <lampret@opencores.org>
+   Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+   This file is part of OpenRISC 1000 Architectural Simulator.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation; either version 3 of the License, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+   more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program.  If not, see <http:  www.gnu.org/licenses/>.  */
+
+/* ----------------------------------------------------------------------------
+   This code is commented throughout for use with Doxygen.
+   --------------------------------------------------------------------------*/
+
+/* This file is part of test microkernel for OpenRISC 1000. */
+/* spr-defs.h -- Defines OR1K architecture specific special-purpose registers
 
    Copyright (C) 1999 Damjan Lampret, lampret@opencores.org
    Copyright (C) 2008 Embecosm Limited
@@ -20,9 +48,14 @@
    You should have received a copy of the GNU General Public License along
    with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+/* This program is commented throughout in a fashion suitable for processing
+   with Doxygen. */
 
-/* Definition of special-purpose registers (SPRs). This is just a copy of
-   cpu/or1k/spr_defs.h. It really should not be duplicated here. */
+
+#ifndef SPR_DEFS__H
+#define SPR_DEFS__H
+
+/* Definition of special-purpose registers (SPRs). */
 
 #define MAX_GRPS (32)
 #define MAX_SPRS_PER_GRP_BITS (11)
@@ -41,6 +74,7 @@
 #define SPRGROUP_PM	(8<< MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_PIC	(9<< MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_TT	(10<< MAX_SPRS_PER_GRP_BITS)
+#define SPRGROUP_FP	(11<< MAX_SPRS_PER_GRP_BITS)
 
 /* System control and status group */
 #define SPR_VR		(SPRGROUP_SYS + 0)
@@ -55,12 +89,14 @@
 #define SPR_NPC         (SPRGROUP_SYS + 16)  /* CZ 21/06/01 */
 #define SPR_SR		(SPRGROUP_SYS + 17)  /* CZ 21/06/01 */
 #define SPR_PPC         (SPRGROUP_SYS + 18)  /* CZ 21/06/01 */
+#define SPR_FPCSR       (SPRGROUP_SYS + 20)  /* CZ 21/06/01 */
 #define SPR_EPCR_BASE	(SPRGROUP_SYS + 32)  /* CZ 21/06/01 */
 #define SPR_EPCR_LAST	(SPRGROUP_SYS + 47)  /* CZ 21/06/01 */
 #define SPR_EEAR_BASE	(SPRGROUP_SYS + 48)
 #define SPR_EEAR_LAST	(SPRGROUP_SYS + 63)
 #define SPR_ESR_BASE	(SPRGROUP_SYS + 64)
 #define SPR_ESR_LAST	(SPRGROUP_SYS + 79)
+#define SPR_GPR_BASE	(SPRGROUP_SYS + 1024)
 
 /* Data MMU group */
 #define SPR_DMMUCR	(SPRGROUP_DMMU + 0)
@@ -128,8 +164,14 @@
  * Bit definitions for the Version Register
  *
  */
-#define SPR_VR_VER	0xffff0000  /* Processor version */
+#define SPR_VR_VER	0xff000000  /* Processor version */
+#define SPR_VR_CFG	0x00ff0000  /* Processor configuration */
+#define SPR_VR_RES	0x00ff0000  /* Reserved */
 #define SPR_VR_REV	0x0000003f  /* Processor revision */
+
+#define SPR_VR_VER_OFF	24
+#define SPR_VR_CFG_OFF	16
+#define SPR_VR_REV_OFF	0
 
 /*
  * Bit definitions for the Unit Present Register
@@ -177,7 +219,7 @@
 #define SPR_DCFGR_NDP6     0x00000005  /* Six matchpoints supported */
 #define SPR_DCFGR_NDP7     0x00000006  /* Seven matchpoints supported */
 #define SPR_DCFGR_NDP8     0x00000007  /* Eight matchpoints supported */
-#define SPR_DCFGR_WPCI     0x00000080  /* Watchpoint counters implemented */
+#define SPR_DCFGR_WPCI     0x00000008  /* Watchpoint counters implemented */
 
 #define MATCHPOINTS_TO_NDP(n) (1 == n ? SPR_DCFGR_NDP1 : \
                                2 == n ? SPR_DCFGR_NDP2 : \
@@ -309,6 +351,10 @@
 #define SPR_DCCFGR_CBFRI	0x00002000
 #define SPR_DCCFGR_CBWBRI	0x00004000
 
+#define SPR_DCCFGR_NCW_OFF      0
+#define SPR_DCCFGR_NCS_OFF      3
+#define SPR_DCCFGR_CBS_OFF	7
+
 /*
  * Bit definitions for Instruction Cache Configuration Register
  *
@@ -320,6 +366,10 @@
 #define SPR_ICCFGR_CBIRI	0x00000400
 #define SPR_ICCFGR_CBPRI	0x00000800
 #define SPR_ICCFGR_CBLRI	0x00001000
+
+#define SPR_ICCFGR_NCW_OFF      0
+#define SPR_ICCFGR_NCS_OFF      3
+#define SPR_ICCFGR_CBS_OFF	7
 
 /*
  * Bit definitions for Data MMU Configuration Register
@@ -334,6 +384,9 @@
 #define SPR_DMMUCFGR_TEIRI	0x00000400
 #define SPR_DMMUCFGR_HTR	0x00000800
 
+#define SPR_DMMUCFGR_NTW_OFF	0
+#define SPR_DMMUCFGR_NTS_OFF	2
+
 /*
  * Bit definitions for Instruction MMU Configuration Register
  *
@@ -346,6 +399,9 @@
 #define SPR_IMMUCFGR_PRI	0x00000200
 #define SPR_IMMUCFGR_TEIRI	0x00000400
 #define SPR_IMMUCFGR_HTR	0x00000800
+
+#define SPR_IMMUCFGR_NTW_OFF	0
+#define SPR_IMMUCFGR_NTS_OFF	2
 
 /*
  * Bit definitions for Debug Control registers
@@ -453,7 +509,7 @@
 #define SPR_DSR_IME	0x00000200  /* ITLB miss exception */
 #define SPR_DSR_RE	0x00000400  /* Range exception */
 #define SPR_DSR_SCE	0x00000800  /* System call exception */
-#define SPR_DSR_SSE     0x00001000  /* Single Step Exception */
+#define SPR_DSR_FPE     0x00001000  /* Floating Point Exception */
 #define SPR_DSR_TE	0x00002000  /* Trap exception */
 
 /*
@@ -472,7 +528,8 @@
 #define SPR_DRR_IME	0x00000200  /* ITLB miss exception */
 #define SPR_DRR_RE	0x00000400  /* Range exception */
 #define SPR_DRR_SCE	0x00000800  /* System call exception */
-#define SPR_DRR_TE	0x00001000  /* Trap exception */
+#define SPR_DRR_FPE     0x00001000  /* Floating Point Exception */
+#define SPR_DRR_TE	0x00002000  /* Trap exception */
 
 /*
  * Bit definitions for Performance counters mode registers
@@ -538,16 +595,42 @@
 #define SPR_TTMR_M      0xc0000000  /* Tick mode */
 
 /*
+ * Bit definitions for the FP Control Status Register
+ *
+ */
+#define SPR_FPCSR_FPEE  0x00000001  /* Floating Point Exception Enable */
+#define SPR_FPCSR_RM    0x00000006  /* Rounding Mode */
+#define SPR_FPCSR_OVF   0x00000008  /* Overflow Flag */
+#define SPR_FPCSR_UNF   0x00000010  /* Underflow Flag */
+#define SPR_FPCSR_SNF   0x00000020  /* SNAN Flag */
+#define SPR_FPCSR_QNF   0x00000040  /* QNAN Flag */
+#define SPR_FPCSR_ZF    0x00000080  /* Zero Flag */
+#define SPR_FPCSR_IXF   0x00000100  /* Inexact Flag */
+#define SPR_FPCSR_IVF   0x00000200  /* Invalid Flag */
+#define SPR_FPCSR_INF   0x00000400  /* Infinity Flag */
+#define SPR_FPCSR_DZF   0x00000800  /* Divide By Zero Flag */
+#define SPR_FPCSR_ALLF (SPR_FPCSR_OVF | SPR_FPCSR_UNF | SPR_FPCSR_SNF | \
+			SPR_FPCSR_QNF | SPR_FPCSR_ZF | SPR_FPCSR_IXF |  \
+			SPR_FPCSR_IVF | SPR_FPCSR_INF | SPR_FPCSR_DZF)
+
+#define FPCSR_RM_RN (0<<1)
+#define FPCSR_RM_RZ (1<<1)
+#define FPCSR_RM_RIP (2<<1)
+#define FPCSR_RM_RIN (3<<1)
+
+/*
  * l.nop constants
  *
  */
 #define NOP_NOP          0x0000      /* Normal nop instruction */
 #define NOP_EXIT         0x0001      /* End of simulation */
 #define NOP_REPORT       0x0002      /* Simple report */
-/*#define NOP_PRINTF       0x0003      Simprintf instruction now obsolete */
+/*#define NOP_PRINTF       0x0003       Simprintf instruction (obsolete)*/
 #define NOP_PUTC         0x0004      /* JPB: Simputc instruction */
 #define NOP_CNT_RESET    0x0005	     /* Reset statistics counters */
 #define NOP_GET_TICKS    0x0006	     /* JPB: Get # ticks running */
 #define NOP_GET_PS       0x0007      /* JPB: Get picosecs/cycle */
 #define NOP_REPORT_FIRST 0x0400      /* Report with number */
 #define NOP_REPORT_LAST  0x03ff      /* Report with number */
+
+#endif	/* SPR_DEFS__H */

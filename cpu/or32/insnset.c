@@ -796,165 +796,128 @@ INSTRUCTION (l_fl1) {
 /* Do calculation, and update FPCSR as required */
 /* Single precision */
 INSTRUCTION (lf_add_s) {
-  if (config.cpu.hardfloat) {  
-  FLOAT param0, param1, param2;
-  param1.hval = (uorreg_t)PARAM1;
-  param2.hval = (uorreg_t)PARAM2;
-  fp_set_or1k_rm();
-  param0.fval = param1.fval + param2.fval;
-  SET_PARAM0(param0.hval);
-  fp_set_flags_restore_host_rm();
+  if (config.cpu.hardfloat) {
+  float_set_rm();
+  SET_PARAM0(float32_add((unsigned int)PARAM1,(unsigned int)PARAM2));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_div_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1, param2;
-  param1.hval = (uorreg_t)PARAM1;
-  param2.hval = (uorreg_t)PARAM2;
-  fp_set_or1k_rm();
-  param0.fval = param1.fval / param2.fval;
-  SET_PARAM0(param0.hval);
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_div((unsigned int)PARAM1,(unsigned int)PARAM2));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_ftoi_s) {
   if (config.cpu.hardfloat) {
-    fp_set_or1k_rm();
-    // no other way appeared to work --jb
-    float tmp_f; memcpy((void*)&tmp_f, (void*)&PARAM1, sizeof(float));
-    SET_PARAM0((int)tmp_f);
-    fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_to_int32((unsigned int)PARAM1));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_itof_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0;
-  fp_set_or1k_rm();
-  param0.fval = (float)((int)PARAM1);
-  SET_PARAM0(param0.hval);
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(int32_to_float32((unsigned int)PARAM1));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_madd_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0,param1, param2;  
-  param0.hval = (uorreg_t)PARAM0;
-  param1.hval = (uorreg_t)PARAM1;
-  fp_set_or1k_rm();
-  param2.hval = PARAM2;
-  param0.fval += param1.fval * param2.fval; 
-  SET_PARAM0(param0.hval);
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_add((unsigned int)PARAM0, float32_mul((unsigned int)PARAM1,(unsigned int)PARAM2)));
+  // Note: this ignores flags from the multiply!
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_mul_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1, param2;
-  param1.hval = (uorreg_t)PARAM1;
-  param2.hval = (uorreg_t)PARAM2;
-  fp_set_or1k_rm();
-  param0.fval = param1.fval * param2.fval;
-  SET_PARAM0(param0.hval); 
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_mul((unsigned int)PARAM1,(unsigned int)PARAM2));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_rem_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1, param2;
-  param1.hval = PARAM1;
-  param2.hval = PARAM2;
-  fp_set_or1k_rm();
-  param0.fval = fmodf (param1.fval, param2.fval);
-  SET_PARAM0(param0.hval);
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_rem((unsigned int)PARAM1,(unsigned int)PARAM2));
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sfeq_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval == param1.fval)
+  float_set_rm();
+  if(float32_eq((unsigned int)PARAM0, (unsigned int)PARAM1))
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  fp_set_flags_restore_host_rm();
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sfge_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval >= param1.fval)
+  float_set_rm();
+  if((!float32_lt((unsigned int)PARAM0, (unsigned int)PARAM1) & 
+      !float32_is_nan( (unsigned int)PARAM0) &
+      !float32_is_nan( (unsigned int)PARAM1) ) )
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;  
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  fp_set_flags_restore_host_rm();
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sfgt_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval > param1.fval)
+  float_set_rm();
+  if((!float32_le((unsigned int)PARAM0, (unsigned int)PARAM1)  & 
+      !float32_is_nan( (unsigned int)PARAM0) &
+      !float32_is_nan( (unsigned int)PARAM1) ) )
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  fp_set_flags_restore_host_rm();
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sfle_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval <= param1.fval)
+  float_set_rm();
+  if((float32_le((unsigned int)PARAM0, (unsigned int)PARAM1) & 
+      !float32_is_nan( (unsigned int)PARAM0) &
+      !float32_is_nan( (unsigned int)PARAM1) ) )    
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  fp_set_flags_restore_host_rm();
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sflt_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval < param1.fval)
+  float_set_rm();
+  if(( float32_lt((unsigned int)PARAM0, (unsigned int)PARAM1) & 
+       !float32_is_nan( (unsigned int)PARAM0) &
+       !float32_is_nan( (unsigned int)PARAM1) ) )
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
-  fp_set_flags_restore_host_rm();
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sfne_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1;
-  param0.hval = PARAM0;
-  param1.hval = PARAM1;
-  fp_set_or1k_rm();
-  if(param0.fval != param1.fval)
+  float_set_rm();
+  if(!float32_eq((unsigned int)PARAM0, (unsigned int)PARAM1))    
     cpu_state.sprs[SPR_SR] |= SPR_SR_F;
   else
     cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+  float_set_flags();
   } else l_invalid();
 }
 INSTRUCTION (lf_sub_s) {
   if (config.cpu.hardfloat) {
-  FLOAT param0, param1, param2;
-  param1.hval = PARAM1;
-  param2.hval = PARAM2;
-  fp_set_or1k_rm();
-  param0.fval = param1.fval - param2.fval;
-  SET_PARAM0(param0.hval); 
-  fp_set_flags_restore_host_rm();
+  float_set_rm();
+  SET_PARAM0(float32_sub((unsigned int)PARAM1,(unsigned int)PARAM2));
+  float_set_flags();
   } else l_invalid();
 }
 

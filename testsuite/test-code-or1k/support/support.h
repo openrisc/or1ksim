@@ -75,6 +75,9 @@ extern void *memcpy (void *__restrict         __dest,
                      __const void *__restrict __src,
 		     size_t                   __n);
 
+/* pseudo-random number generator */
+extern unsigned long int rand ();
+
 /* Externally used exception handlers */
 extern unsigned long int  excpt_buserr;
 extern unsigned long int  excpt_dpfault;

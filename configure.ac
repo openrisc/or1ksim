@@ -176,6 +176,7 @@ AC_CHECK_SIZEOF(char, 1)
 AC_CHECK_SIZEOF(short, 1)
 AC_CHECK_SIZEOF(int, 1)
 AC_CHECK_SIZEOF(long, 1)
+AC_CHECK_SIZEOF(long long, 1)
 
 #Check for compare function type for qsort (needed by some Linuxes)
 AC_CHECK_TYPES([__compar_fn_t])
@@ -342,7 +343,8 @@ INCLUDES="$INCLUDES -I\${top_srcdir} -I\${top_srcdir}/cpu/common \
 -I\${top_srcdir}/bpb -I\${top_srcdir}/peripheral -I\${top_srcdir}/tick \
 -I\${top_srcdir}/peripheral/channels -I\${top_srcdir}/pm -I\${top_srcdir}/pic \
 -I\${top_srcdir}/debug -I\${top_srcdir}/vapi -I\${top_srcdir}/support \
--I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2"
+-I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2 \
+-I\${top_srcdir}/softfloat"
 AC_SUBST(INCLUDES)
 
 AC_CONFIG_FILES([Makefile                                 \
@@ -353,6 +355,7 @@ AC_CONFIG_FILES([Makefile                                 \
                  cpu/common/Makefile                      \
                  cpu/or1k/Makefile                        \
                  cuc/Makefile                             \
+                 softfloat/Makefile                       \
                  debug/Makefile                           \
                  doc/Makefile                             \
                  mmu/Makefile                             \

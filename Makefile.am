@@ -41,6 +41,7 @@ SUBDIRS               = argtable2  \
                         vapi       \
                         cuc        \
                         port       \
+			softfloat  \
                         testsuite
 
 # Build a standalone simulator and a linkable library of the simulator
@@ -81,6 +82,7 @@ libor1ksys_la_LIBADD  = argtable2/libargtable2.la          \
                         debug/libdebug.la                  \
                         vapi/libvapi.la                    \
                         cuc/libcuc.la                      \
+			softfloat/libsoftfloat.la	   \
                         port/libport.la
 
 libor1ksys_la_LDFLAGS = -lm

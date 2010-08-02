@@ -130,6 +130,7 @@ AC_CONFIG_FILES([Makefile               \
 		 ext/Makefile           \
 		 fbtest/Makefile        \
 		 fp/Makefile            \
+		 testfloat/Makefile     \
 		 functest/Makefile      \
 		 flag/Makefile          \
 		 int-test/Makefile      \

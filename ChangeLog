@@ -1,3 +1,20 @@
+2010-08-03 Julius Baxter <julius.baxter@orsoc.se>
+	* softfloat/: Added softfloat, software emulation of 32-bit FPU	
+	* configure.ac: Added softfloat path to appropriate places
+	* Makefile.am: Added softfloat path and library to appropriate places
+	* cpu/or32/execute-fp.h: deleted
+	* cpu/or32/execute.c: Updated with FPU flag and rounding mode functions
+	* cpu/or32/insnset.c: FP insns. now call softfloat functions for ops.
+	* cpu/or1k/spr-defs.h: Add timer disabled bit
+	* testsuite/test-code-or1k/testfloat: Added new OR1K test of FPU
+	* testsuite/test-code-or1k/fp/fp.S: Update to work with softfloat FPU
+	* testsuite/test-code-or1k/support/support.c: Added rand() function
+	* testsuite/test-code-or1k/support/support.h: Added rand() fn. prototype
+	* testsuite/test-code-or1k/support/spr-defs.h: sync up with main defs
+	* testsuite/or1ksim.tests/fp.exp: Update expected output
+	* testsuite/or1ksim.tests/testfloat.exp: Expect file for testfloat sw.
+	* testsuite/or1ksim.tests/testfloat.cfg: Sim config file for testfloat
+
 2010-08-01  Jeremy Bennett  <jeremy.bennett@embecosm.co>
 
 	* configure: Regenerated.

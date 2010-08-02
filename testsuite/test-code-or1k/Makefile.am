@@ -54,6 +54,7 @@ SUBDIRS = support       \
 	  ext           \
 	  fbtest        \
 	  fp            \
+	  testfloat	\
 	  functest      \
 	  flag          \
 	  inst-set-test \

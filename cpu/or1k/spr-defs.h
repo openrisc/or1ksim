@@ -588,6 +588,7 @@
 #define SPR_TTMR_PERIOD	SPR_TTCR_PERIOD
 #define SPR_TTMR_IP	0x10000000  /* Interrupt Pending */
 #define SPR_TTMR_IE	0x20000000  /* Interrupt Enable */
+#define SPR_TTMR_DI	0x00000000  /* Disabled */
 #define SPR_TTMR_RT	0x40000000  /* Restart tick */
 #define SPR_TTMR_SR     0x80000000  /* Single run */
 #define SPR_TTMR_CR     0xc0000000  /* Continuous run */

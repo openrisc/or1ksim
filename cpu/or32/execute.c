@@ -3,8 +3,10 @@
    Copyright (C) 1999 Damjan Lampret, lampret@opencores.org
    Copyright (C) 2005 György `nog' Jeney, nog@sdf.lonestar.org
    Copyright (C) 2008 Embecosm Limited
+   Copyright (C) 2010 ORSoC AB
   
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+   Contributor Julius Baxter <julius.baxter@orsoc.se>
   
    This file is part of OpenRISC 1000 Architectural Simulator.
   
@@ -54,7 +56,7 @@
 #include "branch-predict.h"
 #include "sprs.h"
 #include "rsp-server.h"
-#include <fenv.h> // Floating point environment for FPU instructions
+#include "softfloat.h"
 
 /* Includes and macros for simple execution */
 #if SIMPLE_EXECUTION
@@ -106,9 +108,6 @@ static int sbuf_prev_cycles = 0;
 /* Variables used throughout this file to share information */
 static int  breakpoint;
 static int  next_delay_insn;
-
-/* A place to store the host's FPU rounding mode while OR1k's is used */
-static int host_fp_rm;
 
 /* Forward declaration of static functions */
 #if !(DYNAMIC_EXECUTION)
@@ -1052,74 +1051,75 @@ exec_main ()
     }
 }	/* exec_main() */
 
-
 /*---------------------------------------------------------------------------*/
-/*!Floating point operation setup function
-
-   Save host rounding mode, set it to OR1K's according to FPCSR
-   This function should be called before performing any FP instructions to
-   ensure the OR1K's rounding mode is installed in the host
-                                                                             */
+/*!Update the rounding mode variable the softfloat library reads             */
 /*---------------------------------------------------------------------------*/
 static void
-fp_set_or1k_rm(void)
- {
-   // Set OR1K's RM in host machine
-   // First save host RM to restore it later
-   host_fp_rm = fegetround();
-   // Now map OR1K RM to host RM
-   int or1k_rm = 0;
-   switch(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_RM)
-     {
-     case FPCSR_RM_RN:
-       or1k_rm = FE_TONEAREST;
-       break;
-     case FPCSR_RM_RZ:
-       or1k_rm = FE_TOWARDZERO;
-       break;
-     case FPCSR_RM_RIP:
-       or1k_rm = FE_UPWARD;
-       break;
-     case FPCSR_RM_RIN:
-       or1k_rm = FE_TOWARDZERO;
-       break;
-     }
-   // Now set this RM for the host
-   fesetround(or1k_rm); // TODO - check for nonzero return here, if RM not
-                        // able to be set, maybe warn user
- }
+float_set_rm ()
+{
+  //
+  // float_rounding_mode is used by the softfloat library, it is declared in
+  // "softfloat.h"
+  //
+  switch(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_RM)
+    {
+    case FPCSR_RM_RN:
+      //printf("or1ksim <%s>: rounding mode RN\n",__FUNCTION__);
+      float_rounding_mode = float_round_nearest_even;
+      break;
+    case FPCSR_RM_RZ:
+      //printf("or1ksim <%s>: rounding mode RZ\n",__FUNCTION__);
+      float_rounding_mode = float_round_to_zero;
+      break;
+    case FPCSR_RM_RIP:
+      //printf("or1ksim <%s>: rounding mode R+\n",__FUNCTION__);
+      float_rounding_mode = float_round_up;
+      break;
+    case FPCSR_RM_RIN:
+      //printf("or1ksim <%s>: rounding mode R-\n",__FUNCTION__);
+      float_rounding_mode = float_round_down;
+      break;
+    }
+}
 
 /*---------------------------------------------------------------------------*/
-/*!Floating point operation flag set and host restore function
-
-  Copy flags from floating point op into OR1K's FPCSR, and restore the host's
-  rounding mode.
-                                                                             */
+/*!Update the OR1K's FPCSR after each floating point instruction             */
 /*---------------------------------------------------------------------------*/
 static void
-fp_set_flags_restore_host_rm(void)
- {
-   // Check FP flags on host, convert to OR1K FPCSR bits
-   // First clear all flags in OR1K FPCSR
-   cpu_state.sprs[SPR_FPCSR] &= ~SPR_FPCSR_ALLF;
-
-   // Test host flags, set appropriate OR1K flags
-   if (fetestexcept(FE_DIVBYZERO)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_DZF;
-   if (fetestexcept(FE_INEXACT)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IXF;
-   if (fetestexcept(FE_INVALID)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IVF;
-   if (fetestexcept(FE_OVERFLOW)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_OVF;
-   if (fetestexcept(FE_UNDERFLOW)) cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_UNF;
-   
-   // Restore the hosts's rounding mode
-   fesetround(host_fp_rm);
-   
-   // TODO: Call FP exception is FPEE set and any of the flags were set
-   /*
+float_set_flags ()
+{
+  // Get the flags from softfloat's variable and set the OR1K's FPCR values
+  // First clear all flags in OR1K FPCSR
+  cpu_state.sprs[SPR_FPCSR] &= ~SPR_FPCSR_ALLF;
+  
+  if (float_exception_flags & float_flag_invalid)
+    cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IVF;
+  if (float_exception_flags & float_flag_divbyzero)
+    cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_DZF;
+  if (float_exception_flags & float_flag_overflow)
+    cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_OVF;
+  if (float_exception_flags & float_flag_underflow)
+    cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_UNF;
+  if (float_exception_flags & float_flag_inexact)
+    cpu_state.sprs[SPR_FPCSR] |= SPR_FPCSR_IXF;
+  /*
+  printf("or1ksim: post-fp-op flags from softfloat: %x%x%x%x%x\n",
+	 !!(float_exception_flags & float_flag_invalid),
+	 !!(float_exception_flags & float_flag_divbyzero),
+	 !!(float_exception_flags & float_flag_overflow),
+	 !!(float_exception_flags & float_flag_underflow),
+	 !!(float_exception_flags & float_flag_inexact));
+  */
+  // TODO: Call FP exception is FPEE set and any of the flags were set
+  /*
      if ((cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_FPEE) &
      (|(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_ALLF)))
      except_handle (EXCEPT_FPE, cpu_state.iqueue.insn_addr);
-   */
- }
+  */
+  // Now clear softfloat's flags:
+  float_exception_flags = 0;
+  
+}
 
 #if COMPLEX_EXECUTION
 
