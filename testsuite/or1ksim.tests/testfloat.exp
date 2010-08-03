@@ -27,11 +27,12 @@
 
 
 # Can take up to 5 minutes to run this test
+set old_timeout $timeout
 set timeout 300
 
 # Run testfloat
 run_or1ksim "testfloat"                       \
-    [list "!No errors found in int32_to_float32, rounding nearest_even." \
+    [list "No errors found in int32_to_float32, rounding nearest_even." \
 	 "No errors found in int32_to_float32, rounding to_zero." \
 	 "No errors found in int32_to_float32, rounding down." \
 	 "No errors found in int32_to_float32, rounding up." \
@@ -59,5 +60,7 @@ run_or1ksim "testfloat"                       \
 	 "No errors found in float32_eq." \
 	 "No errors found in float32_le." \
 	 "No errors found in float32_lt" \
-	 "exit(0)"]                    \
-    "testfloat.cfg" "testfloat/testfloat"
+	 "!exit(0)"]                    \
+    "fp.cfg" "testfloat/testfloat"
+
+set timeout $old_timeout

@@ -1,3 +1,16 @@
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/testfloat.exp: Modified to use fp.cfg, corrected
+	which tests are counted. Fixed change of timeout.
+	* or1ksim.tests/testfloat.cfg: Deleted.
+	* or1ksim.tests/Makefile.am: Added testfloat.exp to distribution.
+
+2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* or1ksim.tests/fp.exp: Update expected output.
+	* or1ksim.tests/testfloat.exp: Expect file for testfloat sw.
+	* or1ksim.tests/testfloat.cfg: Sim config file for testfloat.
+
 2010-07-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* or1ksim.tests/except-test.exp: Output no longer reports out of

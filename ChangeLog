@@ -1,19 +1,28 @@
-2010-08-03 Julius Baxter <julius.baxter@orsoc.se>
-	* softfloat/: Added softfloat, software emulation of 32-bit FPU	
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+
+2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* softfloat: Directory for softfloat, software emulation of 32-bit FPU.
+	* softfloat/Makefile.am: Created.
+	* softfloat/Makefile.in: Regenerated.
+	* softfloat/README: Created.
+	* softfloat/host.h: Created.
+	* softfloat/milieu.h: Created.
+	* softfloat/softfloat-macros: Created.
+	* softfloat/softfloat-specialize: Created.
+	* softfloat/softfloat.c: Created.
+	* softfloat/softfloat.h: Created.
+	* configure: Regenerated.
 	* configure.ac: Added softfloat path to appropriate places
 	* Makefile.am: Added softfloat path and library to appropriate places
+	* Makefile.in: Regenerated.
 	* cpu/or32/execute-fp.h: deleted
 	* cpu/or32/execute.c: Updated with FPU flag and rounding mode functions
 	* cpu/or32/insnset.c: FP insns. now call softfloat functions for ops.
 	* cpu/or1k/spr-defs.h: Add timer disabled bit
-	* testsuite/test-code-or1k/testfloat: Added new OR1K test of FPU
-	* testsuite/test-code-or1k/fp/fp.S: Update to work with softfloat FPU
-	* testsuite/test-code-or1k/support/support.c: Added rand() function
-	* testsuite/test-code-or1k/support/support.h: Added rand() fn. prototype
-	* testsuite/test-code-or1k/support/spr-defs.h: sync up with main defs
-	* testsuite/or1ksim.tests/fp.exp: Update expected output
-	* testsuite/or1ksim.tests/testfloat.exp: Expect file for testfloat sw.
-	* testsuite/or1ksim.tests/testfloat.cfg: Sim config file for testfloat
 
 2010-08-01  Jeremy Bennett  <jeremy.bennett@embecosm.co>
 
@@ -2586,8 +2595,7 @@
 	cuc/Makefile.in, debug/Makefile.in, extras/Makefile.in,
 	extras/extras.c, mmu/Makefile.in, peripheral/Makefile.in,
 	peripheral/channels/Makefile.in, pic/Makefile.in, pm/Makefile.in,
-	support/Makefile.in, testbench/Makefile.in, testbench/configure,
-	tick/Makefile.in, vapi/Makefile.in:
+	support/Makefile.in, testbench/Makefile.in, testbench/configure,, 	tick/Makefile.in, vapi/Makefile.in:
 
 	Downgrading back to automake-1.4
 

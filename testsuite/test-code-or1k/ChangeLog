@@ -1,3 +1,41 @@
+2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* testsuite/test-code-or1k/fp/fp.S: Update to work with softfloat FPU
+	* testsuite/test-code-or1k/support/support.c: Added rand() function
+	* testsuite/test-code-or1k/support/support.h: Added rand() fn. prototype
+	* testsuite/test-code-or1k/support/spr-defs.h: sync up with main defs
+	* testsuite/test-code-or1k/testfloat: Directory for new OR1K test
+	of FPU.
+	* testsuite/test-code-or1k/testfloat/Makefile.am: Created.
+	* testsuite/test-code-or1k/testfloat/Makefile.in: Regenerated.
+	* testsuite/test-code-or1k/testfloat/README: Created.
+	* testsuite/test-code-or1k/testfloat/fail.c: Created.
+	* testsuite/test-code-or1k/testfloat/fail.h: Created.
+	* testsuite/test-code-or1k/testfloat/milieu.h: Created.
+	* testsuite/test-code-or1k/testfloat/or1k-gcc.h: Created.
+	* testsuite/test-code-or1k/testfloat/random.c: Created.
+	* testsuite/test-code-or1k/testfloat/random.h: Created.
+	* testsuite/test-code-or1k/testfloat/slowfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/slowfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/softfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/softfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/systflags.c: Created.
+	* testsuite/test-code-or1k/testfloat/systflags.h: Created.
+	* testsuite/test-code-or1k/testfloat/systfloat.S: Created.
+	* testsuite/test-code-or1k/testfloat/systfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/systmodes.c: Created.
+	* testsuite/test-code-or1k/testfloat/systmodes.h: Created.
+	* testsuite/test-code-or1k/testfloat/testCases.c: Created.
+	* testsuite/test-code-or1k/testfloat/testCases.h: Created.
+	* testsuite/test-code-or1k/testfloat/testFunction.c: Created.
+	* testsuite/test-code-or1k/testfloat/testFunction.h: Created.
+	* testsuite/test-code-or1k/testfloat/testLoops.c: Created.
+	* testsuite/test-code-or1k/testfloat/testLoops.h: Created.
+	* testsuite/test-code-or1k/testfloat/testfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/testsoftfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/writeHex.c: Created.
+	* testsuite/test-code-or1k/testfloat/writeHex.h: Created.
+
 2010-08-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
