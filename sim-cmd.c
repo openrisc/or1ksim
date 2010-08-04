@@ -43,7 +43,6 @@
 #include "sim-config.h"
 #include "execute.h"
 #include "labels.h"
-#include "gdbcomm.h"
 #include "sched.h"
 #include "toplevel-support.h"
 #include "dumpverilog.h"
@@ -695,14 +694,6 @@ handle_sim_command (void)
 #else
       PRINTF ("(sim) ");
 
-      /* RSP does not get involved during CLI, so only check legacy interface
-	 here. */
-      if (config.debug.gdb_enabled)
-	{
-	  fflush (stdout);
-	  handle_server_socket (TRUE);	/* block & check_stdin = true */
-	}
-
       cur_arg = fgets (b2, sizeof (b2), stdin);
 
       if (!cur_arg)
@@ -809,19 +800,6 @@ handle_sim_command (void)
 
 #ifdef HAVE_LIBREADLINE
 
-int
-check_gdb_comm (void)
-{
-  /* Only do anything for legacy debug interface. RSP does not get involved
-     when the CLI is active */
-  if (config.debug.gdb_enabled)
-    {
-      handle_server_socket (TRUE);	/* block & check_stdin = true */
-    }
-
-  return 0;
-}
-
 char *command_generator ();
 char **sim_completion ();
 
@@ -837,10 +815,6 @@ initialize_readline (void)
   /* Tell the completer that we want a crack first. */
   rl_attempted_completion_function = sim_completion;
 
-#if HAVE_DECL_RL_EVENT_HOOK
-  /* Handle the gdb socket while waiting for input */
-  rl_event_hook = check_gdb_comm;
-#endif
 }
 
 /* Attempt to complete on the contents of TEXT.  START and END bound the

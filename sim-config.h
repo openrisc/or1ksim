@@ -162,9 +162,7 @@ struct config
   struct
   {
     int enabled;		/* Is debug module enabled */
-    int gdb_enabled;		/* Is legacy debugging with GDB possible */
     int rsp_enabled;		/* Is RSP debugging with GDB possible */
-    int server_port;		/* Port for legacy GDB connection */
     int rsp_port;		/* Port for RSP GDB connection */
     unsigned long vapi_id;	/* "Fake" vapi dev id for JTAG proxy */
     long int  jtagcycle_ps;	/* JTAG clock duration in ps */
@@ -225,7 +223,7 @@ struct runtime
   } cpu;
 
   struct
-  {				/* Verification API, part of Advanced Core Verification */
+  {				/* Verification API, part of Adv Core Verif */
     int enabled;		/* Whether is VAPI module enabled */
     FILE *vapi_file;		/* vapi file */
     int server_port;		/* A user specified port number for services */

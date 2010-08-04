@@ -26,8 +26,6 @@ noinst_LTLIBRARIES  = libdebug.la
 libdebug_la_SOURCES = debug-unit.c \
                       debug-unit.h \
 		      gdb.h        \
-                      gdbcomm.c    \
-                      gdbcomm.h    \
                       jtag.c       \
                       jtag.h       \
 		      rsp-server.c \

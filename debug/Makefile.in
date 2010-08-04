@@ -72,8 +72,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdebug_la_LIBADD =
-am_libdebug_la_OBJECTS = debug-unit.lo gdbcomm.lo jtag.lo \
-	rsp-server.lo
+am_libdebug_la_OBJECTS = debug-unit.lo jtag.lo rsp-server.lo
 libdebug_la_OBJECTS = $(am_libdebug_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -155,6 +154,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -228,8 +228,6 @@ noinst_LTLIBRARIES = libdebug.la
 libdebug_la_SOURCES = debug-unit.c \
                       debug-unit.h \
 		      gdb.h        \
-                      gdbcomm.c    \
-                      gdbcomm.h    \
                       jtag.c       \
                       jtag.h       \
 		      rsp-server.c \
@@ -288,7 +286,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug-unit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdbcomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jtag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsp-server.Plo@am__quote@
 

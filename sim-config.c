@@ -289,7 +289,7 @@ init_defconfig ()
 
   /* VAPI */
   config.vapi.enabled        = 0;
-  config.vapi.server_port    = 50000;
+/*   config.vapi.server_port    = 50000; */
   config.vapi.log_enabled    = 0;
   config.vapi.hide_device_id = 0;
   config.vapi.vapi_fn        = strdup ("vapi.log");
@@ -384,9 +384,7 @@ init_defconfig ()
   
   /* Debug */
   config.debug.enabled     = 0;
-  config.debug.gdb_enabled = 0;
   config.debug.rsp_enabled = 0;
-  config.debug.server_port = 51000;
   config.debug.rsp_port    = 51000;
   config.debug.vapi_id     = 0;
 
@@ -1073,15 +1071,15 @@ parse_args (int argc, char *argv[])
       else
 	{
 	  config.debug.enabled = 0;
-	  config.debug.gdb_enabled = 0;
+	  config.debug.rsp_enabled = 0;
 	}
     }
 
   if (srv->count > 0)
     {
-      config.debug.enabled = 1;
-      config.debug.gdb_enabled = 1;
-      config.debug.server_port = srv->ival[0];
+      config.debug.enabled     = 1;
+      config.debug.rsp_enabled = 1;
+      config.debug.rsp_port    = srv->ival[0];
     }
 
   /* Runtime debug messages */

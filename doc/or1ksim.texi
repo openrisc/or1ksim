@@ -443,19 +443,23 @@ on configuring @value{OR1KSIM}.
 
 @item --nosrv
 @cindex @code{--nosrv}
-Do not start up the debug server.  This overrides any setting specified
-in the configuration file.  This option may not be specified with
-@code{--srv}.  If it is, a rude message is printed and the
-@code{--nosrv} option is ignored.
+@cindex Remote Serial Protocol, @code{--nosrv}
+Do not start up the @dfn{Remote Serial Protocol} debug server.  This
+overrides any setting specified in the configuration file.  This
+option may not be specified with @code{--srv}.  If it is, a rude
+message is printed and the @code{--nosrv} option is ignored.
 
 @item --srv
 @item --srv=@var{n}
 @cindex @code{--srv}
-Start up the debug server.  If the parameter, @var{n}, is specified,
-use that as the TCP/IP port for the server, otherwise a random value
-from the private port range (41920-65535) will be used.  This option
-may not be specified with @code{--nosrv}.  If it is, a rude message is
-printed and the @code{--nosrv} option is ignored.
+@cindex Remote Serial Protocol, @code{--srv}
+Start up the @dfn{Remote Serial Protocol} debug server.  This
+overrides any setting specified in the configuration file.  If the
+parameter, @var{n}, is specified, use that as the TCP/IP port for the
+server, otherwise a random value from the private port range
+(41920-65535) will be used.  This option may not be specified with
+@code{--nosrv}.  If it is, a rude message is printed and the
+@code{--nosrv} option is ignored.
 
 @item -d=@var{config_string}
 @itemx --debug-config=@var{config_string}
@@ -1911,7 +1915,7 @@ If 1 (true), the debug unit is enabled.  If 0 (the default), it is disabled.
 This enables the functionality of the debug unit (its registers etc) within
 the mode.  It does not provide any external interface to the debug unit.
 For
-that, see @code{gdb_enabled} and @code{rsp_enabled} below.
+that, see @code{rsp_enabled} below.
 @end quotation
 
 @item rsp_enabled = 0|1
@@ -1928,13 +1932,6 @@ Embecosm Application Note 2, @cite{Howto: Porting the GNU Debugger Practical
 Experience with the OpenRISC 1000 Architecture}, by Jeremy Bennett, published
 by Embecosm Limited (@url{www.embecosm.com}).
 
-@quotation Note
-@code{rsp_enabled} may not be enabled with @code{gdb_enabled} (see
-below).  If
-both are enabled, a warning is issued and only the @dfn{Remote Serial
-Protocol} interface is enabled.
-@end quotation
-
 @item rsp_port = @var{value}
 @cindex @code{rsp_port} (debug interface configuration)
 @var{value} specifies the port to be used for the GDB @dfn{Remote Serial
@@ -1947,48 +1944,6 @@ service named @code{or1ksim-rsp}.
 There is no registered port for @value{OR1KSIM} @dfn{Remote Serial Protocol}
 service @code{or1ksim-rsp}.  Good practice suggests users should adopt port
 values in the @dfn{Dynamic} or @dfn{Private} port range, i.e.  49152-65535.
-@end quotation
-
-@item gdb_enabled = 0|1
-@cindex @code{gdb_enabled} (debug interface configuration)
-If 1 (true), the OpenRISC Remote JTAG protocol server is started, provding an
-interface to an external GNU debugger, using the port specified in the
-@code{server_port} field (see below), or the @code{or1ksim} TCP/IP
-service.  If
-0 (the default), the server is not started, and no external interface is
-provided.
-
-For more detailed information on the interface to the GNU Debugger see
-Embecosm Application Note 2, @cite{Howto: Porting the GNU Debugger Practical
-Experience with the OpenRISC 1000 Architecture}, by Jeremy Bennett, published
-by Embecosm Limited (@url{www.embecosm.com}).
-
-@quotation Note
-The OpenRISC Remote JTAG protocol is unique to OpenRISC, and remains only for
-backward compatibility.  New users should adopt the standard GDB @dfn{Remote
-Serial Protocol} interface (see @code{rsp_enabled} above) providing access to
-a wider range of GDB functionality.
-@end quotation
-
-@quotation Note
-@code{gdb_enabled} may not be enabled with @code{rsp_enabled}.  If both are
-enabled, a warning is issued and only the @dfn{Remote Serial Protocol}
-interface is enabled.
-@end quotation
-
-@item server_port = @var{value}
-@cindex @code{server_port} (debug interface configuration)
-@var{value} specifies the port to be used for the OpenRISC Rmote JTAG
-protocol interface to the GNU Debugger (GDB).  Default value 51000.  If
-the value 0 is specified, @value{OR1KSIM} will instead look for a TCP/IP
-service named @code{or1ksim}.
-
-@quotation Tip
-@cindex TCP/IP port range for @code{or1ksim} service
-There is no registered port for @value{OR1KSIM} Remote JTAG Interface
-or service @code{or1ksim}.  Good practice suggests users should adopt
-port values in the @dfn{Dynamic} or @dfn{Private} port range,
-i.e.  49152-65535.
 @end quotation
 
 @item vapi_id = @var{value}

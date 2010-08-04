@@ -1,5 +1,10 @@
 2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
+	* or1ksim.tests/eth.cfg: Fix section debug to use RSP only.
+	* or1ksim.tests/kbdtest.cfg: Fix section debug to use RSP only.
+
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
 	* or1ksim.tests/testfloat.exp: Modified to use fp.cfg, corrected
 	which tests are counted. Fixed change of timeout.
 	* or1ksim.tests/testfloat.cfg: Deleted.

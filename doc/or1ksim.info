@@ -359,19 +359,21 @@ Many of the options have both a short and a long form.  For example
      information on configuring Or1ksim.
 
 `--nosrv'
-     Do not start up the debug server.  This overrides any setting
-     specified in the configuration file.  This option may not be
-     specified with `--srv'.  If it is, a rude message is printed and
-     the `--nosrv' option is ignored.
+     Do not start up the "Remote Serial Protocol" debug server.  This
+     overrides any setting specified in the configuration file.  This
+     option may not be specified with `--srv'.  If it is, a rude
+     message is printed and the `--nosrv' option is ignored.
 
 `--srv'
 
 `--srv=N'
-     Start up the debug server.  If the parameter, N, is specified, use
-     that as the TCP/IP port for the server, otherwise a random value
-     from the private port range (41920-65535) will be used.  This
-     option may not be specified with `--nosrv'.  If it is, a rude
-     message is printed and the `--nosrv' option is ignored.
+     Start up the "Remote Serial Protocol" debug server.  This
+     overrides any setting specified in the configuration file.  If the
+     parameter, N, is specified, use that as the TCP/IP port for the
+     server, otherwise a random value from the private port range
+     (41920-65535) will be used.  This option may not be specified with
+     `--nosrv'.  If it is, a rude message is printed and the `--nosrv'
+     option is ignored.
 
 `-d=CONFIG_STRING'
 `--debug-config=CONFIG_STRING'
@@ -1562,7 +1564,7 @@ parameters may be specified.
           Note: This enables the functionality of the debug unit (its
           registers etc) within the mode.  It does not provide any
           external interface to the debug unit.  For that, see
-          `gdb_enabled' and `rsp_enabled' below.
+          `rsp_enabled' below.
 
 `rsp_enabled = 0|1'
      If 1 (true), the GDB "Remote Serial Protocol" server is started,
@@ -1576,10 +1578,6 @@ parameters may be specified.
      Practical Experience with the OpenRISC 1000 Architecture', by
      Jeremy Bennett, published by Embecosm Limited (`www.embecosm.com').
 
-          Note: `rsp_enabled' may not be enabled with `gdb_enabled' (see
-          below).  If both are enabled, a warning is issued and only
-          the "Remote Serial Protocol" interface is enabled.
-
 `rsp_port = VALUE'
      VALUE specifies the port to be used for the GDB "Remote Serial
      Protocol" interface to the GNU Debugger (GDB).  Default value
@@ -1590,39 +1588,6 @@ parameters may be specified.
           Protocol" service `or1ksim-rsp'.  Good practice suggests
           users should adopt port values in the "Dynamic" or "Private"
           port range, i.e.  49152-65535.
-
-`gdb_enabled = 0|1'
-     If 1 (true), the OpenRISC Remote JTAG protocol server is started,
-     provding an interface to an external GNU debugger, using the port
-     specified in the `server_port' field (see below), or the `or1ksim'
-     TCP/IP service.  If 0 (the default), the server is not started,
-     and no external interface is provided.
-
-     For more detailed information on the interface to the GNU Debugger
-     see Embecosm Application Note 2, `Howto: Porting the GNU Debugger
-     Practical Experience with the OpenRISC 1000 Architecture', by
-     Jeremy Bennett, published by Embecosm Limited (`www.embecosm.com').
-
-          Note: The OpenRISC Remote JTAG protocol is unique to
-          OpenRISC, and remains only for backward compatibility.  New
-          users should adopt the standard GDB "Remote Serial Protocol"
-          interface (see `rsp_enabled' above) providing access to a
-          wider range of GDB functionality.
-
-          Note: `gdb_enabled' may not be enabled with `rsp_enabled'.
-          If both are enabled, a warning is issued and only the "Remote
-          Serial Protocol" interface is enabled.
-
-`server_port = VALUE'
-     VALUE specifies the port to be used for the OpenRISC Rmote JTAG
-     protocol interface to the GNU Debugger (GDB).  Default value
-     51000.  If the value 0 is specified, Or1ksim will instead look for
-     a TCP/IP service named `or1ksim'.
-
-          Tip: There is no registered port for Or1ksim Remote JTAG
-          Interface or service `or1ksim'.  Good practice suggests users
-          should adopt port values in the "Dynamic" or "Private" port
-          range, i.e.  49152-65535.
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
@@ -3442,7 +3407,7 @@ Index
 
 * --cumulative:                          Profiling Utility.   (line  26)
 * --debug-config:                        Standalone Simulator.
-                                                              (line  48)
+                                                              (line  50)
 * --disable-all-tests:                   Configuring the Build.
                                                               (line 105)
 * --disable-arith-flag:                  Configuring the Build.
@@ -3470,11 +3435,11 @@ Index
 * --enable-execution:                    Configuring the Build.
                                                               (line  37)
 * --enable-mprofile:                     Standalone Simulator.
-                                                              (line  77)
+                                                              (line  79)
 * --enable-ov-flag:                      Configuring the Build.
                                                               (line 132)
 * --enable-profile:                      Standalone Simulator.
-                                                              (line  74)
+                                                              (line  76)
 * --enable-profiling:                    Configuring the Build.
                                                               (line  29)
 * --enable-range-stats:                  Configuring the Build.
@@ -3494,7 +3459,7 @@ Index
                                                               (line  22)
 * --help (profiling utility):            Profiling Utility.   (line  22)
 * --interactive:                         Standalone Simulator.
-                                                              (line  54)
+                                                              (line  56)
 * --mode:                                Memory Profiling Utility.
                                                               (line  26)
 * --nosrv:                               Standalone Simulator.
@@ -3503,7 +3468,7 @@ Index
 * --srv:                                 Standalone Simulator.
                                                               (line  40)
 * --strict-npc:                          Standalone Simulator.
-                                                              (line  57)
+                                                              (line  59)
 * --version:                             Standalone Simulator.
                                                               (line  16)
 * --version (memory profiling utility):  Memory Profiling Utility.
@@ -3511,7 +3476,7 @@ Index
 * --version (profiling utility):         Profiling Utility.   (line  17)
 * -c:                                    Profiling Utility.   (line  26)
 * -d:                                    Standalone Simulator.
-                                                              (line  48)
+                                                              (line  50)
 * -f <1>:                                Memory Profiling Utility.
                                                               (line  51)
 * -f:                                    Standalone Simulator.
@@ -3525,7 +3490,7 @@ Index
                                                               (line  22)
 * -h (profiling utility):                Profiling Utility.   (line  22)
 * -i:                                    Standalone Simulator.
-                                                              (line  54)
+                                                              (line  56)
 * -m:                                    Memory Profiling Utility.
                                                               (line  26)
 * -q:                                    Profiling Utility.   (line  30)
@@ -3839,8 +3804,6 @@ Index
 * floating point support:                Known Issues.        (line  42)
 * frame buffer configuration:            Frame Buffer Configuration.
                                                               (line   6)
-* gdb_enabled (debug interface configuration): Debug Interface Configuration.
-                                                              (line  47)
 * generic peripheral configuration:      Generic Peripheral Configuration.
                                                               (line   6)
 * GPIO configuration:                    GPIO Configuration.  (line   6)
@@ -4091,6 +4054,10 @@ Index
 * regression testing:                    Regression Testing.  (line   6)
 * Remote Serial Protocol:                Debug Interface Configuration.
                                                               (line  20)
+* Remote Serial Protocol, --nosrv:       Standalone Simulator.
+                                                              (line  32)
+* Remote Serial Protocol, --srv:         Standalone Simulator.
+                                                              (line  40)
 * reset (Interactive CLI):               Interactive Command Line.
                                                               (line  63)
 * reset hooks:                           Concepts.            (line  13)
@@ -4102,7 +4069,7 @@ Index
 * rsp_enabled (debug interface configuration): Debug Interface Configuration.
                                                               (line  20)
 * rsp_port (debug interface configuration): Debug Interface Configuration.
-                                                              (line  36)
+                                                              (line  32)
 * rtx_type (Ethernet configuration):     Ethernet Configuration.
                                                               (line  46)
 * run (Interactive CLI):                 Interactive Command Line.
@@ -4174,8 +4141,6 @@ Index
                                                               (line  49)
 * sectors (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 125)
-* server_port (debug interface configuration): Debug Interface Configuration.
-                                                              (line  69)
 * server_port (verification API configuration): Verification API Configuration.
                                                               (line  19)
 * set (Interactive CLI):                 Interactive Command Line.
@@ -4234,10 +4199,8 @@ Index
 * target test code:                      Regression Testing.  (line  63)
 * TCP/IP port range:                     Verification API Configuration.
                                                               (line  23)
-* TCP/IP port range for or1ksim service: Debug Interface Configuration.
-                                                              (line  74)
 * TCP/IP port range for or1ksim-rsp service: Debug Interface Configuration.
-                                                              (line  41)
+                                                              (line  37)
 * test code for host:                    Regression Testing.  (line  57)
 * test code for target:                  Regression Testing.  (line  63)
 * test make file:                        Regression Testing.  (line  27)
@@ -4298,7 +4261,7 @@ Index
 * VAPI for GPIO:                         Verification API.    (line  88)
 * VAPI for UART:                         Verification API.    (line  41)
 * vapi_id (debug interface configuration): Debug Interface Configuration.
-                                                              (line  80)
+                                                              (line  43)
 * vapi_id (DMA configuration) <1>:       Ethernet Configuration.
                                                               (line  88)
 * vapi_id (DMA configuration):           DMA Configuration.   (line  38)
@@ -4330,47 +4293,47 @@ Node: Build and Install7880
 Node: Known Issues8726
 Node: Usage11788
 Node: Standalone Simulator12002
-Node: Profiling Utility14905
-Node: Memory Profiling Utility15815
-Node: Simulator Library17180
-Node: Configuration24958
-Node: Configuration File Format25570
-Node: Configuration File Preprocessing25862
-Node: Configuration File Syntax26159
-Node: Simulator Configuration28944
-Node: Simulator Behavior29235
-Node: Verification API Configuration33764
-Node: CUC Configuration35704
-Node: Core OpenRISC Configuration37621
-Node: CPU Configuration38123
-Node: Memory Configuration42241
-Node: Memory Management Configuration48699
-Node: Cache Configuration51076
-Node: Interrupt Configuration53462
-Node: Power Management Configuration54198
-Node: Branch Prediction Configuration55475
-Node: Debug Interface Configuration56835
-Node: Peripheral Configuration61055
-Node: Memory Controller Configuration61681
-Node: UART Configuration65095
-Node: DMA Configuration68614
-Node: Ethernet Configuration70481
-Node: GPIO Configuration74457
-Node: Display Interface Configuration76090
-Node: Frame Buffer Configuration78399
-Node: Keyboard Configuration80263
-Node: Disc Interface Configuration82501
-Node: Generic Peripheral Configuration87444
-Node: Interactive Command Line89739
-Node: Verification API96713
-Node: Code Internals101143
-Node: Coding Conventions101726
-Node: Global Data Structures106153
-Node: Concepts108810
-Ref: Output Redirection108955
-Node: Internal Debugging109494
-Node: Regression Testing110018
-Node: GNU Free Documentation License113813
-Node: Index136220
+Node: Profiling Utility15030
+Node: Memory Profiling Utility15940
+Node: Simulator Library17305
+Node: Configuration25083
+Node: Configuration File Format25695
+Node: Configuration File Preprocessing25987
+Node: Configuration File Syntax26284
+Node: Simulator Configuration29069
+Node: Simulator Behavior29360
+Node: Verification API Configuration33889
+Node: CUC Configuration35829
+Node: Core OpenRISC Configuration37746
+Node: CPU Configuration38248
+Node: Memory Configuration42366
+Node: Memory Management Configuration48824
+Node: Cache Configuration51201
+Node: Interrupt Configuration53587
+Node: Power Management Configuration54323
+Node: Branch Prediction Configuration55600
+Node: Debug Interface Configuration56960
+Node: Peripheral Configuration59303
+Node: Memory Controller Configuration59929
+Node: UART Configuration63343
+Node: DMA Configuration66862
+Node: Ethernet Configuration68729
+Node: GPIO Configuration72705
+Node: Display Interface Configuration74338
+Node: Frame Buffer Configuration76647
+Node: Keyboard Configuration78511
+Node: Disc Interface Configuration80749
+Node: Generic Peripheral Configuration85692
+Node: Interactive Command Line87987
+Node: Verification API94961
+Node: Code Internals99391
+Node: Coding Conventions99974
+Node: Global Data Structures104401
+Node: Concepts107058
+Ref: Output Redirection107203
+Node: Internal Debugging107742
+Node: Regression Testing108266
+Node: GNU Free Documentation License112061
+Node: Index134468
 
 End Tag Table

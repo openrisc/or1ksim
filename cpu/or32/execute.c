@@ -44,7 +44,6 @@
 #include "toplevel-support.h"
 #include "except.h"
 #include "labels.h"
-#include "gdbcomm.h"
 #include "sched.h"
 #include "stats.h"
 #include "opcode/or32.h"
@@ -983,11 +982,6 @@ exec_main ()
 		{
 		  handle_rsp ();
 		}
-	      else if (config.debug.gdb_enabled)
-		{
-		  block_jtag ();
-		  handle_server_socket (FALSE);
-		}
 	      else
 		{
 		  fprintf (stderr, "ERROR: CPU stalled and GDB connection not "
@@ -1021,11 +1015,6 @@ exec_main ()
       if (config.vapi.enabled && runtime.vapi.enabled)
 	{
 	  vapi_check ();
-	}
-
-      if (config.debug.gdb_enabled)
-	{
-	  handle_server_socket (FALSE);	/* block & check_stdin = false */
 	}
 
       if (config.debug.enabled)

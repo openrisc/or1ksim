@@ -49,7 +49,6 @@
 #include "stats.h"
 #include "opcode/or32.h"
 #include "parse.h"
-#include "gdbcomm.h"
 #include "rsp-server.h"
 #include "vapi.h"
 #include "abstract.h"
@@ -300,11 +299,9 @@ sim_init ()
 	}
     }
 
-  /* Disable GDB debugging, if debug unit is not available.  */
-  if ((config.debug.gdb_enabled || config.debug.rsp_enabled) &&
-      !config.debug.enabled)
+  /* Disable RSP debugging, if debug unit is not available.  */
+  if (config.debug.rsp_enabled && !config.debug.enabled)
     {
-      config.debug.gdb_enabled = 0;
       config.debug.rsp_enabled = 0;
 
       if (config.sim.verbose)
@@ -323,10 +320,6 @@ sim_init ()
 	 processor. */
       rsp_exception (EXCEPT_TRAP);
       set_stall_state (1);
-    }
-  else if (config.debug.gdb_enabled)
-    {
-      gdbcomm_init ();
     }
 
   /* Enable dependency stats, if we want to do history analisis */

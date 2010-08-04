@@ -2,6 +2,33 @@
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
+	* cpu/or32/execute.c: Remove include of gdbcomm.h.
+	(exec_main): Remove two tests for config.debug.gdb_enabled.
+	* cpu/or32/insnset.c <l_nop>: Change test for
+	config.debug.gdb_enabled to config.debug.enabled for NOP_EXIT
+	case.
+	* debug/debug-unit.c (debug_gdb_enabled, debug_server_port):
+	Deleted.
+	(debug_rsp_enabled): Remove test for gdb_enabled.
+	(reg_debug_sec): Remove gdb_enabled and server_port parameters.
+	* debug/Makefile.am: Remove gdbcomm.c and gdbcomm.h.
+	* sim-cmd.c: Remove include of gdbcomm.h.
+	(initialize_readline): Remove conditional setting of
+	rl_event_hook.
+	(check_gdbcomm): Deleted.
+	(handle_sim_command): Remove check of gdb_enabled.
+	* sim-config.c (init_defconfig): Remove setting of
+	config.debug.gdb_enabled and config.debug.server_port.
+	(parse_args): Use --srv and --nosrv to set/clear RSP debugging.
+	* sim-config.h <struct config>: Removed debug.gdb_enabled and
+	debug.server_port.
+	* toplevel-support.c: Remove include of gdbcomm.h.
+	(sim_init): Remove two tests for gdb_enabled.
+
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
 
 2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
 

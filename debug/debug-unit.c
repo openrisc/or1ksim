@@ -981,34 +981,9 @@ debug_enabled (union param_val val, void *dat)
 
 
 /*---------------------------------------------------------------------------*/
-/*!Enable or disable the legacy GDB interface to the debug unit
-
-   This is for use with the OpenRISC Remote JTAG protocol (now deprecated). It
-   may only be specified if the RSP interface is not specified. If both are
-   specified, the RSP will be used.
-
-   @param[in] val  The value to use
-   @param[in] dat  The config data structure (not used here)                 */
-/*---------------------------------------------------------------------------*/
-static void
-debug_gdb_enabled (union param_val val, void *dat)
-{
-  config.debug.gdb_enabled = val.int_val;
-
-  if (config.debug.gdb_enabled && config.debug.rsp_enabled)
-    {
-      fprintf (stderr, "WARNING. Cannot specify both legacy and RSP GDB "
-	       "interfaces: legacy interface ignored\n");
-      config.debug.gdb_enabled = 0;
-    }
-}	/* debug_gdb_enabled () */
-
-
-/*---------------------------------------------------------------------------*/
 /*!Enable or disable Remote Serial Protocol GDB interface to the debug unit
 
-   This is the preferred interface. It may only be specified if the RSP
-   interface is not specified. If both are specified, the RSP will be used.
+   This is the now the only interface.
 
    @param[in] val  The value to use
    @param[in] dat  The config data structure (not used here)                 */
@@ -1018,40 +993,7 @@ debug_rsp_enabled (union param_val val, void *dat)
 {
   config.debug.rsp_enabled = val.int_val;
 
-  if (config.debug.gdb_enabled && config.debug.rsp_enabled)
-    {
-      fprintf (stderr, "WARNING. Cannot specify both legacy and RSP GDB "
-	       "interfaces: legacy interface ignored\n");
-      config.debug.gdb_enabled = 0;
-    }
 }	/* debug_rsp_enabled () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Set the legacy GDB server port
-
-   This is for use with the OpenRISC Remote JTAG protocol (now deprecated).
-   Ensure the value chosen is valid. Note that 0 is permitted, meaning the
-   connection should be to the "or1ksim" service, rather than a port.
-
-   Both this and the RSP port may be specified, but only one may be enabled
-   (see debug_gdb_enabled() and debug_rsp_enabled()).
-
-   @param[in] val  The value to use
-   @param[in] dat  The config data structure (not used here)                 */
-/*---------------------------------------------------------------------------*/
-static void
-debug_server_port (union param_val val, void *dat)
-{
-  if ((val.int_val < 0) || (val.int_val > 65535))
-    {
-      fprintf (stderr, "Warning: invalid legacy GDB port specified: ignored\n");
-    }
-  else
-    {
-      config.debug.server_port = val.int_val;
-    }
-}	/* debug_server_port() */
 
 
 /*---------------------------------------------------------------------------*/
@@ -1060,9 +1002,6 @@ debug_server_port (union param_val val, void *dat)
    This is for use with the RSP, which is now the preferred interface.  Ensure
    the value chosen is valid. Note that 0 is permitted, meaning the connection
    should be to the "or1ksim-rsp" service, rather than a port.
-
-   Both this and the legacy port may be specified, but only one may be enabled
-   (see debug_gdb_enabled() and debug_rsp_enabled()).
 
    @param[in] val  The value to use
    @param[in] dat  The config data structure (not used here)                 */
@@ -1104,9 +1043,7 @@ reg_debug_sec ()
   struct config_section *sec = reg_config_sec ("debug", NULL, NULL);
 
   reg_config_param (sec, "enabled",     PARAMT_INT, debug_enabled);
-  reg_config_param (sec, "gdb_enabled", PARAMT_INT, debug_gdb_enabled);
   reg_config_param (sec, "rsp_enabled", PARAMT_INT, debug_rsp_enabled);
-  reg_config_param (sec, "server_port", PARAMT_INT, debug_server_port);
   reg_config_param (sec, "rsp_port",    PARAMT_INT, debug_rsp_port);
   reg_config_param (sec, "vapi_id",     PARAMT_INT, debug_vapi_id);
 
