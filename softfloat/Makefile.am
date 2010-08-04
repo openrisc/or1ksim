@@ -24,9 +24,10 @@
 
 
 noinst_LTLIBRARIES = libsoftfloat.la
+
 libsoftfloat_la_SOURCES  = softfloat.c \
-			softfloat.h \
-			host.h \
-			milieu.h \
-			softfloat-macros \
-			softfloat-specialize
+			   softfloat.h \
+			   host.h \
+			   milieu.h \
+			   softfloat-macros \
+			   softfloat-specialize

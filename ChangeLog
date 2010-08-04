@@ -1,4 +1,21 @@
-2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-08-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date. Test for
+	varargs.h dropped.
+	* cpu/or32/insnset.c <l_nop>: Terminate execution on NOP_EXIT,
+	even if debugging.
+	* debug/rsp-server.c (rsp_query): Added support for qAttached
+	packet.
+	* libtoplevel.c (or1ksim_run): Stall after a single instruction if
+	SPR_DMR1_ST flag is set.
+	* softfloat/host.h: Make #define of INLINE conditional, to allow
+	the user to override.
+	* softfloat/README: Added instructions for non-optimized compilation.
+	* softfloat/softfloat-macros: Add a conditional #ifndef
+	NO_SOFTFLOAT_UNUSUED around unused functions.
+
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -25,7 +42,7 @@
 	* toplevel-support.c: Remove include of gdbcomm.h.
 	(sim_init): Remove two tests for gdb_enabled.
 
-2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -51,7 +68,7 @@
 	* cpu/or32/insnset.c: FP insns. now call softfloat functions for ops.
 	* cpu/or1k/spr-defs.h: Add timer disabled bit
 
-2010-08-01  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-08-01  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -105,7 +122,7 @@
 	* cpu/or1k/spr-defs.h: Added FP group and FPCSR addr and bits defines
 	* testsuite/test-code-or1k/support/spr-defs.h: ditto
 
-2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -181,7 +198,7 @@
 	(reg_sim_sec): Upper case enumeration elements.
 	(set_config): Use new section and parameter lookup functions.
 
-2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Version changed to current date.
@@ -220,7 +237,7 @@
 	* cpu/or32/execute.c: Adding binary execution dump function
 	* cpu/common/execute.h: Adding proptoype for binary dump function
 
-2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.co>
+2010-06-31  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* argtable2/argtable2.c (arg_print_formatted): Cast argument to
 	* configure: Regenerated.

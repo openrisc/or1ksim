@@ -563,10 +563,6 @@ INSTRUCTION (l_nop) {
 	  runtime.cpu.halted = 1;
 	  set_stall_state (1);
 	}
-      else if (config.debug.enabled)
-	{
-	  set_stall_state (1);
-	}
       else
 	{
 	  sim_done();

@@ -200,9 +200,6 @@
 /* Whether l.xori takes an unsigned immediate operand */
 #undef HAVE_UNSIGNED_XORI
 
-/* Define to 1 if you have the <varargs.h> header file. */
-#undef HAVE_VARARGS_H
-
 /* Define to 1 if the system has the type `__compar_fn_t'. */
 #undef HAVE___COMPAR_FN_T
 
@@ -236,9 +233,6 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION

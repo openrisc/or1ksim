@@ -185,6 +185,12 @@ or1ksim_run (double duration)
 	  return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
 	}
 
+      /* If we were single stepping, stall immediately. */
+      if (cpu_state.sprs[SPR_DMR1] & SPR_DMR1_ST)
+	{
+	  set_stall_state (1);
+	}
+
       /* If we are stalled we can't do anything. We treat this as hitting a
 	 breakpoint or halting. */
       if(runtime.cpu.stalled)

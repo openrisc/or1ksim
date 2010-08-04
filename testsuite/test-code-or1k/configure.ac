@@ -24,7 +24,7 @@
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
 
-AC_INIT([or1ksim-testsuite],[2010-08-03], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite],[2010-08-04], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL

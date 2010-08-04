@@ -128,6 +128,8 @@ INLINE void
 
 }
 
+
+#ifndef NO_SOFTFLOAT_UNUSED
 /*----------------------------------------------------------------------------
 | Shifts the 128-bit value formed by concatenating `a0' and `a1' right by the
 | number of bits given in `count'.  Any bits shifted off are lost.  The value
@@ -327,6 +329,8 @@ INLINE void
 
 }
 
+#endif
+
 /*----------------------------------------------------------------------------
 | Adds the 128-bit value formed by concatenating `a0' and `a1' to the 128-bit
 | value formed by concatenating `b0' and `b1'.  Addition is modulo 2^128, so
@@ -345,6 +349,8 @@ INLINE void
     *z0Ptr = a0 + b0 + ( z1 < a1 );
 
 }
+
+#ifndef NO_SOFTFLOAT_UNUSED
 
 /*----------------------------------------------------------------------------
 | Adds the 192-bit value formed by concatenating `a0', `a1', and `a2' to the
@@ -384,6 +390,8 @@ INLINE void
 
 }
 
+#endif
+
 /*----------------------------------------------------------------------------
 | Subtracts the 128-bit value formed by concatenating `b0' and `b1' from the
 | 128-bit value formed by concatenating `a0' and `a1'.  Subtraction is modulo
@@ -401,6 +409,8 @@ INLINE void
     *z0Ptr = a0 - b0 - ( a1 < b1 );
 
 }
+
+#ifndef NO_SOFTFLOAT_UNUSED
 
 /*----------------------------------------------------------------------------
 | Subtracts the 192-bit value formed by concatenating `b0', `b1', and `b2'
@@ -440,6 +450,8 @@ INLINE void
 
 }
 
+#endif
+
 /*----------------------------------------------------------------------------
 | Multiplies `a' by `b' to obtain a 128-bit product.  The product is broken
 | into two 64-bit pieces which are stored at the locations pointed to by
@@ -468,6 +480,8 @@ INLINE void mul64To128( bits64 a, bits64 b, bits64 *z0Ptr, bits64 *z1Ptr )
     *z0Ptr = z0;
 
 }
+
+#ifndef NO_SOFTFLOAT_UNUSED
 
 /*----------------------------------------------------------------------------
 | Multiplies the 128-bit value formed by concatenating `a0' and `a1' by
@@ -533,6 +547,8 @@ INLINE void
     *z0Ptr = z0;
 
 }
+
+#endif
 
 /*----------------------------------------------------------------------------
 | Returns an approximation to the 64-bit integer quotient obtained by dividing
@@ -666,6 +682,8 @@ static int8 countLeadingZeros64( bits64 a )
 
 }
 
+#ifndef NO_SOFTFLOAT_UNUSED
+
 /*----------------------------------------------------------------------------
 | Returns 1 if the 128-bit value formed by concatenating `a0' and `a1'
 | is equal to the 128-bit value formed by concatenating `b0' and `b1'.
@@ -718,3 +736,4 @@ INLINE flag ne128( bits64 a0, bits64 a1, bits64 b0, bits64 b1 )
 
 }
 
+#endif

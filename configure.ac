@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-08-03], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2010-08-04], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -73,8 +73,9 @@ esac
 
 AC_SUBST(CPU_ARCH)
 
-# Set the CFLAGS we want
-CFLAGS="$CFLAGS -g -Wall -Werror -O2 -D$ARCH_ISA"
+# Set the CFLAGS we want. We put the user flags last, so that if the user
+# changes the optimization level, that will take precedence.
+CFLAGS="-g -Wall -Werror -O2 -D$ARCH_ISA $CFLAGS"
 
 AM_PROG_AS
 
@@ -91,7 +92,7 @@ AC_CHECK_PROG(AR, ar, ar)
 test -n "$ARFLAGS" || ARFLAGS="cr"
 
 AC_TYPE_SIGNAL
-AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h      \
+AC_CHECK_HEADERS(unistd.h stdlib.h stdarg.h string.h strings.h      \
 		 sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
 		 termcap.h termios.h termio.h sys/file.h locale.h getopt.h    \
 		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h  \

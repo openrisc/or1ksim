@@ -1757,7 +1757,13 @@ rsp_write_reg (struct rsp_buf *buf)
 static void
 rsp_query (struct rsp_buf *buf)
 {
-  if (0 == strcmp ("qC", buf->data))
+  if (0 == strcmp ("qAttached", buf->data))
+    {
+      /* We are always attaching to an existing process with the bare metal
+	 embedded system. */
+      put_str_packet ("1");
+    }
+  else if (0 == strcmp ("qC", buf->data))
     {
       /* Return the current thread ID (unsigned hex). A null response
 	 indicates to use the previously selected thread. We use the constant
