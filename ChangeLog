@@ -1,3 +1,7 @@
+2010-08-06  Julius Baxter <julius.baxter@orsoc.se>
+
+	* cpu/or1k/spr-defs.h <SPR_VR_RES>: Fixed value (Thanks to Jonas Bonn)
+
 2010-08-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
