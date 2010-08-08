@@ -90,20 +90,20 @@ int output_function (FILE *fo, const char *func_name, int level)
     if (strncmp (str, "INSTRUCTION (", 13) == 0) {
       char *s;
       str += 13;
-      while (isspace (*str)) str++;
+      while (isspace ((int)*str)) str++;
       s = str;
       while (*s && *s != ')') s++;
       *s = 0;
-      while (isspace(*(s - 1))) s--;
+      while (isspace((int)*(s - 1))) s--;
       *s = 0;
       if (strcmp (str, func_name) == 0) {
         olevel = 1;
         str += strlen (str) + 1;
-        while (isspace (*str)) str++;
+        while (isspace ((int)*str)) str++;
         s = str;
         while (*s && *s != '\n' && *s != '\r') s++;
         *s = 0;
-        while (isspace(*(s - 1))) s--;
+        while (isspace((int)*(s - 1))) s--;
         *s = 0;
         /*shift_fprintf (level, fo, "#line %i \"%s\"\n", line_num, in_file);*/
         shift_fprintf (level, fo, "%s", str);

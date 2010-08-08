@@ -615,7 +615,7 @@ sim_cmd_set (int argc, char **argv)	/* configuration info */
 static char *
 strip_space (char *str)
 {
-  while (isblank (*str) && *str)
+  while (isblank ((int)*str) && *str)
     str++;
   return str;
 }
@@ -732,7 +732,7 @@ handle_sim_command (void)
 	{
 	  redirstr = strip_space (++redirstr);
 
-	  while (!isspace (*redirstr) && *redirstr)
+	  while (!isspace ((int)*redirstr) && *redirstr)
 	    redirstr++;
 	  *redirstr = '\0';
 
@@ -752,7 +752,7 @@ handle_sim_command (void)
 	    {
 	      argv[argc] = cur_arg;
 	      argc++;
-	      while (!isspace (*cur_arg) && *cur_arg)
+	      while (!isspace ((int)*cur_arg) && *cur_arg)
 		cur_arg++;
 	      if (*cur_arg)
 		{

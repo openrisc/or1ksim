@@ -1,5 +1,5 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
-../../doc/or1ksim.texi.
+This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
+4.8 from ../../or1ksim/doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -1223,7 +1223,8 @@ The following parameters may be specified.
 
     `unknown'
           The memory values are not initialized (i.e.  left "unknown").
-          This option will yield faster initialization of the simulator.
+          This option will yield faster initialization of the
+          simulator.
 
     `zero'
           Set the memory values to be 0.  This is the equivalent of
@@ -1754,8 +1755,8 @@ parameters may be specified.
                Tip: There is no registered port for Or1ksim telnet UART
                connection.  Priviledged access is required to read
                traffic on the registered "well-known" telnet port (23).
-               Instead users should use port values in the "Dynamic" or
-               "Private" port range, i.e.  49152-65535.
+               Instead users should use port values in the "Dynamic"
+               or "Private" port range, i.e.  49152-65535.
 
     `channel="fd:`rxfd',`txfd'"'
           Read and write characters from and to the existing open
@@ -1763,8 +1764,8 @@ parameters may be specified.
 
     `channel="tty:device=/dev/ttyS0,baud=9600"'
           Read and write characters from and to a physical serial port.
-          The precise device (shown here as `/dev/ttyS0') may vary from
-          machine to machine.
+          The precise device (shown here as `/dev/ttyS0') may vary
+          from machine to machine.
 
 
      The default value for this field is `"xterm:"'.
@@ -2171,8 +2172,8 @@ following parameters may be specified.
      Set the VALUE as the revision of the OCIDEC ATA/ATAPI interface.
      The default value is 1.  The default value is 0.  Its value should
      be in the range 0-15.  Larger values are truncated with a warning.
-     This only affects the reset value of the `STAT' register, where it
-     forms bits 24-27.
+     This only affects the reset value of the `STAT' register, where
+     it forms bits 24-27.
 
 `pio_mode0_t1 = VALUE'
 `pio_mode0_t2 = VALUE'
@@ -3481,9 +3482,9 @@ Index
                                                               (line  51)
 * -f:                                    Standalone Simulator.
                                                               (line  24)
-* -g <1>:                                Memory Profiling Utility.
+* -g <1>:                                Profiling Utility.   (line  34)
+* -g:                                    Memory Profiling Utility.
                                                               (line  47)
-* -g:                                    Profiling Utility.   (line  34)
 * -h:                                    Standalone Simulator.
                                                               (line  20)
 * -h (memory profiling utility):         Memory Profiling Utility.
@@ -3533,7 +3534,7 @@ Index
 * baseaddr (keyboard configuration):     Keyboard Configuration.
                                                               (line  36)
 * baseaddr (memory configuration):       Memory Configuration.
-                                                              (line  87)
+                                                              (line  88)
 * baseaddr (memory controller configuration): Memory Controller Configuration.
                                                               (line  46)
 * baseaddr (UART configuration):         UART Configuration.  (line  22)
@@ -3559,7 +3560,7 @@ Index
 * cache configuration:                   Cache Configuration. (line   6)
 * calling_convention (CUC configuration): CUC Configuration.  (line  34)
 * ce (memory configuration):             Memory Configuration.
-                                                              (line 117)
+                                                              (line 118)
 * cfgr (CPU configuration):              CPU Configuration.   (line  47)
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
@@ -3654,7 +3655,7 @@ Index
 * DCGE (power management register):      Power Management Configuration.
                                                               (line  21)
 * debug (Interactive CLI):               Interactive Command Line.
-                                                              (line 151)
+                                                              (line 162)
 * debug (simulator configuration):       Simulator Behavior.  (line  13)
 * debug channel toggle (Interactive CLI): Interactive Command Line.
                                                               (line 141)
@@ -3672,9 +3673,9 @@ Index
 * DejaGNU tests directories:             Regression Testing.  (line  50)
 * DejaGnu tool specific configuration:   Regression Testing.  (line  39)
 * delayr (memory configuration):         Memory Configuration.
-                                                              (line 137)
+                                                              (line 138)
 * delayw (memory configuration):         Memory Configuration.
-                                                              (line 143)
+                                                              (line 144)
 * dependstats (CPU configuration):       CPU Configuration.   (line  89)
 * dev_id (ATA/ATAPI configuration):      Disc Interface Configuration.
                                                               (line  36)
@@ -3693,7 +3694,7 @@ Index
 * dm (Interactive CLI):                  Interactive Command Line.
                                                               (line  31)
 * dma (Ethernet configuration):          Ethernet Configuration.
-                                                              (line  33)
+                                                              (line  43)
 * DMA configuration:                     DMA Configuration.   (line   6)
 * DMA verification (VAPI):               Verification API.    (line  73)
 * dma_mode0_td (ATA/ATAPI configuration): Disc Interface Configuration.
@@ -3878,13 +3879,13 @@ Index
 * load_missdelay (data cache configuration): Cache Configuration.
                                                               (line  50)
 * log (memory configuration):            Memory Configuration.
-                                                              (line 149)
+                                                              (line 150)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
 * long:                                  Simulator Library.   (line  87)
 * make file for tests:                   Regression Testing.  (line  27)
 * mc (memory configuration):             Memory Configuration.
-                                                              (line 126)
+                                                              (line 127)
 * memory configuration:                  Memory Configuration.
                                                               (line   6)
 * memory controller configuration:       Memory Controller Configuration.
@@ -3924,14 +3925,14 @@ Index
 * mprof_fn (simulator configuration - deprecated): Simulator Behavior.
                                                               (line  34)
 * mprofile (Interactive CLI):            Interactive Command Line.
-                                                              (line 173)
+                                                              (line 178)
 * mprofile (simulator configuration):    Simulator Behavior.  (line  29)
 * mwdma (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 128)
 * name (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  42)
 * name (memory configuration):           Memory Configuration.
-                                                              (line 108)
+                                                              (line 109)
 * no_multicycle (CUC configuration):     CUC Configuration.   (line  42)
 * nsets (cache configuration):           Cache Configuration. (line  15)
 * nsets (MMU configuration):             Memory Management Configuration.
@@ -3965,7 +3966,7 @@ Index
 * patching the program counter (Interactive CLI): Interactive Command Line.
                                                               (line  51)
 * pattern (memory configuration):        Memory Configuration.
-                                                              (line  75)
+                                                              (line  76)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
 * PIC configuration:                     Interrupt Configuration.
@@ -4039,7 +4040,7 @@ Index
 * r (Interactive CLI):                   Interactive Command Line.
                                                               (line  14)
 * random_seed (memory configuration):    Memory Configuration.
-                                                              (line  65)
+                                                              (line  66)
 * refresh_rate (frame buffer configuration): Frame Buffer Configuration.
                                                               (line  30)
 * refresh_rate (VGA configuration):      Display Interface Configuration.
@@ -4163,7 +4164,7 @@ Index
 * size (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  30)
 * size (memory configuration):           Memory Configuration.
-                                                              (line  92)
+                                                              (line  93)
 * sleep mode (power management register): Power Management Configuration.
                                                               (line  16)
 * slow down factor (power management register): Power Management Configuration.
@@ -4236,7 +4237,7 @@ Index
 * type=unknown (memory configuration):   Memory Configuration.
                                                               (line  50)
 * type=zero (memory configuration):      Memory Configuration.
-                                                              (line  54)
+                                                              (line  55)
 * UART configuration:                    UART Configuration.  (line   6)
 * UART I/O from/to a physical serial port: UART Configuration.
                                                               (line  62)
@@ -4262,9 +4263,9 @@ Index
 * VAPI for UART:                         Verification API.    (line  41)
 * vapi_id (debug interface configuration): Debug Interface Configuration.
                                                               (line  43)
-* vapi_id (DMA configuration) <1>:       Ethernet Configuration.
+* vapi_id (DMA configuration) <1>:       DMA Configuration.   (line  38)
+* vapi_id (DMA configuration):           Ethernet Configuration.
                                                               (line  88)
-* vapi_id (DMA configuration):           DMA Configuration.   (line  38)
 * vapi_id (GPIO configuration):          GPIO Configuration.  (line  32)
 * vapi_id (UART configuration):          UART Configuration.  (line  85)
 * vapi_log_file (verification API configuration): Verification API Configuration.
@@ -4285,55 +4286,55 @@ Index
 
 
 Tag Table:
-Node: Top814
-Node: Installation1224
-Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install7880
-Node: Known Issues8726
-Node: Usage11788
-Node: Standalone Simulator12002
-Node: Profiling Utility15030
-Node: Memory Profiling Utility15940
-Node: Simulator Library17305
-Node: Configuration25083
-Node: Configuration File Format25695
-Node: Configuration File Preprocessing25987
-Node: Configuration File Syntax26284
-Node: Simulator Configuration29069
-Node: Simulator Behavior29360
-Node: Verification API Configuration33889
-Node: CUC Configuration35829
-Node: Core OpenRISC Configuration37746
-Node: CPU Configuration38248
-Node: Memory Configuration42366
-Node: Memory Management Configuration48824
-Node: Cache Configuration51201
-Node: Interrupt Configuration53587
-Node: Power Management Configuration54323
-Node: Branch Prediction Configuration55600
-Node: Debug Interface Configuration56960
-Node: Peripheral Configuration59303
-Node: Memory Controller Configuration59929
-Node: UART Configuration63343
-Node: DMA Configuration66862
-Node: Ethernet Configuration68729
-Node: GPIO Configuration72705
-Node: Display Interface Configuration74338
-Node: Frame Buffer Configuration76647
-Node: Keyboard Configuration78511
-Node: Disc Interface Configuration80749
-Node: Generic Peripheral Configuration85692
-Node: Interactive Command Line87987
-Node: Verification API94961
-Node: Code Internals99391
-Node: Coding Conventions99974
-Node: Global Data Structures104401
-Node: Concepts107058
-Ref: Output Redirection107203
-Node: Internal Debugging107742
-Node: Regression Testing108266
-Node: GNU Free Documentation License112061
-Node: Index134468
+Node: Top829
+Node: Installation1239
+Node: Preparation1486
+Node: Configuring the Build1781
+Node: Build and Install7895
+Node: Known Issues8741
+Node: Usage11803
+Node: Standalone Simulator12017
+Node: Profiling Utility15045
+Node: Memory Profiling Utility15955
+Node: Simulator Library17320
+Node: Configuration25098
+Node: Configuration File Format25710
+Node: Configuration File Preprocessing26002
+Node: Configuration File Syntax26299
+Node: Simulator Configuration29084
+Node: Simulator Behavior29375
+Node: Verification API Configuration33904
+Node: CUC Configuration35844
+Node: Core OpenRISC Configuration37761
+Node: CPU Configuration38263
+Node: Memory Configuration42381
+Node: Memory Management Configuration48849
+Node: Cache Configuration51226
+Node: Interrupt Configuration53612
+Node: Power Management Configuration54348
+Node: Branch Prediction Configuration55625
+Node: Debug Interface Configuration56985
+Node: Peripheral Configuration59328
+Node: Memory Controller Configuration59954
+Node: UART Configuration63368
+Node: DMA Configuration66887
+Node: Ethernet Configuration68754
+Node: GPIO Configuration72730
+Node: Display Interface Configuration74363
+Node: Frame Buffer Configuration76672
+Node: Keyboard Configuration78536
+Node: Disc Interface Configuration80774
+Node: Generic Peripheral Configuration85717
+Node: Interactive Command Line88012
+Node: Verification API94986
+Node: Code Internals99416
+Node: Coding Conventions99999
+Node: Global Data Structures104426
+Node: Concepts107083
+Ref: Output Redirection107228
+Node: Internal Debugging107767
+Node: Regression Testing108291
+Node: GNU Free Documentation License112086
+Node: Index134493
 
 End Tag Table

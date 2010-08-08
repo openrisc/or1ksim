@@ -197,11 +197,7 @@
 #else /* !HAVE_NET_ETHERNET_H && !HAVE_SYS_ETHERNET_H - */
 #ifdef __CYGWIN__
 /* define some missing cygwin defines.
- *
- * NOTE! there is no nonblocking socket option implemented in cygwin.dll
- *       so defining MSG_DONTWAIT is just (temporary) workaround !!!
  */
-#define MSG_DONTWAIT  0x40
 #define ETH_HLEN      14
 #endif /* __CYGWIN__ */
 

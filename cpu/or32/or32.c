@@ -669,7 +669,7 @@ insn_extract (param_ch, enc_initial)
       }
     else
       {
-	if (*enc == '0' || *enc == '1' || *enc == '-' || isalpha (*enc))
+	if (*enc == '0' || *enc == '1' || *enc == '-' || isalpha ((int)*enc))
 	  {
 	    opc_pos--;
 	    if (param_ch == *enc)
@@ -867,7 +867,7 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
 	  if (*args == 'D')
 	    type |= OPTYPE_DST;
 	}
-      else if (isalpha (*args))
+      else if (isalpha ((int)*args))
 	{
 	  unsigned long arg;
 	  arg = insn_extract (*args, opcode->encoding);
@@ -1163,13 +1163,13 @@ or1ksim_or32_extract (param_ch, enc_initial, insn)
 	printf ("\n  ret=%x opc_pos=%x, param_pos=%x\n", ret, opc_pos,
 		param_pos);
 #endif
-	if (islower (param_ch))
+	if (islower ((int) param_ch))
 	  ret -= ((insn >> opc_pos) & 0x1) << param_pos;
 	else
 	  ret += ((insn >> opc_pos) & 0x1) << param_pos;
 	enc++;
       }
-    else if (isalpha (*enc))
+    else if (isalpha ((int)*enc))
       {
 	opc_pos--;
 	enc++;
