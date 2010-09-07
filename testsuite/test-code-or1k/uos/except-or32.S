@@ -198,7 +198,7 @@
  * Reset Exception handler
  */
 .org 0x100
-_reset_vector:
+reset_vector:
 
   l.movhi r3,hi(MC_BASE_ADDR)
   l.ori   r3,r3,lo(MC_BASE_ADDR)
@@ -277,20 +277,20 @@ _reset_vector:
 2:
 
 
-  l.movhi r2,hi(_reset)
-  l.ori   r2,r2,lo(_reset)
+  l.movhi r2,hi(reset)
+  l.ori   r2,r2,lo(reset)
   l.jr    r2
   l.nop
 
 /*
- * Switch to a new context pointed by _task_context
+ * Switch to a new context pointed by task_context
  */
-.global _dispatch
+.global dispatch
 .align 4
-_dispatch:
+dispatch:
 	/* load user task GPRs and PC */
-	l.movhi	r3,hi(_task_context)
-	l.addi	r3,r0,lo(_task_context)
+	l.movhi	r3,hi(task_context)
+	l.addi	r3,r0,lo(task_context)
 	LOADREGS_N_GO
 
 .section .except, "ax"
@@ -299,79 +299,79 @@ _dispatch:
  * Bus Error Exception handler
  */
 .org 0x0200
-_buserr:
+buserr:
 	l.nop
 	l.sw	0(r0),r3	/* Save r3 */
-	PRINTF(r3, _buserr_str)
-_hang:
-	l.j	_hang
+	PRINTF(r3, buserr_str)
+hang:
+	l.j	hang
 	l.nop
 
-_buserr_str:
+buserr_str:
         .ascii  "Bus error exception.\n\000"
 
 /*
  * External Interrupt Exception handler
  */
 .org 0x800
-_extint:
+extint:
 	l.nop
 	l.sw	0(r0),r3	/* Save r3 */
-	PRINTF(r3,_extint_str)
+	PRINTF(r3,extint_str)
 	l.mfspr	r3,r0,SPR_EPCR_BASE	/* Get EPCR */
 	l.sw	4(r0),r3	/* and save it */
 
 	/* now save user task context */
-	l.movhi	r3,hi(_task_context)
-	l.addi	r3,r0,lo(_task_context)
+	l.movhi	r3,hi(task_context)
+	l.addi	r3,r0,lo(task_context)
 	SAVEREGS
 
 	/* set kernel context's PC to kernel's scheduler */
-	l.movhi	r3,hi(_kernel_context)
-	l.addi	r3,r0,lo(_kernel_context)
-	SET_CONTEXTPC(r3,_int_main,r4)
+	l.movhi	r3,hi(kernel_context)
+	l.addi	r3,r0,lo(kernel_context)
+	SET_CONTEXTPC(r3,int_main,r4)
 
 	/* load kernel context */
-	l.movhi	r3,hi(_kernel_context)
-	l.addi	r3,r0,lo(_kernel_context)
+	l.movhi	r3,hi(kernel_context)
+	l.addi	r3,r0,lo(kernel_context)
 	LOADREGS
 	
-	l.movhi	r3,hi(_int_main)
-	l.addi	r3,r0,lo(_int_main)
+	l.movhi	r3,hi(int_main)
+	l.addi	r3,r0,lo(int_main)
 	l.jr    r3
 	l.nop
 
-_extint_str:
+extint_str:
         .ascii  "External interrupt exception.\n\000"
 
 /*
  * System Call Exception handler
  */
 .org 0x0c00
-_syscall:
+syscall:
 	l.nop
 	l.sw	0(r0),r3	/* Save r3 */
-	PRINTF(r3,_syscall_str)
+	PRINTF(r3,syscall_str)
 	l.mfspr	r3,r0,SPR_EPCR_BASE	/* Get EPCR */
 	l.addi	r3,r3,4		/* increment because EPCR instruction was already executed */
 	l.sw	4(r0),r3	/* and save it */
 
 	/* now save user task context */
-	l.movhi	r3,hi(_task_context)
-	l.addi	r3,r0,lo(_task_context)
+	l.movhi	r3,hi(task_context)
+	l.addi	r3,r0,lo(task_context)
 	SAVEREGS
 
 	/* set kernel context's PC to kernel's syscall entry */
-	l.movhi	r3,hi(_kernel_context)
-	l.addi	r3,r0,lo(_kernel_context)
-	SET_CONTEXTPC(r3,_kernel_syscall,r4)
+	l.movhi	r3,hi(kernel_context)
+	l.addi	r3,r0,lo(kernel_context)
+	SET_CONTEXTPC(r3,kernel_syscall,r4)
 
 	/* load kernel context */
-	l.movhi	r3,hi(_kernel_context)
-	l.addi	r3,r0,lo(_kernel_context)
+	l.movhi	r3,hi(kernel_context)
+	l.addi	r3,r0,lo(kernel_context)
 	LOADREGS_N_GO
 
-_syscall_str:
+syscall_str:
         .ascii  "System call exception.\n\000"
 
 

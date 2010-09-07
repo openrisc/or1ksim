@@ -28,31 +28,31 @@
 /* Support file for c based tests */
 #include "spr-defs.h"
 
-#define reset _reset
+#define reset reset
 
         .section .stack
         .space 0x1000
-_stack:
+stack:
 
-        .extern _reset_support
-        .extern _c_reset
-        .extern _excpt_buserr
-        .extern _excpt_dpfault
-        .extern _excpt_ipfault
-        .extern _excpt_tick
-        .extern _excpt_align
-        .extern _excpt_illinsn
-        .extern _excpt_int
-        .extern _excpt_dtlbmiss
-        .extern _excpt_itlbmiss
-        .extern _excpt_range
-        .extern _excpt_syscall
-        .extern _excpt_break
-        .extern _excpt_trap
+        .extern reset_support
+        .extern c_reset
+        .extern excpt_buserr
+        .extern excpt_dpfault
+        .extern excpt_ipfault
+        .extern excpt_tick
+        .extern excpt_align
+        .extern excpt_illinsn
+        .extern excpt_int
+        .extern excpt_dtlbmiss
+        .extern excpt_itlbmiss
+        .extern excpt_range
+        .extern excpt_syscall
+        .extern excpt_break
+        .extern excpt_trap
 
 	.section .except,"ax"
 	.org	0x100
-_reset_vector:
+reset_vector:
         l.nop
         l.nop
         l.addi  r4,r0,0x0
@@ -87,8 +87,8 @@ _reset_vector:
         l.j     init_mc
         l.nop
 
-start:  l.movhi r1,hi(_stack)
-        l.ori   r1,r1,lo(_stack)
+start:  l.movhi r1,hi(stack)
+        l.ori   r1,r1,lo(stack)
 
         /* Check if this is RTL version */
         l.lbz   r3,0(r0)
@@ -121,21 +121,21 @@ start:  l.movhi r1,hi(_stack)
         l.nop
 
         .org    0x200
-_buserr_vector:
+buserr_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_buserr)
-        l.ori   r10,r10,lo(_excpt_buserr)
+        l.movhi r10,hi(excpt_buserr)
+        l.ori   r10,r10,lo(excpt_buserr)
         l.lwz   r10,0x0(r10)
         l.jr    r10
         l.nop
 
         .org    0x300
-_dpfault_vector:
+dpfault_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
@@ -147,84 +147,84 @@ _dpfault_vector:
 
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_dpfault)
-        l.ori   r10,r10,lo(_excpt_dpfault)
+        l.movhi r10,hi(excpt_dpfault)
+        l.ori   r10,r10,lo(excpt_dpfault)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x400
-_ipfault_vector:
+ipfault_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_ipfault)
-        l.ori   r10,r10,lo(_excpt_ipfault)
+        l.movhi r10,hi(excpt_ipfault)
+        l.ori   r10,r10,lo(excpt_ipfault)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x500
-_lpint_vector:
+lpint_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_tick)
-        l.ori   r10,r10,lo(_excpt_tick)
+        l.movhi r10,hi(excpt_tick)
+        l.ori   r10,r10,lo(excpt_tick)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x600
-_align_vector:
+align_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_align)
-        l.ori   r10,r10,lo(_excpt_align)
+        l.movhi r10,hi(excpt_align)
+        l.ori   r10,r10,lo(excpt_align)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x700
-_illinsn_vector:
+illinsn_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_illinsn)
-        l.ori   r10,r10,lo(_excpt_illinsn)
+        l.movhi r10,hi(excpt_illinsn)
+        l.ori   r10,r10,lo(excpt_illinsn)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x800
-_hpint_vector:
+hpint_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_int)
-        l.ori   r10,r10,lo(_excpt_int)
+        l.movhi r10,hi(excpt_int)
+        l.ori   r10,r10,lo(excpt_int)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0x900
-_dtlbmiss_vector:
+dtlbmiss_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
@@ -236,78 +236,78 @@ _dtlbmiss_vector:
 
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_dtlbmiss)
-        l.ori   r10,r10,lo(_excpt_dtlbmiss)
+        l.movhi r10,hi(excpt_dtlbmiss)
+        l.ori   r10,r10,lo(excpt_dtlbmiss)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0xa00
-_itlbmiss_vector:
+itlbmiss_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_itlbmiss)
-        l.ori   r10,r10,lo(_excpt_itlbmiss)
+        l.movhi r10,hi(excpt_itlbmiss)
+        l.ori   r10,r10,lo(excpt_itlbmiss)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0xb00
-_range_vector:
+range_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_range)
-        l.ori   r10,r10,lo(_excpt_range)
+        l.movhi r10,hi(excpt_range)
+        l.ori   r10,r10,lo(excpt_range)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0xc00
-_syscall_vector:
+syscall_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_syscall)
-        l.ori   r10,r10,lo(_excpt_syscall)
+        l.movhi r10,hi(excpt_syscall)
+        l.ori   r10,r10,lo(excpt_syscall)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0xd00
-_break_vector:
+break_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_break)
-        l.ori   r10,r10,lo(_excpt_break)
+        l.movhi r10,hi(excpt_break)
+        l.ori   r10,r10,lo(excpt_break)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
         .org    0xe00
-_trap_vector:
+trap_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
         l.jal   store_regs
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(_excpt_trap)
-        l.ori   r10,r10,lo(_excpt_trap)
+        l.movhi r10,hi(excpt_trap)
+        l.ori   r10,r10,lo(excpt_trap)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop

@@ -38,24 +38,24 @@
 #define MC_TMS(i)       (0x14 + (i) * 8)
 
 
-        .extern _main
+        .extern main
 
-        .global _ic_enable
-        .global _ic_disable
-        .global _dc_enable
-        .global _dc_disable
-        .global _dc_inv
-        .global _ic_inv_test
-        .global _dc_inv_test
+        .global ic_enable
+        .global ic_disable
+        .global dc_enable
+        .global dc_disable
+        .global dc_inv
+        .global ic_inv_test
+        .global dc_inv_test
 
         .section .stack
         .space 0x1000
-_stack:
+stack:
 
 	.section .reset, "ax"
 
         .org    0x100
-_reset_vector:
+reset_vector:
         l.addi  r2,r0,0x0
         l.addi  r3,r0,0x0
         l.addi  r4,r0,0x0
@@ -92,11 +92,11 @@ _reset_vector:
         l.jr    r3
         l.nop
 start:
-        l.jal   _init_mc
+        l.jal   init_mc
         l.nop
 
-        l.movhi r1,hi(_stack)
-        l.ori   r1,r1,lo(_stack)
+        l.movhi r1,hi(stack)
+        l.ori   r1,r1,lo(stack)
 
         /* Copy data section */
         l.movhi r3,hi(_src_beg)
@@ -118,12 +118,12 @@ start:
         l.bf   	1b
         l.nop
 2:
-        l.movhi r2,hi(_main)
-        l.ori   r2,r2,lo(_main)
+        l.movhi r2,hi(main)
+        l.ori   r2,r2,lo(main)
         l.jr    r2
         l.nop
 
-_init_mc:
+init_mc:
  
         l.movhi r3,hi(MC_BASE_ADDR)
         l.ori   r3,r3,lo(MC_BASE_ADDR)
@@ -165,7 +165,7 @@ _init_mc:
 
         .section .text
 
-_ic_enable:
+ic_enable:
         /* Disable IC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -195,7 +195,7 @@ _ic_enable:
         l.jr    r9
         l.nop
 
-_ic_disable:
+ic_disable:
         /* Disable IC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -206,7 +206,7 @@ _ic_disable:
         l.jr    r9
         l.nop
 
-_dc_enable:
+dc_enable:
         /* Disable DC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -231,7 +231,7 @@ _dc_enable:
         l.jr    r9
         l.nop
 
-_dc_disable:
+dc_disable:
         /* Disable DC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -242,7 +242,7 @@ _dc_disable:
         l.jr    r9
         l.nop
 
-_dc_inv:
+dc_inv:
         l.mfspr r4,r0,SPR_SR
         l.addi  r5,r0,-1
         l.xori  r5,r5,SPR_SR_DCE
@@ -254,9 +254,9 @@ _dc_inv:
         l.nop
 
         .align  0x10
-_ic_inv_test:
-        l.movhi r7,hi(_ic_test_1)
-        l.ori   r7,r7,lo(_ic_test_1)
+ic_inv_test:
+        l.movhi r7,hi(ic_test_1)
+        l.ori   r7,r7,lo(ic_test_1)
         l.addi  r3,r0,0
         l.addi  r4,r0,0
         l.addi  r5,r0,0
@@ -264,7 +264,7 @@ _ic_inv_test:
         l.nop
         l.nop
 
-_ic_test_1:
+ic_test_1:
 3:      l.addi  r3,r3,1
 
         l.sfeqi r4,0x01
@@ -294,7 +294,7 @@ _ic_test_1:
         l.jr    r9
         l.nop
 
-_dc_inv_test:
+dc_inv_test:
         l.movhi r4,hi(0x08040201)
         l.ori   r4,r4,lo(0x08040201)
         l.sw    0x00(r3),r4
@@ -304,7 +304,7 @@ _dc_inv_test:
         l.sw    0x28(r3),r4
 
         l.addi  r8,r9,0
-        l.jal   _dc_enable
+        l.jal   dc_enable
         l.nop
         l.addi  r9,r8,0
 

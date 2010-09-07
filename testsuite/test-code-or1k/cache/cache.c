@@ -168,14 +168,14 @@ void dummy();
 
 void jump_and_link(void) 
 {
-	asm("_jalr:");
+	asm("jalr:");
   asm("l.jr\tr9");
   asm("l.nop");
 }
 
 void jump(void)
 {
-	asm("_jr:");
+	asm("jr:");
 	/* Read and increment index */
 	asm("l.lwz\t\tr3,0(r11)");
 	asm("l.addi\t\tr3,r3,4");
@@ -195,8 +195,8 @@ void copy_jr(unsigned long add)
 
 void call(unsigned long add)
 {
-  asm("l.movhi\tr11,hi(_jump_indx)" : :);
-  asm("l.ori\tr11,r11,lo(_jump_indx)" : :);
+  asm("l.movhi\tr11,hi(jump_indx)" : :);
+  asm("l.ori\tr11,r11,lo(jump_indx)" : :);
 	asm("l.jalr\t\t%0" : : "r" (add) : "r11", "r9");
 	asm("l.nop" : :);
 }

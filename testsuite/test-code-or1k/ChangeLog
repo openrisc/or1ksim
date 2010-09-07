@@ -1,3 +1,29 @@
+2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* mc-common/except-mc.S: Remove leading underscores from global
+	symbols.
+	* except/except.S: Remove leading underscores from global symbols.
+	* cache/cache-asm.S: Remove leading underscores from global symbols.
+	* cache/cache.c (jump_and_link): Remove leading underscore from
+	label.
+	(jump): Remove leading underscore from label.
+	(all): Remove leading underscore from global symbol references.
+	* testfloat/systfloat.S: Remove leading underscores from global
+	symbols.
+	* mmu/mmu.c (jump): Remove leading underscore from label.
+	* mmu/mmu-asm.S: Remove leading underscores from global symbols.
+	* except-test/except-test.c: Remove leading underscores from
+	global symbols.
+	* except-test/except-test-s.S: Remove leading underscores from
+	global symbols.
+	* uos/except-or32.S: Remove leading underscores from global
+	symbols.
+
+2010-09-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc1.
+
 2010-08-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.

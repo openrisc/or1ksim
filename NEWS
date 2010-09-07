@@ -2,11 +2,17 @@
 	      ==================================================
 
 
-New in top of tree
-==================
+New in release 0.5.0rc1
+=======================
+
+The floating point implementation is now based on John Hauser's "softfloat"
+package, ensuring rigorous compliance with the IEEE 754-2008 standard.
 
 The library interface is extended to allow registers and memory to be written
-directly. This is to allow direct integration as a simulator in GDB.
+directly and processor stalled and unstalled. This is to allow direct
+integration as a simulator in GDB.
+
+Some of the existing library interface functions have different prototypes.
 
 The "include" feature of configuration files (which never worked, but no one
 ever noticed) is dropped.
@@ -15,13 +21,39 @@ If the configuration file is not found in the local directory, it is searched
 for in the ${HOME}/.or1ksim directory, then (for backwards compatibility) the
 ${HOME}/.or1k directory.
 
-There is an option to collect statistics on instruction execution in binary
-form.
+If no simulation file is specified, then sim.cfg is not searched for as a
+default.
 
+New options are added -q|--quiet, -V|--verbose, -m|--memory and
+--report-memory-errors. The semantics of --nosrv and --src otpions are changed.
+
+There is a configuration option to collect statistics on instruction execution
+in binary form.
+
+In previous versions, Bus exceptions were unique in that they produced an
+error message on standard output. The default is now for this exception to be
+handled silently, unless requested by --report-memory-errors.
+
+The following feature requests have been accepted.
+* Feature  393: Integrate Or1ksim in GDB.
+
+The following feature requests have been rejected.
 
 The following bugs are fixed.
-* Bug 1797: Or1ksim does not compile with GCC 3.4.4 under Cygwin
-* Bug 1795: GDB breakpoints do not work with Icache enabled.
+* Bug 1821: Reference configuration file has defective debug section.
+* Bug 1817: Reference configuration file missing from distribution.
+* Bug 1795: GDB breakpoints do not work with the instruction cache. 
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+* Bug 1824: Memory controller issue (probably the same as Bug 1758).
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA section in configuration file is broken.
+* Bug 1816: Error message when target not set is obscure.
+* Bug 1813: "make check" fails before installation.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
 
 New in release 0.4.0
 ====================

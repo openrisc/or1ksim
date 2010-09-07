@@ -1,10 +1,28 @@
+2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* config.h.in: Regenerated.
+	* debug.cfg, rsp.cfg: Deleted.
+	* doc/or1ksim.texi: Updated for new options and library interface.
+	* doc/or1ksim.info, doc/version.texi: Regenerated.
+	* Makefile.am: Added sim.cfg to EXTRA_DIST.
+	* NEWS: Updated for 0.5.0rc1.
+	* or1ksim.h <enum or1ksim_rc>: OR1KSIM_RC_OK explicitly zero.
+	* sim.cfg: Updated for consistency with the user guide.
+	* sim-config.c (init_defconfig): 50000 as default VAPI port.
+	(alloc_memory_block): Verbose message of amount allocated.
+
+2010-09-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc1.
+
 2010-08-08  Julius Baxter <julius.baxter@orsoc.se>
 
 	* cpu/or32/or32.c: Fix compile warning about chars indexing arrays
 	* cpu/or32/generate.c: Fix compile warning about chars indexing arrays
 	* sim-cmd.c: Fix compile warning about chars indexing arrays
 	* peripheral/eth.h: Removed define for MSG_WAITALL under Cygwin
-	
+
 2010-08-06  Julius Baxter <julius.baxter@orsoc.se>
 
 	* cpu/or1k/spr-defs.h <SPR_VR_RES>: Fixed value (Thanks to Jonas Bonn)

@@ -1,5 +1,5 @@
-This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
-4.8 from ../../or1ksim/doc/or1ksim.texi.
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
+../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-08-04.tar.bz2
+     tar jxf or1ksim-0.5.0rc1.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-08-04/configure --target=or32-uclinux ...
+     ../or1ksim-0.5.0rc1/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -89,7 +89,7 @@ options.  The most useful is `--prefix' to specify a directory for
 installation of the tools.
 
 For testing (using `make check'), the `--target' parameter _must_ be
-specified, to allow the target tool chain to be selected. If the tools
+specified, to allow the target tool chain to be selected.  If the tools
 have been installed using the standard OpenRISC script, then this
 should be set to `or32-elf'.
 
@@ -137,7 +137,7 @@ enabling at configuration.  These include
 
 `--enable-unsigned-xori'
 `--disable-unsigned-xori'
-     Historically, `l.xori', has sign extended its operand. This is
+     Historically, `l.xori', has sign extended its operand.  This is
      inconsistent with the other logical opcodes (`l.andi', `l.ori'),
      but in the absence of `l.not', it allows a register to be inverted
      in a single instruction using:
@@ -182,7 +182,7 @@ enabling at configuration.  These include
 
 
 A number of configuration flags have been removed since version 0.3.0,
-because they led to invalid behavior of Or1ksim. Those removed are:
+because they led to invalid behavior of Or1ksim.  Those removed are:
 
 `--enable-arith-flag'
 `--disable-arith-flag'
@@ -191,7 +191,7 @@ because they led to invalid behavior of Or1ksim. Those removed are:
      The instructions affected by this were `l.add', `l.addc',
      `l.addi', `l.and' and `l.andi'.
 
-     If set, this caused incorrect behavior. Whether or not flags are
+     If set, this caused incorrect behavior.  Whether or not flags are
      set is part of the OpenRISC 1000 architectural specification.  The
      only flags which should set this are the "set flag" instructions:
      `l.sfeq', `l.sfeqi', `l.sfges', `l.sfgesi', `l.sfgeu', `l.sfgeui',
@@ -243,8 +243,6 @@ This will install the three variations of the Or1ksim tool,
 Or1ksim library, `libsim', the header file, `or1ksim.h' and this
 documentation in `info' format.
 
-     Note: Testing Or1ksim with `make check' is not yet supported.
-
 The documentation may be created and installed in alternative formats
 (PDF, Postscript, DVI, HTML) with for example:
 
@@ -257,61 +255,23 @@ File: or1ksim.info,  Node: Known Issues,  Prev: Build and Install,  Up: Installa
 1.4 Known Problems and Issues
 =============================
 
-The following problems and issues are known about with Or1ksim
-2010-08-04.  The OpenRISC tracker may be used to see the current state
-of these issues and to raise new problems and feature requests.  It may
-be found at `http://www.opencores.org/ptracker.cgi/view/or1k/398'.
+Full details of outstanding issues may be found in the `NEWS' file in
+the main directory of the distribution.  The OpenRISC tracker may be
+used to see the current state of these issues and to raise new problems
+and feature requests.  It may be found at bugtracker.
+
+The following issues are long standing and unlikely to be fixed in
+Or1ksim in the near future.
 
    * The Supervision Register Little Endian Enable (LEE) bit is
      ignored.  Or1ksim can be built for either little endian or big
      endian use, but that behavior cannot be changed dynamically.
-
-   * The NPC is a read/write register, but after being written it
-     clears the pipeline.  This means that if the processor is stalled,
-     the value should subsequently read back as 0, until the processor
-     is unstalled and able to refill its pipeline.  By default Or1ksim
-     always reports back the value of NPC, even when it has been
-     written while stalled.
-
-     There is now an option, `--strict-npc', which will enforce this
-     behavior.  At some stage in the future it will become the default
-     behavior, but for now it is an option, since its use will break
-     GDB.
-
-   * The memory components are given names in the configuration file.
-     However there is currently no way for Or1ksim to report that name
-     back to the user (for example to identify which memory block
-     corresponds to a particular access).
-
-   * Or1ksim allows the processor to be stalled (from the command
-     line), even if there is no debugger present.  This seems to be a
-     meaningless operation.
 
    * Or1ksim is not reentrant, so a program cannot instantiate multiple
      instances using the library.  This is clearly a problem when
      considering multi-core applications.  However it stems from the
      original design, and can only be fixed by a complete rewrite.  The
      entire source code uses static global constants liberally!
-
-   * There is no support for single precision floating point
-     instructions in Or1ksim if configured in the CPU (*note CPU
-     Configuration: CPU Configuration.).  These are implemented using
-     the floating point support in the host C library, which will
-     usually be IEEE 745 compliant.  There is at present no support for
-     double precision floating point instructions, since these are
-     meaningless with 32-bit registers.
-
-     Floating point support within OpenRISC is intended to follow IEEE
-     745, which offers a degree of configurability. However at present
-     the FPSCR register is not supported, so there is no mechanism for
-     configuring floating point behavior. Thus the default
-     functionality of the host C library will be used.
-
-   * The single precision floating point multiply and add instruction,
-     `lf.madd.s', is not clearly specified in the original architectural
-     manual. User should consult the `OpenRISC 1200 version 2
-     Supplementary Programmer's Reference Manual' for a specification
-     of the functionality implemented.
 
 
 
@@ -335,7 +295,8 @@ File: or1ksim.info,  Node: Standalone Simulator,  Next: Profiling Utility,  Up: 
 
 The general form the standalone command is:
 
-     or32-uclinux-sim [-vhi] [-f FILE] [--nosrv] [--srv=[N]] [-d STR]
+     or32-uclinux-sim [-vhiqV] [-f FILE] [--nosrv] [--srv=[N]]
+                      [-m <n>][-d STR]
                       [--enable-profile] [--enable-mprofile] [FILE]
 
 Many of the options have both a short and a long form.  For example
@@ -348,6 +309,20 @@ Many of the options have both a short and a long form.  For example
 `-h'
 `--help'
      Print out help about the command line options and what they mean.
+
+`-i'
+`--interactive'
+     After starting, drop into the Or1ksim interactive command shell.
+
+`-q'
+`--quiet'
+     Do not generate any information messages, only error messages.
+
+`-V'
+`--verbose'
+     Generate extra output messages (equivalent of specifying the
+     "verbose" option in the simulator configuration section (see *note
+     Simulator Behavior: Simulator Behavior.).
 
 `-f FILE'
 `--file FILE'
@@ -375,15 +350,36 @@ Many of the options have both a short and a long form.  For example
      `--nosrv'.  If it is, a rude message is printed and the `--nosrv'
      option is ignored.
 
+`-m=SIZE'
+`--memory=SIZE'
+     Configure a memory block of SIZE bytes, starting at address zero.
+     The size may be followed by `k', `K', `m', `M', `g', `G', to
+     indicate kilobytes (2^10 bytes), megabytes (2^20 bytes) and
+     gigabytes (2^30 bytes).
+
+     This is mainly intended for use when Or1ksim is used without a
+     configuration file, to allow just the processor and memory to be
+     set up.  This is the equivalent of specifying a configuration
+     memory section with `baseaddr = 0' and `size = SIZE' and all other
+     parameters taking their default value.
+
+     If a configuration file is also used, it should be sure not to
+     specify an overlapping memory block.
+
 `-d=CONFIG_STRING'
 `--debug-config=CONFIG_STRING'
      Enable selected debug messages in Or1ksim.  This parameter is for
      use by developers only, and is not covered further here.  See the
      source code for more details.
 
-`-i'
-`--interactive'
-     After starting, drop into the Or1ksim interactive command shell.
+`--report-memory-errors'
+     By default all exceptions are now handled silently.  If this
+     option is specified, bus exceptions will be reported with a
+     message to standard error indicating the address at which the
+     exception occurred.
+
+     This was the default behaviour up to Or1ksim 0.4.0.  This flag is
+     provided for those who wish to keep that behavior.
 
 `--strict-npc'
      In real hardware, setting the next program counter (NPC, SPR 16),
@@ -520,21 +516,19 @@ should be added to the link command.
 The header file `or1ksim.h' contains appropriate declarations of the
 functions exported by the Or1ksim library.  These are:
 
- -- `or1ksim.h': int or1ksim_init (const char
-     *CONFIG_FILE, const char *IMAGE_FILE, void *CLASS_PTR, int
-     (*UPR)(void *CLASS_PTR, unsigned long int ADDR, unsigned char
+ -- `or1ksim.h': int or1ksim_init (int ARGC, char *ARGV, void
+          *CLASS_PTR,
+     int (*UPR)(void *CLASS_PTR, unsigned long int ADDR, unsigned char
      MASK[], unsigned char RDATA[], int DATA_LEN), int (*UPW)(void
      *CLASS_PTR, unsigned long int ADDR, unsigned char MASK[], unsigned
      char WDATA[], int DATA_LEN))
 
-     The initialization function is supplied with the name of a
-     configuration file, CONFIG_FILE, an executable image, IMAGE_FILE,
-     a pointer to the calling class, CLASS_PTR (since the library may
-     be used from C++) and two up-call functions, one for reads, UPR,
-     and one for writes, UPW.
-
-     *Note Configuration: Configuration, for detailed information on
-     configuring Or1ksim and the format of the configuration file.
+     The initialization function is supplied with a vector of arguments,
+     which are interpreted as arguments to the standalone version (see
+     *note Standalone Simulator: Standalone Simulator.), a pointer to
+     the calling class, CLASS_PTR (since the library may be used from
+     C++) and two up-call functions, one for reads, UPR, and one for
+     writes, UPW.
 
      UPW is called for any write to an address external to the model
      (determined by a `generic' section in the configuration file).
@@ -551,12 +545,16 @@ functions exported by the Or1ksim library.  These are:
      address, since the upcall function must handle all generic
      devices, using the full address for decoding.
 
-     Endianness is not completely transparent, since Or1ksim is
-     transferring byte vectors, not multi-byte values.
+     Endianness is not a concern, since Or1ksim is transferring byte
+     vectors, not multi-byte values.
 
-          Caution: This is a change from version 0.3.0. It simplifies
-          the interface, and makes Or1ksim more consistent with payload
-          representation in SystemC TLM 2.0.
+     The result indicates whether the initialization was successful.
+     The integer values are available as an `enum or1ksim', with
+     possible values `OR1KSIM_RC_OK' and `OR1KSIM_RC_BADINIT'.
+
+          Caution: This is a change from versions 0.3.0 and 0.4.0.  It
+          further simplifies the interface, and makes Or1ksim more
+          consistent with payload representation in SystemC TLM 2.0.
 
           Note: The current implementation of Or1ksim always transfers
           single words (4 bytes), using masks if smaller values are
@@ -565,7 +563,13 @@ functions exported by the Or1ksim library.  These are:
 
  -- `or1ksim.h': int or1ksim_run (double DURATION)
      Run the simulator for the simulated duration specified (in
-     seconds).
+     seconds).  A duration of -1 indicates `run forever'
+
+     The result indicates how the run terminated.  The integer values
+     are available as an `enum or1ksim', with possible values
+     `OR1KSIM_RC_OK' (ran for the full duration), `OR1KSIM_RC_BRKPT'
+     (terminated early due to hitting a breakpoint) and
+     `OR1KSIM_RC_HALTED' (terminated early due to hitting `l.nop 1').
 
 
  -- `or1ksim.h': void or1ksim_reset_duration (double DURATION)
@@ -626,7 +630,7 @@ functions exported by the Or1ksim library.  These are:
 
 
  -- `or1ksim.h': double or1ksim_jtag_reset ()
-     Drive a reset sequence through the JTAG interface. Return the
+     Drive a reset sequence through the JTAG interface.  Return the
      (model) time taken for this action.  Remember that the JTAG has
      its own clock, which can be an order of magnitude slower than the
      main clock, so even a reset (5 JTAG cycles) could take 50
@@ -637,7 +641,7 @@ functions exported by the Or1ksim library.  These are:
      char *JREG, int NUM_BITS)
 
      Shift the supplied register through the JTAG instruction register.
-     Return the (model) time taken for this action. The register is
+     Return the (model) time taken for this action.  The register is
      supplied as a byte vector, with the least significant bits in the
      least significant byte.  If the total number of bits is not an
      exact number of bytes, then the odd bits are found in the least
@@ -651,7 +655,7 @@ functions exported by the Or1ksim library.  These are:
      char *JREG, int NUM_BITS)
 
      Shift the supplied register through the JTAG data register.
-     Return the (model) time taken for this action. The register is
+     Return the (model) time taken for this action.  The register is
      supplied as a byte vector, with the least significant bits in the
      least significant byte.  If the total number of bits is not an
      exact number of bytes, then the odd bits are found in the least
@@ -659,6 +663,69 @@ functions exported by the Or1ksim library.  These are:
 
      For example a 12-bit register would have bits 0-7 in byte 0 and
      bits 11-8 in the least significant 4 bits of byte 1.
+
+
+ -- `or1ksim.h': int or1ksim_read_mem (unsigned
+     long int ADDR, unsigned char *BUF, int LEN)
+
+     Read LEN bytes from ADDR, placing the result in BUF.  Return LEN
+     on success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': int or1ksim_write_mem (unsigned
+     long int ADDR, unsigned char *BUF, int LEN)
+
+     Write LEN bytes to ADDR, taking the data from BUF.  Return LEN on
+     success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': int or1ksim_read_spr (int SPRNUM, unsigned
+     long int *SPRVAL_PTR)
+
+     Read the SPR specified by SPRNUM, placing the result in
+     SPRVAL_PTR.  Return non-zero on success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': int or1ksim_write_spr (int SPRNUM, unsigned
+     long int SPRVA)
+
+     Write SPRVAL to the SPR specified by SPRNUM.  Return non-zero on
+     success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': int or1ksim_read_reg (int REGNUM, unsigned
+     long int *REGVAL_PTR)
+
+     Read the general purpose register specified by REGNUM, placing the
+     result in REGVAL_PTR.  Return non-zero on success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': int or1ksim_write_reg (int REGNUM, unsigned
+     long int REGVA)
+
+     Write REGVAL to the general purpose register specified by REGNUM.
+     Return non-zero on success and 0 on failure.
+
+          Note: This function was added in Or1ksim 0.5.0.
+
+
+ -- `or1ksim.h': void or1ksim_set_stall_state (int
+     STATE)
+
+     Set the processor's state according to STATE (1 = stalled, 0 = not
+     stalled).
+
+          Note: This function was added in Or1ksim 0.5.0.
 
 
 The libraries will be installed in the `lib' sub-directory of the main
@@ -716,7 +783,8 @@ File: or1ksim.info,  Node: Configuration File Format,  Next: Simulator Configura
 3.1 Configuration File Format
 =============================
 
-The configuration file is a plain text file.
+The configuration file is a plain text file.  A reference example,
+`sim.cfg', is included in the top level directory of the distribution.
 
 * Menu:
 
@@ -850,18 +918,18 @@ appear only once.  The following parameters may be specified.
      Specifies the file to be used with the `profile' parameter.
      Default `sim.profile'.  For backwards compatibility, the
      alternative name `prof_fn' is supported for this parameter, but
-     deprecated.
+     deprecated.  Default `sim.profile'.
 
 `mprofile = 0|1'
      If 1 (true) generate a memory profiling file using the file
      specified in the `mprof_file' parameter or otherwise
      `sim.mprofile'.  Default 0.
 
-`mprof_fn = ``FILENAME'''
+`mprof_file = ``FILENAME'''
      Specifies the file to be used with the `mprofile' parameter.
      Default `sim.mprofile'.  For backwards compatibility, the
      alternative name `mprof_fn' is supported for this parameter, but
-     deprecated.
+     deprecated.  Default `sim.mprofile'.
 
 `history = 0|1'
      If 1 (true) track execution flow.  Default 0.
@@ -927,10 +995,10 @@ appear only once.  The following parameters may be specified.
      deprecated.
 
 `exe_bin_insn_log = 0|1'
-     Enable logging of executed instructions to a file in binary
-     format. This is helpful for off-line dynamic execution analysis.
+     Enable logging of executed instructions to a file in binary format.
+     This is helpful for off-line dynamic execution analysis.
 
-          Note: Execution logs can be _very_ big. For example, while
+          Note: Execution logs can be _very_ big.  For example, while
           booting the Linux kernel, version 2.6.34, a log file 1.2GB in
           size was generated.
 
@@ -1011,12 +1079,15 @@ appear at most once.  The following parameters may be specified.
           Different memory ordering, even if there are dependencies.
           Bursts can be made, width can change.
 
+    `memory_order=weak'
           Different memory ordering, even if there are dependencies.  If
           dependencies cannot occur, then bursts can be made, width can
           change.
 
+    `memory_order=strong'
           Same memory ordering.  Bursts can be made, width can change.
 
+    `memory_order=exact'
           Exactly the same memory ordering and widths.
 
 
@@ -1169,7 +1240,7 @@ The following parameters may be specified.
      committed when I/O is idle.
 
 `hardfloat = 0|1'
-     If 1, hardfloat instructions are enabled. Default value 0.
+     If 1, hardfloat instructions are enabled.  Default value 0.
 
 
 
@@ -1182,7 +1253,7 @@ Memory configuration is described in `section memory'.  This section
 may appear multiple times, specifying multiple blocks of memory.
 
      Caution: The user may choose whether or not to enable a memory
-     controller. If a memory controller is enabled, then the standard
+     controller.  If a memory controller is enabled, then the standard
      OpenRISC C libraries will initialize it to expect 64MB memory
      blocks, and any memory declarations _must_ reflect this.  The
      section describing memory controller configuration describes the
@@ -1224,7 +1295,7 @@ The following parameters may be specified.
     `unknown'
           The memory values are not initialized (i.e.  left "unknown").
           This option will yield faster initialization of the
-          simulator.
+          simulator.  This is the default.
 
     `zero'
           Set the memory values to be 0.  This is the equivalent of
@@ -1295,8 +1366,8 @@ The following parameters may be specified.
      greater than or equal to zero.  This is used by the memory
      controller when identifying different memory instances.
 
-     There is no requirement to set  `ce' if a memory controller is not
-     enabled. The default value is -1 (invalid).
+     There is no requirement to set `ce' if a memory controller is not
+     enabled.  The default value is -1 (invalid).
 
 `mc = VALUE'
      Specifies the memory controller this memory is connected to.  It
@@ -1304,8 +1375,8 @@ The following parameters may be specified.
      for a memory controller (*note Memory Controller Configuration:
      Memory Controller Configuration.).
 
-     There is no requirement to set  `mc' if a memory controller is not
-     enabled. Default value is 0, which is also the default value of a
+     There is no requirement to set `mc' if a memory controller is not
+     enabled.  Default value is 0, which is also the default value of a
      memory controller `index' field.  This is suitable therefore for
      designs with just one memory controller.
 
@@ -1646,7 +1717,7 @@ controllers.
 
      If smaller memory blocks are declared with a memory controller,
      then sufficient memory will not be allocated by Or1ksim, but out of
-     range memory accesses will not be trapped. For example declaring a
+     range memory accesses will not be trapped.  For example declaring a
      memory section from 0-4MB with a memory controller enabled would
      mean that accesses between 4MB and 64MB would be permitted, but
      having no allocated memory would likely cause a segmentation fault.
@@ -1755,8 +1826,8 @@ parameters may be specified.
                Tip: There is no registered port for Or1ksim telnet UART
                connection.  Priviledged access is required to read
                traffic on the registered "well-known" telnet port (23).
-               Instead users should use port values in the "Dynamic"
-               or "Private" port range, i.e.  49152-65535.
+               Instead users should use port values in the "Dynamic" or
+               "Private" port range, i.e.  49152-65535.
 
     `channel="fd:`rxfd',`txfd'"'
           Read and write characters from and to the existing open
@@ -1764,8 +1835,8 @@ parameters may be specified.
 
     `channel="tty:device=/dev/ttyS0,baud=9600"'
           Read and write characters from and to a physical serial port.
-          The precise device (shown here as `/dev/ttyS0') may vary
-          from machine to machine.
+          The precise device (shown here as `/dev/ttyS0') may vary from
+          machine to machine.
 
 
      The default value for this field is `"xterm:"'.
@@ -2172,8 +2243,8 @@ following parameters may be specified.
      Set the VALUE as the revision of the OCIDEC ATA/ATAPI interface.
      The default value is 1.  The default value is 0.  Its value should
      be in the range 0-15.  Larger values are truncated with a warning.
-     This only affects the reset value of the `STAT' register, where
-     it forms bits 24-27.
+     This only affects the reset value of the `STAT' register, where it
+     forms bits 24-27.
 
 `pio_mode0_t1 = VALUE'
 `pio_mode0_t2 = VALUE'
@@ -2231,7 +2302,7 @@ Within the `device' subsection, the following parameters may appear:
 `file = "FILENAME"'
      `filename' specifies the file to be used for a simulated ATA
      device if the file type (see `type' above) is 1.  Default value
-     `"ata-FileN"', where N is the device number.
+     `"ata_fileN"', where N is the device number.
 
 `size = VALUE'
      VALUE specifies the size of a simulated ATA device if the file
@@ -2945,22 +3016,21 @@ directories used are as follows.
 
 To add a new test needs the following steps.
 
-   * Put new host C code in its own directory within `test-code'. Add
+   * Put new host C code in its own directory within `test-code'.  Add
      the directory to the existing `Makefile.am' in the `test-code'
      directory and create a `Makefile.am' in the new directory to drive
-     building the test program(s). Don't forget to add the new
+     building the test program(s).  Don't forget to add the new
      `Makefile' to the top level `configure.ac' so it gets generated.
      Not all tests require code here.
 
-   * Put new target C code in its own directory within
-     `test-code-or1k'. Once again modify & create `Makefile.am'. this
-     time though modify the `configure.ac' in the `test-code-or1k' so
-     the `Makefile' gets generated. The existing programs provide
-     examples to start from, including custom linker scripts where
-     needed.
+   * Put new target C code in its own directory within `test-code-or1k'.
+     Once again modify & create `Makefile.am'.  This time modify the
+     `configure.ac' in the `test-code-or1k' so the `Makefile' gets
+     generated.  The existing programs provide examples to start from,
+     including custom linker scripts where needed.
 
    * Add one or more tests and configuration files to the relevant
-     "tool" test directory. Use the existing tests as templates. They
+     "tool" test directory.  Use the existing tests as templates.  They
      make heavy use of the `expect'/TCL procedures in the `config'
      directory to facilitate driving the tests.
 
@@ -3408,7 +3478,7 @@ Index
 
 * --cumulative:                          Profiling Utility.   (line  26)
 * --debug-config:                        Standalone Simulator.
-                                                              (line  50)
+                                                              (line  81)
 * --disable-all-tests:                   Configuring the Build.
                                                               (line 105)
 * --disable-arith-flag:                  Configuring the Build.
@@ -3436,11 +3506,11 @@ Index
 * --enable-execution:                    Configuring the Build.
                                                               (line  37)
 * --enable-mprofile:                     Standalone Simulator.
-                                                              (line  79)
+                                                              (line 115)
 * --enable-ov-flag:                      Configuring the Build.
                                                               (line 132)
 * --enable-profile:                      Standalone Simulator.
-                                                              (line  76)
+                                                              (line 112)
 * --enable-profiling:                    Configuring the Build.
                                                               (line  29)
 * --enable-range-stats:                  Configuring the Build.
@@ -3448,55 +3518,69 @@ Index
 * --enable-unsigned-xori:                Configuring the Build.
                                                               (line  68)
 * --file:                                Standalone Simulator.
-                                                              (line  24)
+                                                              (line  39)
 * --filename:                            Memory Profiling Utility.
                                                               (line  51)
 * --generate:                            Profiling Utility.   (line  34)
 * --group:                               Memory Profiling Utility.
                                                               (line  47)
 * --help:                                Standalone Simulator.
-                                                              (line  20)
+                                                              (line  21)
 * --help (memory profiling utility):     Memory Profiling Utility.
                                                               (line  22)
 * --help (profiling utility):            Profiling Utility.   (line  22)
 * --interactive:                         Standalone Simulator.
-                                                              (line  56)
+                                                              (line  25)
+* --memory:                              Standalone Simulator.
+                                                              (line  65)
 * --mode:                                Memory Profiling Utility.
                                                               (line  26)
 * --nosrv:                               Standalone Simulator.
-                                                              (line  32)
-* --quiet:                               Profiling Utility.   (line  30)
+                                                              (line  47)
+* --quiet <1>:                           Profiling Utility.   (line  30)
+* --quiet:                               Standalone Simulator.
+                                                              (line  29)
+* --report-memory-errors:                Standalone Simulator.
+                                                              (line  86)
 * --srv:                                 Standalone Simulator.
-                                                              (line  40)
+                                                              (line  55)
 * --strict-npc:                          Standalone Simulator.
-                                                              (line  59)
+                                                              (line  95)
+* --verbose:                             Standalone Simulator.
+                                                              (line  33)
 * --version:                             Standalone Simulator.
-                                                              (line  16)
+                                                              (line  17)
 * --version (memory profiling utility):  Memory Profiling Utility.
                                                               (line  17)
 * --version (profiling utility):         Profiling Utility.   (line  17)
 * -c:                                    Profiling Utility.   (line  26)
 * -d:                                    Standalone Simulator.
-                                                              (line  50)
+                                                              (line  81)
 * -f <1>:                                Memory Profiling Utility.
                                                               (line  51)
 * -f:                                    Standalone Simulator.
-                                                              (line  24)
-* -g <1>:                                Profiling Utility.   (line  34)
-* -g:                                    Memory Profiling Utility.
+                                                              (line  39)
+* -g <1>:                                Memory Profiling Utility.
                                                               (line  47)
+* -g:                                    Profiling Utility.   (line  34)
 * -h:                                    Standalone Simulator.
-                                                              (line  20)
+                                                              (line  21)
 * -h (memory profiling utility):         Memory Profiling Utility.
                                                               (line  22)
 * -h (profiling utility):                Profiling Utility.   (line  22)
 * -i:                                    Standalone Simulator.
-                                                              (line  56)
-* -m:                                    Memory Profiling Utility.
+                                                              (line  25)
+* -m <1>:                                Memory Profiling Utility.
                                                               (line  26)
-* -q:                                    Profiling Utility.   (line  30)
+* -m:                                    Standalone Simulator.
+                                                              (line  65)
+* -q <1>:                                Profiling Utility.   (line  30)
+* -q:                                    Standalone Simulator.
+                                                              (line  29)
+* -V:                                    Standalone Simulator.
+                                                              (line  33)
 * -v:                                    Standalone Simulator.
-                                                              (line  16)
+                                                              (line  17)
 * -v (memory profiling utility):         Memory Profiling Utility.
                                                               (line  17)
 * -v (profiling utility):                Profiling Utility.   (line  17)
@@ -3558,7 +3642,7 @@ Index
 * byte_enabled (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  48)
 * cache configuration:                   Cache Configuration. (line   6)
-* calling_convention (CUC configuration): CUC Configuration.  (line  34)
+* calling_convention (CUC configuration): CUC Configuration.  (line  37)
 * ce (memory configuration):             Memory Configuration.
                                                               (line 118)
 * cfgr (CPU configuration):              CPU Configuration.   (line  47)
@@ -3655,7 +3739,7 @@ Index
 * DCGE (power management register):      Power Management Configuration.
                                                               (line  21)
 * debug (Interactive CLI):               Interactive Command Line.
-                                                              (line 162)
+                                                              (line 151)
 * debug (simulator configuration):       Simulator Behavior.  (line  13)
 * debug channel toggle (Interactive CLI): Interactive Command Line.
                                                               (line 141)
@@ -3694,7 +3778,7 @@ Index
 * dm (Interactive CLI):                  Interactive Command Line.
                                                               (line  31)
 * dma (Ethernet configuration):          Ethernet Configuration.
-                                                              (line  43)
+                                                              (line  33)
 * DMA configuration:                     DMA Configuration.   (line   6)
 * DMA verification (VAPI):               Verification API.    (line  73)
 * dma_mode0_td (ATA/ATAPI configuration): Disc Interface Configuration.
@@ -3719,7 +3803,7 @@ Index
                                                               (line  23)
 * edge_trigger (interrupt controller):   Interrupt Configuration.
                                                               (line  16)
-* enable_bursts (CUC configuration):     CUC Configuration.   (line  38)
+* enable_bursts (CUC configuration):     CUC Configuration.   (line  41)
 * enabled (ATA/ATAPI configuration):     Disc Interface Configuration.
                                                               (line  18)
 * enabled (branch prediction configuration): Branch Prediction Configuration.
@@ -3801,8 +3885,6 @@ Index
                                                               (line 117)
 * flag setting by instructions:          Configuring the Build.
                                                               (line 118)
-* floating point multiply and add:       Known Issues.        (line  56)
-* floating point support:                Known Issues.        (line  42)
 * frame buffer configuration:            Frame Buffer Configuration.
                                                               (line   6)
 * generic peripheral configuration:      Generic Peripheral Configuration.
@@ -3868,7 +3950,6 @@ Index
 * jitter (UART configuration):           UART Configuration.  (line  78)
 * keyboard configuration:                Keyboard Configuration.
                                                               (line   6)
-* lf.madd.s:                             Known Issues.        (line  56)
 * library version of Or1ksim:            Simulator Library.   (line   6)
 * license for Or1ksim:                   GNU Free Documentation License.
                                                               (line   6)
@@ -3882,7 +3963,7 @@ Index
                                                               (line 150)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
-* long:                                  Simulator Library.   (line  87)
+* long:                                  Simulator Library.   (line  95)
 * make file for tests:                   Regression Testing.  (line  27)
 * mc (memory configuration):             Memory Configuration.
                                                               (line 127)
@@ -3909,10 +3990,10 @@ Index
 * memory profiling version of Or1ksim:   Memory Profiling Utility.
                                                               (line   6)
 * memory_order (CUC configuration):      CUC Configuration.   (line  15)
-* memory_order=exact (CUC configuration): CUC Configuration.  (line  27)
+* memory_order=exact (CUC configuration): CUC Configuration.  (line  30)
 * memory_order=none (CUC configuration): CUC Configuration.   (line  18)
-* memory_order=strong (CUC configuration): CUC Configuration. (line  25)
-* memory_order=weak (CUC configuration): CUC Configuration.   (line  21)
+* memory_order=strong (CUC configuration): CUC Configuration. (line  27)
+* memory_order=weak (CUC configuration): CUC Configuration.   (line  22)
 * missdelay (branch prediction configuration): Branch Prediction Configuration.
                                                               (line  37)
 * missdelay (instruction cache configuration): Cache Configuration.
@@ -3925,7 +4006,7 @@ Index
 * mprof_fn (simulator configuration - deprecated): Simulator Behavior.
                                                               (line  34)
 * mprofile (Interactive CLI):            Interactive Command Line.
-                                                              (line 178)
+                                                              (line 173)
 * mprofile (simulator configuration):    Simulator Behavior.  (line  29)
 * mwdma (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 128)
@@ -3933,25 +4014,32 @@ Index
                                                               (line  42)
 * name (memory configuration):           Memory Configuration.
                                                               (line 109)
-* no_multicycle (CUC configuration):     CUC Configuration.   (line  42)
+* no_multicycle (CUC configuration):     CUC Configuration.   (line  45)
 * nsets (cache configuration):           Cache Configuration. (line  15)
 * nsets (MMU configuration):             Memory Management Configuration.
                                                               (line  16)
 * nways (cache configuration):           Cache Configuration. (line  22)
 * nways (MMU configuration):             Memory Management Configuration.
                                                               (line  22)
-* or1ksim_get_time_period:               Simulator Library.   (line  77)
-* or1ksim_init:                          Simulator Library.   (line  14)
-* or1ksim_interrupt:                     Simulator Library.   (line  92)
-* or1ksim_interrupt_clear:               Simulator Library.   (line 110)
-* or1ksim_interrupt_set:                 Simulator Library.   (line 101)
-* or1ksim_is_le:                         Simulator Library.   (line  82)
-* or1ksim_jtag_reset:                    Simulator Library.   (line 119)
-* or1ksim_jtag_shift_dr:                 Simulator Library.   (line 141)
-* or1ksim_jtag_shift_ir:                 Simulator Library.   (line 127)
-* or1ksim_reset_duration:                Simulator Library.   (line  62)
-* or1ksim_run:                           Simulator Library.   (line  57)
-* or1ksim_set_time_point:                Simulator Library.   (line  73)
+* or1ksim_get_time_period:               Simulator Library.   (line  85)
+* or1ksim_init:                          Simulator Library.   (line  15)
+* or1ksim_interrupt:                     Simulator Library.   (line 100)
+* or1ksim_interrupt_clear:               Simulator Library.   (line 118)
+* or1ksim_interrupt_set:                 Simulator Library.   (line 109)
+* or1ksim_is_le:                         Simulator Library.   (line  90)
+* or1ksim_jtag_reset:                    Simulator Library.   (line 127)
+* or1ksim_jtag_shift_dr:                 Simulator Library.   (line 149)
+* or1ksim_jtag_shift_ir:                 Simulator Library.   (line 135)
+* or1ksim_read_mem:                      Simulator Library.   (line 163)
+* or1ksim_read_reg:                      Simulator Library.   (line 199)
+* or1ksim_read_spr:                      Simulator Library.   (line 181)
+* or1ksim_reset_duration:                Simulator Library.   (line  70)
+* or1ksim_run:                           Simulator Library.   (line  59)
+* or1ksim_set_stall_state:               Simulator Library.   (line 217)
+* or1ksim_set_time_point:                Simulator Library.   (line  81)
+* or1ksim_write_mem:                     Simulator Library.   (line 172)
+* or1ksim_write_reg:                     Simulator Library.   (line 208)
+* or1ksim_write_spr:                     Simulator Library.   (line 190)
 * output rediretion:                     Concepts.            (line   7)
 * overflow flag setting by instructions: Configuring the Build.
                                                               (line 133)
@@ -4056,9 +4144,9 @@ Index
 * Remote Serial Protocol:                Debug Interface Configuration.
                                                               (line  20)
 * Remote Serial Protocol, --nosrv:       Standalone Simulator.
-                                                              (line  32)
+                                                              (line  47)
 * Remote Serial Protocol, --srv:         Standalone Simulator.
-                                                              (line  40)
+                                                              (line  55)
 * reset (Interactive CLI):               Interactive Command Line.
                                                               (line  63)
 * reset hooks:                           Concepts.            (line  13)
@@ -4209,9 +4297,9 @@ Index
 * testing:                               Regression Testing.  (line   6)
 * tests, all enabled.:                   Configuring the Build.
                                                               (line 105)
-* timings_file (CUC configuration):      CUC Configuration.   (line  46)
+* timings_file (CUC configuration):      CUC Configuration.   (line  49)
 * timings_fn (CUC configuration - deprecated): CUC Configuration.
-                                                              (line  46)
+                                                              (line  49)
 * toggle breakpoint (Interactive CLI):   Interactive Command Line.
                                                               (line  57)
 * toggle debug channels (Interactive CLI): Interactive Command Line.
@@ -4263,9 +4351,9 @@ Index
 * VAPI for UART:                         Verification API.    (line  41)
 * vapi_id (debug interface configuration): Debug Interface Configuration.
                                                               (line  43)
-* vapi_id (DMA configuration) <1>:       DMA Configuration.   (line  38)
-* vapi_id (DMA configuration):           Ethernet Configuration.
+* vapi_id (DMA configuration) <1>:       Ethernet Configuration.
                                                               (line  88)
+* vapi_id (DMA configuration):           DMA Configuration.   (line  38)
 * vapi_id (GPIO configuration):          GPIO Configuration.  (line  32)
 * vapi_id (UART configuration):          UART Configuration.  (line  85)
 * vapi_log_file (verification API configuration): Verification API Configuration.
@@ -4286,55 +4374,55 @@ Index
 
 
 Tag Table:
-Node: Top829
-Node: Installation1239
-Node: Preparation1486
-Node: Configuring the Build1781
-Node: Build and Install7895
-Node: Known Issues8741
-Node: Usage11803
-Node: Standalone Simulator12017
-Node: Profiling Utility15045
-Node: Memory Profiling Utility15955
-Node: Simulator Library17320
-Node: Configuration25098
-Node: Configuration File Format25710
-Node: Configuration File Preprocessing26002
-Node: Configuration File Syntax26299
-Node: Simulator Configuration29084
-Node: Simulator Behavior29375
-Node: Verification API Configuration33904
-Node: CUC Configuration35844
-Node: Core OpenRISC Configuration37761
-Node: CPU Configuration38263
-Node: Memory Configuration42381
-Node: Memory Management Configuration48849
-Node: Cache Configuration51226
-Node: Interrupt Configuration53612
-Node: Power Management Configuration54348
-Node: Branch Prediction Configuration55625
-Node: Debug Interface Configuration56985
-Node: Peripheral Configuration59328
-Node: Memory Controller Configuration59954
-Node: UART Configuration63368
-Node: DMA Configuration66887
-Node: Ethernet Configuration68754
-Node: GPIO Configuration72730
-Node: Display Interface Configuration74363
-Node: Frame Buffer Configuration76672
-Node: Keyboard Configuration78536
-Node: Disc Interface Configuration80774
-Node: Generic Peripheral Configuration85717
-Node: Interactive Command Line88012
-Node: Verification API94986
-Node: Code Internals99416
-Node: Coding Conventions99999
-Node: Global Data Structures104426
-Node: Concepts107083
-Ref: Output Redirection107228
-Node: Internal Debugging107767
-Node: Regression Testing108291
-Node: GNU Free Documentation License112086
-Node: Index134493
+Node: Top814
+Node: Installation1224
+Node: Preparation1471
+Node: Configuring the Build1764
+Node: Build and Install7880
+Node: Known Issues8658
+Node: Usage9713
+Node: Standalone Simulator9927
+Node: Profiling Utility14342
+Node: Memory Profiling Utility15252
+Node: Simulator Library16617
+Node: Configuration26694
+Node: Configuration File Format27306
+Node: Configuration File Preprocessing27691
+Node: Configuration File Syntax27988
+Node: Simulator Configuration30773
+Node: Simulator Behavior31064
+Node: Verification API Configuration35645
+Node: CUC Configuration37585
+Node: Core OpenRISC Configuration39577
+Node: CPU Configuration40079
+Node: Memory Configuration44198
+Node: Memory Management Configuration50689
+Node: Cache Configuration53066
+Node: Interrupt Configuration55452
+Node: Power Management Configuration56188
+Node: Branch Prediction Configuration57465
+Node: Debug Interface Configuration58825
+Node: Peripheral Configuration61168
+Node: Memory Controller Configuration61794
+Node: UART Configuration65209
+Node: DMA Configuration68728
+Node: Ethernet Configuration70595
+Node: GPIO Configuration74571
+Node: Display Interface Configuration76204
+Node: Frame Buffer Configuration78513
+Node: Keyboard Configuration80377
+Node: Disc Interface Configuration82615
+Node: Generic Peripheral Configuration87558
+Node: Interactive Command Line89853
+Node: Verification API96827
+Node: Code Internals101257
+Node: Coding Conventions101840
+Node: Global Data Structures106267
+Node: Concepts108924
+Ref: Output Redirection109069
+Node: Internal Debugging109608
+Node: Regression Testing110132
+Node: GNU Free Documentation License113921
+Node: Index136328
 
 End Tag Table

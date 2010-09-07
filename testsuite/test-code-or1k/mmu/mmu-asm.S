@@ -33,25 +33,25 @@
                           SPR_DTLBTR_SWE  )
 #define ITLB_PR_NOLIMIT  (SPR_ITLBTR_SXE  | \
                           SPR_ITLBTR_UXE  )
-        .global _lo_dmmu_en
-        .global _lo_immu_en
-        .global _lo_dtlb_ci_test
-        .global _lo_itlb_ci_test
-        .global _testjump
-        .global _ic_enable
-        .global _ic_disable
-        .global _dc_enable
-        .global _dc_disable
+        .global lo_dmmu_en
+        .global lo_immu_en
+        .global lo_dtlb_ci_test
+        .global lo_itlb_ci_test
+        .global testjump
+        .global ic_enable
+        .global ic_disable
+        .global dc_enable
+        .global dc_disable
 
-_lo_dmmu_en:
-				l.mfspr r11,r0,SPR_SR
+lo_dmmu_en:
+	l.mfspr r11,r0,SPR_SR
         l.ori   r11,r11,SPR_SR_DME
         l.mtspr r0,r11,SPR_ESR_BASE
         l.mtspr r0,r9,SPR_EPCR_BASE
         l.rfe
         l.nop
   
-_lo_dmmu_dis:
+lo_dmmu_dis:
         l.addi  r13,r0,-1
         l.xori  r13,r13,SPR_SR_DME
         l.mfspr r11,r0,SPR_SR
@@ -60,15 +60,15 @@ _lo_dmmu_dis:
         l.jr    r9
         l.nop
 
-_lo_immu_en:
-				l.mfspr r11,r0,SPR_SR
+lo_immu_en:
+	l.mfspr r11,r0,SPR_SR
         l.ori   r11,r11,SPR_SR_IME
         l.mtspr r0,r11,SPR_ESR_BASE
         l.mtspr r0,r9,SPR_EPCR_BASE
         l.rfe
         l.nop
  
-_lo_immu_dis:
+lo_immu_dis:
         l.addi  r13,r0,-1
         l.xori  r13,r13,SPR_SR_IME
         l.mfspr r11,r0,SPR_SR
@@ -77,7 +77,7 @@ _lo_immu_dis:
         l.jr    r9
         l.nop
 
-_testjump:
+testjump:
         l.movhi r5,0x4800
         l.ori   r5,r5,0x4800
         l.sw    0x0(r3),r5
@@ -91,7 +91,7 @@ _testjump:
         l.jr    r9
         l.nop   
 
-_ic_enable:
+ic_enable:
         /* Disable IC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -121,7 +121,7 @@ _ic_enable:
         l.jr    r9
         l.nop
  
-_ic_disable:
+ic_disable:
         /* Disable IC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -132,7 +132,7 @@ _ic_disable:
         l.jr    r9
         l.nop
  
-_dc_enable:
+dc_enable:
         /* Disable DC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -157,7 +157,7 @@ _dc_enable:
         l.jr    r9
         l.nop
 
-_dc_disable:
+dc_disable:
         /* Disable DC */
         l.mfspr r13,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -169,7 +169,7 @@ _dc_disable:
         l.nop
 
         /* dtlb_ic_test(unsigned long add, unsigned long set) */
-_lo_dtlb_ci_test:
+lo_dtlb_ci_test:
         l.addi  r1,r1,-4
         l.sw    0(r1),r9
 
@@ -198,9 +198,9 @@ _lo_dtlb_ci_test:
         l.addi  r6,r4,1
         l.mtspr r6,r5,SPR_DTLBTR_BASE(0)
 
-        l.jal   _lo_dmmu_en
+        l.jal   lo_dmmu_en
         l.nop
-        l.jal   _dc_enable
+        l.jal   dc_enable
         l.nop
 
         l.movhi r6,hi(0x01234567)
@@ -223,11 +223,11 @@ _lo_dtlb_ci_test:
         l.ori   r5,r5,lo(0xfedcba9)
         l.sw    (PAGE_SIZE - 4)(r3),r5
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
         l.ori   r5,r3,(DTLB_PR_NOLIMIT)
         l.mtspr r4,r5,SPR_DTLBTR_BASE(0)
-        l.jal   _lo_dmmu_en
+        l.jal   lo_dmmu_en
         l.nop
 
         l.movhi r6,hi(0x76543210)
@@ -243,11 +243,11 @@ _lo_dtlb_ci_test:
         l.bnf   14f
         l.nop
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
         l.ori   r5,r3,(DTLB_PR_NOLIMIT | SPR_DTLBTR_CI)
         l.mtspr r4,r5,SPR_DTLBTR_BASE(0)
-        l.jal   _lo_dmmu_en
+        l.jal   lo_dmmu_en
         l.nop
 
         l.movhi r5,hi(0x00112233)
@@ -281,11 +281,11 @@ _lo_dtlb_ci_test:
         l.bnf   16f
         l.nop
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
         l.ori   r5,r3,(DTLB_PR_NOLIMIT)
         l.mtspr r4,r5,SPR_DTLBTR_BASE(0)
-        l.jal   _lo_dmmu_en
+        l.jal   lo_dmmu_en
         l.nop
 
         l.movhi r6,hi(0x76543210)
@@ -303,7 +303,7 @@ _lo_dtlb_ci_test:
         l.nop
 
         /* Invalidate cache */
-        l.jal   _dc_disable
+        l.jal   dc_disable
         l.nop
 
         l.movhi r5,hi(0x00112233)
@@ -322,11 +322,11 @@ _lo_dtlb_ci_test:
         l.ori   r5,r5,lo(0x44556677)
         l.sw    (PAGE_SIZE - 4)(r3),r5
 
-        l.jal   _dc_enable
+        l.jal   dc_enable
         l.nop
 
         /* I want this part to execute as fast as possible */
-        l.jal   _ic_enable
+        l.jal   ic_enable
         l.nop
 
         l.addi  r5,r3,PAGE_SIZE
@@ -370,10 +370,10 @@ _lo_dtlb_ci_test:
         l.bnf   19f
         l.nop
 
-        l.jal   _dc_disable
+        l.jal   dc_disable
         l.nop
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
 
         l.j     10f
@@ -389,13 +389,13 @@ _lo_dtlb_ci_test:
 12:     l.addi  r8,r8,1
 11:     l.addi  r8,r8,1
 
-10:     l.jal   _dc_disable
+10:     l.jal   dc_disable
         l.nop
 
-        l.jal   _ic_disable
+        l.jal   ic_disable
         l.nop
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
 
         l.addi  r11,r8,0
@@ -407,7 +407,7 @@ _lo_dtlb_ci_test:
         l.addi  r1,r1,4
 
         /* itlb_ic_test(unsigned long add, unsigned long set) */
-_lo_itlb_ci_test:
+lo_itlb_ci_test:
         l.addi  r1,r1,-4
         l.sw    0(r1),r9
 
@@ -415,8 +415,8 @@ _lo_itlb_ci_test:
 
         /* Copy the code to the prepeared location */
         l.addi  r7,r0,88
-        l.movhi r5,hi(_ci_test)
-        l.ori   r5,r5,lo(_ci_test)
+        l.movhi r5,hi(ci_test)
+        l.ori   r5,r5,lo(ci_test)
         l.addi  r6,r3,0
 1:      l.lwz   r11,0(r5)
         l.sw    0(r6),r11
@@ -433,9 +433,9 @@ _lo_itlb_ci_test:
         l.ori   r5,r3,ITLB_PR_NOLIMIT 
         l.mtspr r4,r5,SPR_ITLBTR_BASE(0)
 
-        l.jal   _lo_immu_en
+        l.jal   lo_immu_en
         l.nop
-        l.jal   _ic_enable
+        l.jal   ic_enable
         l.nop
 
         l.addi  r5,r0,0
@@ -449,8 +449,8 @@ _lo_itlb_ci_test:
 
         /* Copy the code to the prepeared location */
         l.addi  r7,r0,20
-        l.movhi r5,hi(_ic_refill_test)
-        l.ori   r5,r5,lo(_ic_refill_test)
+        l.movhi r5,hi(ic_refill_test)
+        l.ori   r5,r5,lo(ic_refill_test)
         l.addi  r6,r3,12
 1:      l.lwz   r11,0(r5)
         l.sw    0(r6),r11
@@ -461,9 +461,9 @@ _lo_itlb_ci_test:
         l.bnf   1b
         l.nop
 
-        l.jal   _ic_disable
+        l.jal   ic_disable
         l.nop
-        l.jal   _ic_enable
+        l.jal   ic_enable
         l.nop
 
         l.addi  r5,r0,0
@@ -484,10 +484,10 @@ _lo_itlb_ci_test:
 12:     l.addi  r8,r8,1
 11:     l.addi  r8,r8,1
 
-10:     l.jal   _ic_disable
+10:     l.jal   ic_disable
         l.nop
 
-        l.jal   _lo_dmmu_dis
+        l.jal   lo_dmmu_dis
         l.nop
 
         l.addi  r11,r8,0
@@ -498,7 +498,7 @@ _lo_itlb_ci_test:
         l.jr    r9
         l.addi  r1,r1,4
  
-_ci_test:
+ci_test:
 3:      l.addi  r5,r5,1
 
         l.sfeqi r6,0x01
@@ -529,7 +529,7 @@ _ci_test:
         l.nop
 
        
-_ic_refill_test:
+ic_refill_test:
         l.jr    r9
         l.addi  r5,r5,1
         l.addi  r5,r5,1

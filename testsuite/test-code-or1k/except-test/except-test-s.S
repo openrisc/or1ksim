@@ -28,7 +28,7 @@
 #include "spr-defs.h"
 #include "board.h"
 
-#define reset _main
+#define reset main
 
 #define MC_CSR          (0x00)
 #define MC_POC          (0x04)
@@ -36,54 +36,54 @@
 #define MC_CSC(i)       (0x10 + (i) * 8)
 #define MC_TMS(i)       (0x14 + (i) * 8)
 
-        .global _except_basic
-        .global _lo_dmmu_en
-        .global _lo_immu_en
-        .global _call
-        .global _call_with_int
-        .global _load_acc_32
-        .global _load_acc_16
-        .global _store_acc_32
-        .global _store_acc_16
-        .global _load_b_acc_32
-        .global _trap
-        .global _b_trap
-        .global _range
-        .global _b_range
-        .global _int_trigger
-        .global _int_loop
-        .global _jump_back
+        .global except_basic
+        .global lo_dmmu_en
+        .global lo_immu_en
+        .global call
+        .global call_with_int
+        .global load_acc_32
+        .global load_acc_16
+        .global store_acc_32
+        .global store_acc_16
+        .global load_b_acc_32
+        .global trap
+        .global b_trap
+        .global range
+        .global b_range
+        .global int_trigger
+        .global int_loop
+        .global jump_back
 
         .section .stack
         .space 0x1000
-_stack:
+stack:
 
-        .extern _reset_support
-        .extern _c_reset
-        .extern _excpt_buserr
-        .extern _excpt_dpfault
-        .extern _excpt_ipfault
-        .extern _excpt_tick
-        .extern _excpt_align
-        .extern _excpt_illinsn
-        .extern _excpt_int
-        .extern _excpt_dtlbmiss
-        .extern _excpt_itlbmiss
-        .extern _excpt_range
-        .extern _excpt_syscall
-        .extern _excpt_break
-        .extern _excpt_trap
+        .extern reset_support
+        .extern c_reset
+        .extern excpt_buserr
+        .extern excpt_dpfault
+        .extern excpt_ipfault
+        .extern excpt_tick
+        .extern excpt_align
+        .extern excpt_illinsn
+        .extern excpt_int
+        .extern excpt_dtlbmiss
+        .extern excpt_itlbmiss
+        .extern excpt_range
+        .extern excpt_syscall
+        .extern excpt_break
+        .extern excpt_trap
 
   .section .except, "ax"
 
-_buserr_vector:
+buserr_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_buserr)
-        l.ori   r10,r10,lo(_excpt_buserr)
+        l.movhi r10,hi(excpt_buserr)
+        l.ori   r10,r10,lo(excpt_buserr)
         l.jr    r9
         l.nop
         l.nop
@@ -94,14 +94,14 @@ _buserr_vector:
         l.nop
         l.nop
 
-_dpfault_vector:
+dpfault_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_dpfault)
-        l.ori   r10,r10,lo(_excpt_dpfault)
+        l.movhi r10,hi(excpt_dpfault)
+        l.ori   r10,r10,lo(excpt_dpfault)
         l.jr    r9
         l.nop
         l.nop
@@ -112,14 +112,14 @@ _dpfault_vector:
         l.nop
         l.nop
 
-_ipfault_vector:
+ipfault_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_ipfault)
-        l.ori   r10,r10,lo(_excpt_ipfault)
+        l.movhi r10,hi(excpt_ipfault)
+        l.ori   r10,r10,lo(excpt_ipfault)
         l.jr    r9
         l.nop
         l.nop
@@ -130,14 +130,14 @@ _ipfault_vector:
         l.nop
         l.nop
 
-_tick_vector:
+tick_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_tick)
-        l.ori   r10,r10,lo(_excpt_tick)
+        l.movhi r10,hi(excpt_tick)
+        l.ori   r10,r10,lo(excpt_tick)
         l.jr    r9
         l.nop
         l.nop
@@ -148,14 +148,14 @@ _tick_vector:
         l.nop
         l.nop
 
-_align_vector:
+align_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_align)
-        l.ori   r10,r10,lo(_excpt_align)
+        l.movhi r10,hi(excpt_align)
+        l.ori   r10,r10,lo(excpt_align)
         l.jr    r9
         l.nop
         l.nop
@@ -166,14 +166,14 @@ _align_vector:
         l.nop
         l.nop
 
-_illinsn_vector:
+illinsn_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_illinsn)
-        l.ori   r10,r10,lo(_excpt_illinsn)
+        l.movhi r10,hi(excpt_illinsn)
+        l.ori   r10,r10,lo(excpt_illinsn)
         l.jr    r9
         l.nop
         l.nop
@@ -184,14 +184,14 @@ _illinsn_vector:
         l.nop
         l.nop
 
-_int_vector:
+int_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_int)
-        l.ori   r10,r10,lo(_excpt_int)
+        l.movhi r10,hi(excpt_int)
+        l.ori   r10,r10,lo(excpt_int)
         l.jr    r9
         l.nop
         l.nop
@@ -202,14 +202,14 @@ _int_vector:
         l.nop
         l.nop
 
-_dtlbmiss_vector:
+dtlbmiss_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_dtlbmiss)
-        l.ori   r10,r10,lo(_excpt_dtlbmiss)
+        l.movhi r10,hi(excpt_dtlbmiss)
+        l.ori   r10,r10,lo(excpt_dtlbmiss)
         l.jr    r9
         l.nop
         l.nop
@@ -220,14 +220,14 @@ _dtlbmiss_vector:
         l.nop
         l.nop
 
-_itlbmiss_vector:
+itlbmiss_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_itlbmiss)
-        l.ori   r10,r10,lo(_excpt_itlbmiss)
+        l.movhi r10,hi(excpt_itlbmiss)
+        l.ori   r10,r10,lo(excpt_itlbmiss)
         l.jr    r9
         l.nop
         l.nop
@@ -238,14 +238,14 @@ _itlbmiss_vector:
         l.nop
         l.nop
 
-_range_vector:
+range_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_range)
-        l.ori   r10,r10,lo(_excpt_range)
+        l.movhi r10,hi(excpt_range)
+        l.ori   r10,r10,lo(excpt_range)
         l.jr    r9
         l.nop
         l.nop
@@ -256,7 +256,7 @@ _range_vector:
         l.nop
         l.nop
 
-_syscall_vector:
+syscall_vector:
         l.addi  r3,r3,4
 
         l.mfspr r4,r0,SPR_SR
@@ -264,29 +264,29 @@ _syscall_vector:
         l.add   r6,r0,r4
         
         l.mfspr r4,r0,SPR_EPCR_BASE
-        l.movhi r5,hi(_sys1)
-        l.ori r5,r5,lo(_sys1)
+        l.movhi r5,hi(sys1)
+        l.ori r5,r5,lo(sys1)
         l.sub r5,r4,r5
         
         l.mfspr r4,r0,SPR_ESR_BASE  /* ESR - set supvisor mode */
         l.ori r4,r4,SPR_SR_SM
         l.mtspr r0,r4,SPR_ESR_BASE  
         
-        l.movhi r4,hi(_sys2)
-        l.ori r4,r4,lo(_sys2)
+        l.movhi r4,hi(sys2)
+        l.ori r4,r4,lo(sys2)
         l.mtspr r0,r4,SPR_EPCR_BASE
         
         l.rfe
         l.addi  r3,r3,8
 
-_break_vector:
+break_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_break)
-        l.ori   r10,r10,lo(_excpt_break)
+        l.movhi r10,hi(excpt_break)
+        l.ori   r10,r10,lo(excpt_break)
         l.jr    r9
         l.nop
         l.nop
@@ -297,14 +297,14 @@ _break_vector:
         l.nop
         l.nop
 
-_trap_vector:
+trap_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(_excpt_trap)
-        l.ori   r10,r10,lo(_excpt_trap)
+        l.movhi r10,hi(excpt_trap)
+        l.ori   r10,r10,lo(excpt_trap)
         l.jr    r9
         l.nop
         l.nop
@@ -320,7 +320,7 @@ _trap_vector:
 	.section .except-text
 
         .org    0x100
-_reset_vector:
+reset_vector:
         l.nop
         l.nop
         l.addi  r2,r0,0x0
@@ -359,11 +359,11 @@ _reset_vector:
         l.jr    r3
         l.nop
 start:
-        l.jal   _init_mc
+        l.jal   init_mc
         l.nop
 
-        l.movhi r1,hi(_stack)
-        l.ori   r1,r1,lo(_stack)
+        l.movhi r1,hi(stack)
+        l.ori   r1,r1,lo(stack)
 
         /* Setup exception wrappers */
         l.movhi r3,hi(_src_beg)
@@ -413,7 +413,7 @@ start:
         l.jr    r2
         l.nop
 
-_init_mc:
+init_mc:
  
         l.movhi r3,hi(MC_BASE_ADDR)
         l.ori   r3,r3,lo(MC_BASE_ADDR)
@@ -483,13 +483,13 @@ store_regs:
         l.sw    0x74(r1),r31
 
         l.mfspr r3,r0,SPR_EPCR_BASE
-        l.movhi r4,hi(_except_pc)
-        l.ori   r4,r4,lo(_except_pc)
+        l.movhi r4,hi(except_pc)
+        l.ori   r4,r4,lo(except_pc)
         l.sw    0(r4),r3
 
         l.mfspr r3,r0,SPR_EEAR_BASE
-        l.movhi r4,hi(_except_ea)
-        l.ori   r4,r4,lo(_except_ea)
+        l.movhi r4,hi(except_ea)
+        l.ori   r4,r4,lo(except_ea)
         l.sw    0(r4),r3
 
         l.movhi r9,hi(end_except)
@@ -537,8 +537,8 @@ end_except:
 
   .section .text
 
-_except_basic:
-_sys1:
+except_basic:
+sys1:
         l.addi  r3,r0,-2  /* Enable exceptiom recognition and external interrupt,set user mode */
         l.mfspr r4,r0,SPR_SR
         l.and   r4,r4,r3
@@ -549,7 +549,7 @@ _sys1:
         l.sys   1
         l.addi  r3,r3,2
 
-_sys2:
+sys2:
         l.addi  r11,r0,0
         
         l.mfspr r4,r0,SPR_SR  /* Check SR */
@@ -577,7 +577,7 @@ _sys2:
         l.jr    r9
         l.nop
 
-_lo_dmmu_en:
+lo_dmmu_en:
         l.mfspr r3,r0,SPR_SR
         l.ori   r3,r3,SPR_SR_DME
         l.mtspr r0,r3,SPR_ESR_BASE
@@ -585,7 +585,7 @@ _lo_dmmu_en:
         l.rfe
         l.nop
   
-_lo_immu_en:
+lo_immu_en:
         l.mfspr r3,r0,SPR_SR
         l.ori   r3,r3,SPR_SR_IME
         l.mtspr r0,r3,SPR_ESR_BASE
@@ -593,78 +593,78 @@ _lo_immu_en:
         l.rfe
         l.nop
  
-_call:
+call:
         l.addi  r11,r0,0
         l.jr    r3
         l.nop
 
-_call_with_int:
+call_with_int:
         l.mfspr r8,r0,SPR_SR
         l.ori   r8,r8,SPR_SR_TEE
         l.mtspr r0,r8,SPR_ESR_BASE
         l.mtspr r0,r3,SPR_EPCR_BASE
         l.rfe
 
-_load_acc_32:
+load_acc_32:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
         l.lwz   r11,0(r4)
         l.jr    r9
         l.nop
 
-_load_acc_16:
+load_acc_16:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
         l.lhz   r11,0(r4)
         l.jr    r9
         l.nop
 
-_store_acc_32:
+store_acc_32:
         l.movhi r3,hi(0x12345678)
         l.ori   r3,r3,lo(0x12345678)
         l.sw    0(r4),r3
         l.jr    r9
         l.nop
 
-_store_acc_16:
+store_acc_16:
         l.movhi r3,hi(0x12345678)
         l.ori   r3,r3,lo(0x12345678)
         l.sh    0(r4),r3
         l.jr    r9
         l.nop
 
-_load_b_acc_32:
+load_b_acc_32:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
         l.jr    r9
         l.lwz   r11,0(r4)
 
-_b_trap:
+b_trap:
         l.jr    r9
-_trap: 
+trap: 
         l.trap  1
         l.jr    r9
         l.nop
 
-_b_range:
+b_range:
         l.jr    r9
-_range: 
+range: 
         l.addi  r3,r0,-1
         l.jr    r9
         l.nop
 
-_int_trigger:
+int_trigger:
         l.addi  r11,r0,0
         l.mfspr r3,r0,SPR_SR
         l.ori   r3,r3,SPR_SR_TEE
         l.mtspr r0,r3,SPR_SR
         l.addi  r11,r11,1
 
-_int_loop:
-        l.j     _int_loop
+int_loop:
+        l.j     int_loop
         l.lwz   r5,0(r4);
 
-_jump_back:
+jump_back:
         l.addi  r11,r0,0
         l.jr    r9
         l.addi  r11,r11,1

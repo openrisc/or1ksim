@@ -167,7 +167,7 @@ void fail (char *func, int line)
 
 void test_dummy (void)
 {
-	asm("_test:");
+	asm("test:");
 	asm("l.addi\t\tr3,r3,1") ;
 	asm("l.nop" : :);
 }

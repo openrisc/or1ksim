@@ -165,7 +165,7 @@ void call(unsigned long add)
 
 void jump(void)
 {
-	asm("_jr:");
+	asm("jr:");
 	asm("l.jr\t\tr9") ;
 	asm("l.nop" : :);
 }

@@ -112,7 +112,7 @@ directory for installation of the tools.
 
 For testing (using @command{make check}), the @code{--target} parameter
 @emph{must} be specified, to allow the target tool chain to be
-selected. If the tools have been installed using the standard OpenRISC
+selected.  If the tools have been installed using the standard OpenRISC
 script, then this should be set to @code{or32-elf}.
 
 A number of @value{OR1KSIM} specific features in the simulator do
@@ -174,7 +174,7 @@ The default is for this to be disabled.
 @itemx --disable-unsigned-xori
 @cindex @code{--disable-unsigned-xori}
 @cindex exclusive-OR immediate operand
-Historically, @code{l.xori}, has sign extended its operand. This is
+Historically, @code{l.xori}, has sign extended its operand.  This is
 inconsistent with the other logical opcodes (@code{l.andi},
 @code{l.ori}), but in the absence of @code{l.not}, it allows a register
 to be inverted in a single instruction using:
@@ -234,7 +234,7 @@ get the missing test(s) working.
 @end table
 
 A number of configuration flags have been removed since version 0.3.0,
-because they led to invalid behavior of Or1ksim. Those removed are:
+because they led to invalid behavior of Or1ksim.  Those removed are:
 
 @table @code
 
@@ -248,7 +248,7 @@ If enabled, this option caused certain instructions to set the flag
 The instructions affected by this were @code{l.add}, @code{l.addc},
 @code{l.addi}, @code{l.and} and @code{l.andi}.
 
-If set, this caused incorrect behavior. Whether or not flags are set is part
+If set, this caused incorrect behavior.  Whether or not flags are set is part
 of the OpenRISC 1000 architectural specification.  The only flags which
 should set this are the ``set flag'' instructions: @code{l.sfeq},
 @code{l.sfeqi}, @code{l.sfges}, @code{l.sfgesi}, @code{l.sfgeu},
@@ -309,10 +309,6 @@ This will install the three variations of the @value{OR1KSIM} tool,
 @command{or32-uclinux-mpsim}, the @value{OR1KSIM} library, @file{libsim}, the
 header file, @file{or1ksim.h} and this documentation in @command{info} format.
 
-@quotation Note
-Testing @value{OR1KSIM} with @kbd{make check} is not yet supported.
-@end quotation
-
 The documentation may be created and installed in alternative formats (PDF,
 Postscript, DVI, HTML) with for example:
 
@@ -324,10 +320,14 @@ Postscript, DVI, HTML) with for example:
 @node Known Issues
 @section Known Problems and Issues
 
-The following problems and issues are known about with @value{OR1KSIM}
-@value{VERSION}.  The OpenRISC tracker may be used to see the current
-state of these issues and to raise new problems and feature requests.  It
-may be found at @url{http://www.opencores.org/ptracker.cgi/view/or1k/398}.
+Full details of outstanding issues may be found in the @file{NEWS} file in
+the main directory of the distribution.  The OpenRISC tracker may be used
+to see the current state of these issues and to raise new problems and
+feature requests.  It may be found at
+@url{http://opencores.org/project,or1k,bugtracker}.
+
+The following issues are long standing and unlikely to be fixed in
+Or1ksim in the near future.
 
 @itemize @bullet
 @item
@@ -336,57 +336,11 @@ ignored.  @value{OR1KSIM} can be built for either little endian or big endian
 use, but that behavior cannot be changed dynamically.
 
 @item
-The NPC is a read/write register, but after being written it clears the
-pipeline.  This means that if the processor is stalled, the value should
-subsequently read back as 0, until the processor is unstalled and able
-to refill its pipeline.  By default @value{OR1KSIM} always reports back the value
-of NPC, even when it has been written while stalled.
-
-There is now an option, @code{--strict-npc}, which will enforce this
-behavior.  At some stage in the future it will become the default
-behavior, but for now it is an option, since its use will break GDB.
-
-@item
-The memory components are given names in the configuration file.  However
-there is currently no way for @value{OR1KSIM} to report that name back to the
-user (for example to identify which memory block corresponds to a
-particular access).
-
-@item
-@value{OR1KSIM} allows the processor to be stalled (from the command
-line), even if there is no debugger present.  This seems to be a
-meaningless operation.
-
-@item
 @value{OR1KSIM} is not reentrant, so a program cannot instantiate
 multiple instances using the library.  This is clearly a problem when
 considering multi-core applications.  However it stems from the original
 design, and can only be fixed by a complete rewrite.  The entire source
 code uses static global constants liberally!
-
-@item
-@cindex floating point support
-There is no support for single precision floating point instructions in
-@value{OR1KSIM} if configured in the CPU (@pxref{CPU Configuration, ,
-CPU Configuration}).  These are implemented using the floating point
-support in the host C library, which will usually be IEEE 745 compliant.
-There is at present no support for double precision floating point
-instructions, since these are meaningless with 32-bit registers.
-
-Floating point support within OpenRISC is intended to follow IEEE 745,
-which offers a degree of configurability. However at present the FPSCR
-register is not supported, so there is no mechanism for configuring
-floating point behavior. Thus the default functionality of the host C
-library will be used.
-
-@item
-@cindex floating point multiply and add
-@cindex lf.madd.s
-The single precision floating point multiply and add instruction,
-@code{lf.madd.s}, is not clearly specified in the original architectural
-manual. User should consult the @cite{OpenRISC 1200 version 2
-Supplementary Programmer's Reference Manual} for a specification of the
-functionality implemented.
 
 @end itemize
 
@@ -408,7 +362,8 @@ functionality implemented.
 The general form the standalone command is:
 
 @example
-or32-uclinux-sim [-vhi] [-f @var{file}] [--nosrv] [--srv=[@var{n}]] [-d @var{str}]
+or32-uclinux-sim [-vhiqV] [-f @var{file}] [--nosrv] [--srv=[@var{n}]]
+                 [-m <n>][-d @var{str}]
                  [--enable-profile] [--enable-mprofile] [@var{file}]
 @end example
 
@@ -429,6 +384,26 @@ exit.
 @cindex @code{-h}
 @cindex @code{--help}
 Print out help about the command line options and what they mean.
+
+@item -i
+@itemx --interactive
+@cindex @code{-i}
+@cindex @code{--interactive}
+After starting, drop into the @value{OR1KSIM} interactive command
+shell.
+
+@item -q
+@itemx --quiet
+@cindex @code{-q}
+@cindex @code{--quiet}
+Do not generate any information messages, only error messages.
+
+@item -V
+@itemx --verbose
+@cindex @code{-V}
+@cindex @code{--verbose}
+Generate extra output messages (equivalent of specifying the ``verbose''
+option in the simulator configuration section (see @pxref{Simulator Behavior, , Simulator Behavior}).
 
 @item -f @var{file}
 @itemx --file @var{file}
@@ -461,6 +436,25 @@ server, otherwise a random value from the private port range
 @code{--nosrv}.  If it is, a rude message is printed and the
 @code{--nosrv} option is ignored.
 
+@item -m=@var{size}
+@itemx --memory=@var{size}
+@cindex @code{-m}
+@cindex @code{--memory}
+Configure a memory block of @var{size} bytes, starting at address
+zero.  The size may be followed by @samp{k}, @samp{K}, @samp{m},
+@samp{M}, @samp{g}, @samp{G}, to indicate kilobytes (@math{2^{10}}
+bytes), megabytes (@math{2^{20}} bytes) and gigabytes (@math{2^{30}}
+bytes).
+
+This is mainly intended for use when Or1ksim is used without a
+configuration file, to allow just the processor and memory to be set
+up.  This is the equivalent of specifying a configuration memory section
+with @code{baseaddr = 0} and @code{size = @var{size}} and all other
+parameters taking their default value.
+
+If a configuration file is also used, it should be sure not to specify
+an overlapping memory block.
+
 @item -d=@var{config_string}
 @itemx --debug-config=@var{config_string}
 @cindex @code{-d}
@@ -469,12 +463,14 @@ Enable selected debug messages in @value{OR1KSIM}.  This parameter is
 for use by developers only, and is not covered further here.  See the
 source code for more details.
 
-@item -i
-@itemx --interactive
-@cindex @code{-i}
-@cindex @code{--interactive}
-After starting, drop into the @value{OR1KSIM} interactive command
-shell.
+@item --report-memory-errors
+@cindex @code{--report-memory-errors}
+By default all exceptions are now handled silently.  If this option is
+specified, bus exceptions will be reported with a message to standard
+error indicating the address at which the exception occurred.
+
+This was the default behaviour up to Or1ksim 0.4.0.  This flag is
+provided for those who wish to keep that behavior.
 
 @item --strict-npc
 @cindex @code{--strict-npc}
@@ -490,8 +486,8 @@ is changed while the processor is stalled, subsequent reads of its value
 will return 0 until the processor is unstalled.
 
 This is not currently the default behavior, since tools such as GDB have
-been implemented assuming the historic @value{OR1KSIM} behavior.  However at some
-time in the future it will become the default.
+been implemented assuming the historic @value{OR1KSIM} behavior.
+However at some time in the future it will become the default.
 
 @item --enable-profile
 @cindex @code{--enable-profile}
@@ -644,22 +640,19 @@ library, the flag, @code{-lsim} should be added to the link command.
 The header file @file{or1ksim.h} contains appropriate declarations of
 the functions exported by the @value{OR1KSIM} library.  These are:
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_init (const char
-*@var{config_file}, const char *@var{image_file}, void *@var{class_ptr},
+@deftypefn {@file{or1ksim.h}} int or1ksim_init (int @var{argc}, char *@var{argv}, void *@var{class_ptr},
 int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr},
 unsigned char @var{mask}[], unsigned char @var{rdata}[], int
 @var{data_len}), int (*@var{upw})(void *@var{class_ptr}, unsigned long
 int @var{addr}, unsigned char @var{mask}[], unsigned char @var{wdata}[],
 int @var{data_len}))
 
-The initialization function is supplied with the name of a
-configuration file, @var{config_file}, an executable image, @var{image_file}, a pointer to the calling
-class, @var{class_ptr} (since the library may be used from C++) and
-two up-call functions, one for reads, @var{upr}, and one for writes,
+The initialization function is supplied with a vector of arguments,
+which are interpreted as arguments to the standalone version (see
+@pxref{Standalone Simulator, , Standalone Simulator}), a pointer to the
+calling class, @var{class_ptr} (since the library may be used from C++)
+and two up-call functions, one for reads, @var{upr}, and one for writes,
 @var{upw}.
-
-@xref{Configuration, , Configuration}, for detailed information on
-configuring @value{OR1KSIM} and the format of the configuration file.
 
 @var{upw} is called for any write to an address external to the model
 (determined by a @code{generic} section in the configuration
@@ -676,13 +669,17 @@ read.  Bytes to be read/written should have 0xff set in
 @var{addr}, is the @emph{full} address, since the upcall function must
 handle all generic devices, using the full address for decoding.
 
-Endianness is not completely transparent, since @value{OR1KSIM} is
-transferring byte vectors, not multi-byte values.
+Endianness is not a concern, since @value{OR1KSIM} is transferring byte
+vectors, not multi-byte values.
+
+The result indicates whether the initialization was successful.  The
+integer values are available as an @code{enum or1ksim}, with possible
+values @code{OR1KSIM_RC_OK} and @code{OR1KSIM_RC_BADINIT}.
 
 @quotation Caution
-This is a change from version 0.3.0. It simplifies the interface, and
-makes @value{OR1KSIM} more consistent with payload representation in
-SystemC TLM 2.0.
+This is a change from versions 0.3.0 and 0.4.0.  It further simplifies
+the interface, and makes @value{OR1KSIM} more consistent with payload
+representation in SystemC TLM 2.0.
 @end quotation
 
 @quotation Note
@@ -695,7 +692,15 @@ behavior of the WishBone bus.
 
 @deftypefn {@file{or1ksim.h}} int or1ksim_run (double  @var{duration})
 
-Run the simulator for the simulated duration specified (in seconds).
+Run the simulator for the simulated duration specified (in seconds).  A
+duration of -1 indicates `run forever'
+
+The result indicates how the run terminated.  The integer values are
+available as an @code{enum or1ksim}, with possible values
+@code{OR1KSIM_RC_OK} (ran for the full duration),
+@code{OR1KSIM_RC_BRKPT} (terminated early due to hitting a breakpoint)
+and @code{OR1KSIM_RC_HALTED} (terminated early due to hitting
+@code{l.nop 1}).
 
 @end deftypefn
 
@@ -772,7 +777,7 @@ have been configured with the programmable interrupt controller
 
 @deftypefn {@file{or1ksim.h}} double or1ksim_jtag_reset ()
 
-Drive a reset sequence through the JTAG interface. Return the (model)
+Drive a reset sequence through the JTAG interface.  Return the (model)
 time taken for this action.  Remember that the JTAG has its own clock,
 which can be an order of magnitude slower than the main clock, so even a
 reset (5 JTAG cycles) could take 50 processor clock cycles to complete.
@@ -782,9 +787,9 @@ reset (5 JTAG cycles) could take 50 processor clock cycles to complete.
 @deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir (unsigned
 char *@var{jreg}, int @var{num_bits})
 
-Shift the supplied register through the JTAG instruction
-register.  Return the (model) time taken for this action. The register is
-supplied as a byte vector, with the least significant bits in the least
+Shift the supplied register through the JTAG instruction register.
+Return the (model) time taken for this action.  The register is supplied
+as a byte vector, with the least significant bits in the least
 significant byte.  If the total number of bits is not an exact number of
 bytes, then the odd bits are found in the least significant end of the
 highest numbered byte.
@@ -798,7 +803,7 @@ For example a 12-bit register would have bits 0-7 in byte 0 and bits
 char *@var{jreg}, int @var{num_bits})
 
 Shift the supplied register through the JTAG data register.  Return the
-(model) time taken for this action. The register is supplied as a byte
+(model) time taken for this action.  The register is supplied as a byte
 vector, with the least significant bits in the least significant byte.
 If the total number of bits is not an exact number of bytes, then the
 odd bits are found in the least significant end of the highest numbered
@@ -806,6 +811,91 @@ byte.
 
 For example a 12-bit register would have bits 0-7 in byte 0 and bits
 11-8 in the least significant 4 bits of byte 1.
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_mem (unsigned
+long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+
+Read @var{len} bytes from @var{addr}, placing the result in @var{buf}.
+Return @var{len} on success and 0 on failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_mem (unsigned
+long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+
+Write @var{len} bytes to @var{addr}, taking the data from @var{buf}.
+Return @var{len} on success and 0 on failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_spr (int @var{sprnum}, unsigned
+long int *@var{sprval_ptr})
+
+Read the SPR specified by @var{sprnum}, placing the result in
+@var{sprval_ptr}.  Return non-zero on success and 0 on failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_spr (int @var{sprnum}, unsigned
+long int @var{sprva})
+
+Write @var{sprval} to the SPR specified by @var{sprnum}.  Return
+non-zero on success and 0 on failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_reg (int @var{regnum}, unsigned
+long int *@var{regval_ptr})
+
+Read the general purpose register specified by @var{regnum}, placing the
+result in @var{regval_ptr}.  Return non-zero on success and 0 on
+failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_reg (int @var{regnum}, unsigned
+long int @var{regva})
+
+Write @var{regval} to the general purpose register specified by
+@var{regnum}.  Return non-zero on success and 0 on failure.
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
+
+@end deftypefn
+
+@deftypefn {@file{or1ksim.h}} void or1ksim_set_stall_state (int
+@var{state})
+
+Set the processor's state according to @var{state} (1 = stalled, 0 = not
+stalled).
+
+@quotation Note
+This function was added in Or1ksim 0.5.0.
+@end quotation
 
 @end deftypefn
 
@@ -873,7 +963,9 @@ current directory, then in the @file{$HOME/.or1ksim} directory of the user.
 @section Configuration File Format
 @cindex configuration file structure
 
-The configuration file is a plain text file.
+The configuration file is a plain text file.  A reference example,
+@file{sim.cfg}, is included in the top level directory of the
+distribution.
 
 @menu
 * Configuration File Preprocessing::
@@ -1016,19 +1108,22 @@ If 1 (true) generate a profiling file using the file specified in the
 @cindex @code{prof_fn} (simulator configuration - deprecated)
 Specifies the file to be used with the @code{profile} parameter.  Default
 @file{sim.profile}.  For backwards compatibility, the alternative name
-@code{prof_fn} is supported for this parameter, but deprecated.
+@code{prof_fn} is supported for this parameter, but deprecated.  Default
+@file{sim.profile}.
+
 
 @item mprofile = 0|1
 @cindex @code{mprofile} (simulator configuration)
 If 1 (true) generate a memory profiling file using the file specified in the
 @code{mprof_file} parameter or otherwise @file{sim.mprofile}.  Default 0.
 
-@item mprof_fn = ``@var{filename}''
+@item mprof_file = ``@var{filename}''
 @cindex @code{mprof_file} (simulator configuration)
 @cindex @code{mprof_fn} (simulator configuration - deprecated)
 Specifies the file to be used with the @code{mprofile} parameter.  Default
 @file{sim.mprofile}.  For backwards compatibility, the alternative name
 @code{mprof_fn} is supported for this parameter, but deprecated.
+Default @file{sim.mprofile}.
 
 @item history = 0|1
 @cindex @code{history} (simulator configuration)
@@ -1114,12 +1209,12 @@ Filename for the execution log filename if @code{exe_log} is enabled.  Default
 
 @item exe_bin_insn_log = 0|1
 @cindex @code{exe_bin_insn_log} (simulator configuration)
-Enable logging of executed instructions to a file in binary format. This is 
-helpful for off-line dynamic execution analysis.
+Enable logging of executed instructions to a file in binary format.
+This is helpful for off-line dynamic execution analysis.
 
 @quotation Note
-Execution logs can be @emph{very} big. For example, while booting the Linux 
-kernel, version 2.6.34, a log file 1.2GB in size was generated.
+Execution logs can be @emph{very} big.  For example, while booting the
+Linux kernel, version 2.6.34, a log file 1.2GB in size was generated.
 @end quotation
 
 @item exe_bin_insn_log_file = @var{filename}
@@ -1227,13 +1322,16 @@ This parameter specifies the memory ordering required:
 Different memory ordering, even if there are dependencies.  Bursts can
 be made, width can change.
 
+@item memory_order=weak
 @cindex @code{memory_order=weak} (CUC configuration)
 Different memory ordering, even if there are dependencies.  If
 dependencies cannot occur, then bursts can be made, width can change.
 
+@item memory_order=strong
 @cindex @code{memory_order=strong} (CUC configuration)
 Same memory ordering.  Bursts can be made, width can change.
 
+@item memory_order=exact
 @cindex @code{memory_order=exact} (CUC configuration)
 Exactly the same memory ordering and widths.
 
@@ -1411,7 +1509,7 @@ when I/O is idle.
 
 @item hardfloat = 0|1
 @cindex @code{hardfloat} (CPU configuration)
-If 1, hardfloat instructions are enabled. Default value 0.
+If 1, hardfloat instructions are enabled.  Default value 0.
 
 @end table
 
@@ -1425,13 +1523,13 @@ section may appear multiple times, specifying multiple blocks of
 memory.
 
 @quotation Caution
-The user may choose whether or not to enable a memory controller. If a
+The user may choose whether or not to enable a memory controller.  If a
 memory controller is enabled, then the standard OpenRISC C libraries
 will initialize it to expect 64MB memory blocks, and any memory
 declarations @emph{must} reflect this.  The section describing memory
-controller configuration describes the steps necessary for using
-smaller or larger memory sections (@pxref{Memory Controller
-Configuration, , Memory Controller Configuration}).
+controller configuration describes the steps necessary for using smaller
+or larger memory sections (@pxref{Memory Controller Configuration, ,
+Memory Controller Configuration}).
 
 If a memory controller is @emph{not} enabled, then the standard C
 library code will generate memory access errors.  The solution is to
@@ -1479,7 +1577,8 @@ Set the memory values to be a pattern value, which is set using the
 @item unknown
 @cindex @code{type=unknown} (memory configuration)
 The memory values are not initialized (i.e.  left ``unknown'').  This
-option will yield faster initialization of the simulator.
+option will yield faster initialization of the simulator.  This is the
+default.
 
 @item zero
 @cindex @code{type=zero} (memory configuration)
@@ -1564,8 +1663,8 @@ should have a unique chip enable index, which should be greater
 than or equal to zero.  This is used by the memory controller when
 identifying different memory instances.
 
-There is no requirement to set  @code{ce} if a memory controller is
-not enabled. The default value is -1 (invalid).
+There is no requirement to set @code{ce} if a memory controller is not
+enabled.  The default value is -1 (invalid).
 
 @item mc = @var{value}
 @cindex @code{mc} (memory configuration)
@@ -1574,10 +1673,10 @@ correspond to the @code{index} field specified in a @code{@w{section
 mc}} for a memory controller (@pxref{Memory Controller Configuration,
 , Memory Controller Configuration}).
 
-There is no requirement to set  @code{mc} if a memory controller is
-not enabled. Default value is 0, which is also the default value of a memory
-controller @code{index} field.  This is suitable therefore for designs
-with just one memory controller.
+There is no requirement to set @code{mc} if a memory controller is not
+enabled.  Default value is 0, which is also the default value of a
+memory controller @code{index} field.  This is suitable therefore for
+designs with just one memory controller.
 
 @item delayr = @var{value}
 @cindex @code{delayr} (memory configuration)
@@ -2001,7 +2100,7 @@ controller to expect 64MB memory blocks, and any memory declarations
 
 If smaller memory blocks are declared with a memory controller, then
 sufficient memory will not be allocated by @value{OR1KSIM}, but out of
-range memory accesses will not be trapped. For example declaring a
+range memory accesses will not be trapped.  For example declaring a
 memory section from 0-4MB with a memory controller enabled would mean
 that accesses between 4MB and 64MB would be permitted, but having no
 allocated memory would likely cause a segmentation fault.
@@ -2707,7 +2806,7 @@ hard disk.
 @cindex @code{file} (ATA/ATAPI device configuration)
 @file{filename} specifies the file to be used for a simulated ATA
 device if the file type (see @code{type} above) is 1.  Default value
-@code{"ata-File@var{n}"}, where @var{n} is the device number.
+@code{"ata_file@var{n}"}, where @var{n} is the device number.
 
 @item size = @var{value}
 @cindex @code{size} (ATA/ATAPI device configuration)
@@ -3604,9 +3703,9 @@ library, and build various programs linking in the library.
 @cindex target test code
 @cindex test code for target
 These are all the test programs to be compiled with the OpenRISC tool
-chain to run with either standalone @value{OR1KSIM} or the library. This
-directory includes its own @file{configure.ac}, since it must set up a
-separate tool chain based on the target, not the host.
+chain to run with either standalone @value{OR1KSIM} or the library.
+This directory includes its own @file{configure.ac}, since it must set
+up a separate tool chain based on the target, not the host.
 
 @end table
 
@@ -3615,26 +3714,25 @@ To add a new test needs the following steps.
 @itemize @bullet
 
 @item
-Put new host C code in its own directory within @file{test-code}. Add
+Put new host C code in its own directory within @file{test-code}.  Add
 the directory to the existing @file{Makefile.am} in the @file{test-code}
-directory and create a @file{Makefile.am} in the new directory to
-drive building the test program(s). Don't forget to add the new
-@file{Makefile} to the top level @file{configure.ac} so it gets generated. Not
-all tests require code here.
+directory and create a @file{Makefile.am} in the new directory to drive
+building the test program(s).  Don't forget to add the new
+@file{Makefile} to the top level @file{configure.ac} so it gets
+generated. Not all tests require code here.
 
 @item
-Put new target C code in its own directory within
-@file{test-code-or1k}. Once again modify & create
-@file{Makefile.am}. this time though modify the @file{configure.ac} in
-the @file{test-code-or1k} so the @file{Makefile} gets generated. The
-existing programs provide examples to start from, including custom
-linker scripts where needed.
+Put new target C code in its own directory within @file{test-code-or1k}.
+Once again modify & create @file{Makefile.am}.  This time modify the
+@file{configure.ac} in the @file{test-code-or1k} so the @file{Makefile}
+gets generated.  The existing programs provide examples to start from,
+including custom linker scripts where needed.
 
 @item
 Add one or more tests and configuration files to the relevant ``tool''
-test directory. Use the existing tests as templates. They make heavy use
-of the @command{expect}/TCL procedures in the @file{config} directory to
-facilitate driving the tests.
+test directory.  Use the existing tests as templates.  They make heavy
+use of the @command{expect}/TCL procedures in the @file{config}
+directory to facilitate driving the tests.
 
 @end itemize
 

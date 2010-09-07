@@ -289,7 +289,7 @@ init_defconfig ()
 
   /* VAPI */
   config.vapi.enabled        = 0;
-/*   config.vapi.server_port    = 50000; */
+  config.vapi.server_port    = 50000;
   config.vapi.log_enabled    = 0;
   config.vapi.hide_device_id = 0;
   config.vapi.vapi_fn        = strdup ("vapi.log");
@@ -880,6 +880,7 @@ alloc_memory_block (const char *size)
     case 'K': case 'k': multiplier =      0x400UL; break;
     default:            multiplier =        0x1UL; break;
     }
+
   unsigned long int  mem_size = strtoul (size, NULL, 0) * multiplier;
 
   if (0 == mem_size)
@@ -910,7 +911,11 @@ alloc_memory_block (const char *size)
   set_config_param (sec, lookup_param ("size", sec),     str_size);
 
   sec->sec_end (sec->dat);
-  
+
+  if (config.sim.verbose)
+    {
+      PRINTF ("Memory block of 0x%lx bytes allocated\n", mem_size);
+    }  
 }	/* alloc_memory_block () */
 
 

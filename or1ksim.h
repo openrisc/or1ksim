@@ -34,7 +34,7 @@
 /* The return codes */
 
 enum  or1ksim_rc {
-  OR1KSIM_RC_OK,		/* No error */
+  OR1KSIM_RC_OK = 0,		/* No error */
 
   OR1KSIM_RC_BADINIT,		/* Couldn't initialize */
   OR1KSIM_RC_BRKPT,		/* Hit a breakpoint */

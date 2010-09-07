@@ -1,3 +1,11 @@
+2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/int-edge.exp <int-edge simple 1>: Increase time
+	between interrupts to 2ms.
+	<int-edge simple 2>: Increase time between interrupts to 2ms.
+	<int-edge duplicated 1>: Increase time between interrupts to 2ms.
+	<int-edge duplicated 2>: Increase time between interrupts to 2ms.
+
 2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* or1ksim.tests/eth.cfg: Fix section debug to use RSP only.

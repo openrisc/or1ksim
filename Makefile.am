@@ -26,6 +26,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --target=or32-elf
 
+EXTRA_DIST = sim.cfg
+
 SUBDIRS               = argtable2  \
 			cpu        \
                         bpb        \
