@@ -1,3 +1,7 @@
+2010-09-24 Julius Baxter <julius.baxter@orsoc.se>
+	* debug/rsp-server.c: Added rsp_query handler entries for new packets
+	                      seen with gdb-7.2.
+
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* config.h.in: Regenerated.
