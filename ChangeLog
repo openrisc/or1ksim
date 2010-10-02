@@ -1,6 +1,45 @@
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* Release 0.5.0rc2.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc2.
+	* debug/rsp-server.c (rsp_query): Simplified handling of
+	"qTStatus" to indicate we just do not support tracing.
+	* doc/or1ksim.texi <Configuring the Build>: No longer mandatory to
+	specify the target.
+	<Memory Configuration>: Warns about issues with memory controller.
+	<Memory Controller Configuration>: Warns about issues with memory
+	controller and advises not to use it.
+	<Standalone Simulator>: Details for options with arguments updated.
+	* NEWS: Updated for 0.5.0rc2.
+	* peripheral/mc.c (mc_poc): Use constant MC_POC_VALID
+	(mc_index): Ensure value is valid.
+	* peripheral/mc-defines.h <MC_CE_VALID>: Defined.
+
+2010-09-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure.ac: Minor tidy ups.
+	* configure: Regenerated.
+
 2010-09-24 Julius Baxter <julius.baxter@orsoc.se>
+
 	* debug/rsp-server.c: Added rsp_query handler entries for new packets
-	                      seen with gdb-7.2.
+	seen with gdb-7.2.
+
+2010-09-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* cpu/or32/execute.c (exec_main): Dump regs if tracing enabled.
+	* doc/or1ksim.texi <Usage>: Document -t/--trace.
+	<Simulator Library>: or1ksim_write_mem second argument is now
+	const.
+	* libtoplevel.c (or1ksim_run): Dump regs if tracing enabled.
+	(or1ksim_write_mem): Second argument is now const.
+	* or1ksim.h <or1ksim_write_mem>: Second argument is now const.
+	* sim-config.c (parse_args): New option -t/--trace.
+	* toplevel.c (main): Remove setting of runtim.sim.hush.
 
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 

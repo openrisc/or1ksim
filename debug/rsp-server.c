@@ -1851,35 +1851,7 @@ rsp_query (struct rsp_buf *buf)
     }
   else if (0 == strncmp ("qTStatus", buf->data, strlen ("qTStatus")))  
     {
-      /* Ask the stub if there is a trace experiment running right now.
-	 The reply has the form:
-	 `Trunning[;field]...'
-	  running is a single digit 1 if the trace is presently running, or 0 
-	  if not. It is followed by semicolon-separated optional fields that an 
-	  agent may use to report additional status.
-      */
-      put_str_packet ("T0");
-    }
-  else if ((0 == strncmp ("qTfV", buf->data, strlen ("qTfV"))) ||
-	   (0 == strncmp ("qTsV", buf->data, strlen ("qTsV"))))
-    {
-      /*
-	These packets request data about trace state variables that are on the 
-	target. gdb sends qTfV to get the first vari of data, and multiple qTsV
-	to get additional variables. Replies to these packets follow the syntax
-	of the QTDV packets that define trace state variables. 
-      */
-      put_str_packet ("");
-    }
-  else if (0 == strncmp ("qTfP", buf->data, strlen ("qTfP")))  
-    {
-      /*
-	These packets request data about tracepoints that are being used by the
-	target. gdb sends qTfP to get the first piece of data, and multiple 
-	qTsP to get additional pieces. Replies to these packets generally take 
-	the form of the QTDP packets that define tracepoints. (FIXME add 
-	detailed syntax) 
-      */
+      /* We don't support tracing, so return empty packet. */
       put_str_packet ("");
     }
   else if (0 == strncmp ("qXfer:", buf->data, strlen ("qXfer:")))

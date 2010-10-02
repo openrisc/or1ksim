@@ -354,22 +354,40 @@ mc_poc (union param_val  val,
 {
   struct mc *mc = dat;
 
-  if (val.int_val > 0xf)
+  if (val.int_val > MC_POC_VALID)
     {
-      fprintf (stderr, "Warning: memory controller PoC > 4 bits: truncated\n");
+      fprintf (stderr, "Warning: memory controller PoC > 0x%lx: truncated\n",
+	       MC_POC_VALID);
     }
 
-  mc->poc = val.int_val & 0xf;
+  mc->poc = val.int_val & MC_POC_VALID;
 
 }	/* mc_poc() */
 
 
+/*---------------------------------------------------------------------------*/
+/*!Set the index of this memory controller.
+
+   This identifies which chip enable value will select this memory
+   controller. Truncate if the value is too large with a warning.
+
+   @param[in] val  The value to use
+   @param[in] dat  The config data structure                                 */
+/*---------------------------------------------------------------------------*/
 static void
 mc_index (union param_val val, void *dat)
 {
   struct mc *mc = dat;
-  mc->index = val.int_val;
+
+  if (val.int_val > MC_CE_VALID)
+    {
+      fprintf (stderr, "Warning: memory controller index > 0x%x: truncated.\n",
+	       MC_CE_VALID);
+    }
+      
+  mc->index = val.int_val & MC_CE_VALID;
 }
+
 
 /*---------------------------------------------------------------------------*/
 /*!Initialize a new memory controller configuration

@@ -111,9 +111,9 @@ all the options.  The most useful is @code{--prefix} to specify a
 directory for installation of the tools.
 
 For testing (using @command{make check}), the @code{--target} parameter
-@emph{must} be specified, to allow the target tool chain to be
-selected.  If the tools have been installed using the standard OpenRISC
-script, then this should be set to @code{or32-elf}.
+may be specified, to allow the target tool chain to be selected.  If not
+specified, it will default to @code{or32-elf}, which is the same prefix
+used with the standard OpenRISC toolchain installation script.
 
 A number of @value{OR1KSIM} specific features in the simulator do
 require enabling at configuration.  These include
@@ -362,7 +362,7 @@ code uses static global constants liberally!
 The general form the standalone command is:
 
 @example
-or32-uclinux-sim [-vhiqV] [-f @var{file}] [--nosrv] [--srv=[@var{n}]]
+or32-uclinux-sim [-vhiqVt] [-f @var{file}] [--nosrv] [--srv=[@var{n}]]
                  [-m <n>][-d @var{str}]
                  [--enable-profile] [--enable-mprofile] [@var{file}]
 @end example
@@ -405,8 +405,15 @@ Do not generate any information messages, only error messages.
 Generate extra output messages (equivalent of specifying the ``verbose''
 option in the simulator configuration section (see @pxref{Simulator Behavior, , Simulator Behavior}).
 
+@item -t
+@itemx --trace
+@cindex @code{-V}
+@cindex @code{--verbose}
+Dump previous instruction, next instruction, GPRs and flag after each
+instruction.
+
 @item -f @var{file}
-@itemx --file @var{file}
+@itemx --file=@var{file}
 @cindex @code{-f}
 @cindex @code{--file}
 Read configuration commands from the specified file, looking first in
@@ -436,7 +443,7 @@ server, otherwise a random value from the private port range
 @code{--nosrv}.  If it is, a rude message is printed and the
 @code{--nosrv} option is ignored.
 
-@item -m=@var{size}
+@item -m @var{size}
 @itemx --memory=@var{size}
 @cindex @code{-m}
 @cindex @code{--memory}
@@ -455,7 +462,7 @@ parameters taking their default value.
 If a configuration file is also used, it should be sure not to specify
 an overlapping memory block.
 
-@item -d=@var{config_string}
+@item -d @var{config_string}
 @itemx --debug-config=@var{config_string}
 @cindex @code{-d}
 @cindex @code{--debug-config}
@@ -827,7 +834,7 @@ This function was added in Or1ksim 0.5.0.
 @end deftypefn
 
 @deftypefn {@file{or1ksim.h}} int or1ksim_write_mem (unsigned
-long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+long int @var{addr}, const unsigned char *@var{buf}, int @var{len})
 
 Write @var{len} bytes to @var{addr}, taking the data from @var{buf}.
 Return @var{len} on success and 0 on failure.
@@ -1524,17 +1531,17 @@ memory.
 
 @quotation Caution
 The user may choose whether or not to enable a memory controller.  If a
-memory controller is enabled, then the standard OpenRISC C libraries
-will initialize it to expect 64MB memory blocks, and any memory
-declarations @emph{must} reflect this.  The section describing memory
-controller configuration describes the steps necessary for using smaller
-or larger memory sections (@pxref{Memory Controller Configuration, ,
-Memory Controller Configuration}).
+memory controller is enabled, then appropriate initalization code must
+be provided.  The section describing memory controller configuration
+describes the steps necessary for using smaller or larger memory
+sections (@pxref{Memory Controller Configuration, , Memory Controller
+Configuration}).
 
-If a memory controller is @emph{not} enabled, then the standard C
-library code will generate memory access errors.  The solution is to
-declare an additional writable memory block, mimicing the memory
-controller's register bank as follows.
+The @dfn{uClibc} startup code initalizes a memory controller, assumed to
+be mapped at 0x93000000.  If a memory controller is @emph{not} enabled,
+then the standard C library code will generate memory access errors.
+The solution is to declare an additional writable memory block, mimicing
+the memory controller's register bank as follows.
 
 @example
 section memory
@@ -2093,10 +2100,20 @@ The memory controller configuration is described in @code{@w{section
 mc}}.  This section may appear multiple times, specifying multiple
 memory controllers.
 
+@quotation Warning
+There are known to be problems with the current memory controller, which
+currently is not included in the regression test suite. Users are
+advised not to use the memory controller in the current release.
+@end quotation
+
 @quotation Caution
-The standard OpenRISC C libraries will initialize the memory
-controller to expect 64MB memory blocks, and any memory declarations
-@emph{must} reflect this.
+There is no initialization code in the standard @dfn{newlib}
+library.
+
+The standard @dfn{uClibc} library assumes a memory controller
+mapped at 0x93000000 and will initialize the memory controller to expect
+64MB memory blocks, and any memory declarations @emph{must} reflect
+this.
 
 If smaller memory blocks are declared with a memory controller, then
 sufficient memory will not be allocated by @value{OR1KSIM}, but out of
@@ -2687,6 +2704,11 @@ the document @cite{ATA/ATAPI-5 Core Specification} by Richard
 Herveille, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
+
+@quotation Warning
+In the current release of Or1ksim, parsing of the ATA section is
+broken. Users should not configure the disc interface in this release.
+@end quotation
 
 ATA/ATAPI configuration is described in @code{@w{section ata}}.  This section
 may appear multiple times, specifying multiple disc controllers.  The

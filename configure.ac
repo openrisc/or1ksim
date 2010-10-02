@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [0.5.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim], [0.5.0rc2], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -56,9 +56,11 @@ case "$target_cpu" in
 or32*)	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
+
 dlx*)	CPU_ARCH=dlx;
 	ARCH_ISA=DLX;;
-*)      AC_MSG_WARN(Unknown target architecture $target_cpu: OR32 assumed);
+
+*)      AC_MSG_WARN(Unknown target architecture $target_cpu: OR32 ELF assumed);
 	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;

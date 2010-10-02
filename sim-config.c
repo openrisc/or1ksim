@@ -942,6 +942,7 @@ parse_args (int argc, char *argv[])
   struct arg_lit  *command;
   struct arg_lit  *quiet;
   struct arg_lit  *verbose;
+  struct arg_lit  *trace;
   struct arg_lit  *report_mem_errs;
   struct arg_lit  *strict_npc;
   struct arg_lit  *profile;
@@ -955,8 +956,9 @@ parse_args (int argc, char *argv[])
   cfg_file = arg_file0 ("f", "file", "<file>",
 			"config file (default \"sim.cfg\")");
   cfg_file->filename[0] = "sim.cfg";
-  nosrv = arg_lit0 (NULL, "nosrv", "do not launch JTAG proxy server");
-  srv = arg_int0 (NULL, "srv", "<n>", "port number (default random)");
+  nosrv = arg_lit0 (NULL, "nosrv", "do not launch debug server");
+  srv = arg_int0 (NULL, "srv", "<n>",
+		  "launch debug server on port (default random)");
   srv->ival[0] = rand () % (65536 - 49152) + 49152;
   srv->hdr.flag |= ARG_HASOPTVALUE;
   mem = arg_str0 ("m", "memory", "<n>", "add memory block of <n> bytes");
@@ -964,6 +966,7 @@ parse_args (int argc, char *argv[])
   command = arg_lit0 ("i", "interactive", "launch interactive prompt");
   quiet = arg_lit0 ("q", "quiet", "minimal message output");
   verbose = arg_lit0 ("V", "verbose", "verbose message output");
+  trace = arg_lit0 ("t", "trace", "trace each instruction");
   report_mem_errs = arg_lit0 (NULL, "report-memory-errors",
 			      "Report out of memory accesses");
   strict_npc = arg_lit0 (NULL, "strict-npc", "setting NPC flushes pipeline");
@@ -984,6 +987,7 @@ parse_args (int argc, char *argv[])
     command,
     quiet,
     verbose,
+    trace,
     report_mem_errs,
     strict_npc,
     profile,
@@ -1040,6 +1044,9 @@ parse_args (int argc, char *argv[])
     {
       config.sim.verbose = verbose->count;
     }
+
+  /* Request for tracing */
+  runtime.sim.hush = trace->count ? 0 : 1;
 
   /* Request for memory errors */
   config.sim.report_mem_errs = report_mem_errs->count;

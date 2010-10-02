@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-0.5.0rc1.tar.bz2
+     tar jxf or1ksim-0.5.0rc2.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,17 +81,17 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-0.5.0rc1/configure --target=or32-uclinux ...
+     ../or1ksim-0.5.0rc2/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
 options.  The most useful is `--prefix' to specify a directory for
 installation of the tools.
 
-For testing (using `make check'), the `--target' parameter _must_ be
-specified, to allow the target tool chain to be selected.  If the tools
-have been installed using the standard OpenRISC script, then this
-should be set to `or32-elf'.
+For testing (using `make check'), the `--target' parameter may be
+specified, to allow the target tool chain to be selected.  If not
+specified, it will default to `or32-elf', which is the same prefix used
+with the standard OpenRISC toolchain installation script.
 
 A number of Or1ksim specific features in the simulator do require
 enabling at configuration.  These include
@@ -295,7 +295,7 @@ File: or1ksim.info,  Node: Standalone Simulator,  Next: Profiling Utility,  Up: 
 
 The general form the standalone command is:
 
-     or32-uclinux-sim [-vhiqV] [-f FILE] [--nosrv] [--srv=[N]]
+     or32-uclinux-sim [-vhiqVt] [-f FILE] [--nosrv] [--srv=[N]]
                       [-m <n>][-d STR]
                       [--enable-profile] [--enable-mprofile] [FILE]
 
@@ -324,8 +324,13 @@ Many of the options have both a short and a long form.  For example
      "verbose" option in the simulator configuration section (see *note
      Simulator Behavior: Simulator Behavior.).
 
+`-t'
+`--trace'
+     Dump previous instruction, next instruction, GPRs and flag after
+     each instruction.
+
 `-f FILE'
-`--file FILE'
+`--file=FILE'
      Read configuration commands from the specified file, looking first
      in the current directory, and otherwise in the `$HOME/.or1k'
      directory.  If this argument is not specified, the file `sim.cfg'
@@ -350,7 +355,7 @@ Many of the options have both a short and a long form.  For example
      `--nosrv'.  If it is, a rude message is printed and the `--nosrv'
      option is ignored.
 
-`-m=SIZE'
+`-m SIZE'
 `--memory=SIZE'
      Configure a memory block of SIZE bytes, starting at address zero.
      The size may be followed by `k', `K', `m', `M', `g', `G', to
@@ -366,7 +371,7 @@ Many of the options have both a short and a long form.  For example
      If a configuration file is also used, it should be sure not to
      specify an overlapping memory block.
 
-`-d=CONFIG_STRING'
+`-d CONFIG_STRING'
 `--debug-config=CONFIG_STRING'
      Enable selected debug messages in Or1ksim.  This parameter is for
      use by developers only, and is not covered further here.  See the
@@ -675,7 +680,7 @@ functions exported by the Or1ksim library.  These are:
 
 
  -- `or1ksim.h': int or1ksim_write_mem (unsigned
-     long int ADDR, unsigned char *BUF, int LEN)
+     long int ADDR, const unsigned char *BUF, int LEN)
 
      Write LEN bytes to ADDR, taking the data from BUF.  Return LEN on
      success and 0 on failure.
@@ -1253,17 +1258,18 @@ Memory configuration is described in `section memory'.  This section
 may appear multiple times, specifying multiple blocks of memory.
 
      Caution: The user may choose whether or not to enable a memory
-     controller.  If a memory controller is enabled, then the standard
-     OpenRISC C libraries will initialize it to expect 64MB memory
-     blocks, and any memory declarations _must_ reflect this.  The
-     section describing memory controller configuration describes the
-     steps necessary for using smaller or larger memory sections (*note
-     Memory Controller Configuration: Memory Controller Configuration.).
+     controller.  If a memory controller is enabled, then appropriate
+     initalization code must be provided.  The section describing
+     memory controller configuration describes the steps necessary for
+     using smaller or larger memory sections (*note Memory Controller
+     Configuration: Memory Controller Configuration.).
 
-     If a memory controller is _not_ enabled, then the standard C
-     library code will generate memory access errors.  The solution is
-     to declare an additional writable memory block, mimicing the memory
-     controller's register bank as follows.
+     The "uClibc" startup code initalizes a memory controller, assumed
+     to be mapped at 0x93000000.  If a memory controller is _not_
+     enabled, then the standard C library code will generate memory
+     access errors.  The solution is to declare an additional writable
+     memory block, mimicing the memory controller's register bank as
+     follows.
 
           section memory
             pattern = 0x00
@@ -1711,9 +1717,18 @@ The memory controller configuration is described in `section mc'.  This
 section may appear multiple times, specifying multiple memory
 controllers.
 
-     Caution: The standard OpenRISC C libraries will initialize the
-     memory controller to expect 64MB memory blocks, and any memory
-     declarations _must_ reflect this.
+     Warning: There are known to be problems with the current memory
+     controller, which currently is not included in the regression test
+     suite. Users are advised not to use the memory controller in the
+     current release.
+
+     Caution: There is no initialization code in the standard "newlib"
+     library.
+
+     The standard "uClibc" library assumes a memory controller mapped
+     at 0x93000000 and will initialize the memory controller to expect
+     64MB memory blocks, and any memory declarations _must_ reflect
+     this.
 
      If smaller memory blocks are declared with a memory controller,
      then sufficient memory will not be allocated by Or1ksim, but out of
@@ -2208,6 +2223,10 @@ top level SVN directory, `ata'.  It is described in the document
 `ATA/ATAPI-5 Core Specification' by Richard Herveille, which can be
 found in the `doc' subdirectory.  It is a memory mapped component,
 which resides on the main OpenRISC Wishbone data bus.
+
+     Warning: In the current release of Or1ksim, parsing of the ATA
+     section is broken. Users should not configure the disc interface
+     in this release.
 
 ATA/ATAPI configuration is described in `section ata'.  This section
 may appear multiple times, specifying multiple disc controllers.  The
@@ -3478,7 +3497,7 @@ Index
 
 * --cumulative:                          Profiling Utility.   (line  26)
 * --debug-config:                        Standalone Simulator.
-                                                              (line  81)
+                                                              (line  86)
 * --disable-all-tests:                   Configuring the Build.
                                                               (line 105)
 * --disable-arith-flag:                  Configuring the Build.
@@ -3506,11 +3525,11 @@ Index
 * --enable-execution:                    Configuring the Build.
                                                               (line  37)
 * --enable-mprofile:                     Standalone Simulator.
-                                                              (line 115)
+                                                              (line 120)
 * --enable-ov-flag:                      Configuring the Build.
                                                               (line 132)
 * --enable-profile:                      Standalone Simulator.
-                                                              (line 112)
+                                                              (line 117)
 * --enable-profiling:                    Configuring the Build.
                                                               (line  29)
 * --enable-range-stats:                  Configuring the Build.
@@ -3518,7 +3537,7 @@ Index
 * --enable-unsigned-xori:                Configuring the Build.
                                                               (line  68)
 * --file:                                Standalone Simulator.
-                                                              (line  39)
+                                                              (line  44)
 * --filename:                            Memory Profiling Utility.
                                                               (line  51)
 * --generate:                            Profiling Utility.   (line  34)
@@ -3532,20 +3551,20 @@ Index
 * --interactive:                         Standalone Simulator.
                                                               (line  25)
 * --memory:                              Standalone Simulator.
-                                                              (line  65)
+                                                              (line  70)
 * --mode:                                Memory Profiling Utility.
                                                               (line  26)
 * --nosrv:                               Standalone Simulator.
-                                                              (line  47)
+                                                              (line  52)
 * --quiet <1>:                           Profiling Utility.   (line  30)
 * --quiet:                               Standalone Simulator.
                                                               (line  29)
 * --report-memory-errors:                Standalone Simulator.
-                                                              (line  86)
+                                                              (line  91)
 * --srv:                                 Standalone Simulator.
-                                                              (line  55)
+                                                              (line  60)
 * --strict-npc:                          Standalone Simulator.
-                                                              (line  95)
+                                                              (line 100)
 * --verbose:                             Standalone Simulator.
                                                               (line  33)
 * --version:                             Standalone Simulator.
@@ -3555,11 +3574,11 @@ Index
 * --version (profiling utility):         Profiling Utility.   (line  17)
 * -c:                                    Profiling Utility.   (line  26)
 * -d:                                    Standalone Simulator.
-                                                              (line  81)
+                                                              (line  86)
 * -f <1>:                                Memory Profiling Utility.
                                                               (line  51)
 * -f:                                    Standalone Simulator.
-                                                              (line  39)
+                                                              (line  44)
 * -g <1>:                                Memory Profiling Utility.
                                                               (line  47)
 * -g:                                    Profiling Utility.   (line  34)
@@ -3573,7 +3592,7 @@ Index
 * -m <1>:                                Memory Profiling Utility.
                                                               (line  26)
 * -m:                                    Standalone Simulator.
-                                                              (line  65)
+                                                              (line  70)
 * -q <1>:                                Profiling Utility.   (line  30)
 * -q:                                    Standalone Simulator.
                                                               (line  29)
@@ -3602,11 +3621,11 @@ Index
 * ATA/ATAPI configuration:               Disc Interface Configuration.
                                                               (line   6)
 * ATA/ATAPI device configuration:        Disc Interface Configuration.
-                                                              (line  88)
+                                                              (line  92)
 * base_vapi_id (GPIO configuration - deprecated): GPIO Configuration.
                                                               (line  32)
 * baseaddr (ATA/ATAPI configuration):    Disc Interface Configuration.
-                                                              (line  22)
+                                                              (line  26)
 * baseaddr (DMA configuration):          DMA Configuration.   (line  24)
 * baseaddr (Ethernet configuration):     Ethernet Configuration.
                                                               (line  22)
@@ -3618,9 +3637,9 @@ Index
 * baseaddr (keyboard configuration):     Keyboard Configuration.
                                                               (line  36)
 * baseaddr (memory configuration):       Memory Configuration.
-                                                              (line  88)
+                                                              (line  89)
 * baseaddr (memory controller configuration): Memory Controller Configuration.
-                                                              (line  46)
+                                                              (line  55)
 * baseaddr (UART configuration):         UART Configuration.  (line  22)
 * baseaddr (VGA configuration):          Display Interface Configuration.
                                                               (line  26)
@@ -3644,7 +3663,7 @@ Index
 * cache configuration:                   Cache Configuration. (line   6)
 * calling_convention (CUC configuration): CUC Configuration.  (line  37)
 * ce (memory configuration):             Memory Configuration.
-                                                              (line 118)
+                                                              (line 119)
 * cfgr (CPU configuration):              CPU Configuration.   (line  47)
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
@@ -3757,18 +3776,18 @@ Index
 * DejaGNU tests directories:             Regression Testing.  (line  50)
 * DejaGnu tool specific configuration:   Regression Testing.  (line  39)
 * delayr (memory configuration):         Memory Configuration.
-                                                              (line 138)
+                                                              (line 139)
 * delayw (memory configuration):         Memory Configuration.
-                                                              (line 144)
+                                                              (line 145)
 * dependstats (CPU configuration):       CPU Configuration.   (line  89)
 * dev_id (ATA/ATAPI configuration):      Disc Interface Configuration.
-                                                              (line  36)
+                                                              (line  40)
 * disassemble (Interactive CLI):         Interactive Command Line.
                                                               (line  41)
 * disc interface configuration:          Disc Interface Configuration.
                                                               (line   6)
 * disc interface device configuration:   Disc Interface Configuration.
-                                                              (line  88)
+                                                              (line  92)
 * display interface configuration:       Display Interface Configuration.
                                                               (line   6)
 * displaying memory (Interactive CLI):   Interactive Command Line.
@@ -3782,11 +3801,11 @@ Index
 * DMA configuration:                     DMA Configuration.   (line   6)
 * DMA verification (VAPI):               Verification API.    (line  73)
 * dma_mode0_td (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  70)
+                                                              (line  74)
 * dma_mode0_teoc (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  71)
+                                                              (line  75)
 * dma_mode0_tm (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  69)
+                                                              (line  73)
 * DME (power management register):       Power Management Configuration.
                                                               (line  15)
 * DMMU configuration:                    Memory Management Configuration.
@@ -3805,7 +3824,7 @@ Index
                                                               (line  16)
 * enable_bursts (CUC configuration):     CUC Configuration.   (line  41)
 * enabled (ATA/ATAPI configuration):     Disc Interface Configuration.
-                                                              (line  18)
+                                                              (line  22)
 * enabled (branch prediction configuration): Branch Prediction Configuration.
                                                               (line  15)
 * enabled (cache configuration):         Cache Configuration. (line  11)
@@ -3824,7 +3843,7 @@ Index
 * enabled (keyboard configuration):      Keyboard Configuration.
                                                               (line  32)
 * enabled (memory controller configuration): Memory Controller Configuration.
-                                                              (line  35)
+                                                              (line  44)
 * enabled (MMU configuration):           Memory Management Configuration.
                                                               (line  12)
 * enabled (power management configuration): Power Management Configuration.
@@ -3874,7 +3893,7 @@ Index
 * execution history (Interactive CLI):   Interactive Command Line.
                                                               (line  67)
 * file (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 104)
+                                                              (line 108)
 * file (keyboard configuration):         Keyboard Configuration.
                                                               (line  51)
 * filename (frame buffer configuration - deprecated): Frame Buffer Configuration.
@@ -3882,7 +3901,7 @@ Index
 * filename (VGA configuration - deprecated): Display Interface Configuration.
                                                               (line  47)
 * firmware (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 117)
+                                                              (line 121)
 * flag setting by instructions:          Configuring the Build.
                                                               (line 118)
 * frame buffer configuration:            Frame Buffer Configuration.
@@ -3901,7 +3920,7 @@ Index
 * hardfloat (CPU configuration):         CPU Configuration.   (line 110)
 * hazards (CPU configuration):           CPU Configuration.   (line  74)
 * heads (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 121)
+                                                              (line 125)
 * help (Interactive CLI):                Interactive Command Line.
                                                               (line 170)
 * hexadecimal memory dump (Interactive CLI): Interactive Command Line.
@@ -3925,7 +3944,7 @@ Index
 * IMMU configuration:                    Memory Management Configuration.
                                                               (line   6)
 * index (memory controller configuration): Memory Controller Configuration.
-                                                              (line  68)
+                                                              (line  77)
 * info (Interactive CLI):                Interactive Command Line.
                                                               (line 119)
 * installing Or1ksim:                    Installation.        (line   6)
@@ -3939,7 +3958,7 @@ Index
 * interrupt controller configuration:    Interrupt Configuration.
                                                               (line   6)
 * irq (ATA/ATAPI configuration):         Disc Interface Configuration.
-                                                              (line  32)
+                                                              (line  36)
 * irq (DMA configuration):               DMA Configuration.   (line  34)
 * irq (GPIO configuration):              GPIO Configuration.  (line  29)
 * irq (keyboard configuration):          Keyboard Configuration.
@@ -3960,13 +3979,13 @@ Index
 * load_missdelay (data cache configuration): Cache Configuration.
                                                               (line  50)
 * log (memory configuration):            Memory Configuration.
-                                                              (line 150)
+                                                              (line 151)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
 * long:                                  Simulator Library.   (line  95)
 * make file for tests:                   Regression Testing.  (line  27)
 * mc (memory configuration):             Memory Configuration.
-                                                              (line 127)
+                                                              (line 128)
 * memory configuration:                  Memory Configuration.
                                                               (line   6)
 * memory controller configuration:       Memory Controller Configuration.
@@ -4009,11 +4028,11 @@ Index
                                                               (line 173)
 * mprofile (simulator configuration):    Simulator Behavior.  (line  29)
 * mwdma (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 128)
+                                                              (line 132)
 * name (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  42)
 * name (memory configuration):           Memory Configuration.
-                                                              (line 109)
+                                                              (line 110)
 * no_multicycle (CUC configuration):     CUC Configuration.   (line  45)
 * nsets (cache configuration):           Cache Configuration. (line  15)
 * nsets (MMU configuration):             Memory Management Configuration.
@@ -4044,7 +4063,7 @@ Index
 * overflow flag setting by instructions: Configuring the Build.
                                                               (line 133)
 * packet (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 113)
+                                                              (line 117)
 * pagesize (MMU configuration):          Memory Management Configuration.
                                                               (line  27)
 * patching memory (Interactive CLI):     Interactive Command Line.
@@ -4054,21 +4073,21 @@ Index
 * patching the program counter (Interactive CLI): Interactive Command Line.
                                                               (line  51)
 * pattern (memory configuration):        Memory Configuration.
-                                                              (line  76)
+                                                              (line  77)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
 * PIC configuration:                     Interrupt Configuration.
                                                               (line   6)
 * pio (ATA/ATAPI device configuration):  Disc Interface Configuration.
-                                                              (line 132)
+                                                              (line 136)
 * pio_mode0_t1 (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  51)
+                                                              (line  55)
 * pio_mode0_t2 (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  52)
+                                                              (line  56)
 * pio_mode0_t4 (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  53)
+                                                              (line  57)
 * pio_mode0_teoc (ATA/ATAPI configuration): Disc Interface Configuration.
-                                                              (line  54)
+                                                              (line  58)
 * pm (Interactive CLI):                  Interactive Command Line.
                                                               (line  48)
 * PMR - DGCE:                            Power Management Configuration.
@@ -4084,7 +4103,7 @@ Index
 * PMU configuration:                     Power Management Configuration.
                                                               (line   6)
 * poc (memory controller configuration): Memory Controller Configuration.
-                                                              (line  55)
+                                                              (line  64)
 * port range for TCP/IP:                 Verification API Configuration.
                                                               (line  23)
 * power management configuration:        Power Management Configuration.
@@ -4128,7 +4147,7 @@ Index
 * r (Interactive CLI):                   Interactive Command Line.
                                                               (line  14)
 * random_seed (memory configuration):    Memory Configuration.
-                                                              (line  66)
+                                                              (line  67)
 * refresh_rate (frame buffer configuration): Frame Buffer Configuration.
                                                               (line  30)
 * refresh_rate (VGA configuration):      Display Interface Configuration.
@@ -4144,16 +4163,16 @@ Index
 * Remote Serial Protocol:                Debug Interface Configuration.
                                                               (line  20)
 * Remote Serial Protocol, --nosrv:       Standalone Simulator.
-                                                              (line  47)
+                                                              (line  52)
 * Remote Serial Protocol, --srv:         Standalone Simulator.
-                                                              (line  55)
+                                                              (line  60)
 * reset (Interactive CLI):               Interactive Command Line.
                                                               (line  63)
 * reset hooks:                           Concepts.            (line  13)
 * reset the simulator (Interactive CLI): Interactive Command Line.
                                                               (line  63)
 * rev (ATA/ATAPI configuration):         Disc Interface Configuration.
-                                                              (line  44)
+                                                              (line  48)
 * rev (CPU configuration):               CPU Configuration.   (line  15)
 * rsp_enabled (debug interface configuration): Debug Interface Configuration.
                                                               (line  20)
@@ -4229,7 +4248,7 @@ Index
 * sections:                              Global Data Structures.
                                                               (line  49)
 * sectors (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 125)
+                                                              (line 129)
 * server_port (verification API configuration): Verification API Configuration.
                                                               (line  19)
 * set (Interactive CLI):                 Interactive Command Line.
@@ -4248,11 +4267,11 @@ Index
 * simulator statistics (Interactive CLI): Interactive Command Line.
                                                               (line  83)
 * size (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line 109)
+                                                              (line 113)
 * size (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  30)
 * size (memory configuration):           Memory Configuration.
-                                                              (line  93)
+                                                              (line  94)
 * sleep mode (power management register): Power Management Configuration.
                                                               (line  16)
 * slow down factor (power management register): Power Management Configuration.
@@ -4315,17 +4334,17 @@ Index
 * txfile (VGA configuration):            Display Interface Configuration.
                                                               (line  47)
 * type (ATA/ATAPI device configuration): Disc Interface Configuration.
-                                                              (line  99)
+                                                              (line 103)
 * type (memory configuration):           Memory Configuration.
-                                                              (line  36)
+                                                              (line  37)
 * type=pattern (memory configuration):   Memory Configuration.
-                                                              (line  46)
+                                                              (line  47)
 * type=random (memory configuration):    Memory Configuration.
-                                                              (line  40)
+                                                              (line  41)
 * type=unknown (memory configuration):   Memory Configuration.
-                                                              (line  50)
+                                                              (line  51)
 * type=zero (memory configuration):      Memory Configuration.
-                                                              (line  55)
+                                                              (line  56)
 * UART configuration:                    UART Configuration.  (line   6)
 * UART I/O from/to a physical serial port: UART Configuration.
                                                               (line  62)
@@ -4378,51 +4397,51 @@ Node: Top814
 Node: Installation1224
 Node: Preparation1471
 Node: Configuring the Build1764
-Node: Build and Install7880
-Node: Known Issues8658
-Node: Usage9713
-Node: Standalone Simulator9927
-Node: Profiling Utility14342
-Node: Memory Profiling Utility15252
-Node: Simulator Library16617
-Node: Configuration26694
-Node: Configuration File Format27306
-Node: Configuration File Preprocessing27691
-Node: Configuration File Syntax27988
-Node: Simulator Configuration30773
-Node: Simulator Behavior31064
-Node: Verification API Configuration35645
-Node: CUC Configuration37585
-Node: Core OpenRISC Configuration39577
-Node: CPU Configuration40079
-Node: Memory Configuration44198
-Node: Memory Management Configuration50689
-Node: Cache Configuration53066
-Node: Interrupt Configuration55452
-Node: Power Management Configuration56188
-Node: Branch Prediction Configuration57465
-Node: Debug Interface Configuration58825
-Node: Peripheral Configuration61168
-Node: Memory Controller Configuration61794
-Node: UART Configuration65209
-Node: DMA Configuration68728
-Node: Ethernet Configuration70595
-Node: GPIO Configuration74571
-Node: Display Interface Configuration76204
-Node: Frame Buffer Configuration78513
-Node: Keyboard Configuration80377
-Node: Disc Interface Configuration82615
-Node: Generic Peripheral Configuration87558
-Node: Interactive Command Line89853
-Node: Verification API96827
-Node: Code Internals101257
-Node: Coding Conventions101840
-Node: Global Data Structures106267
-Node: Concepts108924
-Ref: Output Redirection109069
-Node: Internal Debugging109608
-Node: Regression Testing110132
-Node: GNU Free Documentation License113921
-Node: Index136328
+Node: Build and Install7906
+Node: Known Issues8684
+Node: Usage9739
+Node: Standalone Simulator9953
+Node: Profiling Utility14478
+Node: Memory Profiling Utility15388
+Node: Simulator Library16753
+Node: Configuration26836
+Node: Configuration File Format27448
+Node: Configuration File Preprocessing27833
+Node: Configuration File Syntax28130
+Node: Simulator Configuration30915
+Node: Simulator Behavior31206
+Node: Verification API Configuration35787
+Node: CUC Configuration37727
+Node: Core OpenRISC Configuration39719
+Node: CPU Configuration40221
+Node: Memory Configuration44340
+Node: Memory Management Configuration50848
+Node: Cache Configuration53225
+Node: Interrupt Configuration55611
+Node: Power Management Configuration56347
+Node: Branch Prediction Configuration57624
+Node: Debug Interface Configuration58984
+Node: Peripheral Configuration61327
+Node: Memory Controller Configuration61953
+Node: UART Configuration65733
+Node: DMA Configuration69252
+Node: Ethernet Configuration71119
+Node: GPIO Configuration75095
+Node: Display Interface Configuration76728
+Node: Frame Buffer Configuration79037
+Node: Keyboard Configuration80901
+Node: Disc Interface Configuration83139
+Node: Generic Peripheral Configuration88243
+Node: Interactive Command Line90538
+Node: Verification API97512
+Node: Code Internals101942
+Node: Coding Conventions102525
+Node: Global Data Structures106952
+Node: Concepts109609
+Ref: Output Redirection109754
+Node: Internal Debugging110293
+Node: Regression Testing110817
+Node: GNU Free Documentation License114606
+Node: Index137013
 
 End Tag Table

@@ -94,9 +94,9 @@ int  or1ksim_read_mem (unsigned long int  addr,
 		       unsigned char     *buf,
 		       int                len);
 
-int  or1ksim_write_mem (unsigned long int  addr,
-			unsigned char     *buf,
-			int                len);
+int  or1ksim_write_mem (unsigned long int    addr,
+			const unsigned char *buf,
+			int                  len);
 
 int  or1ksim_read_spr (int                 sprnum,
 		       unsigned long int  *sprval_ptr);

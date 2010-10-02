@@ -1,3 +1,18 @@
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* Release 0.5.0rc2.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc2.
+	* support/spr-defs.h <SPR_VR_RES>: Definition corrected.
+
+2010-09-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Handle the case where target_cpu is not set.
+
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* mc-common/except-mc.S: Remove leading underscores from global

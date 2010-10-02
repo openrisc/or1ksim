@@ -103,7 +103,6 @@ or1ksim_init (int         argc,
   print_config ();		/* Will go eventually */
   signal (SIGINT, ctrl_c);	/* Not sure we want this really */
 
-  runtime.sim.hush = 1;		/* Not sure if this is needed */
   do_stats = config.cpu.superscalar ||
              config.cpu.dependstats ||
              config.sim.history     ||
@@ -183,6 +182,12 @@ or1ksim_run (double duration)
 	  /* This is probably wrong. This is an Or1ksim breakpoint, not a GNU
 	     one. */
 	  return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
+	}
+
+      /* If we are tracing, dump after each instruction. */
+      if (!runtime.sim.hush)
+	{
+	  dumpreg ();
 	}
 
       /* If we were single stepping, stall immediately. */
@@ -568,9 +573,9 @@ or1ksim_read_mem (unsigned long int  addr,
    @return  Number of bytes written, or zero if error.                       */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_mem (unsigned long int  addr,
-		   unsigned char     *buf,
-		   int                len)
+or1ksim_write_mem (unsigned long int    addr,
+		   const unsigned char *buf,
+		   int                  len)
 {
   int             off;			/* Offset into the memory */
 

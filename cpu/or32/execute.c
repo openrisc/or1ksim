@@ -1012,6 +1012,12 @@ exec_main ()
 	    }
 	}
 
+      /* If we are tracing, dump after each instruction. */
+      if (!runtime.sim.hush)
+	{
+	  dumpreg ();
+	}
+
       if (config.vapi.enabled && runtime.vapi.enabled)
 	{
 	  vapi_check ();

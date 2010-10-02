@@ -75,7 +75,6 @@ main (int   argc,
   print_config ();
   signal (SIGINT, ctrl_c);
 
-  runtime.sim.hush = 1;
   do_stats         = config.cpu.superscalar ||
                      config.cpu.dependstats ||
                      config.sim.history     ||

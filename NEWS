@@ -2,6 +2,22 @@
 	      ==================================================
 
 
+New in release 0.5.0rc2
+=======================
+
+No new features. This is purely bug fixes post-0.5.0rc1.
+
+The following bugs are fixed.
+* Bug 1824: Memory controller issue (marked as duplicate of Bug 1758).
+* Bug 1816: Error message when target not set is obscure.
+* Bug 1813: "make check" fails before installation.
+
+The following bugs are outstanding
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
 New in release 0.5.0rc1
 =======================
 
@@ -36,8 +52,6 @@ handled silently, unless requested by --report-memory-errors.
 
 The following feature requests have been accepted.
 * Feature  393: Integrate Or1ksim in GDB.
-
-The following feature requests have been rejected.
 
 The following bugs are fixed.
 * Bug 1821: Reference configuration file has defective debug section.

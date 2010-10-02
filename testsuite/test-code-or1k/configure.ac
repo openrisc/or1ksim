@@ -24,7 +24,7 @@
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
 
-AC_INIT([or1ksim-testsuite], [0.5.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite], [0.5.0rc2], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
@@ -33,6 +33,19 @@ AC_CONFIG_HEADERS([config.h])
 
 # make sure we are using a recent autoconf version
 AC_PREREQ(2.59)
+
+# This is not nice, but it gets round the problem of the target not being
+# specified. We don't need to warn again - the main configure did that for us.
+case "$target_cpu" in
+or32*)
+	;;
+
+dlx*)
+	;;
+
+*)      target_alias=or32-elf;
+	;;
+esac
 
 # check for --enable-all-tests argument, in which case we attempt to build all
 # tests, even those that do not compile properly.

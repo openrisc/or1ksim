@@ -166,7 +166,7 @@
  */
 #define SPR_VR_VER	0xff000000  /* Processor version */
 #define SPR_VR_CFG	0x00ff0000  /* Processor configuration */
-#define SPR_VR_RES	0x00ff0000  /* Reserved */
+#define SPR_VR_RES	0x0000ffc0  /* Reserved */
 #define SPR_VR_REV	0x0000003f  /* Processor revision */
 
 #define SPR_VR_VER_OFF	24
