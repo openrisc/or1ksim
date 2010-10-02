@@ -308,10 +308,7 @@ test -n "$profile"  && CFLAGS="$CFLAGS $profile" LDFLAGS="$LDFLAGS $profile"
 
 # Check for a DejaGNU global config file. If not set, then set it
 # ourselves. This stops runtest complaining
-if test x"$DEJAGNU" = x
-then
-  DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
-fi
+DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
 
 AC_SUBST(DEJAGNU)
 

@@ -5,6 +5,11 @@
 2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
+	* configure.ac: Fixed DEJAGNU to always be set, with no user override.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
 	* configure.ac: Version changed to 0.5.0rc2.
 	* debug/rsp-server.c (rsp_query): Simplified handling of
 	"qTStatus" to indicate we just do not support tracing.
