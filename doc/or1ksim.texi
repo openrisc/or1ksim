@@ -1562,7 +1562,7 @@ The following parameters may be specified.
 
 @table @code
 
-@item type=random|pattern|unknown|zero
+@item type=random|pattern|unknown|zero|exitnops
 @cindex @code{type} (memory configuration)
 Specifies the values to which memory should be initialized.  The
 default value is @code{unknown}.
@@ -1598,6 +1598,13 @@ As a consequence, if the @code{pattern} field is @emph{subsequently}
 specified in this section, the value in that field will be used
 instead of zero to initialize the memory.
 @end quotation
+
+@item exitnops
+@cindex @code{type=exitnops} (memory configuration)
+Set the memory values to be an instruction used to signal end of
+simulation. This is useful for causing immediate end of simulation
+when PC corruption occurs.
+
 
 @end table
 

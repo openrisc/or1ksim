@@ -1,3 +1,8 @@
+2010-10-02  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/memory.c: Added support for exitnops memory fill option
+	* doc/or1ksim.texi: Added information about exitnops option
+
 2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* Release 0.5.0rc2.
