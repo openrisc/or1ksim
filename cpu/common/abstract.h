@@ -148,6 +148,7 @@ extern void                dump_memory (oraddr_t  from,
 extern void                disassemble_memory (oraddr_t  from,
 					       oraddr_t  to,
 					       int       nl);
+extern void                disassemble_instr (oraddr_t  addr);
 extern uint32_t            evalsim_mem32 (oraddr_t, oraddr_t);
 extern uint16_t            evalsim_mem16 (oraddr_t, oraddr_t);
 extern uint8_t             evalsim_mem8 (oraddr_t, oraddr_t);

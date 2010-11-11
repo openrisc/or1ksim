@@ -187,7 +187,7 @@ or1ksim_run (double duration)
       /* If we are tracing, dump after each instruction. */
       if (!runtime.sim.hush)
 	{
-	  dumpreg ();
+	  trace_instr ();
 	}
 
       /* If we were single stepping, stall immediately. */

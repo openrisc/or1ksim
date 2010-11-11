@@ -1084,6 +1084,13 @@ or1ksim_insn_decode (unsigned int insn)
 static char disassembled_str[50];
 char *or1ksim_disassembled = &disassembled_str[0];
 
+/* trace data */
+int           trace_dest_reg;
+int           trace_store_addr_reg;
+unsigned int  trace_store_imm;
+int           trace_store_val_reg;
+int           trace_store_width;
+
 /* Automagically does zero- or sign- extension and also finds correct
    sign bit position if sign extension is correct extension. Which extension
    is proper is figured out from letter description. */
@@ -1294,3 +1301,130 @@ or1ksim_disassemble_index (insn, index)
     }
   return or1ksim_insn_len (insn);
 }
+
+
+/* -------------------------------------------------------------------------- */
+/*!Disassemble one instruction for tracing.
+
+   A simplified form of  or1ksim_disassemble_index.
+
+   @param[in] insn  The instruction to disassemble
+   @param[in] index  Index into the opcode table.                             */
+/* -------------------------------------------------------------------------- */
+void
+or1ksim_disassemble_trace_index (unsigned long int  insn,
+				 int                index)
+{
+  int                i;
+  char              *dest        = or1ksim_disassembled;
+
+  /* Set trace result defaults. */
+  trace_dest_reg       = -1;
+  trace_store_addr_reg = -1;
+  trace_store_imm      =  0;
+  trace_store_val_reg  = -1;
+  trace_store_width    =  0;	/* Non-zero if we have a store */
+
+  if (index >= 0)
+    {
+      const int  OPC_WIDTH = 8;
+
+      struct or32_opcode const *opcode = &or1ksim_or32_opcodes[index];
+      char                     *s;
+
+      /* Is it a store opcode? */
+      if (0 == strcmp ("l.sb", opcode->name))
+	{
+	  trace_store_width = 1;
+	}
+      else if (0 == strcmp ("l.sh", opcode->name))
+	{
+	  trace_store_width = 2;
+	}
+      else if (0 == strcmp ("l.sw", opcode->name))
+	{
+	  trace_store_width = 4;
+	}
+
+      /* Copy the opcode and pad */
+      strcpy (dest, opcode->name);
+
+      for (i = 0; i < OPC_WIDTH; i++)
+	{
+	  if ('\0' == dest[0])
+	    {
+	      dest[0] = ' ';
+	      dest[1] = '\0';
+	    }
+
+	  dest++;
+	}
+
+      for (s = opcode->args; *s != '\0'; ++s)
+	{
+	  switch (*s)
+	    {
+	    case '\0':
+	      break;
+
+	    case 'r':
+	      dest = or32_print_register (dest, *++s, opcode->encoding, insn);
+
+	      switch (*s)
+		{
+		case 'D':
+		  trace_dest_reg =
+		    or1ksim_or32_extract (*s, opcode->encoding, insn);
+		  break;
+
+		case 'A':
+		  if (0 != trace_store_width)
+		    {
+		      trace_store_addr_reg =
+			or1ksim_or32_extract (*s, opcode->encoding, insn);
+		    }
+		  break;
+
+		case 'B':
+		  if (0 != trace_store_width)
+		    {
+		      trace_store_val_reg =
+			or1ksim_or32_extract (*s, opcode->encoding, insn);
+		    }
+		  break;
+		  
+		}
+
+	      break;
+
+	    default:
+	      if (strchr (opcode->encoding, *s))
+		{
+		  dest = or32_print_immediate (dest, *s, opcode->encoding,
+					       insn);
+
+		  /* If we have a store instruction, save the immediate. */
+		  if (0 != trace_store_width)
+		    {
+		      trace_store_imm = 
+			or1ksim_or32_extract (*s, opcode->encoding, insn);
+		      trace_store_imm =
+			or1ksim_extend_imm (trace_store_imm, *s);
+		    }
+		}
+	      else
+		{
+		  *dest++ = *s;
+		  *dest = 0;
+		}
+	    }
+	}
+    }
+  else
+    {
+      /* This used to be %8x for binutils.  */
+      sprintf (dest, ".word 0x%08lx", insn);
+      while (*dest)
+	dest++;
+    }
+}	/* or1ksim_disassemble_trace_index () */

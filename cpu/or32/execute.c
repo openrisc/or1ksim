@@ -795,6 +795,27 @@ dumpreg ()
 
 
 /*---------------------------------------------------------------------------*/
+/*!Trace an instruction
+
+   Supports GDB tracing                                                      */
+/*---------------------------------------------------------------------------*/
+void
+trace_instr ()
+{
+  oraddr_t  physical_pc;
+
+  if ((physical_pc = peek_into_itlb (cpu_state.iqueue.insn_addr)))
+    {
+      disassemble_instr (physical_pc);
+    }
+  else
+    {
+      PRINTF ("INTERNAL SIMULATOR ERROR: no trace available\n");
+    }
+}	/* trace_instr () */
+
+
+/*---------------------------------------------------------------------------*/
 /*!Wrapper around real decode_execute function
 
    Some statistics here only
@@ -1015,7 +1036,7 @@ exec_main ()
       /* If we are tracing, dump after each instruction. */
       if (!runtime.sim.hush)
 	{
-	  dumpreg ();
+	  trace_instr ();
 	}
 
       if (config.vapi.enabled && runtime.vapi.enabled)

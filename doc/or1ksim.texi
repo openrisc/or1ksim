@@ -407,10 +407,10 @@ option in the simulator configuration section (see @pxref{Simulator Behavior, , 
 
 @item -t
 @itemx --trace
-@cindex @code{-V}
-@cindex @code{--verbose}
-Dump previous instruction, next instruction, GPRs and flag after each
-instruction.
+@cindex @code{-t}
+@cindex @code{--trace}
+Dump instruction just executed and any register/memory location chaged
+after each instruction (one line per instruction).
 
 @item -f @var{file}
 @itemx --file=@var{file}
@@ -1604,7 +1604,6 @@ instead of zero to initialize the memory.
 Set the memory values to be an instruction used to signal end of
 simulation. This is useful for causing immediate end of simulation
 when PC corruption occurs.
-
 
 @end table
 

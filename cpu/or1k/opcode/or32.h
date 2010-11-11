@@ -157,12 +157,20 @@ struct temp_insn_struct
   int in_pass;
 };
 
+  
 extern unsigned long *or1ksim_automata;
 extern struct temp_insn_struct *or1ksim_ti;
 
 extern CONST struct  or32_opcode  or1ksim_or32_opcodes[];
 
 extern char *or1ksim_disassembled;
+
+/* trace data */
+extern int           trace_dest_reg;
+extern int           trace_store_addr_reg;
+extern unsigned int  trace_store_imm;
+extern int           trace_store_val_reg;
+extern int           trace_store_width;
 
 /* Calculates instruction length in bytes.  Always 4 for OR32. */
 extern int or1ksim_insn_len PARAMS((int insn_index));
@@ -186,6 +194,10 @@ extern int or1ksim_disassemble_insn (unsigned long insn);
 /* Disassemble one instruction from insn index.
    Return the size of the instruction.  */
 int or1ksim_disassemble_index (unsigned long insn, int index);
+
+/* Disassemble one instruction from insn index for tracing. */
+void or1ksim_disassemble_trace_index (unsigned long int  insn,
+				      int                index);
 
 /* FOR INTERNAL USE ONLY */
 /* Automatically does zero- or sign- extension and also finds correct

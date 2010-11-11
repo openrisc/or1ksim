@@ -2,14 +2,31 @@
 	      ==================================================
 
 
+New in top of tree
+==================
+
+New features (shouldn't be there during a release cycle, but prompted by debug
+needs elsewhere in the tool chain).
+
+New option --trace provides a one line dump of instruction executed and any
+register or memory location changed after each instruction.
+
+New config setting for memory initialization "exitnops" fills memory with
+"l.nop 1", which will cause the simulator to exit. Good for tracking pointer
+corruption.
+
+
 New in release 0.5.0rc2
 =======================
 
 No new features. This is purely bug fixes post-0.5.0rc1.
 
 The following bugs are fixed.
+* Bug 1847: Build issues with RSP server (duplicate of 1815).
+* Bug 1846: Casting errors.
 * Bug 1824: Memory controller issue (marked as duplicate of Bug 1758).
-* Bug 1816: Error message when target not set is obscure.
+* Bug 1816: Error message when target not set is obscure (duplicate of 1813).
+* Bug 1815: Build errors with RSP server.
 * Bug 1813: "make check" fails before installation.
 
 The following bugs are outstanding

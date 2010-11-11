@@ -1,3 +1,51 @@
+2010-11-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: Added information about --trace option
+	* NEWS: Updated.
+
+2010-10-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/common/abstract.c (disassemble_instr): Initialize store_val
+	and store_addr to avoid any compiler warnings.
+	* cpu/or32/or32.c (or1ksim_disassemble_trace_index): Sign extend
+	trace_store_imm.
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* cpu/or32/or32.c <trace_dest_reg, trace_store_addr_reg>: New globals.
+	<trace_store_imm, trace_store_val_reg, trace_store_width>: New
+	globals.
+	(or1ksim_disassemble_trace_index): Result now void, passes back all
+	info via globals (yuk, but consistent with what exists). Handles
+	store addresses.
+	* cpu/or32/execute.c (trace_instr): Simplified.
+	* cpu/common/abstract.c (disassemble_instr): Result now void, all
+	reg info printed here. Handles store addresses.
+	* cpu/common/abstract.h <disassemble_instr>: Change return type.
+	* cpu/or1k/opcode/or32.h <trace_dest_reg, trace_store_addr_reg>:
+	New globals marked extern.
+	<trace_store_imm, trace_store_val_reg, trace_store_width>: New
+	globals marked extern.
+	<or1ksim_disassemble_trace_index>: Change return type.
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or32/or32.c (or1ksim_disassemble_trace_index): Added.
+	* cpu/or32/execute.c (trace_instr): Added.
+	(exec_main): Call trace_instr rather than dumpreg if tracing.
+	* cpu/common/abstract.c (disassemble_instr): Added.
+	* cpu/common/execute.h <trace_instr>: Added.
+	* cpu/common/abstract.h <diassemble_instr>: Added.
+	* cpu/or1k/opcode/or32.h <or1ksim_disassemble_trace_index>: Added.
+	* libtoplevel.c (or1ksim_run): Call trace_instr rather than
+	dumpreg if tracing.
+
 2010-10-02  Julius Baxter  <julius@opencores.org>
 
 	* peripheral/memory.c: Added support for exitnops memory fill option

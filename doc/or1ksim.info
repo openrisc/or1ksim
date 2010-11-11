@@ -1,5 +1,5 @@
-This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
-4.13 from ../../or1ksim/doc/or1ksim.texi.
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
+../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-0.5.0rc2.tar.bz2
+     tar jxf or1ksim-2010-11-11.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-0.5.0rc2/configure --target=or32-uclinux ...
+     ../or1ksim-2010-11-11/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -326,8 +326,8 @@ Many of the options have both a short and a long form.  For example
 
 `-t'
 `--trace'
-     Dump previous instruction, next instruction, GPRs and flag after
-     each instruction.
+     Dump instruction just executed and any register/memory location
+     chaged after each instruction (one line per instruction).
 
 `-f FILE'
 `--file=FILE'
@@ -1308,15 +1308,15 @@ The following parameters may be specified.
           `type=pattern' and a `pattern' value of 0, and implemented as
           such.
 
-    `exitnops'
-          Set the memory values to be an instruction used to signal end
-          of simulation. This is useful for causing immediate end of
-          simulation when PC corruption occurs.
-
                Note: As a consequence, if the `pattern' field is
                _subsequently_ specified in this section, the value in
                that field will be used instead of zero to initialize
                the memory.
+
+    `exitnops'
+          Set the memory values to be an instruction used to signal end
+          of simulation. This is useful for causing immediate end of
+          simulation when PC corruption occurs.
 
 
 `random_seed = VALUE'
@@ -3570,6 +3570,8 @@ Index
                                                               (line  60)
 * --strict-npc:                          Standalone Simulator.
                                                               (line 100)
+* --trace:                               Standalone Simulator.
+                                                              (line  39)
 * --verbose:                             Standalone Simulator.
                                                               (line  33)
 * --version:                             Standalone Simulator.
@@ -3601,6 +3603,8 @@ Index
 * -q <1>:                                Profiling Utility.   (line  30)
 * -q:                                    Standalone Simulator.
                                                               (line  29)
+* -t:                                    Standalone Simulator.
+                                                              (line  39)
 * -V:                                    Standalone Simulator.
                                                               (line  33)
 * -v:                                    Standalone Simulator.
@@ -4343,7 +4347,7 @@ Index
 * type (memory configuration):           Memory Configuration.
                                                               (line  37)
 * type=exitnops (memory configuration):  Memory Configuration.
-                                                              (line  61)
+                                                              (line  66)
 * type=pattern (memory configuration):   Memory Configuration.
                                                               (line  47)
 * type=random (memory configuration):    Memory Configuration.
@@ -4400,55 +4404,55 @@ Index
 
 
 Tag Table:
-Node: Top830
-Node: Installation1240
-Node: Preparation1487
-Node: Configuring the Build1780
-Node: Build and Install7922
-Node: Known Issues8700
-Node: Usage9755
-Node: Standalone Simulator9969
-Node: Profiling Utility14494
-Node: Memory Profiling Utility15404
-Node: Simulator Library16769
-Node: Configuration26852
-Node: Configuration File Format27464
-Node: Configuration File Preprocessing27849
-Node: Configuration File Syntax28146
-Node: Simulator Configuration30931
-Node: Simulator Behavior31222
-Node: Verification API Configuration35803
-Node: CUC Configuration37743
-Node: Core OpenRISC Configuration39735
-Node: CPU Configuration40237
-Node: Memory Configuration44356
-Node: Memory Management Configuration51078
-Node: Cache Configuration53455
-Node: Interrupt Configuration55841
-Node: Power Management Configuration56577
-Node: Branch Prediction Configuration57854
-Node: Debug Interface Configuration59214
-Node: Peripheral Configuration61557
-Node: Memory Controller Configuration62183
-Node: UART Configuration65963
-Node: DMA Configuration69482
-Node: Ethernet Configuration71349
-Node: GPIO Configuration75325
-Node: Display Interface Configuration76958
-Node: Frame Buffer Configuration79267
-Node: Keyboard Configuration81131
-Node: Disc Interface Configuration83369
-Node: Generic Peripheral Configuration88473
-Node: Interactive Command Line90768
-Node: Verification API97742
-Node: Code Internals102172
-Node: Coding Conventions102755
-Node: Global Data Structures107182
-Node: Concepts109839
-Ref: Output Redirection109984
-Node: Internal Debugging110523
-Node: Regression Testing111047
-Node: GNU Free Documentation License114836
-Node: Index137243
+Node: Top814
+Node: Installation1224
+Node: Preparation1471
+Node: Configuring the Build1766
+Node: Build and Install7910
+Node: Known Issues8688
+Node: Usage9743
+Node: Standalone Simulator9957
+Node: Profiling Utility14521
+Node: Memory Profiling Utility15431
+Node: Simulator Library16796
+Node: Configuration26879
+Node: Configuration File Format27491
+Node: Configuration File Preprocessing27876
+Node: Configuration File Syntax28173
+Node: Simulator Configuration30958
+Node: Simulator Behavior31249
+Node: Verification API Configuration35830
+Node: CUC Configuration37770
+Node: Core OpenRISC Configuration39762
+Node: CPU Configuration40264
+Node: Memory Configuration44383
+Node: Memory Management Configuration51105
+Node: Cache Configuration53482
+Node: Interrupt Configuration55868
+Node: Power Management Configuration56604
+Node: Branch Prediction Configuration57881
+Node: Debug Interface Configuration59241
+Node: Peripheral Configuration61584
+Node: Memory Controller Configuration62210
+Node: UART Configuration65990
+Node: DMA Configuration69509
+Node: Ethernet Configuration71376
+Node: GPIO Configuration75352
+Node: Display Interface Configuration76985
+Node: Frame Buffer Configuration79294
+Node: Keyboard Configuration81158
+Node: Disc Interface Configuration83396
+Node: Generic Peripheral Configuration88500
+Node: Interactive Command Line90795
+Node: Verification API97769
+Node: Code Internals102199
+Node: Coding Conventions102782
+Node: Global Data Structures107209
+Node: Concepts109866
+Ref: Output Redirection110011
+Node: Internal Debugging110550
+Node: Regression Testing111074
+Node: GNU Free Documentation License114863
+Node: Index137270
 
 End Tag Table

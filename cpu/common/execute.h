@@ -90,6 +90,7 @@ extern struct hist_exec *hist_exec_tail;
 
 /* Prototypes for external use */
 extern void      dumpreg ();
+extern void      trace_instr ();
 extern void      dump_exe_log ();
 extern void      dump_exe_bin_insn_log (struct iqueue_entry *current);
 
