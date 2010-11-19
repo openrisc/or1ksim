@@ -81,6 +81,9 @@ struct eth_device
   /* VAPI ID */
   unsigned long base_vapi_id;
 
+  /* Ethernet PHY address */
+  unsigned long phy_addr;
+
   /* RX and TX file names and handles */
   char *rxfile, *txfile;
   int txfd;
@@ -169,6 +172,7 @@ static ssize_t eth_read_rx_file (struct eth_device *, void *, size_t);
 static void eth_skip_rx_file (struct eth_device *, off_t);
 static void eth_rx_next_packet (struct eth_device *);
 static void eth_write_tx_bd_num (struct eth_device *, unsigned long value);
+static void eth_miim_trans (void *dat);
 /* ========================================================================= */
 /*  TX LOGIC                                                                 */
 /*---------------------------------------------------------------------------*/
@@ -710,7 +714,9 @@ eth_reset (void *dat)
 	}
 
       /* Set registers to default values */
+      /* Zero all registers */
       memset (&(eth->regs), 0, sizeof (eth->regs));
+      /* Set those with non-zero reset defaults */
       eth->regs.moder = 0x0000A000;
       eth->regs.ipgt = 0x00000012;
       eth->regs.ipgr1 = 0x0000000C;
@@ -731,6 +737,7 @@ eth_reset (void *dat)
 	  vapi_install_multi_handler (eth->base_vapi_id, ETH_NUM_VAPI_IDS,
 				      eth_vapi_read, dat);
 	}
+      
     }
 }
 
@@ -811,6 +818,7 @@ eth_read32 (oraddr_t addr, void *dat)
     case ETH_MIITX_DATA:
       return eth->regs.miitx_data;
     case ETH_MIIRX_DATA:
+      /*printf("or1ksim: read MIIM RX: 0x%x\n",(int)eth->regs.miirx_data);*/
       return eth->regs.miirx_data;
     case ETH_MIISTATUS:
       return eth->regs.miistatus;
@@ -903,6 +911,8 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
       return;
     case ETH_MIICOMMAND:
       eth->regs.miicommand = value;
+      /* Perform MIIM transaction, if required */
+      eth_miim_trans(dat);
       return;
     case ETH_MIIADDRESS:
       eth->regs.miiaddress = value;
@@ -911,11 +921,16 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
       eth->regs.miitx_data = value;
       return;
     case ETH_MIIRX_DATA:
+      /* Register is R/O
       eth->regs.miirx_data = value;
+      */
       return;
     case ETH_MIISTATUS:
+      /* Register is R/O
       eth->regs.miistatus = value;
+      */
       return;
+
     case ETH_MAC_ADDR0:
       eth->mac_address[0] = value & 0xFF;
       eth->mac_address[1] = (value >> 8) & 0xFF;
@@ -1233,6 +1248,146 @@ eth_vapi_id (union param_val  val,
   eth->base_vapi_id = val.int_val;
 }
 
+
+static void
+eth_phy_addr (union param_val  val,
+	      void            *dat)
+{
+  struct eth_device *eth = dat;
+  eth->phy_addr = val.int_val & ETH_MIIADDR_FIAD_MASK;
+}
+
+
+/*---------------------------------------------------------------------------*/
+/*!Emulate MIIM transaction to ethernet PHY
+
+   @param[in] dat  The config data structure                                 */
+/*---------------------------------------------------------------------------*/
+static void
+eth_miim_trans (void *dat)
+{
+  struct eth_device *eth = dat;
+  switch (eth->regs.miicommand)
+    {
+    case ((1 << ETH_MIICOMM_WCDATA_OFFSET)):
+      /* Perhaps something to emulate here later, but for now do nothing */
+      break;
+      
+    case ((1 << ETH_MIICOMM_RSTAT_OFFSET)):
+
+      printf("or1ksim: eth_miim_trans: phy %d\n",(int)
+	     ((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)& 
+	      ETH_MIIADDR_FIAD_MASK));
+      printf("or1ksim: eth_miim_trans: reg %d\n",(int)
+	     ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
+	      ETH_MIIADDR_RGAD_MASK));
+
+      /*First check if it's the correct PHY to address */
+      if (((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)&
+	   ETH_MIIADDR_FIAD_MASK) == eth->phy_addr)
+	{
+	  /* Correct PHY - now switch based on the register address in the PHY*/
+	  switch ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
+		  ETH_MIIADDR_RGAD_MASK)
+	    {
+	    case MII_BMCR:
+	      eth->regs.miirx_data = BMCR_FULLDPLX;
+	      break;
+	    case MII_BMSR:
+	      eth->regs.miirx_data = BMSR_LSTATUS | BMSR_ANEGCOMPLETE | 
+		BMSR_10HALF | BMSR_10FULL | BMSR_100HALF | BMSR_100FULL;
+	      break;
+	    case MII_PHYSID1:
+	      eth->regs.miirx_data = 0x22; /* Micrel PHYID */
+	      break;
+	    case MII_PHYSID2:
+	      eth->regs.miirx_data = 0x1613; /* Micrel PHYID */
+	      break;
+	    case MII_ADVERTISE:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_LPA:
+	      eth->regs.miirx_data = LPA_DUPLEX | LPA_100;
+	      break;
+	    case MII_EXPANSION:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_CTRL1000:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_STAT1000:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_ESTATUS:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_DCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_FCSCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_NWAYTEST:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_RERRCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_SREVISION:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_RESV1:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_LBRERROR:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_PHYADDR:
+	      eth->regs.miirx_data = eth->phy_addr;
+	      break;
+	    case MII_RESV2:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_TPISTATUS:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_NCONFIG:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    default:
+	      eth->regs.miirx_data = 0xffff;
+	      break;
+	    }
+	}
+      else
+	eth->regs.miirx_data = 0xffff; /* PHY doesn't exist, read all 1's */
+      break;
+
+    case ((1 << ETH_MIICOMM_SCANS_OFFSET)):
+      /* From MAC's datasheet: 
+	 A host initiates the Scan Status Operation by asserting the SCANSTAT 
+	 signal. The MIIM performs a continuous read operation of the PHY 
+	 Status register. The PHY is selected by the FIAD[4:0] signals. The 
+	 link status LinkFail signal is asserted/deasserted by the MIIM module 
+	 and reflects the link status bit of the PHY Status register. The 
+	 signal NVALID is used for qualifying the validity of the LinkFail 
+	 signals and the status data PRSD[15:0]. These signals are invalid 
+	 until the first scan status operation ends. During the scan status 
+	 operation, the BUSY signal is asserted until the last read is 
+	 performed (the scan status operation is stopped).
+
+	 So for now - do nothing, leave link status indicator as permanently 
+	 with link.
+      */
+
+      break;
+      
+    default:
+      break;      
+    }
+
+}
+
 /*---------------------------------------------------------------------------*/
 /*!Initialize a new Ethernet configuration
 
@@ -1262,6 +1417,7 @@ eth_sec_start (void)
   new->txfile       = strdup ("eth_tx");
   new->sockif       = strdup ("or1ksim_eth");
   new->base_vapi_id = 0;
+  new->phy_addr     = 0;
 
   return new;
 }
@@ -1317,6 +1473,7 @@ reg_ethernet_sec ()
   reg_config_param (sec, "txfile",     PARAMT_STR,  eth_txfile);
   reg_config_param (sec, "sockif",     PARAMT_STR,  eth_sockif);
   reg_config_param (sec, "vapi_id",    PARAMT_INT,  eth_vapi_id);
+  reg_config_param (sec, "phy_addr",   PARAMT_INT,  eth_phy_addr);
 
 }	/* reg_ethernet_sec() */
 

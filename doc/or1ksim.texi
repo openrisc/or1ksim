@@ -2463,6 +2463,10 @@ address to be used with the Ethernet PHY.  @xref{Verification API, ,
 Verification API}, for more details, which details the use of the VAPI
 with the DMA controller.
 
+@item phy_addr = @var{value}
+@cindex @code{phy_addr} 
+@var{value} specifies address for emulated ethernet PHY. Defaults to 0 otherwise.
+
 @end table
 
 @node GPIO Configuration
