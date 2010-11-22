@@ -99,14 +99,13 @@ report_interrupt (int line)
       return;
     }
 
-  if (cpu_state.pic_lines & lmask)
+  if (cpu_state.sprs[SPR_PICSR] & lmask)
     {
-      /* No edge occured, warn about performance penalty and exit */
+      /* Interrupt already signaled and pending */
       fprintf (stderr, "Warning: Int line %d did not change state\n", line);
       return;
     }
-
-  cpu_state.pic_lines |= lmask;
+  
   cpu_state.sprs[SPR_PICSR] |= lmask;
 
   if ((cpu_state.sprs[SPR_PICMR] & lmask) || line < 2)
@@ -118,10 +117,11 @@ report_interrupt (int line)
 void
 clear_interrupt (int line)
 {
-  cpu_state.pic_lines &= ~(1 << line);
-
+  /* When level triggered, clear corresponding bit in PICSR */
   if (!config.pic.edge_trigger)
-    cpu_state.sprs[SPR_PICSR] &= ~(1 << line);
+    {
+      cpu_state.sprs[SPR_PICSR] &= ~(1 << line);
+    } 
 }
 
 /*----------------------------------------------------[ PIC configuration ]---*/

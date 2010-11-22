@@ -1,4 +1,13 @@
 2010-11-22  Julius Baxter  <julius@opencores.org>
+	* cpu/common/execute.h <cpu_state>: removed pic_lines variable.
+	* cpu/or1k/sprs.c: Added comment clarifying PICSR behavior.
+	* pic/pic.c: Removed use of pic_lines variable, added commenting 
+	clarifying behavior.
+	<clear_interrupt>: only clear PICSR when level triggered.
+	* doc/or1ksim.texi (Interrupt Configuration): Added clarification of 
+	interrupt behavior when edge or level triggered.
+
+2010-11-22  Julius Baxter  <julius@opencores.org>
 	* peripheral/eth.c (eth_miim_trans): comment out debug printf()s
 	* cpu/or32/generate.c (generate_body): Add except_handle call to all 
 	generated illegal instruction cases.

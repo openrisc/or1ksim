@@ -58,7 +58,6 @@ struct cpu_state {
   int                  npc_not_valid;	/*!< NPC updated while stalled */
   oraddr_t             pc;		/*!< PC (and translated PC) */
   oraddr_t             pc_delay;	/*!< Delay instr EA register */
-  uint32_t             pic_lines;	/*!< State of PIC lines */
   struct iqueue_entry  iqueue;		/*!< Decode of just executed instr */
   struct iqueue_entry  icomplet;        /*!< Decode of instr before this */
 

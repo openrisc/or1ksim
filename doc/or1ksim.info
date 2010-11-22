@@ -1549,6 +1549,22 @@ parameters may be specified.
      If 1 (true, the default), the programmable interrupt controller is
      edge triggered.  If 0 (false), it is level triggered.
 
+          Note: When configured to be edge triggered, interrupts must
+          be cleared in the PICSR by the processor writing a '0' to the
+          appropriate bit.
+
+          When configured to be level triggered, the interrupt must be
+          cleared by lowering the peripheral's IRQ line. Writing '0' to
+          the PICSR has no effect.
+
+          Peripherals can call the function `report_interrupt' to
+          signal an interrupt request. When configured for level
+          triggered interrupts, the function `clear_interrupt' will
+          clear the appropriate bit in the PICSR. `clear_interrupt' has
+          no effect when Or1ksim is configured for edge triggered
+          interrupts - interrupts must be cleared by the processor
+          writing '0' to the appropriate bit in the PICSR in this case.
+
 
 
 File: or1ksim.info,  Node: Power Management Configuration,  Next: Branch Prediction Configuration,  Prev: Interrupt Configuration,  Up: Core OpenRISC Configuration
@@ -4435,30 +4451,30 @@ Node: Memory Configuration44399
 Node: Memory Management Configuration51121
 Node: Cache Configuration53498
 Node: Interrupt Configuration55884
-Node: Power Management Configuration56620
-Node: Branch Prediction Configuration57897
-Node: Debug Interface Configuration59257
-Node: Peripheral Configuration61600
-Node: Memory Controller Configuration62226
-Node: UART Configuration66006
-Node: DMA Configuration69525
-Node: Ethernet Configuration71392
-Node: GPIO Configuration75474
-Node: Display Interface Configuration77107
-Node: Frame Buffer Configuration79416
-Node: Keyboard Configuration81280
-Node: Disc Interface Configuration83518
-Node: Generic Peripheral Configuration88622
-Node: Interactive Command Line90917
-Node: Verification API97891
-Node: Code Internals102321
-Node: Coding Conventions102904
-Node: Global Data Structures107331
-Node: Concepts109988
-Ref: Output Redirection110133
-Node: Internal Debugging110672
-Node: Regression Testing111196
-Node: GNU Free Documentation License114985
-Node: Index137392
+Node: Power Management Configuration57446
+Node: Branch Prediction Configuration58723
+Node: Debug Interface Configuration60083
+Node: Peripheral Configuration62426
+Node: Memory Controller Configuration63052
+Node: UART Configuration66832
+Node: DMA Configuration70351
+Node: Ethernet Configuration72218
+Node: GPIO Configuration76300
+Node: Display Interface Configuration77933
+Node: Frame Buffer Configuration80242
+Node: Keyboard Configuration82106
+Node: Disc Interface Configuration84344
+Node: Generic Peripheral Configuration89448
+Node: Interactive Command Line91743
+Node: Verification API98717
+Node: Code Internals103147
+Node: Coding Conventions103730
+Node: Global Data Structures108157
+Node: Concepts110814
+Ref: Output Redirection110959
+Node: Internal Debugging111498
+Node: Regression Testing112022
+Node: GNU Free Documentation License115811
+Node: Index138218
 
 End Tag Table

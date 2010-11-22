@@ -1893,6 +1893,15 @@ If 1 (true), the programmable interrupt controller is enabled.  If 0
 If 1 (true, the default), the programmable interrupt controller is
 edge triggered.  If 0 (false), it is level triggered.
 
+@quotation Note
+When configured to be edge triggered, interrupts must be cleared in the PICSR by the processor writing a '0' to the appropriate bit.
+
+When configured to be level triggered, the interrupt must be cleared by lowering the peripheral's IRQ line. Writing '0' to the PICSR has no effect. 
+
+Peripherals can call the function @code{report_interrupt} to signal an interrupt request. When configured for level triggered interrupts, the function @code{clear_interrupt} will clear the appropriate bit in the PICSR. @code{clear_interrupt} has no effect when @value{OR1KSIM} is configured for edge triggered interrupts - interrupts must be cleared by the processor writing '0' to the appropriate bit in the PICSR in this case.
+@end quotation
+
+
 @end table
 
 @node Power Management Configuration
