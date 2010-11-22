@@ -1274,14 +1274,14 @@ eth_miim_trans (void *dat)
       break;
       
     case ((1 << ETH_MIICOMM_RSTAT_OFFSET)):
-
+      /*
       printf("or1ksim: eth_miim_trans: phy %d\n",(int)
 	     ((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)& 
 	      ETH_MIIADDR_FIAD_MASK));
       printf("or1ksim: eth_miim_trans: reg %d\n",(int)
 	     ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
 	      ETH_MIIADDR_RGAD_MASK));
-
+      */
       /*First check if it's the correct PHY to address */
       if (((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)&
 	   ETH_MIIADDR_FIAD_MASK) == eth->phy_addr)

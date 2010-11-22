@@ -1,3 +1,8 @@
+2010-11-22  Julius Baxter  <julius@opencores.org>
+	* peripheral/eth.c (eth_miim_trans): comment out debug printf()s
+	* cpu/or32/generate.c (generate_body): Add except_handle call to all 
+	generated illegal instruction cases.
+
 2010-11-19  Julius Baxter  <julius@opencores.org>
 	* peripheral/eth.c: Added new variable phy_addr to device struct and 
 	ability to set it in config script section. <eth_miim_trans>: function

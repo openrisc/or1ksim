@@ -1,5 +1,5 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
-../../doc/or1ksim.texi.
+This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
+4.13 from ../../or1ksim/doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -2019,6 +2019,10 @@ interfaces.  The following parameters may be specified.
      address to be used with the Ethernet PHY.  *Note Verification API:
      Verification API, for more details, which details the use of the
      VAPI with the DMA controller.
+
+`phy_addr = VALUE'
+     VALUE specifies address for emulated ethernet PHY. Defaults to 0
+     otherwise.
 
 
 
@@ -4085,6 +4089,8 @@ Index
                                                               (line  82)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
+* phy_addr:                              Ethernet Configuration.
+                                                              (line  94)
 * PIC configuration:                     Interrupt Configuration.
                                                               (line   6)
 * pio (ATA/ATAPI device configuration):  Disc Interface Configuration.
@@ -4404,55 +4410,55 @@ Index
 
 
 Tag Table:
-Node: Top814
-Node: Installation1224
-Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install7910
-Node: Known Issues8688
-Node: Usage9743
-Node: Standalone Simulator9957
-Node: Profiling Utility14521
-Node: Memory Profiling Utility15431
-Node: Simulator Library16796
-Node: Configuration26879
-Node: Configuration File Format27491
-Node: Configuration File Preprocessing27876
-Node: Configuration File Syntax28173
-Node: Simulator Configuration30958
-Node: Simulator Behavior31249
-Node: Verification API Configuration35830
-Node: CUC Configuration37770
-Node: Core OpenRISC Configuration39762
-Node: CPU Configuration40264
-Node: Memory Configuration44383
-Node: Memory Management Configuration51105
-Node: Cache Configuration53482
-Node: Interrupt Configuration55868
-Node: Power Management Configuration56604
-Node: Branch Prediction Configuration57881
-Node: Debug Interface Configuration59241
-Node: Peripheral Configuration61584
-Node: Memory Controller Configuration62210
-Node: UART Configuration65990
-Node: DMA Configuration69509
-Node: Ethernet Configuration71376
-Node: GPIO Configuration75352
-Node: Display Interface Configuration76985
-Node: Frame Buffer Configuration79294
-Node: Keyboard Configuration81158
-Node: Disc Interface Configuration83396
-Node: Generic Peripheral Configuration88500
-Node: Interactive Command Line90795
-Node: Verification API97769
-Node: Code Internals102199
-Node: Coding Conventions102782
-Node: Global Data Structures107209
-Node: Concepts109866
-Ref: Output Redirection110011
-Node: Internal Debugging110550
-Node: Regression Testing111074
-Node: GNU Free Documentation License114863
-Node: Index137270
+Node: Top830
+Node: Installation1240
+Node: Preparation1487
+Node: Configuring the Build1782
+Node: Build and Install7926
+Node: Known Issues8704
+Node: Usage9759
+Node: Standalone Simulator9973
+Node: Profiling Utility14537
+Node: Memory Profiling Utility15447
+Node: Simulator Library16812
+Node: Configuration26895
+Node: Configuration File Format27507
+Node: Configuration File Preprocessing27892
+Node: Configuration File Syntax28189
+Node: Simulator Configuration30974
+Node: Simulator Behavior31265
+Node: Verification API Configuration35846
+Node: CUC Configuration37786
+Node: Core OpenRISC Configuration39778
+Node: CPU Configuration40280
+Node: Memory Configuration44399
+Node: Memory Management Configuration51121
+Node: Cache Configuration53498
+Node: Interrupt Configuration55884
+Node: Power Management Configuration56620
+Node: Branch Prediction Configuration57897
+Node: Debug Interface Configuration59257
+Node: Peripheral Configuration61600
+Node: Memory Controller Configuration62226
+Node: UART Configuration66006
+Node: DMA Configuration69525
+Node: Ethernet Configuration71392
+Node: GPIO Configuration75474
+Node: Display Interface Configuration77107
+Node: Frame Buffer Configuration79416
+Node: Keyboard Configuration81280
+Node: Disc Interface Configuration83518
+Node: Generic Peripheral Configuration88622
+Node: Interactive Command Line90917
+Node: Verification API97891
+Node: Code Internals102321
+Node: Coding Conventions102904
+Node: Global Data Structures107331
+Node: Concepts109988
+Ref: Output Redirection110133
+Node: Internal Debugging110672
+Node: Regression Testing111196
+Node: GNU Free Documentation License114985
+Node: Index137392
 
 End Tag Table
