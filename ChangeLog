@@ -1,19 +1,52 @@
+2010-11-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or1k/sprs.c (mtspr): Setting PICMR considers NMI usage.
+	* doc/or1ksim.texi <Interrupt Configuration>: Documented the PIC
+	use_nmi config.
+	* libtoplevel.c (or1ksim_interrupt): Does not clear interrupts
+	immediately.
+	* NEWS: Updated regarding PIC configuration.
+	* pic/pic.c (pic_reset): Reference to PICPR
+	removed. Initialization considers NMI use.
+	(report_interrupt): NMI now handled through PICMR, rather than
+	directly in the code.
+	(pic_use_nmi): Created.
+	(pic_reg_sec): Added "use_nmi" option.
+	* sim-config.c (init_defconfig): config.pic.use_nmi initialized.
+	* sim-config.h <config.pic>: New entry use_nmi added.
+
+2010-11-24  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: More clarification of interrupt behavior when
+	edge or level triggered.
+	* pic/pic.c (report_interrupt): Improved warning when interrupt is
+	reported while previous one is pending.
+	(clear_interrupt): Now works for both level and edge triggered
+	interrupts.
+
 2010-11-22  Julius Baxter  <julius@opencores.org>
+
 	* cpu/common/execute.h <cpu_state>: removed pic_lines variable.
 	* cpu/or1k/sprs.c: Added comment clarifying PICSR behavior.
-	* pic/pic.c: Removed use of pic_lines variable, added commenting 
+	* pic/pic.c: Removed use of pic_lines variable, added commenting
 	clarifying behavior.
 	<clear_interrupt>: only clear PICSR when level triggered.
-	* doc/or1ksim.texi (Interrupt Configuration): Added clarification of 
+	* doc/or1ksim.texi (Interrupt Configuration): Added clarification of
 	interrupt behavior when edge or level triggered.
 
 2010-11-22  Julius Baxter  <julius@opencores.org>
+
 	* peripheral/eth.c (eth_miim_trans): comment out debug printf()s
-	* cpu/or32/generate.c (generate_body): Add except_handle call to all 
+	* cpu/or32/generate.c (generate_body): Add except_handle call to all
 	generated illegal instruction cases.
 
 2010-11-19  Julius Baxter  <julius@opencores.org>
-	* peripheral/eth.c: Added new variable phy_addr to device struct and 
+
+	* peripheral/eth.c: Added new variable phy_addr to device struct and
 	ability to set it in config script section. <eth_miim_trans>: function
 	to emulate MIIM transactions, mainly PHYID regs at the moment.
 	* peripheral/eth.h: Added MIIM bus defines.

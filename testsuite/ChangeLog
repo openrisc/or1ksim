@@ -1,3 +1,18 @@
+2010-11-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/int-edge.exp: Updated for new interrupt interface.
+	* libsim.tests/int-level.exp: Updated for new interrupt interface.
+	* README: Updated to change number of interrupt tests in library.
+
+2010-11-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code/lib-inttest/Makefile.am: Updated to use lib-inttest.c
+	to build a single program.
+	* test-code/lib-inttest/Makefile.in: Regenerated.
+	* test-code/lib-inttest/lib-inttest.c: Created.
+	* test-code/lib-inttest/lib-inttest-edge.c: Deleted.
+	* test-code/lib-inttest/lib-inttest-level.c: Deleted.
+
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* libsim.tests/int-edge.exp <int-edge simple 1>: Increase time

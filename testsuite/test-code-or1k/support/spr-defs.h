@@ -153,7 +153,6 @@
 
 /* PIC group */
 #define SPR_PICMR (SPRGROUP_PIC + 0)
-#define SPR_PICPR (SPRGROUP_PIC + 1)
 #define SPR_PICSR (SPRGROUP_PIC + 2)
 
 /* Tick Timer group */
@@ -567,12 +566,6 @@
  *
  */
 #define SPR_PICMR_IUM	0xfffffffc  /* Interrupt unmask */
-
-/*
- * Bit definitions for PICPR
- *
- */
-#define SPR_PICPR_IPRIO	0xfffffffc  /* Interrupt priority */
 
 /*
  * Bit definitions for PICSR

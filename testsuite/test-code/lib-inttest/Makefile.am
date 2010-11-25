@@ -24,17 +24,8 @@
 # -----------------------------------------------------------------------------
 
 
-# Test programs of the library interrupt driving functions. Two versions, one
-# to drive edge based interrupts, one to drive level based interrupts.
-check_PROGRAMS            = lib-inttest-edge  \
-			    lib-inttest-level
+# Test program of the library interrupt driving functions.
+check_PROGRAMS      = lib-inttest
 
-# Edge based interrupt
-lib_inttest_edge_SOURCES  = lib-inttest-edge.c
-
-lib_inttest_edge_LDADD    = $(top_builddir)/libsim.la
-
-# Level based interrupt
-lib_inttest_level_SOURCES = lib-inttest-level.c
-
-lib_inttest_level_LDADD   = $(top_builddir)/libsim.la
+lib_inttest_SOURCES = lib-inttest.c
+lib_inttest_LDADD   = $(top_builddir)/libsim.la

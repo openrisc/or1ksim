@@ -647,12 +647,15 @@ library, the flag, @code{-lsim} should be added to the link command.
 The header file @file{or1ksim.h} contains appropriate declarations of
 the functions exported by the @value{OR1KSIM} library.  These are:
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_init (int @var{argc}, char *@var{argv}, void *@var{class_ptr},
-int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr},
-unsigned char @var{mask}[], unsigned char @var{rdata}[], int
-@var{data_len}), int (*@var{upw})(void *@var{class_ptr}, unsigned long
-int @var{addr}, unsigned char @var{mask}[], unsigned char @var{wdata}[],
-int @var{data_len}))
+@deftypefn {@file{or1ksim.h}} int or1ksim_init (int @var{argc}, @
+           char *@var{argv}, void *@var{class_ptr}, @
+           int (*@var{upr})(void *@var{class_ptr}, @
+           unsigned long int @var{addr}, unsigned char @var{mask}[], @
+           unsigned char @var{rdata}[], int @var{data_len}), @
+           int (*@var{upw})(void *@var{class_ptr}, @
+           unsigned long int @var{addr}, @
+           unsigned char @var{mask}[], unsigned char @var{wdata}[], @
+           int @var{data_len}))
 
 The initialization function is supplied with a vector of arguments,
 which are interpreted as arguments to the standalone version (see
@@ -753,21 +756,25 @@ specified in the configuration file.
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt (int  @var{i})
 
-Generate an edge-triggered interrupt on interrupt line @var{i}.  The interrupt
-is then immediately cleared automatically.  A warning will be generated and the
-interrupt request ignored if level sensitive interrupts have been configured
-with the programmable interrupt controller (@pxref{Interrupt Configuration, ,
-Interrupt Configuration}).
+Generate an edge-triggered interrupt on interrupt line @var{i}.  The
+interrupt must be cleared separately by clearing the corresponding bit
+in the PICSR SPR.  Until the interrupt is cleared, any further
+interrupts on the same line will be ignored with a warning.  A warning
+will be generated and the interrupt request ignored if level sensitive
+interrupts have been configured with the programmable interrupt
+controller (@pxref{Interrupt Configuration, , Interrupt Configuration}).
 
 @end deftypefn
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt_set (int  @var{i})
 
-Assert a level-triggered interrupt on interrupt line @var{i}.  The interrupt
-must be cleared separately by an explicit call to
-@code{or1ksim_interrupt_clear}.  A warning will be generated, and the interrupt
-request ignored if edge sensitive interrupts have been configured with the
-programmable interrupt controller (@pxref{Interrupt Configuration, , Interrupt
+Assert a level-triggered interrupt on interrupt line @var{i}.  The
+interrupt must be cleared separately by an explicit call to
+@code{or1ksim_interrupt_clear}.  Until the interrupt is cleared, any
+further setting of interrupts on the same line will be ignored with a
+warning.  A warning will be generated, and the interrupt request ignored
+if edge sensitive interrupts have been configured with the programmable
+interrupt controller (@pxref{Interrupt Configuration, , Interrupt
 Configuration}).
 
 @end deftypefn
@@ -791,8 +798,8 @@ reset (5 JTAG cycles) could take 50 processor clock cycles to complete.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir (unsigned
-char *@var{jreg}, int @var{num_bits})
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir @
+           (unsigned char *@var{jreg}, int @var{num_bits})
 
 Shift the supplied register through the JTAG instruction register.
 Return the (model) time taken for this action.  The register is supplied
@@ -806,8 +813,8 @@ For example a 12-bit register would have bits 0-7 in byte 0 and bits
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_dr (unsigned
-char *@var{jreg}, int @var{num_bits})
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_dr @
+           (unsigned char *@var{jreg}, int @var{num_bits})
 
 Shift the supplied register through the JTAG data register.  Return the
 (model) time taken for this action.  The register is supplied as a byte
@@ -821,8 +828,9 @@ For example a 12-bit register would have bits 0-7 in byte 0 and bits
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_mem (unsigned
-long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_mem @
+           (unsigned long int @var{addr}, unsigned char *@var{buf}, @
+           int @var{len})
 
 Read @var{len} bytes from @var{addr}, placing the result in @var{buf}.
 Return @var{len} on success and 0 on failure.
@@ -833,8 +841,9 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_mem (unsigned
-long int @var{addr}, const unsigned char *@var{buf}, int @var{len})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_mem @
+           (unsigned long int @var{addr}, const unsigned char *@var{buf}, @
+           int @var{len})
 
 Write @var{len} bytes to @var{addr}, taking the data from @var{buf}.
 Return @var{len} on success and 0 on failure.
@@ -845,8 +854,8 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_spr (int @var{sprnum}, unsigned
-long int *@var{sprval_ptr})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_spr (int @var{sprnum}, @
+           unsigned long int *@var{sprval_ptr})
 
 Read the SPR specified by @var{sprnum}, placing the result in
 @var{sprval_ptr}.  Return non-zero on success and 0 on failure.
@@ -857,8 +866,8 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_spr (int @var{sprnum}, unsigned
-long int @var{sprva})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_spr (int @var{sprnum}, @
+           unsigned long int @var{sprva})
 
 Write @var{sprval} to the SPR specified by @var{sprnum}.  Return
 non-zero on success and 0 on failure.
@@ -869,8 +878,8 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_reg (int @var{regnum}, unsigned
-long int *@var{regval_ptr})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_reg (int @var{regnum}, @
+           unsigned long int *@var{regval_ptr})
 
 Read the general purpose register specified by @var{regnum}, placing the
 result in @var{regval_ptr}.  Return non-zero on success and 0 on
@@ -882,8 +891,8 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_reg (int @var{regnum}, unsigned
-long int @var{regva})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_reg (int @var{regnum}, @
+           unsigned long int @var{regva})
 
 Write @var{regval} to the general purpose register specified by
 @var{regnum}.  Return non-zero on success and 0 on failure.
@@ -894,8 +903,7 @@ This function was added in Or1ksim 0.5.0.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} void or1ksim_set_stall_state (int
-@var{state})
+@deftypefn {@file{or1ksim.h}} void or1ksim_set_stall_state (int @var{state})
 
 Set the processor's state according to @var{state} (1 = stalled, 0 = not
 stalled).
@@ -1893,14 +1901,29 @@ If 1 (true), the programmable interrupt controller is enabled.  If 0
 If 1 (true, the default), the programmable interrupt controller is
 edge triggered.  If 0 (false), it is level triggered.
 
+The library interface (@pxref{Simulator Library, , Simulator Library})
+provides different functions for setting the different types of
+interrupt, and a function to clear level sensitive interrupts. Edge
+sensitive interrupts must be cleared by clearing the corresponding bit
+in the PICSR SPR.
+
+Internal functions to set and clear interrupts are also provided for
+peripherals implemented within Or1ksim. @xref{Interrupts Internal, ,
+Interrupts Internal} for more details.
+
+@item use_nmi = 0|1
+@cindex @code{use_nmi} (interrupt controller)
+If 1 (true, the default), interrupt lines 0 and 1 are non-maskable. In
+other words the least significant 2 bits of the PICMR SPR are hard-wired
+to 1.  If 0 (false), all interrupt lines are treated as equivalent.
+
 @quotation Note
-When configured to be edge triggered, interrupts must be cleared in the PICSR by the processor writing a '0' to the appropriate bit.
-
-When configured to be level triggered, the interrupt must be cleared by lowering the peripheral's IRQ line. Writing '0' to the PICSR has no effect. 
-
-Peripherals can call the function @code{report_interrupt} to signal an interrupt request. When configured for level triggered interrupts, the function @code{clear_interrupt} will clear the appropriate bit in the PICSR. @code{clear_interrupt} has no effect when @value{OR1KSIM} is configured for edge triggered interrupts - interrupts must be cleared by the processor writing '0' to the appropriate bit in the PICSR in this case.
+These are not non-maskable in the true sense that they will pre-empt
+other interrupts.  Rather they can never be masked out using the PICMR
+register. It is up the interrupt exception handler to give these
+interrupt lines priority, and indeed to decide on the priority order in
+general.
 @end quotation
-
 
 @end table
 
@@ -3657,6 +3680,37 @@ Any peripheral may register a routine to be called when the the
 processor is reset by calling @code{reg_sim_reset}, providing a
 function and pointer to a data structure as arguments.  On reset that
 function will be called with the data stucture pointer as argument.
+
+@anchor{Interrupts Internal}
+@item Interrupts
+@cindex interrupts
+@findex report_interrupt
+@findex clear_interrupt
+@findex mtspr
+An internal peripheral can model the effect of an interrupt being
+asserted by calling @code{report_interrupt}.  This is used for both edge
+and level sensitive interrupts.
+
+The effect is to set the corresponding bit in the PICSR SPR and to queue
+an interrupt exception to take place after the current instruction
+completes execution.
+
+Externally, the different interrupts require different mechanisms for
+clearing.  Level sensitive interrupts should be cleared by deasserting
+the interrupt line, edge sensitive interrupts by clearing the
+corresponding bit in the PICSR SPR.
+
+Internally this amounts to the same thing (clearing the PICSPR bit), so
+a single function is provided, @code{clear_interrupt}.  Note however that
+when level sensitive interrupts are configured, PICSR is read only, and
+can only be cleared by calling @code{clear_interrupt}.  Using the two
+functions provided will ensure the peripheral works correctly whichever
+type of interrupt is used.
+
+@quotation Note
+Until an interrupt is cleared, all subsequent interrupts are ignored
+with a warning.
+@end quotation
 
 @end table
 

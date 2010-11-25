@@ -11,6 +11,10 @@ needs elsewhere in the tool chain).
 New option --trace provides a one line dump of instruction executed and any
 register or memory location changed after each instruction.
 
+A new configuration option "use_nmi" is added to the programmable interrupt
+controller (PIC). This causes interrupt lines 0 and 1 to be non-maskable, but
+only in the sense that the corresponding bits in PICMR are hard-wired to 1.
+
 New config setting for memory initialization "exitnops" fills memory with
 "l.nop 1", which will cause the simulator to exit. Good for tracking pointer
 corruption.

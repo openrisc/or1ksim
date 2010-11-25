@@ -159,6 +159,13 @@ void mtspr(uint16_t regno, const uorreg_t value)
       cpu_state.sprs[SPR_PICSR] = prev_val;
     break;
   case SPR_PICMR:
+    /* If we have non-maskable interrupts, then the bottom two bits are always
+       one. */
+    if (config.pic.use_nmi)
+      {
+	cpu_state.sprs[SPR_SR] |= 0x00000003;
+      }
+
     if(cpu_state.sprs[SPR_SR] & SPR_SR_IEE)
       pic_ints_en();
     break;

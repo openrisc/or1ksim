@@ -12,8 +12,8 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 2,539 tests compile, run and pass. That
-figure is broken down into 2,275 tests of the standalone simulator and 264
+At the time of writing a total of 2,537 tests compile, run and pass. That
+figure is broken down into 2,275 tests of the standalone simulator and 262
 tests of the library
 
 Configuration and make files are provided for further test programs. These
@@ -87,10 +87,10 @@ mycompress:        1 test using a compression program.
 testfloat         40 tests of detailed floating point behavior
 tick:             19 tests of the OR1K tick timer.
 
-A total of 264 tests of the libsim library:
+A total of 262 tests of the libsim library:
 
 int-edge:               6 tests of edge triggered interrupts.
-int-level:              5 tests of level triggered interrupts. 
+int-level:              3 tests of level triggered interrupts. 
 lib-iftest:             1 test  of the basic library interface functions.
 jtag-basic:            17 tests of JTAG reset and instruction selection
 jtag-go-command-read:  60 tests of JTAG GO_COMMAND for reading

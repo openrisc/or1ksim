@@ -219,9 +219,9 @@ or1ksim_run (double duration)
 	    }
 	}
 
-      /* Clear any interrupts as requested. For edge triggered interrupts this
-	 will happen in the same cycle. For level triggered, it must be an
-	 explicit call. */
+      /* Clear any interrupts as requested. This only applies to level
+	 sensitive interrupts. Edge triggered are cleared by writing to
+	 PICSR. */
       if (0 != runtime.sim.ext_int_clr)
 	{
 	  for (i = 0; i < num_ints; i++)
@@ -348,8 +348,8 @@ or1ksim_clock_rate ()
 /*---------------------------------------------------------------------------*/
 /*!Trigger an edge triggered interrupt
 
-   This function is appropriate for edge triggered interrupts, which are taken
-   and then immediately cleared.
+   This function is appropriate for edge triggered interrupts. These are
+   cleared by writing to the PICSR SPR.
 
    @note There is no check that the specified interrupt number is reasonable
    (i.e. <= 31).
@@ -367,7 +367,6 @@ or1ksim_interrupt (int i)
   else
     {
       runtime.sim.ext_int_set |= 1 << i;	// Better not be > 31!
-      runtime.sim.ext_int_clr |= 1 << i;	// Better not be > 31!
     }
 }	/* or1ksim_interrupt () */
 

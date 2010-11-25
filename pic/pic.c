@@ -45,48 +45,90 @@
 #include "sched.h"
 
 
-/* FIXME: This ugly hack will be removed once the bus architecture gets written
- */
-struct pic pic_state_int = { 1, 1 };
+/* -------------------------------------------------------------------------- */
+/* Reset the PIC.
 
-struct pic *pic_state = &pic_state_int;
-
-/* Reset. It initializes PIC registers. */
+   Sets registers to consistent values.                                       */
+/* -------------------------------------------------------------------------- */
 void
 pic_reset (void)
 {
   PRINTFQ ("Resetting PIC.\n");
-  cpu_state.sprs[SPR_PICMR] = 0;
-  cpu_state.sprs[SPR_PICPR] = 0;
-  cpu_state.sprs[SPR_PICSR] = 0;
-}
+  cpu_state.sprs[SPR_PICMR] = config.pic.use_nmi ? 0x00000003 : 0x00000000;
+  cpu_state.sprs[SPR_PICSR] = 0x00000000;
 
-/* Handles the reporting of an interrupt if it had to be delayed */
+}	/* pic_reset () */
+
+
+/* -------------------------------------------------------------------------- */
+/* Handle the reporting of an interrupt
+
+   PIC interrupts are scheduled to take place after the current instruction
+   has completed execution.
+
+   @param[in] dat  Data associated with the exception (not used)              */
+/* -------------------------------------------------------------------------- */
 static void
 pic_rep_int (void *dat)
 {
+  /* printf ("Handling interrupt PICSR: 0x%08x\n", cpu_state.sprs[SPR_PICSR]);
+   */
+
   if (cpu_state.sprs[SPR_PICSR])
     {
       except_handle (EXCEPT_INT, cpu_state.sprs[SPR_EEAR_BASE]);
     }
-}
+}	/* pic_rep_int () */
 
-/* Called whenever interrupts get enabled */
+
+/* -------------------------------------------------------------------------- */
+/* Enable interrupts.
+
+   Called whenever interrupts get enabled, or when PICMR is written.
+
+   @todo Not sure if calling whenever PICMR is written is a good
+         idea. However, so long as interrupts are properly cleared, it should
+         not be a problem.                                                    */
+/* -------------------------------------------------------------------------- */
 void
 pic_ints_en (void)
 {
   if ((cpu_state.sprs[SPR_PICMR] & cpu_state.sprs[SPR_PICSR]))
-    SCHED_ADD (pic_rep_int, NULL, 0);
-}
+    {
+      SCHED_ADD (pic_rep_int, NULL, 0);
+    }
+}	/* pic_ints_en () */
 
-/* Asserts interrupt to the PIC. */
-/* WARNING: If this is called during a simulated instruction (ie. from a read/
- * write mem callback), the interrupt will be delivered after the instruction
- * has finished executeing */
+
+/* -------------------------------------------------------------------------- */
+/*!Assert an interrupt to the PIC
+
+   OpenRISC supports both edge and level triggered interrupt. The only
+   difference is how the interrupt is cleared. For edge triggered, it is by
+   clearing the corresponding bit in PICSR. For level triggered it is by
+   deasserting the interrupt line.
+
+   For integrated peripherals, these amount to the same thing (using
+   clear_interrupt ()). For external peripherals, the library provides two
+   distinct interfaces.
+
+   An interrupt disables any power management activity.
+
+   We warn if an interrupt is received on a line that already has an interrupt
+   pending.
+
+   @note If this is called during a simulated instruction (ie. from a read/
+         write mem callback), the interrupt will be delivered after the
+         instruction has finished executing.
+
+   @param[in] line  The interrupt being asserted.                             */
+/* -------------------------------------------------------------------------- */
 void
 report_interrupt (int line)
 {
   uint32_t lmask = 1 << line;
+
+  /* printf ("Interrupt reported on line %d\n", line); */
 
   /* Disable doze and sleep mode */
   cpu_state.sprs[SPR_PMR] &= ~(SPR_PMR_DME | SPR_PMR_SME);
@@ -99,30 +141,46 @@ report_interrupt (int line)
       return;
     }
 
+  /* We can't take another interrupt if the previous one has not been
+     cleared. */
   if (cpu_state.sprs[SPR_PICSR] & lmask)
     {
       /* Interrupt already signaled and pending */
-      fprintf (stderr, "Warning: Int line %d did not change state\n", line);
+      PRINTF ("Warning: Int on line %d pending: ignored\n", line);
       return;
     }
   
   cpu_state.sprs[SPR_PICSR] |= lmask;
 
-  if ((cpu_state.sprs[SPR_PICMR] & lmask) || line < 2)
-    if (cpu_state.sprs[SPR_SR] & SPR_SR_IEE)
+  /* If we are enabled in the mask, and interrupts are globally enabled in the
+     SR, schedule the interrupt to take place after the next instruction. */
+  if ((cpu_state.sprs[SPR_PICMR] & lmask) &&
+      (cpu_state.sprs[SPR_SR] & SPR_SR_IEE))
+    {
+      /* printf ("Scheduling interrupt on line %d\n", line); */
       SCHED_ADD (pic_rep_int, NULL, 0);
-}
+    }
+}	/* report_interrupt () */
 
-/* Clears an int on a pic line */
+
+/* -------------------------------------------------------------------------- */
+/* Clear an interrupt on a PIC line.
+
+   Logically this is different for a level sensitive interrupt (it lowers the
+   input line) and an edge sensitive interrupt (it clears the PICSR bit).
+
+   However within Or1ksim, these are implemented through the same operation -
+   clearing the bit in PICSR.
+
+   @param[in] line  The interrupt being cleared.                              */
+/* -------------------------------------------------------------------------- */
 void
 clear_interrupt (int line)
 {
-  /* When level triggered, clear corresponding bit in PICSR */
-  if (!config.pic.edge_trigger)
-    {
-      cpu_state.sprs[SPR_PICSR] &= ~(1 << line);
-    } 
-}
+  cpu_state.sprs[SPR_PICSR] &= ~(1 << line);
+
+}	/* clear_interrupt */
+
 
 /*----------------------------------------------------[ PIC configuration ]---*/
 
@@ -169,6 +227,21 @@ pic_edge_trigger (union param_val  val,
 
 
 /*---------------------------------------------------------------------------*/
+/*!Enable or disable non-maskable interrupts
+
+   @param[in] val  The value to use
+   @param[in] dat  The config data structure (not used here)                 */
+/*---------------------------------------------------------------------------*/
+static void
+pic_use_nmi (union param_val  val,
+		  void            *dat)
+{
+  config.pic.use_nmi = val.int_val;
+
+}	/* pic_use_nmi() */
+
+
+/*---------------------------------------------------------------------------*/
 /*!Initialize a new interrupt controller configuration
 
    ALL parameters are set explicitly to default values in init_defconfig()   */
@@ -180,5 +253,6 @@ reg_pic_sec ()
 
   reg_config_param (sec, "enabled",      PARAMT_INT, pic_enabled);
   reg_config_param (sec, "edge_trigger", PARAMT_INT, pic_edge_trigger);
+  reg_config_param (sec, "use_nmi",      PARAMT_INT, pic_use_nmi);
 
 }	/* reg_pic_sec() */

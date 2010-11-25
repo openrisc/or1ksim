@@ -142,6 +142,7 @@ struct config
   {
     int enabled;		/* Is interrupt controller enabled? */
     int edge_trigger;		/* Are interrupts edge triggered? */
+    int use_nmi;		/* Do we have non-maskable interrupts? */
   } pic;
 
   struct

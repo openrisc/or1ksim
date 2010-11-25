@@ -364,6 +364,7 @@ init_defconfig ()
   /* Programmable Interrupt Controller */
   config.pic.enabled      = 0;
   config.pic.edge_trigger = 1;
+  config.pic.use_nmi      = 1;
 
   if (config.pic.enabled)
     {

@@ -1,5 +1,5 @@
-This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
-4.13 from ../../or1ksim/doc/or1ksim.texi.
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
+../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-11-11.tar.bz2
+     tar jxf or1ksim-2010-11-25.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-11-11/configure --target=or32-uclinux ...
+     ../or1ksim-2010-11-25/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -522,12 +522,11 @@ The header file `or1ksim.h' contains appropriate declarations of the
 functions exported by the Or1ksim library.  These are:
 
  -- `or1ksim.h': int or1ksim_init (int ARGC, char *ARGV, void
-          *CLASS_PTR,
-     int (*UPR)(void *CLASS_PTR, unsigned long int ADDR, unsigned char
-     MASK[], unsigned char RDATA[], int DATA_LEN), int (*UPW)(void
-     *CLASS_PTR, unsigned long int ADDR, unsigned char MASK[], unsigned
-     char WDATA[], int DATA_LEN))
-
+          *CLASS_PTR, int (*UPR)(void *CLASS_PTR, unsigned long int
+          ADDR, unsigned char MASK[], unsigned char RDATA[], int
+          DATA_LEN), int (*UPW)(void *CLASS_PTR, unsigned long int
+          ADDR, unsigned char MASK[], unsigned char WDATA[], int
+          DATA_LEN))
      The initialization function is supplied with a vector of arguments,
      which are interpreted as arguments to the standalone version (see
      *note Standalone Simulator: Standalone Simulator.), a pointer to
@@ -609,20 +608,24 @@ functions exported by the Or1ksim library.  These are:
 
  -- `or1ksim.h': void or1ksim_interrupt (int I)
      Generate an edge-triggered interrupt on interrupt line I.  The
-     interrupt is then immediately cleared automatically.  A warning
-     will be generated and the interrupt request ignored if level
-     sensitive interrupts have been configured with the programmable
-     interrupt controller (*note Interrupt Configuration: Interrupt
-     Configuration.).
+     interrupt must be cleared separately by clearing the corresponding
+     bit in the PICSR SPR.  Until the interrupt is cleared, any further
+     interrupts on the same line will be ignored with a warning.  A
+     warning will be generated and the interrupt request ignored if
+     level sensitive interrupts have been configured with the
+     programmable interrupt controller (*note Interrupt Configuration:
+     Interrupt Configuration.).
 
 
  -- `or1ksim.h': void or1ksim_interrupt_set (int I)
      Assert a level-triggered interrupt on interrupt line I.  The
      interrupt must be cleared separately by an explicit call to
-     `or1ksim_interrupt_clear'.  A warning will be generated, and the
-     interrupt request ignored if edge sensitive interrupts have been
-     configured with the programmable interrupt controller (*note
-     Interrupt Configuration: Interrupt Configuration.).
+     `or1ksim_interrupt_clear'.  Until the interrupt is cleared, any
+     further setting of interrupts on the same line will be ignored
+     with a warning.  A warning will be generated, and the interrupt
+     request ignored if edge sensitive interrupts have been configured
+     with the programmable interrupt controller (*note Interrupt
+     Configuration: Interrupt Configuration.).
 
 
  -- `or1ksim.h': void or1ksim_interrupt_clear (int I)
@@ -642,9 +645,8 @@ functions exported by the Or1ksim library.  These are:
      processor clock cycles to complete.
 
 
- -- `or1ksim.h': double or1ksim_jtag_shift_ir (unsigned
-     char *JREG, int NUM_BITS)
-
+ -- `or1ksim.h': double or1ksim_jtag_shift_ir (unsigned char *JREG, int
+          NUM_BITS)
      Shift the supplied register through the JTAG instruction register.
      Return the (model) time taken for this action.  The register is
      supplied as a byte vector, with the least significant bits in the
@@ -656,9 +658,8 @@ functions exported by the Or1ksim library.  These are:
      bits 11-8 in the least significant 4 bits of byte 1.
 
 
- -- `or1ksim.h': double or1ksim_jtag_shift_dr (unsigned
-     char *JREG, int NUM_BITS)
-
+ -- `or1ksim.h': double or1ksim_jtag_shift_dr (unsigned char *JREG, int
+          NUM_BITS)
      Shift the supplied register through the JTAG data register.
      Return the (model) time taken for this action.  The register is
      supplied as a byte vector, with the least significant bits in the
@@ -670,63 +671,55 @@ functions exported by the Or1ksim library.  These are:
      bits 11-8 in the least significant 4 bits of byte 1.
 
 
- -- `or1ksim.h': int or1ksim_read_mem (unsigned
-     long int ADDR, unsigned char *BUF, int LEN)
-
+ -- `or1ksim.h': int or1ksim_read_mem (unsigned long int ADDR, unsigned
+          char *BUF, int LEN)
      Read LEN bytes from ADDR, placing the result in BUF.  Return LEN
      on success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': int or1ksim_write_mem (unsigned
-     long int ADDR, const unsigned char *BUF, int LEN)
-
+ -- `or1ksim.h': int or1ksim_write_mem (unsigned long int ADDR, const
+          unsigned char *BUF, int LEN)
      Write LEN bytes to ADDR, taking the data from BUF.  Return LEN on
      success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': int or1ksim_read_spr (int SPRNUM, unsigned
-     long int *SPRVAL_PTR)
-
+ -- `or1ksim.h': int or1ksim_read_spr (int SPRNUM, unsigned long int
+          *SPRVAL_PTR)
      Read the SPR specified by SPRNUM, placing the result in
      SPRVAL_PTR.  Return non-zero on success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': int or1ksim_write_spr (int SPRNUM, unsigned
-     long int SPRVA)
-
+ -- `or1ksim.h': int or1ksim_write_spr (int SPRNUM, unsigned long int
+          SPRVA)
      Write SPRVAL to the SPR specified by SPRNUM.  Return non-zero on
      success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': int or1ksim_read_reg (int REGNUM, unsigned
-     long int *REGVAL_PTR)
-
+ -- `or1ksim.h': int or1ksim_read_reg (int REGNUM, unsigned long int
+          *REGVAL_PTR)
      Read the general purpose register specified by REGNUM, placing the
      result in REGVAL_PTR.  Return non-zero on success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': int or1ksim_write_reg (int REGNUM, unsigned
-     long int REGVA)
-
+ -- `or1ksim.h': int or1ksim_write_reg (int REGNUM, unsigned long int
+          REGVA)
      Write REGVAL to the general purpose register specified by REGNUM.
      Return non-zero on success and 0 on failure.
 
           Note: This function was added in Or1ksim 0.5.0.
 
 
- -- `or1ksim.h': void or1ksim_set_stall_state (int
-     STATE)
-
+ -- `or1ksim.h': void or1ksim_set_stall_state (int STATE)
      Set the processor's state according to STATE (1 = stalled, 0 = not
      stalled).
 
@@ -1549,21 +1542,27 @@ parameters may be specified.
      If 1 (true, the default), the programmable interrupt controller is
      edge triggered.  If 0 (false), it is level triggered.
 
-          Note: When configured to be edge triggered, interrupts must
-          be cleared in the PICSR by the processor writing a '0' to the
-          appropriate bit.
+     The library interface (*note Simulator Library: Simulator Library.)
+     provides different functions for setting the different types of
+     interrupt, and a function to clear level sensitive interrupts. Edge
+     sensitive interrupts must be cleared by clearing the corresponding
+     bit in the PICSR SPR.
 
-          When configured to be level triggered, the interrupt must be
-          cleared by lowering the peripheral's IRQ line. Writing '0' to
-          the PICSR has no effect.
+     Internal functions to set and clear interrupts are also provided
+     for peripherals implemented within Or1ksim. *Note Interrupts
+     Internal: Interrupts Internal for more details.
 
-          Peripherals can call the function `report_interrupt' to
-          signal an interrupt request. When configured for level
-          triggered interrupts, the function `clear_interrupt' will
-          clear the appropriate bit in the PICSR. `clear_interrupt' has
-          no effect when Or1ksim is configured for edge triggered
-          interrupts - interrupts must be cleared by the processor
-          writing '0' to the appropriate bit in the PICSR in this case.
+`use_nmi = 0|1'
+     If 1 (true, the default), interrupt lines 0 and 1 are
+     non-maskable. In other words the least significant 2 bits of the
+     PICMR SPR are hard-wired to 1.  If 0 (false), all interrupt lines
+     are treated as equivalent.
+
+          Note: These are not non-maskable in the true sense that they
+          will pre-empt other interrupts.  Rather they can never be
+          masked out using the PICMR register. It is up the interrupt
+          exception handler to give these interrupt lines priority, and
+          indeed to decide on the priority order in general.
 
 
 
@@ -2975,6 +2974,30 @@ _Reset Hooks_
      that function will be called with the data stucture pointer as
      argument.
 
+_Interrupts_
+     An internal peripheral can model the effect of an interrupt being
+     asserted by calling `report_interrupt'.  This is used for both edge
+     and level sensitive interrupts.
+
+     The effect is to set the corresponding bit in the PICSR SPR and to
+     queue an interrupt exception to take place after the current
+     instruction completes execution.
+
+     Externally, the different interrupts require different mechanisms
+     for clearing.  Level sensitive interrupts should be cleared by
+     deasserting the interrupt line, edge sensitive interrupts by
+     clearing the corresponding bit in the PICSR SPR.
+
+     Internally this amounts to the same thing (clearing the PICSPR
+     bit), so a single function is provided, `clear_interrupt'.  Note
+     however that when level sensitive interrupts are configured, PICSR
+     is read only, and can only be cleared by calling
+     `clear_interrupt'.  Using the two functions provided will ensure
+     the peripheral works correctly whichever type of interrupt is used.
+
+          Note: Until an interrupt is cleared, all subsequent
+          interrupts are ignored with a warning.
+
 
 
 File: or1ksim.info,  Node: Internal Debugging,  Next: Regression Testing,  Prev: Concepts,  Up: Code Internals
@@ -3697,6 +3720,7 @@ Index
 * channel (UART configuration):          UART Configuration.  (line  29)
 * clear breakpoint (Interactive CLI):    Interactive Command Line.
                                                               (line  57)
+* clear_interrupt:                       Concepts.            (line  20)
 * clkcycle (simulator configuration):    Simulator Behavior.  (line 115)
 * cm (Interactive CLI):                  Interactive Command Line.
                                                               (line  54)
@@ -3986,6 +4010,7 @@ Index
 * internal debugging:                    Internal Debugging.  (line   6)
 * interrupt controller configuration:    Interrupt Configuration.
                                                               (line   6)
+* interrupts:                            Concepts.            (line  20)
 * irq (ATA/ATAPI configuration):         Disc Interface Configuration.
                                                               (line  36)
 * irq (DMA configuration):               DMA Configuration.   (line  34)
@@ -4011,7 +4036,7 @@ Index
                                                               (line 156)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
-* long:                                  Simulator Library.   (line  95)
+* long:                                  Simulator Library.   (line  94)
 * make file for tests:                   Regression Testing.  (line  27)
 * mc (memory configuration):             Memory Configuration.
                                                               (line 133)
@@ -4056,6 +4081,7 @@ Index
 * mprofile (Interactive CLI):            Interactive Command Line.
                                                               (line 173)
 * mprofile (simulator configuration):    Simulator Behavior.  (line  29)
+* mtspr:                                 Concepts.            (line  20)
 * mwdma (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 132)
 * name (generic peripheral configuration): Generic Peripheral Configuration.
@@ -4069,25 +4095,25 @@ Index
 * nways (cache configuration):           Cache Configuration. (line  22)
 * nways (MMU configuration):             Memory Management Configuration.
                                                               (line  22)
-* or1ksim_get_time_period:               Simulator Library.   (line  85)
-* or1ksim_init:                          Simulator Library.   (line  15)
-* or1ksim_interrupt:                     Simulator Library.   (line 100)
-* or1ksim_interrupt_clear:               Simulator Library.   (line 118)
-* or1ksim_interrupt_set:                 Simulator Library.   (line 109)
-* or1ksim_is_le:                         Simulator Library.   (line  90)
-* or1ksim_jtag_reset:                    Simulator Library.   (line 127)
-* or1ksim_jtag_shift_dr:                 Simulator Library.   (line 149)
-* or1ksim_jtag_shift_ir:                 Simulator Library.   (line 135)
-* or1ksim_read_mem:                      Simulator Library.   (line 163)
-* or1ksim_read_reg:                      Simulator Library.   (line 199)
+* or1ksim_get_time_period:               Simulator Library.   (line  84)
+* or1ksim_init:                          Simulator Library.   (line  19)
+* or1ksim_interrupt:                     Simulator Library.   (line  99)
+* or1ksim_interrupt_clear:               Simulator Library.   (line 121)
+* or1ksim_interrupt_set:                 Simulator Library.   (line 110)
+* or1ksim_is_le:                         Simulator Library.   (line  89)
+* or1ksim_jtag_reset:                    Simulator Library.   (line 130)
+* or1ksim_jtag_shift_dr:                 Simulator Library.   (line 152)
+* or1ksim_jtag_shift_ir:                 Simulator Library.   (line 139)
+* or1ksim_read_mem:                      Simulator Library.   (line 165)
+* or1ksim_read_reg:                      Simulator Library.   (line 197)
 * or1ksim_read_spr:                      Simulator Library.   (line 181)
-* or1ksim_reset_duration:                Simulator Library.   (line  70)
-* or1ksim_run:                           Simulator Library.   (line  59)
-* or1ksim_set_stall_state:               Simulator Library.   (line 217)
-* or1ksim_set_time_point:                Simulator Library.   (line  81)
-* or1ksim_write_mem:                     Simulator Library.   (line 172)
-* or1ksim_write_reg:                     Simulator Library.   (line 208)
-* or1ksim_write_spr:                     Simulator Library.   (line 190)
+* or1ksim_reset_duration:                Simulator Library.   (line  69)
+* or1ksim_run:                           Simulator Library.   (line  58)
+* or1ksim_set_stall_state:               Simulator Library.   (line 212)
+* or1ksim_set_time_point:                Simulator Library.   (line  80)
+* or1ksim_write_mem:                     Simulator Library.   (line 173)
+* or1ksim_write_reg:                     Simulator Library.   (line 205)
+* or1ksim_write_spr:                     Simulator Library.   (line 189)
 * output rediretion:                     Concepts.            (line   7)
 * overflow flag setting by instructions: Configuring the Build.
                                                               (line 133)
@@ -4197,6 +4223,7 @@ Index
                                                               (line  52)
 * Remote Serial Protocol, --srv:         Standalone Simulator.
                                                               (line  60)
+* report_interrupt:                      Concepts.            (line  20)
 * reset (Interactive CLI):               Interactive Command Line.
                                                               (line  63)
 * reset hooks:                           Concepts.            (line  13)
@@ -4391,6 +4418,8 @@ Index
 * unstall the processor (Interactive CLI): Interactive Command Line.
                                                               (line  78)
 * upr (CPU configuration):               CPU Configuration.   (line  21)
+* use_nmi (interrupt controller):        Interrupt Configuration.
+                                                              (line  30)
 * ustates (cache configuration):         Cache Configuration. (line  33)
 * ustates (MMU configuration):           Memory Management Configuration.
                                                               (line  41)
@@ -4426,55 +4455,56 @@ Index
 
 
 Tag Table:
-Node: Top830
-Node: Installation1240
-Node: Preparation1487
-Node: Configuring the Build1782
-Node: Build and Install7926
-Node: Known Issues8704
-Node: Usage9759
-Node: Standalone Simulator9973
-Node: Profiling Utility14537
-Node: Memory Profiling Utility15447
-Node: Simulator Library16812
-Node: Configuration26895
-Node: Configuration File Format27507
-Node: Configuration File Preprocessing27892
-Node: Configuration File Syntax28189
-Node: Simulator Configuration30974
-Node: Simulator Behavior31265
-Node: Verification API Configuration35846
-Node: CUC Configuration37786
-Node: Core OpenRISC Configuration39778
-Node: CPU Configuration40280
-Node: Memory Configuration44399
-Node: Memory Management Configuration51121
-Node: Cache Configuration53498
-Node: Interrupt Configuration55884
-Node: Power Management Configuration57446
-Node: Branch Prediction Configuration58723
-Node: Debug Interface Configuration60083
-Node: Peripheral Configuration62426
-Node: Memory Controller Configuration63052
-Node: UART Configuration66832
-Node: DMA Configuration70351
-Node: Ethernet Configuration72218
-Node: GPIO Configuration76300
-Node: Display Interface Configuration77933
-Node: Frame Buffer Configuration80242
-Node: Keyboard Configuration82106
-Node: Disc Interface Configuration84344
-Node: Generic Peripheral Configuration89448
-Node: Interactive Command Line91743
-Node: Verification API98717
-Node: Code Internals103147
-Node: Coding Conventions103730
-Node: Global Data Structures108157
-Node: Concepts110814
-Ref: Output Redirection110959
-Node: Internal Debugging111498
-Node: Regression Testing112022
-Node: GNU Free Documentation License115811
-Node: Index138218
+Node: Top814
+Node: Installation1224
+Node: Preparation1471
+Node: Configuring the Build1766
+Node: Build and Install7910
+Node: Known Issues8688
+Node: Usage9743
+Node: Standalone Simulator9957
+Node: Profiling Utility14521
+Node: Memory Profiling Utility15431
+Node: Simulator Library16796
+Node: Configuration27201
+Node: Configuration File Format27813
+Node: Configuration File Preprocessing28198
+Node: Configuration File Syntax28495
+Node: Simulator Configuration31280
+Node: Simulator Behavior31571
+Node: Verification API Configuration36152
+Node: CUC Configuration38092
+Node: Core OpenRISC Configuration40084
+Node: CPU Configuration40586
+Node: Memory Configuration44705
+Node: Memory Management Configuration51427
+Node: Cache Configuration53804
+Node: Interrupt Configuration56190
+Node: Power Management Configuration58023
+Node: Branch Prediction Configuration59300
+Node: Debug Interface Configuration60660
+Node: Peripheral Configuration63003
+Node: Memory Controller Configuration63629
+Node: UART Configuration67409
+Node: DMA Configuration70928
+Node: Ethernet Configuration72795
+Node: GPIO Configuration76877
+Node: Display Interface Configuration78510
+Node: Frame Buffer Configuration80819
+Node: Keyboard Configuration82683
+Node: Disc Interface Configuration84921
+Node: Generic Peripheral Configuration90025
+Node: Interactive Command Line92320
+Node: Verification API99294
+Node: Code Internals103724
+Node: Coding Conventions104307
+Node: Global Data Structures108734
+Node: Concepts111391
+Ref: Output Redirection111536
+Ref: Interrupts Internal112074
+Node: Internal Debugging113227
+Node: Regression Testing113751
+Node: GNU Free Documentation License117540
+Node: Index139947
 
 End Tag Table
