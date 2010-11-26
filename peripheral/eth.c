@@ -32,17 +32,19 @@
 /* System includes */
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
+
+#include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <fcntl.h>
+
 #include <sys/poll.h>
-#include <sys/time.h>
 #include <unistd.h>
 #include <errno.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <net/if.h>
+
+#include <linux/if.h>
+#include <linux/if_tun.h>
 
 /* Package includes */
 #include "arch.h"
@@ -84,19 +86,18 @@ struct eth_device
   /* Ethernet PHY address */
   unsigned long phy_addr;
 
-  /* RX and TX file names and handles */
+  /* What sort of external I/F: FILE or TAP */
+  int rtx_type;
+
+  /* RX and TX file names and handles for FILE type connection. */
   char *rxfile, *txfile;
   int txfd;
   int rxfd;
   off_t loopback_offset;
 
-  /* Socket interface name */
-  char *sockif;
-
-  int rtx_sock;
-  int rtx_type;
-  struct ifreq ifr;
-  fd_set rfds, wfds;
+  /* Info for TAP type connections */
+  int   rtx_fd;
+  char *tap_dev;
 
   /* Current TX state */
   struct
@@ -173,6 +174,14 @@ static void eth_skip_rx_file (struct eth_device *, off_t);
 static void eth_rx_next_packet (struct eth_device *);
 static void eth_write_tx_bd_num (struct eth_device *, unsigned long value);
 static void eth_miim_trans (void *dat);
+
+
+/* ========================================================================== */
+/* Dummy socket routines. These are the points where we spoof an Ethernet     */
+/* network.                                                                   */
+/* -------------------------------------------------------------------------- */
+
+
 /* ========================================================================= */
 /*  TX LOGIC                                                                 */
 /*---------------------------------------------------------------------------*/
@@ -186,9 +195,6 @@ eth_controller_tx_clock (void *dat)
 {
   struct eth_device *eth = dat;
   int bAdvance = 1;
-#if HAVE_ETH_PHY
-  struct sockaddr_ll sll;
-#endif /* HAVE_ETH_PHY */
   long nwritten = 0;
   unsigned long read_word;
 
@@ -263,7 +269,6 @@ eth_controller_tx_clock (void *dat)
       /* stay in this state if (TXEN && !READY) */
       break;
     case ETH_TXSTATE_READFIFO:
-#if 1
       if (eth->tx.bytes_sent < eth->tx.packet_length)
 	{
 	  read_word =
@@ -277,14 +282,6 @@ eth_controller_tx_clock (void *dat)
 	  eth->tx_buff[eth->tx.bytes_sent + 3] = (unsigned char) (read_word);
 	  eth->tx.bytes_sent += 4;
 	}
-#else
-      if (eth->tx.bytes_sent < eth->tx.packet_length)
-	{
-	  eth->tx_buff[eth->tx.bytes_sent] =
-	    eval_direct8 (eth->tx.bytes_sent + eth->tx.bd_addr, 0, 0);
-	  eth->tx.bytes_sent += 1;
-	}
-#endif
       else
 	{
 	  eth->tx.state = ETH_TXSTATE_TRANSMIT;
@@ -297,14 +294,10 @@ eth_controller_tx_clock (void *dat)
 	case ETH_RTX_FILE:
 	  nwritten = write (eth->txfd, eth->tx_buff, eth->tx.packet_length);
 	  break;
-#if HAVE_ETH_PHY
-	case ETH_RTX_SOCK:
-	  memset (&sll, 0, sizeof (sll));
-	  sll.sll_ifindex = eth->ifr.ifr_ifindex;
-	  nwritten =
-	    sendto (eth->rtx_sock, eth->tx_buff, eth->tx.packet_length, 0,
-		    (struct sockaddr *) &sll, sizeof (sll));
-#endif /* HAVE_ETH_PHY */
+	case ETH_RTX_TAP:
+	  printf ("Writing TAP\n");
+	  nwritten = write (eth->rtx_fd, eth->tx_buff, eth->tx.packet_length);
+	  break;
 	}
 
       /* set BD status */
@@ -332,7 +325,10 @@ eth_controller_tx_clock (void *dat)
 	  TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M))
 	{
 	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, IRQ))
-	    report_interrupt (eth->mac_int);
+	    {
+	      printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
+	      report_interrupt (eth->mac_int);
+	    }
 	}
 
       /* advance to next BD */
@@ -367,8 +363,10 @@ static void
 eth_controller_rx_clock (void *dat)
 {
   struct eth_device *eth = dat;
-  long nread;
-  unsigned long send_word;
+  long               nread = 0;
+  unsigned long      send_word;
+  struct pollfd      fds[1];
+  int                n;
 
 
   switch (eth->rx.state)
@@ -378,7 +376,8 @@ eth_controller_rx_clock (void *dat)
       break;
 
     case ETH_RXSTATE_WAIT4BD:
-      eth->rx.bd = eth->regs.bd_ram[eth->rx.bd_index];
+
+      eth->rx.bd      = eth->regs.bd_ram[eth->rx.bd_index];
       eth->rx.bd_addr = eth->regs.bd_ram[eth->rx.bd_index + 1];
 
       if (TEST_FLAG (eth->rx.bd, ETH_RX_BD, READY))
@@ -412,19 +411,47 @@ eth_controller_rx_clock (void *dat)
 	}
       else
 	{
-	  nread =
-	    recv (eth->rtx_sock, eth->rx_buff, ETH_MAXPL, /*MSG_PEEK | */
-		  MSG_DONTWAIT);
-	  if (nread > 0)
+	  /* Poll to see if there is data to read */
+	  struct pollfd  fds[1];
+	  int    n;
+
+	  fds[0].fd = eth->rtx_fd;
+	  fds[0].events = POLLIN;
+ 
+	  n = poll (fds, 1, 0);
+	  if (n < 0)
 	    {
-	      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
-	      if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
-		report_interrupt (eth->mac_int);
+	      fprintf (stderr, "Warning: Poll of WAIT4BD failed %s: ignored.\n",
+		       strerror (errno));
+	    }
+	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
+	    {
+	      printf ("Reading TAP\n");
+	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
+
+	      if (nread < 0)
+		{
+		  fprintf (stderr,
+			   "Warning: Read of WAIT4BD failed %s: ignored\n",
+			   strerror (errno));
+		}
+	      else if (nread > 0)
+		{
+		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
+
+		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
+		    {
+		      printf ("ETH_RXSTATE_WAIT4BD interrupt\n");
+		      report_interrupt (eth->mac_int);
+		    }
+		}
 	    }
 	}
+
       break;
 
     case ETH_RXSTATE_RECV:
+
       switch (eth->rtx_type)
 	{
 	case ETH_RTX_FILE:
@@ -434,7 +461,8 @@ eth_controller_rx_clock (void *dat)
 	       sizeof (eth->rx.packet_length)) <
 	      sizeof (eth->rx.packet_length))
 	    {
-	      /* TODO: just do what real ethernet would do (some kind of error state) */
+	      /* TODO: just do what real ethernet would do (some kind of error
+		 state) */
 	      sim_done ();
 	      break;
 	    }
@@ -467,22 +495,41 @@ eth_controller_rx_clock (void *dat)
 
 	  break;
 
-	case ETH_RTX_SOCK:
-	  nread = recv (eth->rtx_sock, eth->rx_buff, ETH_MAXPL, MSG_DONTWAIT);
+	case ETH_RTX_TAP:
+	  /* Poll to see if there is data to read */
+	  fds[0].fd     = eth->rtx_fd;
+	  fds[0].events = POLLIN;
+ 
+	  n = poll (fds, 1, 0);
+	  if (n < 0)
+	    {
+	      fprintf (stderr,
+		       "Warning: Poll of RXTATE_RECV failed %s: ignored.\n",
+		       strerror (errno));
+	    }
+	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
+	    {
+	      printf ("Reading TAP\n");
+	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
 
-	  if (nread == 0)
-	    {
-	      break;
-	    }
-	  else if (nread < 0)
-	    {
-	      if (errno != EAGAIN)
+	      if (nread < 0)
 		{
-		  break;
+		  fprintf (stderr,
+			   "Warning: Read of RXTATE_RECV failed %s: ignored\n",
+			   strerror (errno));
 		}
-	      else
-		break;
+	      else if (nread > 0)
+		{
+		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
+
+		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
+		    {
+		      printf ("ETH_RXTATE_RECV interrupt\n");
+		      report_interrupt (eth->mac_int);
+		    }
+		}
 	    }
+
 	  /* If not promiscouos mode, check the destination address */
 	  if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO))
 	    {
@@ -514,7 +561,6 @@ eth_controller_rx_clock (void *dat)
       break;
 
     case ETH_RXSTATE_WRITEFIFO:
-#if 1
       send_word = ((unsigned long) eth->rx_buff[eth->rx.bytes_read] << 24) |
 	((unsigned long) eth->rx_buff[eth->rx.bytes_read + 1] << 16) |
 	((unsigned long) eth->rx_buff[eth->rx.bytes_read + 2] << 8) |
@@ -523,12 +569,6 @@ eth_controller_rx_clock (void *dat)
       /* update counters */
       eth->rx.bytes_left -= 4;
       eth->rx.bytes_read += 4;
-#else
-      set_direct8 (eth->rx.bd_addr + eth->rx.bytes_read,
-		   eth->rx_buff[eth->rx.bytes_read], 0, 0);
-      eth->rx.bytes_left -= 1;
-      eth->rx.bytes_read += 1;
-#endif
 
       if (eth->rx.bytes_left <= 0)
 	{
@@ -556,6 +596,7 @@ eth_controller_rx_clock (void *dat)
 	  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXB_M)) &&
 	      (TEST_FLAG (eth->rx.bd, ETH_RX_BD, IRQ)))
 	    {
+	      printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
 	      report_interrupt (eth->mac_int);
 	    }
 
@@ -615,133 +656,138 @@ eth_read_rx_file (struct eth_device *eth, void *buf, size_t count)
 
 /* ========================================================================= */
 
-/*
-  Reset. Initializes all registers to default and places devices in
-         memory address space.
-*/
+
+/* -------------------------------------------------------------------------- */
+/*!Reset the Ethernet.
+
+   Open the correct type of simulation interface to the outside world.
+
+   Initialize all registers to default and places devices in memory address
+   space.
+
+   @param[in] dat  The Ethernet interface data structure.                     */
+/* -------------------------------------------------------------------------- */
 static void
 eth_reset (void *dat)
 {
   struct eth_device *eth = dat;
-#if HAVE_ETH_PHY
-  int j;
-  struct sockaddr_ll sll;
-#endif /* HAVE_ETH_PHY */
+  struct ifreq       ifr;
 
-  if (eth->baseaddr != 0)
+  printf ("Resetting Ethernet\n");
+
+  /* Nothing to do if we do not have a base address set.
+
+     TODO: Surely this should test for being enabled? */
+  if (0 == eth->baseaddr)
     {
-      switch (eth->rtx_type)
-	{
-	case ETH_RTX_FILE:
-	  /* (Re-)open TX/RX files */
-	  if (eth->rxfd > 0)
-	    close (eth->rxfd);
-	  if (eth->txfd > 0)
-	    close (eth->txfd);
-	  eth->rxfd = eth->txfd = -1;
-
-	  if ((eth->rxfd = open (eth->rxfile, O_RDONLY)) < 0)
-	    fprintf (stderr, "Cannot open Ethernet RX file \"%s\"\n",
-		     eth->rxfile);
-	  if ((eth->txfd = open (eth->txfile, O_RDWR | O_CREAT | O_APPEND
-#if defined(O_SYNC)		/* BSD / Mac OS X manual doesn't know about O_SYNC */
-				 | O_SYNC
-#endif
-				 ,
-				 S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
-	    fprintf (stderr, "Cannot open Ethernet TX file \"%s\"\n",
-		     eth->txfile);
-	  eth->loopback_offset = lseek (eth->txfd, 0, SEEK_END);
-
-	  break;
-#if HAVE_ETH_PHY
-	case ETH_RTX_SOCK:
-	  /* (Re-)open TX/RX sockets */
-	  if (eth->rtx_sock != 0)
-	    break;
-
-	  eth->rtx_sock = socket (PF_PACKET, SOCK_RAW, htons (ETH_P_ALL));
-	  if (eth->rtx_sock == -1)
-	    {
-	      fprintf (stderr, "Cannot open rtx_sock.\n");
-	      return;
-	    }
-
-	  /* get interface index number */
-	  memset (&(eth->ifr), 0, sizeof (eth->ifr));
-	  strncpy (eth->ifr.ifr_name, eth->sockif, IFNAMSIZ);
-	  if (ioctl (eth->rtx_sock, SIOCGIFINDEX, &(eth->ifr)) == -1)
-	    {
-	      fprintf (stderr, "SIOCGIFINDEX failed!\n");
-	      return;
-	    }
-
-	  /* Bind to interface... */
-	  memset (&sll, 0xff, sizeof (sll));
-	  sll.sll_family = AF_PACKET;	/* allways AF_PACKET */
-	  sll.sll_protocol = htons (ETH_P_ALL);
-	  sll.sll_ifindex = eth->ifr.ifr_ifindex;
-	  if (bind (eth->rtx_sock, (struct sockaddr *) &sll, sizeof (sll)) ==
-	      -1)
-	    {
-	      fprintf (stderr, "Error bind().\n");
-	      return;
-	    }
-
-	  /* first, flush all received packets. */
-	  do
-	    {
-	      fd_set fds;
-	      struct timeval t;
-
-	      FD_ZERO (&fds);
-	      FD_SET (eth->rtx_sock, &fds);
-	      memset (&t, 0, sizeof (t));
-	      j = select (FD_SETSIZE, &fds, NULL, NULL, &t);
-	      if (j > 0)
-		recv (eth->rtx_sock, eth->rx_buff, j, 0);
-	    }
-	  while (j);
-
-	  break;
-#else /* HAVE_ETH_PHY */
-	case ETH_RTX_SOCK:
-	  fprintf (stderr,
-		   "Ethernet phy not enabled in this configuration.  Configure with --enable-ethphy.\n");
-	  exit (1);
-	  break;
-#endif /* HAVE_ETH_PHY */
-	}
-
-      /* Set registers to default values */
-      /* Zero all registers */
-      memset (&(eth->regs), 0, sizeof (eth->regs));
-      /* Set those with non-zero reset defaults */
-      eth->regs.moder = 0x0000A000;
-      eth->regs.ipgt = 0x00000012;
-      eth->regs.ipgr1 = 0x0000000C;
-      eth->regs.ipgr2 = 0x00000012;
-      eth->regs.packetlen = 0x003C0600;
-      eth->regs.collconf = 0x000F003F;
-      eth->regs.miimoder = 0x00000064;
-      eth->regs.tx_bd_num = 0x00000040;
-
-      /* Initialize TX/RX status */
-      memset (&(eth->tx), 0, sizeof (eth->tx));
-      memset (&(eth->rx), 0, sizeof (eth->rx));
-      eth->rx.bd_index = eth->regs.tx_bd_num << 1;
-
-      /* Initialize VAPI */
-      if (eth->base_vapi_id)
-	{
-	  vapi_install_multi_handler (eth->base_vapi_id, ETH_NUM_VAPI_IDS,
-				      eth_vapi_read, dat);
-	}
-      
+      return;
     }
-}
 
-/* ========================================================================= */
+  switch (eth->rtx_type)
+    {
+    case ETH_RTX_FILE:
+
+      /* (Re-)open TX/RX files */
+      if (eth->rxfd >= 0)
+	{
+	  close (eth->rxfd);
+	}
+
+      if (eth->txfd >= 0)
+	{
+	  close (eth->txfd);
+	}
+
+      eth->rxfd = -1;
+      eth->txfd = -1;
+
+      eth->rxfd = open (eth->rxfile, O_RDONLY);
+      if (eth->rxfd < 0)
+	{
+	  fprintf (stderr, "Warning: Cannot open Ethernet RX file \"%s\": %s\n",
+		   eth->rxfile, strerror (errno));
+	}
+
+      eth->txfd = open (eth->txfile,
+#if defined(O_SYNC)		/* BSD/MacOS X doesn't know about O_SYNC */
+			O_SYNC |
+#endif
+			O_RDWR | O_CREAT | O_APPEND,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+      if (eth->txfd < 0)
+	{
+	  fprintf (stderr, "Warning: Cannot open Ethernet TX file \"%s\": %s\n",
+		   eth->txfile, strerror (errno));
+	}
+
+      eth->loopback_offset = lseek (eth->txfd, 0, SEEK_END);
+      break;
+
+    case ETH_RTX_TAP:
+
+      /* (Re-)open TAP interface if necessary */
+      if (eth->rtx_fd != 0)
+	{
+	  break;
+	}
+
+      /* Open the TUN/TAP device */
+      eth->rtx_fd = open ("/dev/net/tun", O_RDWR);
+      if( eth->rtx_fd < 0 )
+	{
+	  fprintf (stderr, "Warning: Failed to open TUN/TAP device: %s\n",
+		   strerror (errno));
+	  eth->rtx_fd = 0;
+	  return;
+	}
+
+      /* Turn it into a specific TAP device. If we haven't specified a
+	 specific (persistent) device, one will be created, but that requires
+	 superuser, or at least CAP_NET_ADMIN capabilities. */
+      memset (&ifr, 0, sizeof(ifr));
+      ifr.ifr_flags = IFF_TAP; 
+      strncpy (ifr.ifr_name, eth->tap_dev, IFNAMSIZ);
+
+      if (ioctl (eth->rtx_fd, TUNSETIFF, (void *) &ifr) < 0)
+	{
+	  fprintf (stderr, "Warning: Failed to set TAP device: %s\n",
+		   strerror (errno));
+	  close (eth->rtx_fd);
+	  eth->rtx_fd = 0;
+	  return;
+	}
+
+      PRINTF ("Opened TAP %s\n", ifr.ifr_name);
+
+      /* Do we need to flush any packets? */
+      break;
+    }
+
+  /* Set registers to default values */
+  memset (&(eth->regs), 0, sizeof (eth->regs));
+
+  eth->regs.moder     = 0x0000A000;
+  eth->regs.ipgt      = 0x00000012;
+  eth->regs.ipgr1     = 0x0000000C;
+  eth->regs.ipgr2     = 0x00000012;
+  eth->regs.packetlen = 0x003C0600;
+  eth->regs.collconf  = 0x000F003F;
+  eth->regs.miimoder  = 0x00000064;
+  eth->regs.tx_bd_num = 0x00000040;
+
+  /* Clear TX/RX status and initialize buffer descriptor index. */
+  memset (&(eth->tx), 0, sizeof (eth->tx));
+  memset (&(eth->rx), 0, sizeof (eth->rx));
+
+  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+
+  /* Initialize VAPI */
+  if (eth->base_vapi_id)
+    {
+      vapi_install_multi_handler (eth->base_vapi_id, ETH_NUM_VAPI_IDS,
+				  eth_vapi_read, dat);
+    }
+}	/* eth_reset () */
 
 
 /* 
@@ -1080,10 +1126,9 @@ eth_irq (union param_val  val,
 /*---------------------------------------------------------------------------*/
 /*!Set the Ethernet interface type
 
-   Currently two types are supported, file and socket. Use of the socket
-   requires a compile time option.
+   Currently two types are supported, file and tap.
 
-   @param[in] val  The value to use. 0 for file, 1 for socket.
+   @param[in] val  The value to use. Currently "file" and "tap" are supported.
    @param[in] dat  The config data structure                                 */
 /*---------------------------------------------------------------------------*/
 static void
@@ -1092,17 +1137,21 @@ eth_rtx_type (union param_val  val,
 {
   struct eth_device *eth = dat;
 
-  if (val.int_val)
+  if (0 == strcasecmp ("file", val.str_val))
     {
-#ifndef HAVE_ETH_PHY
-      fprintf (stderr, "Warning: Ethernet PHY socket not enabled in this "
-	       "configuration (configure with --enable-ethphy): ignored\n");
-      return;
-#endif
+      printf ("Ethernet FILE type\n");
+      eth->rtx_type = ETH_RTX_FILE;
     }
-
-  eth->rtx_type = val.int_val;
-
+  else if (0 == strcasecmp ("tap", val.str_val))
+    {
+      printf ("Ethernet TAP type\n");
+      eth->rtx_type = ETH_RTX_TAP;
+    }
+  else
+    {
+      fprintf (stderr, "Warning: Unknown Ethernet type: file assumed.\n");
+      eth->rtx_type = ETH_RTX_FILE;
+    }
 }	/* eth_rtx_type() */
 
 
@@ -1205,39 +1254,35 @@ eth_txfile (union param_val  val,
 
 
 /*---------------------------------------------------------------------------*/
-/*!Set the Ethernet socket interface
+/*!Set the Ethernet TAP device.
 
-   Free any previously allocated value. This is only meaningful if the socket
-   interface is configured.
+   If we are not superuser (or do not have CAP_NET_ADMIN priviledges), then we
+   must work with a persistent TAP device that is already set up. This option
+   specifies the device to user.
 
-   @param[in] val  The value to use
+   @param[in] val  The value to use.
    @param[in] dat  The config data structure                                 */
 /*---------------------------------------------------------------------------*/
 static void
-eth_sockif (union param_val  val,
-	    void            *dat)
+eth_tap_dev (union param_val  val,
+	      void            *dat)
 {
   struct eth_device *eth = dat;
 
-#ifndef HAVE_ETH_PHY
-  fprintf (stderr, "Warning: Ethernet PHY socket not enabled in this "
-	   "configuration (configure with --enable-ethphy): "
-	   "sockif ignored\n");
-  return;
-#endif
-
-  if (NULL != eth->sockif)
+  if (NULL != eth->tap_dev)
     {
-      free (eth->sockif);
-      eth->sockif = NULL;
+      free (eth->tap_dev);
+      eth->tap_dev = NULL;
     }
 
-  if (!(eth->sockif = strdup (val.str_val)))
+  eth->tap_dev = strdup (val.str_val);
+
+  if (NULL == eth->tap_dev)
     {
-      fprintf (stderr, "Peripheral Ethernet: Run out of memory\n");
+      fprintf (stderr, "ERROR: Peripheral Ethernet: Run out of memory\n");
       exit (-1);
     }
-}	/* eth_sockif() */
+}	/* eth_tap_dev() */
 
 
 static void
@@ -1410,12 +1455,12 @@ eth_sec_start (void)
   new->baseaddr     = 0;
   new->dma          = 0;
   new->mac_int      = 0;
-  new->rtx_type     = 0;
+  new->rtx_type     = ETH_RTX_FILE;
   new->rx_channel   = 0;
   new->tx_channel   = 0;
   new->rxfile       = strdup ("eth_rx");
   new->txfile       = strdup ("eth_tx");
-  new->sockif       = strdup ("or1ksim_eth");
+  new->tap_dev      = strdup ("");
   new->base_vapi_id = 0;
   new->phy_addr     = 0;
 
@@ -1432,7 +1477,7 @@ eth_sec_end (void *dat)
     {
       free (eth->rxfile);
       free (eth->txfile);
-      free (eth->sockif);
+      free (eth->tap_dev);
       free (eth);
       return;
     }
@@ -1466,12 +1511,12 @@ reg_ethernet_sec ()
   reg_config_param (sec, "baseaddr",   PARAMT_ADDR, eth_baseaddr);
   reg_config_param (sec, "dma",        PARAMT_INT,  eth_dma);
   reg_config_param (sec, "irq",        PARAMT_INT,  eth_irq);
-  reg_config_param (sec, "rtx_type",   PARAMT_INT,  eth_rtx_type);
+  reg_config_param (sec, "rtx_type",   PARAMT_STR,  eth_rtx_type);
   reg_config_param (sec, "rx_channel", PARAMT_INT,  eth_rx_channel);
   reg_config_param (sec, "tx_channel", PARAMT_INT,  eth_tx_channel);
   reg_config_param (sec, "rxfile",     PARAMT_STR,  eth_rxfile);
   reg_config_param (sec, "txfile",     PARAMT_STR,  eth_txfile);
-  reg_config_param (sec, "sockif",     PARAMT_STR,  eth_sockif);
+  reg_config_param (sec, "tap_dev",    PARAMT_STR,  eth_tap_dev);
   reg_config_param (sec, "vapi_id",    PARAMT_INT,  eth_vapi_id);
   reg_config_param (sec, "phy_addr",   PARAMT_INT,  eth_phy_addr);
 

@@ -27,10 +27,6 @@
 #ifndef ETH__H
 #define ETH__H
 
-#if HAVE_ETH_PHY
-#include <netpacket/packet.h>
-#endif /* HAVE_ETH_PHY */
-
 #if HAVE_NET_ETHERNET_H
 # include <net/ethernet.h>
 #elif defined(HAVE_SYS_ETHERNET_H)
@@ -258,7 +254,7 @@ struct ether_header
 #define ETH_RXSTATE_WRITEFIFO	30
 
 #define ETH_RTX_FILE    0
-#define ETH_RTX_SOCK    1
+#define ETH_RTX_TAP     1
 #define ETH_RTX_VAPI	2
 
 #define ETH_MAXPL   0x10000

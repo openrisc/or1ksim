@@ -1,3 +1,14 @@
+2010-11-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/default.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/int-edge.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/int-level.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/upcalls.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/default.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/eth.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/fp.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/kbdtest.cfg: Updated Ethernet rtx_type parameter.
+
 2010-11-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* libsim.tests/int-edge.exp: Updated for new interrupt interface.

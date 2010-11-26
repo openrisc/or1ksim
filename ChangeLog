@@ -1,3 +1,24 @@
+2010-11-26  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* peripheral/eth.c: Now uses TUN/TAP tunnelling. ETH_PHY
+	conditional compilation removed throughout.
+	<struct eth_device>: Redundant fields removed. New fields added.
+	(eth_controller_tx_clock): Use write to TAP instead of sendto
+	socket.
+	(eth_controller_rx_clock): Use read from TAP instead of recv from
+	socket.
+	(eth_reset): Socket initialization replaced by opening TAP.
+	(eth_rtx_type): Now string parameter. Currently "FILE" or "TAP"
+	permitted.
+	(eth_tap_dev): Created.
+	(eth_sock_if): Deleted.
+	(eth_sec_start, eth_sec_end, reg_ethernet_sec): Updated to add
+	tap_dev.
+	* peripheral/etch.h: ETH_PHY conditional compilation removed
+	throughout.
+
 2010-11-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
