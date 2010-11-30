@@ -1,5 +1,5 @@
-This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
-../../doc/or1ksim.texi.
+This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
+4.13 from ../../or1ksim/doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -4455,56 +4455,56 @@ Index
 
 
 Tag Table:
-Node: Top814
-Node: Installation1224
-Node: Preparation1471
-Node: Configuring the Build1766
-Node: Build and Install7910
-Node: Known Issues8688
-Node: Usage9743
-Node: Standalone Simulator9957
-Node: Profiling Utility14521
-Node: Memory Profiling Utility15431
-Node: Simulator Library16796
-Node: Configuration27201
-Node: Configuration File Format27813
-Node: Configuration File Preprocessing28198
-Node: Configuration File Syntax28495
-Node: Simulator Configuration31280
-Node: Simulator Behavior31571
-Node: Verification API Configuration36152
-Node: CUC Configuration38092
-Node: Core OpenRISC Configuration40084
-Node: CPU Configuration40586
-Node: Memory Configuration44705
-Node: Memory Management Configuration51427
-Node: Cache Configuration53804
-Node: Interrupt Configuration56190
-Node: Power Management Configuration58023
-Node: Branch Prediction Configuration59300
-Node: Debug Interface Configuration60660
-Node: Peripheral Configuration63003
-Node: Memory Controller Configuration63629
-Node: UART Configuration67409
-Node: DMA Configuration70928
-Node: Ethernet Configuration72795
-Node: GPIO Configuration76877
-Node: Display Interface Configuration78510
-Node: Frame Buffer Configuration80819
-Node: Keyboard Configuration82683
-Node: Disc Interface Configuration84921
-Node: Generic Peripheral Configuration90025
-Node: Interactive Command Line92320
-Node: Verification API99294
-Node: Code Internals103724
-Node: Coding Conventions104307
-Node: Global Data Structures108734
-Node: Concepts111391
-Ref: Output Redirection111536
-Ref: Interrupts Internal112074
-Node: Internal Debugging113227
-Node: Regression Testing113751
-Node: GNU Free Documentation License117540
-Node: Index139947
+Node: Top830
+Node: Installation1240
+Node: Preparation1487
+Node: Configuring the Build1782
+Node: Build and Install7926
+Node: Known Issues8704
+Node: Usage9759
+Node: Standalone Simulator9973
+Node: Profiling Utility14537
+Node: Memory Profiling Utility15447
+Node: Simulator Library16812
+Node: Configuration27217
+Node: Configuration File Format27829
+Node: Configuration File Preprocessing28214
+Node: Configuration File Syntax28511
+Node: Simulator Configuration31296
+Node: Simulator Behavior31587
+Node: Verification API Configuration36168
+Node: CUC Configuration38108
+Node: Core OpenRISC Configuration40100
+Node: CPU Configuration40602
+Node: Memory Configuration44721
+Node: Memory Management Configuration51443
+Node: Cache Configuration53820
+Node: Interrupt Configuration56206
+Node: Power Management Configuration58039
+Node: Branch Prediction Configuration59316
+Node: Debug Interface Configuration60676
+Node: Peripheral Configuration63019
+Node: Memory Controller Configuration63645
+Node: UART Configuration67425
+Node: DMA Configuration70944
+Node: Ethernet Configuration72811
+Node: GPIO Configuration76893
+Node: Display Interface Configuration78526
+Node: Frame Buffer Configuration80835
+Node: Keyboard Configuration82699
+Node: Disc Interface Configuration84937
+Node: Generic Peripheral Configuration90041
+Node: Interactive Command Line92336
+Node: Verification API99310
+Node: Code Internals103740
+Node: Coding Conventions104323
+Node: Global Data Structures108750
+Node: Concepts111407
+Ref: Output Redirection111552
+Ref: Interrupts Internal112090
+Node: Internal Debugging113243
+Node: Regression Testing113767
+Node: GNU Free Documentation License117556
+Node: Index139963
 
 End Tag Table

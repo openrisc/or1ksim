@@ -154,8 +154,8 @@ void mtspr(uint16_t regno, const uorreg_t value)
     break;
   case SPR_PICSR:
     if(!config.pic.edge_trigger)
-      /* When configured with level triggered interrupts we clear PICSR in PIC 
-	 when IRQ goes low */
+      /* When configured with level triggered interrupts we clear PICSR in PIC
+	 peripheral model when incoming IRQ goes low */
       cpu_state.sprs[SPR_PICSR] = prev_val;
     break;
   case SPR_PICMR:

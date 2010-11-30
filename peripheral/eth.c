@@ -269,7 +269,8 @@ eth_controller_tx_clock (void *dat)
       /* stay in this state if (TXEN && !READY) */
       break;
     case ETH_TXSTATE_READFIFO:
-      if (eth->tx.bytes_sent < eth->tx.packet_length)
+      //if (eth->tx.bytes_sent < eth->tx.packet_length)
+      while (eth->tx.bytes_sent < eth->tx.packet_length)
 	{
 	  read_word =
 	    eval_direct32 (eth->tx.bytes_sent + eth->tx.bd_addr, 0, 0);
@@ -282,10 +283,10 @@ eth_controller_tx_clock (void *dat)
 	  eth->tx_buff[eth->tx.bytes_sent + 3] = (unsigned char) (read_word);
 	  eth->tx.bytes_sent += 4;
 	}
-      else
-	{
+      //else
+      //	{
 	  eth->tx.state = ETH_TXSTATE_TRANSMIT;
-	}
+	  //	}
       break;
     case ETH_TXSTATE_TRANSMIT:
       /* send packet */
@@ -295,7 +296,17 @@ eth_controller_tx_clock (void *dat)
 	  nwritten = write (eth->txfd, eth->tx_buff, eth->tx.packet_length);
 	  break;
 	case ETH_RTX_TAP:
+	  /*
 	  printf ("Writing TAP\n");
+	  
+	  printf("packet %d bytes:",(int) eth->tx.packet_length );
+	  int j; for (j=0;j<eth->tx.packet_length;j++)
+		   { if (j%16==0)printf("\n");
+		     else if (j%8==0) printf(" ");
+		     printf("%.2x ", eth->tx_buff[j]);
+		   }
+	  printf("\nend packet:\n");
+	  */
 	  nwritten = write (eth->rtx_fd, eth->tx_buff, eth->tx.packet_length);
 	  break;
 	}
@@ -326,7 +337,7 @@ eth_controller_tx_clock (void *dat)
 	{
 	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, IRQ))
 	    {
-	      printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
+	      //printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
 	      report_interrupt (eth->mac_int);
 	    }
 	}
@@ -404,6 +415,7 @@ eth_controller_rx_clock (void *dat)
 	      eth->rx.offset = 0;
 	    }
 	  eth->rx.state = ETH_RXSTATE_RECV;
+	  //printf("rx_clk: going to ETH_RXSTATE_RECV\n");
 	}
       else if (!TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN))
 	{
@@ -426,7 +438,7 @@ eth_controller_rx_clock (void *dat)
 	    }
 	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
 	    {
-	      printf ("Reading TAP\n");
+	      printf ("Reading TAP and all BDs full = BUSY\n");
 	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
 
 	      if (nread < 0)
@@ -441,7 +453,7 @@ eth_controller_rx_clock (void *dat)
 
 		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
 		    {
-		      printf ("ETH_RXSTATE_WAIT4BD interrupt\n");
+		      printf ("ETH_RXSTATE_WAIT4BD BUSY interrupt\n");
 		      report_interrupt (eth->mac_int);
 		    }
 		}
@@ -509,29 +521,27 @@ eth_controller_rx_clock (void *dat)
 	    }
 	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
 	    {
-	      printf ("Reading TAP\n");
+	      //printf ("Reading TAP. ");
 	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
-
+	      //printf ("%d bytes read.\n",(int) nread);
 	      if (nread < 0)
 		{
 		  fprintf (stderr,
 			   "Warning: Read of RXTATE_RECV failed %s: ignored\n",
-			   strerror (errno));
-		}
-	      else if (nread > 0)
-		{
-		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
+			   strerror (errno));		  		  
 
-		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
+		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXE_M))
 		    {
-		      printf ("ETH_RXTATE_RECV interrupt\n");
+		      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXE);
+ 		      printf ("ETH_RXTATE_RECV RXE interrupt\n");
 		      report_interrupt (eth->mac_int);
 		    }
 		}
+	      
 	    }
 
 	  /* If not promiscouos mode, check the destination address */
-	  if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO))
+	  if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO) && nread)
 	    {
 	      if (TEST_FLAG (eth->regs.moder, ETH_MODER, IAM)
 		  && (eth->rx_buff[0] & 1))
@@ -539,20 +549,40 @@ eth_controller_rx_clock (void *dat)
 		  /* Nothing for now */
 		}
 
-	      if (eth->mac_address[5] != eth->rx_buff[0] ||
-		  eth->mac_address[4] != eth->rx_buff[1] ||
-		  eth->mac_address[3] != eth->rx_buff[2] ||
-		  eth->mac_address[2] != eth->rx_buff[3] ||
-		  eth->mac_address[1] != eth->rx_buff[4] ||
-		  eth->mac_address[0] != eth->rx_buff[5])
+
+	      if (((eth->mac_address[5] != eth->rx_buff[0]) && 
+		   (eth->rx_buff[5] != 0xff) ) ||
+		  ((eth->mac_address[4] != eth->rx_buff[1]) && 
+		   (eth->rx_buff[4] != 0xff) ) ||
+		  ((eth->mac_address[3] != eth->rx_buff[2]) && 
+		   (eth->rx_buff[3] != 0xff) ) ||
+		  ((eth->mac_address[2] != eth->rx_buff[3]) && 
+		   (eth->rx_buff[2] != 0xff) ) ||
+		  ((eth->mac_address[1] != eth->rx_buff[4]) && 
+		   (eth->rx_buff[1] != 0xff) ) ||
+		  ((eth->mac_address[0] != eth->rx_buff[5]) && 
+		   (eth->rx_buff[0] != 0xff)))
+		
+	      {
+		/*
+		  printf("ETH_RXSTATE dropping packet for %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
+		       eth->rx_buff[0],
+		       eth->rx_buff[1],
+		       eth->rx_buff[2],
+		       eth->rx_buff[3],
+		       eth->rx_buff[4],
+		       eth->rx_buff[5]);
+		*/
 		break;
+	      }
 	    }
 
 	  eth->rx.packet_length = nread;
 	  eth->rx.bytes_left = nread;
 	  eth->rx.bytes_read = 0;
 
-	  eth->rx.state = ETH_RXSTATE_WRITEFIFO;
+	  if (nread)
+	    eth->rx.state = ETH_RXSTATE_WRITEFIFO;
 
 	  break;
 	case ETH_RTX_VAPI:
@@ -561,29 +591,43 @@ eth_controller_rx_clock (void *dat)
       break;
 
     case ETH_RXSTATE_WRITEFIFO:
-      send_word = ((unsigned long) eth->rx_buff[eth->rx.bytes_read] << 24) |
-	((unsigned long) eth->rx_buff[eth->rx.bytes_read + 1] << 16) |
-	((unsigned long) eth->rx_buff[eth->rx.bytes_read + 2] << 8) |
-	((unsigned long) eth->rx_buff[eth->rx.bytes_read + 3]);
-      set_direct32 (eth->rx.bd_addr + eth->rx.bytes_read, send_word, 0, 0);
-      /* update counters */
-      eth->rx.bytes_left -= 4;
-      eth->rx.bytes_read += 4;
-
+      //printf("ETH_RXSTATE_WRITEFIFO: writing to %d bytes 0x%.8x\n",(int)eth->rx.bytes_left, (unsigned int)eth->rx.bd_addr);
+      if (eth->rx.bytes_left > 0){
+	while((int) eth->rx.bytes_left){
+	  send_word = ((unsigned long) eth->rx_buff[eth->rx.bytes_read] << 24) |
+	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 1] << 16) |
+	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 2] << 8) |
+	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 3]);
+	  set_direct32 (eth->rx.bd_addr + eth->rx.bytes_read, send_word, 0, 0);
+	  /* update counters */
+	  if (eth->rx.bytes_left >= 4)
+	    {	      
+	      eth->rx.bytes_left -= 4;
+	      eth->rx.bytes_read += 4;
+	    }
+	  else
+	    {
+	      eth->rx.bytes_read += eth->rx.bytes_left;
+	      eth->rx.bytes_left = 0;
+	    }
+	}
+	
+      }
+      //printf("ETH_RXSTATE_WRITEFIFO: bytes read: 0x%.8x\n",(unsigned int)eth->rx.bytes_read);
       if (eth->rx.bytes_left <= 0)
 	{
 	  /* Write result to bd */
-	  SET_FIELD (eth->rx.bd, ETH_RX_BD, LENGTH, eth->rx.packet_length);
+	  SET_FIELD (eth->rx.bd, ETH_RX_BD, LENGTH, eth->rx.packet_length+4);
 	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, READY);
 	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
-
+	  /*
 	  if (eth->rx.packet_length <
 	      (GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MINFL) - 4))
 	    SET_FLAG (eth->rx.bd, ETH_RX_BD, TOOSHORT);
 	  if (eth->rx.packet_length >
 	      GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MAXFL))
 	    SET_FLAG (eth->rx.bd, ETH_RX_BD, TOOBIG);
-
+	  */
 	  eth->regs.bd_ram[eth->rx.bd_index] = eth->rx.bd;
 
 	  /* advance to next BD */
@@ -596,7 +640,7 @@ eth_controller_rx_clock (void *dat)
 	  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXB_M)) &&
 	      (TEST_FLAG (eth->rx.bd, ETH_RX_BD, IRQ)))
 	    {
-	      printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
+	      //printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
 	      report_interrupt (eth->mac_int);
 	    }
 
@@ -745,7 +789,7 @@ eth_reset (void *dat)
 	 specific (persistent) device, one will be created, but that requires
 	 superuser, or at least CAP_NET_ADMIN capabilities. */
       memset (&ifr, 0, sizeof(ifr));
-      ifr.ifr_flags = IFF_TAP; 
+      ifr.ifr_flags = IFF_TAP | IFF_NO_PI; 
       strncpy (ifr.ifr_name, eth->tap_dev, IFNAMSIZ);
 
       if (ioctl (eth->rtx_fd, TUNSETIFF, (void *) &ifr) < 0)
@@ -779,6 +823,8 @@ eth_reset (void *dat)
   memset (&(eth->tx), 0, sizeof (eth->tx));
   memset (&(eth->rx), 0, sizeof (eth->rx));
 
+  /* Reset TX/RX BD indexes */
+  eth->tx.bd_index = 0;
   eth->rx.bd_index = eth->regs.tx_bd_num << 1;
 
   /* Initialize VAPI */
@@ -908,13 +954,20 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 
       if (!TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN) &&
 	  TEST_FLAG (value, ETH_MODER, RXEN))
-	SCHED_ADD (eth_controller_rx_clock, dat, 1);
+	{
+	  // Reset RX BD index
+	  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+	  SCHED_ADD (eth_controller_rx_clock, dat, 1);
+	}
       else if (!TEST_FLAG (value, ETH_MODER, RXEN))
 	SCHED_FIND_REMOVE (eth_controller_rx_clock, dat);
 
       if (!TEST_FLAG (eth->regs.moder, ETH_MODER, TXEN) &&
 	  TEST_FLAG (value, ETH_MODER, TXEN))
-	SCHED_ADD (eth_controller_tx_clock, dat, 1);
+	{
+	  eth->tx.bd_index = 0;
+	  SCHED_ADD (eth_controller_tx_clock, dat, 1);
+	}
       else if (!TEST_FLAG (value, ETH_MODER, TXEN))
 	SCHED_FIND_REMOVE (eth_controller_tx_clock, dat);
 
@@ -924,12 +977,18 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 	eth_reset (dat);
       return;
     case ETH_INT_SOURCE:
-      if (!(eth->regs.int_source & ~value) && eth->regs.int_source)
+      // Clear interrupt if all interrupt sources have been dealt with
+	eth->regs.int_source &= ~value;
+      if (!eth->regs.int_source)
 	clear_interrupt (eth->mac_int);
-      eth->regs.int_source &= ~value;
+      
       return;
     case ETH_INT_MASK:
       eth->regs.int_mask = value;
+      if (eth->regs.int_source & eth->regs.int_mask)
+	report_interrupt (eth->mac_int);
+      else
+	clear_interrupt (eth->mac_int);
       return;
     case ETH_IPGT:
       eth->regs.ipgt = value;
@@ -1349,7 +1408,7 @@ eth_miim_trans (void *dat)
 	      eth->regs.miirx_data = 0x1613; /* Micrel PHYID */
 	      break;
 	    case MII_ADVERTISE:
-	      eth->regs.miirx_data = 0;
+	      eth->regs.miirx_data = ADVERTISE_FULL;
 	      break;
 	    case MII_LPA:
 	      eth->regs.miirx_data = LPA_DUPLEX | LPA_100;
@@ -1458,6 +1517,7 @@ eth_sec_start (void)
   new->rtx_type     = ETH_RTX_FILE;
   new->rx_channel   = 0;
   new->tx_channel   = 0;
+  new->rtx_fd       = 0;
   new->rxfile       = strdup ("eth_rx");
   new->txfile       = strdup ("eth_tx");
   new->tap_dev      = strdup ("");

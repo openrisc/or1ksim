@@ -1,3 +1,7 @@
+2010-11-30  Julius Baxter <julius@opencores.org>
+	* cpu/or1k/sprs.c: Clarify commenting on PIC_PICSR register.
+	* peripheral/eth.c: Many changes.	
+
 2010-11-26  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
