@@ -3,8 +3,10 @@
    Copyright (C) 2001 by Erez Volk, erez@opencores.org
                          Ivan Guzvinec, ivang@opencores.org
    Copyright (C) 2008 Embecosm Limited
+   Copyright (C) 2010 ORSoC
 
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+   Contributor Julius Baxter <julius@orsoc.se>
 
    This file is part of Or1ksim, the OpenRISC 1000 Architectural Simulator.
 
@@ -77,8 +79,11 @@ struct eth_device
   /* Our address */
   unsigned char mac_address[ETHER_ADDR_LEN];
 
-  /* interrupt line */
+  /* interrupt line number */
   unsigned long mac_int;
+
+  /* interrupt line status */
+  int int_line_stat;
 
   /* VAPI ID */
   unsigned long base_vapi_id;
@@ -174,6 +179,8 @@ static void eth_skip_rx_file (struct eth_device *, off_t);
 static void eth_rx_next_packet (struct eth_device *);
 static void eth_write_tx_bd_num (struct eth_device *, unsigned long value);
 static void eth_miim_trans (void *dat);
+
+#define ETH_DEBUG 0
 
 
 /* ========================================================================== */
@@ -296,7 +303,7 @@ eth_controller_tx_clock (void *dat)
 	  nwritten = write (eth->txfd, eth->tx_buff, eth->tx.packet_length);
 	  break;
 	case ETH_RTX_TAP:
-	  /*
+#if ETH_DEBUG
 	  printf ("Writing TAP\n");
 	  
 	  printf("packet %d bytes:",(int) eth->tx.packet_length );
@@ -306,7 +313,7 @@ eth_controller_tx_clock (void *dat)
 		     printf("%.2x ", eth->tx_buff[j]);
 		   }
 	  printf("\nend packet:\n");
-	  */
+#endif	  
 	  nwritten = write (eth->rtx_fd, eth->tx_buff, eth->tx.packet_length);
 	  break;
 	}
@@ -327,18 +334,24 @@ eth_controller_tx_clock (void *dat)
 	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXE);
 
 	  eth->tx.state = ETH_TXSTATE_WAIT4BD;
+	  
 	}
 
       eth->regs.bd_ram[eth->tx.bd_index] = eth->tx.bd;
+
+      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
 
       /* generate OK interrupt */
       if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
 	  TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M))
 	{
-	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, IRQ))
+	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, IRQ) && !eth->int_line_stat)
 	    {
-	      //printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
+#if ETH_DEBUG
+	      printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
+#endif
 	      report_interrupt (eth->mac_int);
+	      eth->int_line_stat = 1;
 	    }
 	}
 
@@ -356,7 +369,10 @@ eth_controller_tx_clock (void *dat)
     }
 
   /* Reschedule */
-  SCHED_ADD (eth_controller_tx_clock, dat, 1);
+  if (eth->tx.state == ETH_TXSTATE_WAIT4BD)
+    SCHED_ADD (eth_controller_tx_clock, dat, 10);
+  else
+    SCHED_ADD (eth_controller_tx_clock, dat, 1);
 }
 
 /* ========================================================================= */
@@ -415,7 +431,7 @@ eth_controller_rx_clock (void *dat)
 	      eth->rx.offset = 0;
 	    }
 	  eth->rx.state = ETH_RXSTATE_RECV;
-	  //printf("rx_clk: going to ETH_RXSTATE_RECV\n");
+
 	}
       else if (!TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN))
 	{
@@ -451,10 +467,12 @@ eth_controller_rx_clock (void *dat)
 		{
 		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
 
-		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
+		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M) &&
+		      !eth->int_line_stat)
 		    {
 		      printf ("ETH_RXSTATE_WAIT4BD BUSY interrupt\n");
 		      report_interrupt (eth->mac_int);
+		      eth->int_line_stat = 1;
 		    }
 		}
 	    }
@@ -521,20 +539,27 @@ eth_controller_rx_clock (void *dat)
 	    }
 	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
 	    {
-	      //printf ("Reading TAP. ");
+#if ETH_DEBUG
+	      printf ("Reading TAP. ");
+#endif
 	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
-	      //printf ("%d bytes read.\n",(int) nread);
+#if ETH_DEBUG
+	      printf ("%d bytes read.\n",(int) nread);
+#endif
 	      if (nread < 0)
 		{
 		  fprintf (stderr,
 			   "Warning: Read of RXTATE_RECV failed %s: ignored\n",
 			   strerror (errno));		  		  
 
-		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXE_M))
-		    {
-		      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXE);
+		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXE);
+
+		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXE_M) &&
+		      !eth->int_line_stat)
+		    {		      
  		      printf ("ETH_RXTATE_RECV RXE interrupt\n");
 		      report_interrupt (eth->mac_int);
+		      eth->int_line_stat = 1;
 		    }
 		}
 	      
@@ -564,7 +589,7 @@ eth_controller_rx_clock (void *dat)
 		   (eth->rx_buff[0] != 0xff)))
 		
 	      {
-		/*
+#if ETH_DEBUG		
 		  printf("ETH_RXSTATE dropping packet for %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
 		       eth->rx_buff[0],
 		       eth->rx_buff[1],
@@ -572,7 +597,7 @@ eth_controller_rx_clock (void *dat)
 		       eth->rx_buff[3],
 		       eth->rx_buff[4],
 		       eth->rx_buff[5]);
-		*/
+#endif
 		break;
 	      }
 	    }
@@ -591,7 +616,11 @@ eth_controller_rx_clock (void *dat)
       break;
 
     case ETH_RXSTATE_WRITEFIFO:
-      //printf("ETH_RXSTATE_WRITEFIFO: writing to %d bytes 0x%.8x\n",(int)eth->rx.bytes_left, (unsigned int)eth->rx.bd_addr);
+#if ETH_DEBUG
+      printf("ETH_RXSTATE_WRITEFIFO: writing to RXBD%d: %d bytes @ 0x%.8x\n",
+	     (int) eth->rx.bd_index/2,  (int)eth->rx.bytes_left, 
+	     (unsigned int)eth->rx.bd_addr);
+#endif
       if (eth->rx.bytes_left > 0){
 	while((int) eth->rx.bytes_left){
 	  send_word = ((unsigned long) eth->rx_buff[eth->rx.bytes_read] << 24) |
@@ -613,11 +642,14 @@ eth_controller_rx_clock (void *dat)
 	}
 	
       }
-      //printf("ETH_RXSTATE_WRITEFIFO: bytes read: 0x%.8x\n",(unsigned int)eth->rx.bytes_read);
+#if ETH_DEBUG
+      printf("ETH_RXSTATE_WRITEFIFO: bytes read: 0x%.8x\n",
+	     (unsigned int)eth->rx.bytes_read);
+#endif
       if (eth->rx.bytes_left <= 0)
 	{
 	  /* Write result to bd */
-	  SET_FIELD (eth->rx.bd, ETH_RX_BD, LENGTH, eth->rx.packet_length+4);
+	  SET_FIELD (eth->rx.bd, ETH_RX_BD, LENGTH, eth->rx.packet_length + 4);
 	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, READY);
 	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
 	  /*
@@ -637,11 +669,17 @@ eth_controller_rx_clock (void *dat)
 	  else
 	    eth->rx.bd_index += 2;
 
+	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
+
 	  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXB_M)) &&
-	      (TEST_FLAG (eth->rx.bd, ETH_RX_BD, IRQ)))
+	      (TEST_FLAG (eth->rx.bd, ETH_RX_BD, IRQ)) &&
+	      !eth->int_line_stat)
 	    {
-	      //printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
+#if ETH_DEBUG
+	      printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
+#endif
 	      report_interrupt (eth->mac_int);
+	      eth->int_line_stat = 1;
 	    }
 
 	  /* ready to receive next packet */
@@ -651,7 +689,10 @@ eth_controller_rx_clock (void *dat)
     }
 
   /* Reschedule */
-  SCHED_ADD (eth_controller_rx_clock, dat, 1);
+  if (eth->rx.state == ETH_RXSTATE_RECV)
+    SCHED_ADD (eth_controller_rx_clock, dat, 10);
+  else
+    SCHED_ADD (eth_controller_rx_clock, dat, 1);
 }
 
 /* ========================================================================= */
@@ -717,8 +758,9 @@ eth_reset (void *dat)
   struct eth_device *eth = dat;
   struct ifreq       ifr;
 
+#if ETH_DEBUG
   printf ("Resetting Ethernet\n");
-
+#endif
   /* Nothing to do if we do not have a base address set.
 
      TODO: Surely this should test for being enabled? */
@@ -800,9 +842,9 @@ eth_reset (void *dat)
 	  eth->rtx_fd = 0;
 	  return;
 	}
-
+#if ETH_DEBUG
       PRINTF ("Opened TAP %s\n", ifr.ifr_name);
-
+#endif
       /* Do we need to flush any packets? */
       break;
     }
@@ -826,6 +868,9 @@ eth_reset (void *dat)
   /* Reset TX/RX BD indexes */
   eth->tx.bd_index = 0;
   eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+
+  /* Reset IRQ line status */
+  eth->int_line_stat = 0;
 
   /* Initialize VAPI */
   if (eth->base_vapi_id)
@@ -951,15 +996,50 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
   switch (addr)
     {
     case ETH_MODER:
-
+#if ETH_DEBUG
+      printf("eth_write32: MODER 0x%x\n",value);
+#endif
       if (!TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN) &&
 	  TEST_FLAG (value, ETH_MODER, RXEN))
 	{
 	  // Reset RX BD index
 	  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+	  
+	  // Clear TAP
+	  {
+	    /* Poll to see if there is data to read */
+	    struct pollfd  fds[1];
+	    int    n;
+	    int nread;
+	    
+	    fds[0].fd = eth->rtx_fd;
+	    fds[0].events = POLLIN;
+	    
+	    do {
+	      n = poll (fds, 1, 0);
+	      if (n < 0)
+		{
+		  fprintf (stderr, "Warning: Poll in while emptying TAP: %s: ignored.\n",
+			   strerror (errno));
+		}
+	      else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
+		{
+		  nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
+		  
+		  if (nread < 0)
+		    {
+		      fprintf (stderr,
+			       "Warning: Read failed %s: ignored\n",
+			       strerror (errno));
+		    }	    
+		}
+	    } while (n > 0);
+	  }
+	  
 	  SCHED_ADD (eth_controller_rx_clock, dat, 1);
 	}
-      else if (!TEST_FLAG (value, ETH_MODER, RXEN))
+      else if (!TEST_FLAG (value, ETH_MODER, RXEN) &&
+	       TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN))
 	SCHED_FIND_REMOVE (eth_controller_rx_clock, dat);
 
       if (!TEST_FLAG (eth->regs.moder, ETH_MODER, TXEN) &&
@@ -968,7 +1048,8 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 	  eth->tx.bd_index = 0;
 	  SCHED_ADD (eth_controller_tx_clock, dat, 1);
 	}
-      else if (!TEST_FLAG (value, ETH_MODER, TXEN))
+      else if (!TEST_FLAG (value, ETH_MODER, TXEN) &&
+	       TEST_FLAG (eth->regs.moder, ETH_MODER, TXEN))
 	SCHED_FIND_REMOVE (eth_controller_tx_clock, dat);
 
       eth->regs.moder = value;
@@ -977,18 +1058,32 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 	eth_reset (dat);
       return;
     case ETH_INT_SOURCE:
-      // Clear interrupt if all interrupt sources have been dealt with
-	eth->regs.int_source &= ~value;
-      if (!eth->regs.int_source)
-	clear_interrupt (eth->mac_int);
+#if ETH_DEBUG
+      printf("eth_write32: INT_SOURCE 0x%x\n",value);
+#endif
+      eth->regs.int_source &= ~value;
+      
+      // Clear IRQ line if all interrupt sources have been dealt with
+      if (!(eth->regs.int_source & eth->regs.int_mask) && eth->int_line_stat)
+	{
+	  clear_interrupt (eth->mac_int);
+	  eth->int_line_stat = 0;
+	}
       
       return;
     case ETH_INT_MASK:
+#if ETH_DEBUG
+      printf("eth_write32: INT_MASK 0x%x\n",value);
+#endif
       eth->regs.int_mask = value;
-      if (eth->regs.int_source & eth->regs.int_mask)
+      if ((eth->regs.int_source & eth->regs.int_mask) && !eth->int_line_stat)
 	report_interrupt (eth->mac_int);
       else
-	clear_interrupt (eth->mac_int);
+	if (eth->int_line_stat)
+	  {
+	    clear_interrupt (eth->mac_int);
+	    eth->int_line_stat = 0;
+	  }
       return;
     case ETH_IPGT:
       eth->regs.ipgt = value;
@@ -1514,6 +1609,7 @@ eth_sec_start (void)
   new->baseaddr     = 0;
   new->dma          = 0;
   new->mac_int      = 0;
+  new->int_line_stat= 0;
   new->rtx_type     = ETH_RTX_FILE;
   new->rx_channel   = 0;
   new->tx_channel   = 0;
