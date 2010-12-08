@@ -146,7 +146,7 @@ report_interrupt (int line)
   if (cpu_state.sprs[SPR_PICSR] & lmask)
     {
       /* Interrupt already signaled and pending */
-      PRINTF ("Warning: Int on line %d pending: ignored\n", line);     
+      PRINTF ("Warning: Int on line %d pending: ignored\n", line);
       return;
     }
 
@@ -157,7 +157,7 @@ report_interrupt (int line)
   if ((cpu_state.sprs[SPR_PICMR] & lmask) &&
       (cpu_state.sprs[SPR_SR] & SPR_SR_IEE))
     {
-      
+      /* printf ("Scheduling interrupt on line %d\n", line); */
       SCHED_ADD (pic_rep_int, NULL, 0);
     }
 }	/* report_interrupt () */
@@ -177,7 +177,7 @@ report_interrupt (int line)
 void
 clear_interrupt (int line)
 {
-  cpu_state.sprs[SPR_PICSR] &= ~(1 << line);  
+  cpu_state.sprs[SPR_PICSR] &= ~(1 << line);
 
 }	/* clear_interrupt */
 

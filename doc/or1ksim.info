@@ -1,5 +1,5 @@
-This is ../../or1ksim/doc/or1ksim.info, produced by makeinfo version
-4.13 from ../../or1ksim/doc/or1ksim.texi.
+This is ../../doc/or1ksim.info, produced by makeinfo version 4.13 from
+../../doc/or1ksim.texi.
 
 INFO-DIR-SECTION Embedded development
 START-INFO-DIR-ENTRY
@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-11-26.tar.bz2
+     tar jxf or1ksim-2010-12-08.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-11-26/configure --target=or32-uclinux ...
+     ../or1ksim-2010-12-08/configure --target=or32-uclinux ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -286,6 +286,7 @@ File: or1ksim.info,  Node: Usage,  Next: Configuration,  Prev: Installation,  Up
 * Profiling Utility::
 * Memory Profiling Utility::
 * Simulator Library::
+* Ethernet TUN/TAP Interface::
 
 
 File: or1ksim.info,  Node: Standalone Simulator,  Next: Profiling Utility,  Up: Usage
@@ -509,7 +510,7 @@ Many of the options have both a short and a long form.  For example
 
 
 
-File: or1ksim.info,  Node: Simulator Library,  Prev: Memory Profiling Utility,  Up: Usage
+File: or1ksim.info,  Node: Simulator Library,  Next: Ethernet TUN/TAP Interface,  Prev: Memory Profiling Utility,  Up: Usage
 
 2.4 Simulator Library
 =====================
@@ -755,6 +756,189 @@ one of the following:
 
    * Add the library directory to `/etc/ld.so.conf'
 
+
+
+File: or1ksim.info,  Node: Ethernet TUN/TAP Interface,  Prev: Simulator Library,  Up: Usage
+
+2.5 Ethernet TUN/TAP Interface
+==============================
+
+When an Ethernet peripheral is configured (*note Ethernet
+Configuration: Ethernet Configuration.), one option is to tunnel
+traffic through a TUN/TAP interface.  The low level TAP interface is
+used to tunnel raw Ethernet datagrams.
+
+The TAP interface can then be connected to a physical Ethernet through a
+bridge, allowing the Or1ksim model to connect to a physical network.
+This is particularly when Or1ksim is running the OpenRISC Linux kernel
+image.
+
+This section explains how to set up a bridge for use by Or1ksim. It does
+require superuser access to the host machine (or at least the relevant
+network capabilities). A system administrator can modify these
+guidelines so they are executed on reboot if appropriate.
+
+* Menu:
+
+* Setting Up a Persistent TAP device::
+* Establishing a Bridge::
+* Opening the Firewall::
+* Disabling Ethernet Filtering::
+* Networking from OpenRISC Linux and BusyBox::
+* Tearing Down a Bridge::
+
+
+File: or1ksim.info,  Node: Setting Up a Persistent TAP device,  Next: Establishing a Bridge,  Up: Ethernet TUN/TAP Interface
+
+2.5.1 Setting Up a Persistent TAP device
+----------------------------------------
+
+TUN/TAP devices can be created dynamically, but this requires superuser
+privileges (or at least `CAP_NET_ADMIN' capability).  The solution is
+to create a persistent TAP device.  This can be done using either
+`openvpn' or `tunctl'.  In either case the package must be installed on
+the host system.  Using `openvpn', the following would set up a TAP
+interface for a specified user and group.
+
+     openvpn --mktun --dev tap_n_ --user _username_ --group _groupname_
+
+
+File: or1ksim.info,  Node: Establishing a Bridge,  Next: Opening the Firewall,  Prev: Setting Up a Persistent TAP device,  Up: Ethernet TUN/TAP Interface
+
+2.5.2 Establishing a Bridge
+---------------------------
+
+A bridge is a "virtual" local area network interfaces, subsuming two or
+more existing network interfaces.  In this case we will bridge the
+physical Ethernet interface of the host with the TAP interface that
+will be used by Or1ksim.
+
+The Ethernet and TAP must lose their own individual IP addresses (by
+setting them to 0.0.0.0) and are replaced by the IP address of the
+bridge interface. To do this we use the `bridge-utils' package, which
+must be installed on the host system. These commands are require
+superuser privileges or `CAP_NET_ADMIN' capability. To create a new
+interface `br_n_' the following commands are appropriate.
+
+     brctl addbr br_n_
+     brctl addif br_n_ eth_x_
+     brctl addif br_n_ tap_y_
+
+     ifconfig eth_x_ 0.0.0.0 promisc up
+     ifconfig tap_y_ 0.0.0.0 promisc up
+
+     dhclient br_n_
+
+The last command instructs the bridge to obtain its IP address, netmask,
+broadcast address, gateway and nameserver information using DHCP.  In a
+network without DHCP it should be replaced by `ifconfig' to set a
+static IP address, netmask and broadcast address.
+
+     Note: This will leave a spare dhclient process running in the
+     background, which should be killed for tidiness. There is a
+     technique to avoid this using `omshell', but that is beyond the
+     scope of this guide.
+
+     Note: It is not clear to the author why the existing interfaces
+     need to be brought up in promiscuous mode, but it seems to cure
+     various problems.
+
+
+File: or1ksim.info,  Node: Opening the Firewall,  Next: Disabling Ethernet Filtering,  Prev: Establishing a Bridge,  Up: Ethernet TUN/TAP Interface
+
+2.5.3 Opening the Firewall
+--------------------------
+
+Firewall rules should be added to ensure traffic flows freely through
+the TAP and bridge interfaces. As superuser the following commands are
+appropriate.
+
+     iptables -A INPUT -i tap_y_ -j ACCEPT
+     iptables -A INPUT -i br_n_ -j ACCEPT
+     iptables -A FORWARD -i br_n_ -j ACCEPT
+
+
+File: or1ksim.info,  Node: Disabling Ethernet Filtering,  Next: Networking from OpenRISC Linux and BusyBox,  Prev: Opening the Firewall,  Up: Ethernet TUN/TAP Interface
+
+2.5.4 Disabling Ethernet Filtering
+----------------------------------
+
+Some systems may have ethernet filtering enabled (`ebtables',
+`bridge-nf', `arptables') which will stop traffic flowing through the
+bridge.
+
+The easiest way to disable this is by writing zero to all `bridge-nf-*'
+entries in `/proc/sys/net/bridge'. As superuser the following commands
+will achieve this.
+
+     cd /proc/sys/net/bridge
+     for f in bridge-nf-*; do echo 0 > $f; done
+
+
+File: or1ksim.info,  Node: Networking from OpenRISC Linux and BusyBox,  Next: Tearing Down a Bridge,  Prev: Disabling Ethernet Filtering,  Up: Ethernet TUN/TAP Interface
+
+2.5.5 Networking from OpenRISC Linux and BusyBox
+------------------------------------------------
+
+The main use of this style of Ethernet interface to Or1ksim is when
+running the OpenRISC Linux kernel with BusyBox. The following commands
+in the BusyBox console window will configure the Ethernet interface
+(assumed to be `eth0') and bring it up with a DHCP assigned address.
+
+     ifconfig eth0
+     ifup eth0
+
+At this stage interface to IP addresses will work correctly.
+
+For DNS to work the BusyBox system needs to know where to find a
+nameserver.  Under BusyBox, `udhcp' does not configure
+`/etc/resolv.conf' automatically.
+
+The solution is to duplicate the nameserver entry from the
+`/etc/resolv.conf' file of the host on the BusyBox system. A typical
+file might be as follows:
+
+     `nameserver 192.168.0.1'
+
+It is convenient to make this permanent within the Linux initramfs. Add
+the file as `arch/openrisc/support/initramfs/etc/resolv.conf' within
+the Linux source tree and rebuild `vmlinux'. It will then be present
+automatically.
+
+One of the most useful functions that is possible is to mount the host
+file system through NFS. For example, from the BusyBox console:
+
+     mount -t nfs -o nolock 192.168.0.60:/home /mnt
+
+Another useful technique is to telnet into the BusyBox system from the
+host. This is particularly valuable when a console process locks up,
+since the `xterm' console will not recognize ctrl-C. Instead the rogue
+process can be killed from a telnet connection.
+
+
+File: or1ksim.info,  Node: Tearing Down a Bridge,  Prev: Networking from OpenRISC Linux and BusyBox,  Up: Ethernet TUN/TAP Interface
+
+2.5.6 Tearing Down a Bridge
+---------------------------
+
+There is little reason why a bridge should ever need to be torn down,
+but if desired, the following commands will achieve the effect.
+
+     ifconfig br_n_ down
+     brctl delbr br_n_
+
+     dhclient eth_x_
+
+As before this will leave a spare `dhclient' process in the background
+which should be killed.
+
+If desired the TAP interface can be deleted using
+
+     openvpn --rmtun -dev tap_y_
+
+     Caution: The TAP interface should not be in use when running this
+     command. For example any OpenRISC Linux/BusyBox sessions should be
+     closed first.
 
 
 File: or1ksim.info,  Node: Configuration,  Next: Interactive Command Line,  Prev: Usage,  Up: Top
@@ -1948,16 +2132,17 @@ File: or1ksim.info,  Node: Ethernet Configuration,  Next: GPIO Configuration,  P
 3.4.4 Ethernet Configuration
 ----------------------------
 
-The Ethernet MAC used in Or1ksim is the component implemented at
-OpenCores, and found in the top level SVN directory, `ethmac'.  It also
-forms part of the OpenRISC SoC, ORPSoC.  It is described in the
-document `Ethernet IP Core Specification' by Igor Mohor, which can be
-found in the `doc' subdirectory.  It is a memory mapped component,
-which resides on the main OpenRISC Wishbone data bus.
-
 Ethernet configuration is described in `section ethernet'.  This
 section may appear multiple times, specifying multiple Ethernet
 interfaces.  The following parameters may be specified.
+
+The Ethernet MAC used in Or1ksim corresponds to the Verilog
+implementation in project "ethmac". It's source code can be found in
+the top level SVN directory, `ethmac'.  It also forms part of the
+OpenRISC reference SoC, ORPSoC.  It is described in the document
+`Ethernet IP Core Specification' by Igor Mohor, which can be found in
+the `doc' subdirectory.  It is a memory mapped component, which resides
+on the main OpenRISC Wishbone data bus.
 
 `enabled = 0|1'
      If 1 (true, the default), this Ethernet MAC is enabled.  If 0, it
@@ -1987,18 +2172,25 @@ interfaces.  The following parameters may be specified.
 `irq = VALUE'
      Use VALUE as the IRQ number of this Ethernet MAC.  Default value 0.
 
-`rtx_type = 0|1'
-     If 1 (true) use a socket interface to the Ethernet (see parameter
-     `sockif' below).  If 0 (the default), use a file interface,
-     reading and writing from and to the files specified in the
-     `rxfile' and `txfile' parameters (see below).
+`rtx_type = "file"|"tap"'
+     Specifies whether to use a TUN/TAP interface or file interface
+     (the default) to model the external connection of the Ethernet.
 
-          Note: By default the socket interface is not provided in
-          Or1ksim.  If it is required, this must be requested when
-          configuring, by use of the `--enable-ethphy' option to
-          `configure'.
+     If a TUN/TAP interface is requested, Ethernet packets will be sent
+     and received through the pesistent TAP interface specified in
+     parameter `tap_dev' (see below).
 
-               configure --target=or32-uclinux --enable-ethphy ...
+     More details on configuring the TUN/TAP interface are given in the
+     Usage section (*note Ethernet TUN/TAP Interface: Ethernet TUN/TAP
+     Interface.).
+
+     If a file interface (the default), is requested, the Ethernet will
+     be modelled by reading and writing from and to the files specified
+     in the `rxfile' and `txfile' parameters (see below).
+
+          Caution: If a file interface is specified, Or1ksim will
+          terminate once the receive file specified by `rxfile' is
+          exhausted.
 
 `rx_channel = RXVALUE'
 `tx_channel = TXVALUE'
@@ -2024,10 +2216,13 @@ interfaces.  The following parameters may be specified.
      writable and will be created if necessary.  If either of these
      conditions is not met, a warning will be given.
 
-`sockif = "SERVICE"'
-     When `rtx_type' is 1 (see above), SERVICE specifies the service to
-     use for communication.  This may be TCP/IP or UDP/IP.  The default
-     value of this parameter is `"or1ksim_eth"'.
+          Caution: Or1ksim will terminate once the RXFILE is exhausted.
+
+`tap_dev = "TAP"'
+     When `rtx_type' is `"tap"' (see above), TAP_DEV specifies the TAP
+     device to use for communication.  This should be a persistent TAP
+     device configured for the system (*note Ethernet TUN/TAP
+     Interface: Ethernet TUN/TAP Interface.)
 
 `vapi_id = VALUE'
      VALUE specifies the value of the Verification API (VAPI) base
@@ -2036,8 +2231,9 @@ interfaces.  The following parameters may be specified.
      VAPI with the DMA controller.
 
 `phy_addr = VALUE'
-     VALUE specifies address for emulated ethernet PHY. Defaults to 0
-     otherwise.
+     VALUE specifies the address for emulated ethernet PHY (default 0).
+     If there are multiple Ethernet peripherals, they should each have a
+     different PHY value.
 
 
 
@@ -3680,7 +3876,7 @@ Index
                                                               (line  26)
 * baseaddr (DMA configuration):          DMA Configuration.   (line  24)
 * baseaddr (Ethernet configuration):     Ethernet Configuration.
-                                                              (line  22)
+                                                              (line  23)
 * baseaddr (frame buffer configuration): Frame Buffer Configuration.
                                                               (line  20)
 * baseaddr (generic peripheral configuration): Generic Peripheral Configuration.
@@ -3708,8 +3904,12 @@ Index
                                                               (line  57)
 * breaks (Interactive CLI):              Interactive Command Line.
                                                               (line  60)
+* bridge setup:                          Establishing a Bridge.
+                                                              (line   6)
 * btic (branch prediction configuration): Branch Prediction Configuration.
                                                               (line  19)
+* BusyBox and Ethernet:                  Networking from OpenRISC Linux and BusyBox.
+                                                              (line   6)
 * byte_enabled (generic peripheral configuration): Generic Peripheral Configuration.
                                                               (line  48)
 * cache configuration:                   Cache Configuration. (line   6)
@@ -3781,6 +3981,8 @@ Index
                                                               (line   6)
 * configuring the Ethernet interface:    Ethernet Configuration.
                                                               (line   6)
+* configuring the Ethernet TUN/TAP interface: Ethernet TUN/TAP Interface.
+                                                              (line   6)
 * configuring the frame buffer:          Frame Buffer Configuration.
                                                               (line   6)
 * configuring the GPIO:                  GPIO Configuration.  (line   6)
@@ -3850,7 +4052,7 @@ Index
 * dm (Interactive CLI):                  Interactive Command Line.
                                                               (line  31)
 * dma (Ethernet configuration):          Ethernet Configuration.
-                                                              (line  33)
+                                                              (line  34)
 * DMA configuration:                     DMA Configuration.   (line   6)
 * DMA verification (VAPI):               Verification API.    (line  73)
 * dma_mode0_td (ATA/ATAPI configuration): Disc Interface Configuration.
@@ -3885,7 +4087,7 @@ Index
                                                               (line  11)
 * enabled (DMA configuration):           DMA Configuration.   (line  20)
 * enabled (Ethernet configuration):      Ethernet Configuration.
-                                                              (line  18)
+                                                              (line  19)
 * enabled (frame buffer configuration):  Frame Buffer Configuration.
                                                               (line  16)
 * enabled (generic peripheral configuration): Generic Peripheral Configuration.
@@ -3912,6 +4114,8 @@ Index
                                                               (line  32)
 * ETH_VAPI_CTRL (Ethernet verification): Verification API.    (line  86)
 * ETH_VAPI_DATA (Ethernet verification): Verification API.    (line  84)
+* Ethernet bridge setup:                 Establishing a Bridge.
+                                                              (line   6)
 * Ethernet configuration:                Ethernet Configuration.
                                                               (line   6)
 * Ethernet verification (VAPI):          Verification API.    (line  78)
@@ -3953,6 +4157,8 @@ Index
                                                               (line  36)
 * filename (VGA configuration - deprecated): Display Interface Configuration.
                                                               (line  47)
+* firewall with Ethernet bridge and TAP/TUN: Opening the Firewall.
+                                                              (line   6)
 * firmware (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 121)
 * flag setting by instructions:          Configuring the Build.
@@ -4025,6 +4231,8 @@ Index
                                                               (line   6)
 * library version of Or1ksim:            Simulator Library.   (line   6)
 * license for Or1ksim:                   GNU Free Documentation License.
+                                                              (line   6)
+* Linux (OpenRISC) and Ethernet:         Networking from OpenRISC Linux and BusyBox.
                                                               (line   6)
 * list breakpoints (Interactive CLI):    Interactive Command Line.
                                                               (line  60)
@@ -4131,8 +4339,10 @@ Index
                                                               (line  82)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
+* persistent TAP device creation:        Setting Up a Persistent TAP device.
+                                                              (line   6)
 * phy_addr:                              Ethernet Configuration.
-                                                              (line  94)
+                                                              (line 105)
 * PIC configuration:                     Interrupt Configuration.
                                                               (line   6)
 * pio (ATA/ATAPI device configuration):  Disc Interface Configuration.
@@ -4237,7 +4447,7 @@ Index
 * rsp_port (debug interface configuration): Debug Interface Configuration.
                                                               (line  32)
 * rtx_type (Ethernet configuration):     Ethernet Configuration.
-                                                              (line  46)
+                                                              (line  47)
 * run (Interactive CLI):                 Interactive Command Line.
                                                               (line  23)
 * running code (Interactive CLI):        Interactive Command Line.
@@ -4255,9 +4465,9 @@ Index
 * runtime.vapi:                          Global Data Structures.
                                                               (line  62)
 * rx_channel (Ethernet configuration):   Ethernet Configuration.
-                                                              (line  59)
+                                                              (line  67)
 * rxfile (Ethernet configuration):       Ethernet Configuration.
-                                                              (line  68)
+                                                              (line  76)
 * sbp_bf_fwd (branch prediction configuration): Branch Prediction Configuration.
                                                               (line  23)
 * sbp_bnf_fwd (branch prediction configuration): Branch Prediction Configuration.
@@ -4336,8 +4546,6 @@ Index
                                                               (line  12)
 * SME (power management register):       Power Management Configuration.
                                                               (line  16)
-* sockif (Ethernet configuration):       Ethernet Configuration.
-                                                              (line  83)
 * sr (CPU configuration):                CPU Configuration.   (line  53)
 * stall (Interactive CLI):               Interactive Command Line.
                                                               (line  72)
@@ -4362,6 +4570,10 @@ Index
                                                               (line  24)
 * t (Interactive CLI):                   Interactive Command Line.
                                                               (line  19)
+* TAP device creation:                   Setting Up a Persistent TAP device.
+                                                              (line   6)
+* tap_dev (Ethernet configuration):      Ethernet Configuration.
+                                                              (line  93)
 * target test code:                      Regression Testing.  (line  63)
 * TCP/IP port range:                     Verification API Configuration.
                                                               (line  23)
@@ -4384,9 +4596,9 @@ Index
 * toggle debug mode (Interactive CLI):   Interactive Command Line.
                                                               (line 151)
 * tx_channel (Ethernet configuration):   Ethernet Configuration.
-                                                              (line  60)
+                                                              (line  68)
 * txfile (Ethernet configuration):       Ethernet Configuration.
-                                                              (line  69)
+                                                              (line  77)
 * txfile (frame buffer configuration):   Frame Buffer Configuration.
                                                               (line  36)
 * txfile (VGA configuration):            Display Interface Configuration.
@@ -4433,7 +4645,7 @@ Index
 * vapi_id (debug interface configuration): Debug Interface Configuration.
                                                               (line  43)
 * vapi_id (DMA configuration) <1>:       Ethernet Configuration.
-                                                              (line  88)
+                                                              (line  99)
 * vapi_id (DMA configuration):           DMA Configuration.   (line  38)
 * vapi_id (GPIO configuration):          GPIO Configuration.  (line  32)
 * vapi_id (UART configuration):          UART Configuration.  (line  85)
@@ -4455,56 +4667,63 @@ Index
 
 
 Tag Table:
-Node: Top830
-Node: Installation1240
-Node: Preparation1487
-Node: Configuring the Build1782
-Node: Build and Install7926
-Node: Known Issues8704
-Node: Usage9759
-Node: Standalone Simulator9973
-Node: Profiling Utility14537
-Node: Memory Profiling Utility15447
-Node: Simulator Library16812
-Node: Configuration27217
-Node: Configuration File Format27829
-Node: Configuration File Preprocessing28214
-Node: Configuration File Syntax28511
-Node: Simulator Configuration31296
-Node: Simulator Behavior31587
-Node: Verification API Configuration36168
-Node: CUC Configuration38108
-Node: Core OpenRISC Configuration40100
-Node: CPU Configuration40602
-Node: Memory Configuration44721
-Node: Memory Management Configuration51443
-Node: Cache Configuration53820
-Node: Interrupt Configuration56206
-Node: Power Management Configuration58039
-Node: Branch Prediction Configuration59316
-Node: Debug Interface Configuration60676
-Node: Peripheral Configuration63019
-Node: Memory Controller Configuration63645
-Node: UART Configuration67425
-Node: DMA Configuration70944
-Node: Ethernet Configuration72811
-Node: GPIO Configuration76893
-Node: Display Interface Configuration78526
-Node: Frame Buffer Configuration80835
-Node: Keyboard Configuration82699
-Node: Disc Interface Configuration84937
-Node: Generic Peripheral Configuration90041
-Node: Interactive Command Line92336
-Node: Verification API99310
-Node: Code Internals103740
-Node: Coding Conventions104323
-Node: Global Data Structures108750
-Node: Concepts111407
-Ref: Output Redirection111552
-Ref: Interrupts Internal112090
-Node: Internal Debugging113243
-Node: Regression Testing113767
-Node: GNU Free Documentation License117556
-Node: Index139963
+Node: Top814
+Node: Installation1224
+Node: Preparation1471
+Node: Configuring the Build1766
+Node: Build and Install7910
+Node: Known Issues8688
+Node: Usage9743
+Node: Standalone Simulator9988
+Node: Profiling Utility14552
+Node: Memory Profiling Utility15462
+Node: Simulator Library16827
+Node: Ethernet TUN/TAP Interface27267
+Node: Setting Up a Persistent TAP device28350
+Node: Establishing a Bridge29025
+Node: Opening the Firewall30708
+Node: Disabling Ethernet Filtering31199
+Node: Networking from OpenRISC Linux and BusyBox31824
+Node: Tearing Down a Bridge33486
+Node: Configuration34229
+Node: Configuration File Format34841
+Node: Configuration File Preprocessing35226
+Node: Configuration File Syntax35523
+Node: Simulator Configuration38308
+Node: Simulator Behavior38599
+Node: Verification API Configuration43180
+Node: CUC Configuration45120
+Node: Core OpenRISC Configuration47112
+Node: CPU Configuration47614
+Node: Memory Configuration51733
+Node: Memory Management Configuration58455
+Node: Cache Configuration60832
+Node: Interrupt Configuration63218
+Node: Power Management Configuration65051
+Node: Branch Prediction Configuration66328
+Node: Debug Interface Configuration67688
+Node: Peripheral Configuration70031
+Node: Memory Controller Configuration70657
+Node: UART Configuration74437
+Node: DMA Configuration77956
+Node: Ethernet Configuration79823
+Node: GPIO Configuration84468
+Node: Display Interface Configuration86101
+Node: Frame Buffer Configuration88410
+Node: Keyboard Configuration90274
+Node: Disc Interface Configuration92512
+Node: Generic Peripheral Configuration97616
+Node: Interactive Command Line99911
+Node: Verification API106885
+Node: Code Internals111315
+Node: Coding Conventions111898
+Node: Global Data Structures116325
+Node: Concepts118982
+Ref: Output Redirection119127
+Ref: Interrupts Internal119665
+Node: Internal Debugging120818
+Node: Regression Testing121342
+Node: GNU Free Documentation License125131
+Node: Index147538
 
 End Tag Table

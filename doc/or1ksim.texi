@@ -86,9 +86,9 @@ Unpack the software and create a @emph{separate} directory in which to
 build it:
 
 @example
-@kbd{tar jxf or1ksim-@value{VERSION}.tar.bz2}
-@kbd{mkdir builddir_or1ksim}
-@kbd{cd builddir_or1ksim}
+tar jxf or1ksim-@value{VERSION}.tar.bz2
+mkdir builddir_or1ksim
+cd builddir_or1ksim
 @end example
 
 @node Configuring the Build
@@ -102,7 +102,7 @@ the OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
 @example
-@kbd{../or1ksim-@value{VERSION}/configure --target=or32-uclinux ...}
+../or1ksim-@value{VERSION}/configure --target=or32-uclinux ...
 @end example
 
 There are several other options available, many of which are standard
@@ -183,7 +183,7 @@ to be inverted in a single instruction using:
 @code{l.xori  rD,rA,-1}
 @end example
 
-This flag causes Or1ksim to treat the immediate operand as unsigned (i.e
+This flag causes @value{OR1KSIM} to treat the immediate operand as unsigned (i.e
 to zero-extend rather than sign-extend).
 
 The default is to sign-extend, so that existing code will continue to
@@ -234,7 +234,7 @@ get the missing test(s) working.
 @end table
 
 A number of configuration flags have been removed since version 0.3.0,
-because they led to invalid behavior of Or1ksim.  Those removed are:
+because they led to invalid behavior of @value{OR1KSIM}.  Those removed are:
 
 @table @code
 
@@ -288,20 +288,20 @@ and @code{l.xori}) do not.
 Build the tool with:
 
 @example
-@kbd{make all}
+make all
 @end example
 
 If you have the OpenRISC tool chain and DejaGNU installed, you can
 verify the tool as follows (otherwise omit this step):
 
 @example
-@kbd{make check}
+make check
 @end example
 
 Install the tool with:
 
 @example
-@kbd{make install}
+make install
 @end example
 
 This will install the three variations of the @value{OR1KSIM} tool,
@@ -313,8 +313,8 @@ The documentation may be created and installed in alternative formats (PDF,
 Postscript, DVI, HTML) with for example:
 
 @example
-@kbd{make pdf}
-@kbd{make install-pdf}
+make pdf
+make install-pdf
 @end example
 
 @node Known Issues
@@ -327,7 +327,7 @@ feature requests.  It may be found at
 @url{http://opencores.org/project,or1k,bugtracker}.
 
 The following issues are long standing and unlikely to be fixed in
-Or1ksim in the near future.
+@value{OR1KSIM} in the near future.
 
 @itemize @bullet
 @item
@@ -353,6 +353,7 @@ code uses static global constants liberally!
 * Profiling Utility::
 * Memory Profiling Utility::
 * Simulator Library::
+* Ethernet TUN/TAP Interface::
 @end menu
 
 @node Standalone Simulator
@@ -453,7 +454,7 @@ zero.  The size may be followed by @samp{k}, @samp{K}, @samp{m},
 bytes), megabytes (@math{2^{20}} bytes) and gigabytes (@math{2^{30}}
 bytes).
 
-This is mainly intended for use when Or1ksim is used without a
+This is mainly intended for use when @value{OR1KSIM} is used without a
 configuration file, to allow just the processor and memory to be set
 up.  This is the equivalent of specifying a configuration memory section
 with @code{baseaddr = 0} and @code{size = @var{size}} and all other
@@ -476,7 +477,7 @@ By default all exceptions are now handled silently.  If this option is
 specified, bus exceptions will be reported with a message to standard
 error indicating the address at which the exception occurred.
 
-This was the default behaviour up to Or1ksim 0.4.0.  This flag is
+This was the default behaviour up to @value{OR1KSIM} 0.4.0.  This flag is
 provided for those who wish to keep that behavior.
 
 @item --strict-npc
@@ -693,7 +694,7 @@ representation in SystemC TLM 2.0.
 @end quotation
 
 @quotation Note
-The current implementation of Or1ksim always transfers single words (4
+The current implementation of @value{OR1KSIM} always transfers single words (4
 bytes), using masks if smaller values are required.  In this it mimcs the
 behavior of the WishBone bus.
 @end quotation
@@ -836,7 +837,7 @@ Read @var{len} bytes from @var{addr}, placing the result in @var{buf}.
 Return @var{len} on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -849,7 +850,7 @@ Write @var{len} bytes to @var{addr}, taking the data from @var{buf}.
 Return @var{len} on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -861,7 +862,7 @@ Read the SPR specified by @var{sprnum}, placing the result in
 @var{sprval_ptr}.  Return non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -873,7 +874,7 @@ Write @var{sprval} to the SPR specified by @var{sprnum}.  Return
 non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -886,7 +887,7 @@ result in @var{regval_ptr}.  Return non-zero on success and 0 on
 failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -898,7 +899,7 @@ Write @var{regval} to the general purpose register specified by
 @var{regnum}.  Return non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -909,7 +910,7 @@ Set the processor's state according to @var{state} (1 = stalled, 0 = not
 stalled).
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -956,6 +957,198 @@ gcc ...  -Wl,--rpath -Wl,/opt/or1ksim/lib ...
 Add the library directory to @file{/etc/ld.so.conf}
 
 @end itemize
+
+@node Ethernet TUN/TAP Interface
+@section Ethernet TUN/TAP Interface
+@cindex configuring the Ethernet TUN/TAP interface
+
+When an Ethernet peripheral is configured (@pxref{Ethernet
+Configuration, , Ethernet Configuration}), one option is to tunnel
+traffic through a TUN/TAP interface.  The low level TAP interface is used
+to tunnel raw Ethernet datagrams.
+
+The TAP interface can then be connected to a physical Ethernet through a
+bridge, allowing the @value{OR1KSIM} model to connect to a physical
+network.  This is particularly when @value{OR1KSIM} is running the
+OpenRISC Linux kernel image.
+
+This section explains how to set up a bridge for use by @value{OR1KSIM}. It does
+require superuser access to the host machine (or at least the relevant
+network capabilities). A system administrator can modify these
+guidelines so they are executed on reboot if appropriate.
+
+@menu
+* Setting Up a Persistent TAP device::
+* Establishing a Bridge::
+* Opening the Firewall::
+* Disabling Ethernet Filtering::
+* Networking from OpenRISC Linux and BusyBox::
+* Tearing Down a Bridge::
+@end menu
+
+@node Setting Up a Persistent TAP device
+@subsection Setting Up a Persistent TAP device
+@cindex persistent TAP device creation
+@cindex TAP device creation
+
+TUN/TAP devices can be created dynamically, but this requires superuser
+privileges (or at least @code{CAP_NET_ADMIN} capability).  The solution
+is to create a persistent TAP device.  This can be done using either
+@command{openvpn} or @command{tunctl}.  In either case the package must
+be installed on the host system.  Using @command{openvpn}, the following
+would set up a TAP interface for a specified user and group.
+
+@example
+openvpn --mktun --dev tap@emph{n} --user @emph{username} --group @emph{groupname}
+@end example
+
+@node Establishing a Bridge
+@subsection Establishing a Bridge
+@cindex bridge setup
+@cindex Ethernet bridge setup
+
+A bridge is a ``virtual'' local area network interfaces, subsuming two or more
+existing network interfaces.  In this case we will bridge the physical
+Ethernet interface of the host with the TAP interface that will be used
+by @value{OR1KSIM}.
+
+The Ethernet and TAP must lose their own individual IP addresses (by
+setting them to 0.0.0.0) and are replaced by the IP address of the
+bridge interface. To do this we use the @command{bridge-utils} package,
+which must be installed on the host system. These commands are require
+superuser privileges or @code{CAP_NET_ADMIN} capability. To create a new
+interface @code{br@emph{n}} the following commands are appropriate.
+
+@example
+brctl addbr br@emph{n}
+brctl addif br@emph{n} eth@emph{x}
+brctl addif br@emph{n} tap@emph{y}
+
+ifconfig eth@emph{x} 0.0.0.0 promisc up
+ifconfig tap@emph{y} 0.0.0.0 promisc up
+
+dhclient br@emph{n}
+@end example
+
+The last command instructs the bridge to obtain its IP address, netmask,
+broadcast address, gateway and nameserver information using DHCP.  In a
+network without DHCP it should be replaced by @command{ifconfig} to set
+a static IP address, netmask and broadcast address.
+
+@quotation Note
+This will leave a spare dhclient process running in the background,
+which should be killed for tidiness. There is a technique to avoid this
+using @command{omshell}, but that is beyond the scope of this guide.
+@end quotation
+
+@quotation Note
+It is not clear to the author why the existing interfaces need to be
+brought up in promiscuous mode, but it seems to cure various problems.
+@end quotation
+
+@node Opening the Firewall
+@subsection  Opening the Firewall
+@cindex firewall with Ethernet bridge and TAP/TUN
+
+Firewall rules should be added to ensure traffic flows freely through
+the TAP and bridge interfaces. As superuser the following commands are
+appropriate.
+
+@example
+iptables -A INPUT -i tap@emph{y} -j ACCEPT
+iptables -A INPUT -i br@emph{n} -j ACCEPT
+iptables -A FORWARD -i br@emph{n} -j ACCEPT
+@end example
+
+@node Disabling Ethernet Filtering
+@subsection Disabling Ethernet Filtering
+
+Some systems may have ethernet filtering enabled (@command{ebtables},
+@command{bridge-nf}, @command{arptables}) which will stop traffic
+flowing through the bridge.
+
+The easiest way to disable this is by writing zero to all
+@file{bridge-nf-*} entries in @file{/proc/sys/net/bridge}. As superuser
+the following commands will achieve this.
+
+@example
+cd /proc/sys/net/bridge
+for f in bridge-nf-*; do echo 0 > $f; done
+@end example
+
+@node Networking from OpenRISC Linux and BusyBox
+@subsection Networking from OpenRISC Linux and BusyBox
+@cindex BusyBox and Ethernet
+@cindex Linux (OpenRISC) and Ethernet
+
+The main use of this style of Ethernet interface to @value{OR1KSIM} is when
+running the OpenRISC Linux kernel with BusyBox. The following commands
+in the BusyBox console window will configure the Ethernet interface
+(assumed to be @code{eth0}) and bring it up with a DHCP assigned
+address.
+
+@example
+ifconfig eth0
+ifup eth0
+@end example
+
+At this stage interface to IP addresses will work correctly.
+
+For DNS to work the BusyBox system needs to know where to find a
+nameserver.  Under BusyBox, @command{udhcp} does not configure
+@file{/etc/resolv.conf} automatically.
+
+The solution is to duplicate the nameserver entry from the
+@file{/etc/resolv.conf} file of the host on the BusyBox system. A
+typical file might be as follows:
+
+@example
+@code{nameserver 192.168.0.1}
+@end example
+
+It is convenient to make this permanent within the Linux initramfs. Add
+the file as @code{arch/openrisc/support/initramfs/etc/resolv.conf}
+within the Linux source tree and rebuild @code{vmlinux}. It will then be
+present automatically.
+
+One of the most useful functions that is possible is to mount
+the host file system through NFS. For example, from the BusyBox console:
+
+@example
+mount -t nfs -o nolock 192.168.0.60:/home /mnt
+@end example
+
+Another useful technique is to telnet into the BusyBox system from the
+host. This is particularly valuable when a console process locks up,
+since the @command{xterm} console will not recognize ctrl-C. Instead the
+rogue process can be killed from a telnet connection.
+
+@node Tearing Down a Bridge
+@subsection Tearing Down a Bridge
+
+There is little reason why a bridge should ever need to be torn down,
+but if desired, the following commands will achieve the effect.
+
+@example
+ifconfig br@emph{n} down
+brctl delbr br@emph{n}
+
+dhclient eth@emph{x}
+@end example
+
+As before this will leave a spare @command{dhclient} process in the
+background which should be killed.
+
+If desired the TAP interface can be deleted using
+
+@example
+openvpn --rmtun -dev tap@emph{y}
+@end example
+
+@quotation Caution
+The TAP interface should not be in use when running this command. For
+example any OpenRISC Linux/BusyBox sessions should be closed first.
+@end quotation
 
 @node Configuration
 @chapter Configuration
@@ -1908,7 +2101,7 @@ sensitive interrupts must be cleared by clearing the corresponding bit
 in the PICSR SPR.
 
 Internal functions to set and clear interrupts are also provided for
-peripherals implemented within Or1ksim. @xref{Interrupts Internal, ,
+peripherals implemented within @value{OR1KSIM}. @xref{Interrupts Internal, ,
 Interrupts Internal} for more details.
 
 @item use_nmi = 0|1
@@ -2385,17 +2578,17 @@ with the DMA controller.
 @cindex configuring the Ethernet interface
 @cindex Ethernet configuration
 @cindex @code{section ethernet}
-The Ethernet MAC used in @value{OR1KSIM} is the component implemented
-at OpenCores, and found in the top level SVN directory, @file{ethmac}.
-It also forms part of the OpenRISC SoC, ORPSoC.  It is described in
-the document @cite{Ethernet IP Core Specification} by Igor Mohor,
-which can be found in the @file{doc} subdirectory.  It is a memory
-mapped component, which resides on the main OpenRISC Wishbone data
-bus.
-
 Ethernet configuration is described in @code{section ethernet}.  This
 section may appear multiple times, specifying multiple Ethernet
 interfaces.  The following parameters may be specified.
+
+The Ethernet MAC used in @value{OR1KSIM} corresponds to the Verilog
+implementation in project @dfn{ethmac}. It's source code can be found in
+the top level SVN directory, @file{ethmac}.  It also forms part of the
+OpenRISC reference SoC, ORPSoC.  It is described in the document
+@cite{Ethernet IP Core Specification} by Igor Mohor, which can be found
+in the @file{doc} subdirectory.  It is a memory mapped component, which
+resides on the main OpenRISC Wishbone data bus.
 
 @table @code
 
@@ -2435,21 +2628,26 @@ Configuration}).
 @cindex @code{dma} (Ethernet configuration)
 Use @var{value} as the IRQ number of this Ethernet MAC.  Default value 0.
 
-@item rtx_type = 0|1
+@item rtx_type = "file"|"tap"
 @cindex @code{rtx_type} (Ethernet configuration)
-If 1 (true) use a socket interface to the Ethernet (see parameter
-@code{sockif} below).  If 0 (the default), use a file interface,
-reading and writing from and to the files specified in the
+Specifies whether to use a TUN/TAP interface or file interface (the default)
+to model the external connection of the Ethernet.
+
+If a TUN/TAP interface is requested, Ethernet packets will be sent and
+received through the pesistent TAP interface specified in parameter
+@code{tap_dev} (see below).
+
+More details on configuring the TUN/TAP interface are given in the Usage
+section (@pxref{Ethernet TUN/TAP Interface, , Ethernet TUN/TAP
+Interface}).
+
+If a file interface (the default), is requested, the Ethernet will be
+modelled by reading and writing from and to the files specified in the
 @code{rxfile} and @code{txfile} parameters (see below).
 
-@quotation Note
-By default the socket interface is not provided in @value{OR1KSIM}.  If
-it is required, this must be requested when configuring, by use of the
-@code{--enable-ethphy} option to @command{configure}.
-
-@example
-configure --target=or32-uclinux --enable-ethphy ...
-@end example
+@quotation Caution
+If a file interface is specified, @value{OR1KSIM} will terminate once the
+receive file specified by @code{rxfile} is exhausted.
 @end quotation
 
 @item rx_channel = @var{rxvalue}
@@ -2482,11 +2680,16 @@ The input file must exist and be readable.  The output file must be
 writable and will be created if necessary.  If either of these
 conditions is not met, a warning will be given.
 
-@item sockif = "@var{service}"
-@cindex @code{sockif} (Ethernet configuration)
-When @code{rtx_type} is 1 (see above), @var{service} specifies the
-service to use for communication.  This may be TCP/IP or UDP/IP.  The
-default value of this parameter is @code{"or1ksim_eth"}.
+@quotation Caution
+@value{OR1KSIM} will terminate once the @var{rxfile} is exhausted.
+@end quotation
+
+@item tap_dev = "@var{tap}"
+@cindex @code{tap_dev} (Ethernet configuration)
+When @code{rtx_type} is @code{"tap"} (see above), @var{tap_dev}
+specifies the TAP device to use for communication.  This should be a
+persistent TAP device configured for the system (@pxref{Ethernet TUN/TAP
+Interface, , Ethernet TUN/TAP Interface})
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (DMA configuration)
@@ -2497,7 +2700,9 @@ with the DMA controller.
 
 @item phy_addr = @var{value}
 @cindex @code{phy_addr} 
-@var{value} specifies address for emulated ethernet PHY. Defaults to 0 otherwise.
+@var{value} specifies the address for emulated ethernet PHY (default
+0). If there are multiple Ethernet peripherals, they should each have a
+different PHY value.
 
 @end table
 
@@ -2748,7 +2953,7 @@ memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
 
 @quotation Warning
-In the current release of Or1ksim, parsing of the ATA section is
+In the current release of @value{OR1KSIM}, parsing of the ATA section is
 broken. Users should not configure the disc interface in this release.
 @end quotation
 
@@ -3782,10 +3987,11 @@ procedures for common use among the tests.
 @item libsim.tests
 @itemx or1ksim.tests
 @cindex DejaGNU tests directories
-These are the directories of tests of the Or1ksim library.  They also include
-@value{OR1KSIM} configuration files and each has a @file{Makefile.am} file.
-@file{Makefile.am} should be updated whenever files are added to this
-directory, to ensure they are included in the distribution.
+These are the directories of tests of the @value{OR1KSIM} library.  They
+also include @value{OR1KSIM} configuration files and each has a
+@file{Makefile.am} file.  @file{Makefile.am} should be updated whenever
+files are added to this directory, to ensure they are included in the
+distribution.
 
 @item test-code
 @cindex host test code

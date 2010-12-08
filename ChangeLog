@@ -1,13 +1,22 @@
+2010-12-08  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: Updated Ethernet configuration section. Added
+	new section on configurating TUN/TAP.
+
 2010-12-01  Julius Baxter <julius@opencores.org>
+
 	* peripheral/eth.c: <define ETH_DEBUG>: controlling debug printouts.
 	<struct eth_device>: Added int_line_stat to hold status of IRQ line.
 	(eth_controller_tx_clock, eth_controller_rx_clock): Add setting of
 	interrupts dependent on line state, added setting of INT_SOURCE reg.
 	regardless of INT_MASK bits or line state.
-	
+
 2010-11-30  Julius Baxter <julius@opencores.org>
+
 	* cpu/or1k/sprs.c: Clarify commenting on PIC_PICSR register.
-	* peripheral/eth.c: Many changes.	
+	* peripheral/eth.c: Many changes.
 
 2010-11-26  Jeremy Bennett <jeremy.bennett@embecosm.com>
 
