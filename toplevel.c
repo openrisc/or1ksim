@@ -74,6 +74,7 @@ main (int   argc,
 
   print_config ();
   signal (SIGINT, ctrl_c);
+  signal (SIGUSR1, toggle_trace);
 
   do_stats         = config.cpu.superscalar ||
                      config.cpu.dependstats ||

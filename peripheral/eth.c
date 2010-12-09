@@ -369,10 +369,7 @@ eth_controller_tx_clock (void *dat)
     }
 
   /* Reschedule */
-  if (eth->tx.state == ETH_TXSTATE_WAIT4BD)
-    SCHED_ADD (eth_controller_tx_clock, dat, 10);
-  else
-    SCHED_ADD (eth_controller_tx_clock, dat, 1);
+  SCHED_ADD (eth_controller_tx_clock, dat, 1);
 }
 
 /* ========================================================================= */
@@ -689,10 +686,7 @@ eth_controller_rx_clock (void *dat)
     }
 
   /* Reschedule */
-  if (eth->rx.state == ETH_RXSTATE_RECV)
-    SCHED_ADD (eth_controller_rx_clock, dat, 10);
-  else
-    SCHED_ADD (eth_controller_rx_clock, dat, 1);
+  SCHED_ADD (eth_controller_rx_clock, dat, 1);
 }
 
 /* ========================================================================= */

@@ -96,6 +96,24 @@ ctrl_c (signum)
 
 }	/* ctrl_c() */
 
+/*---------------------------------------------------------------------------*/
+/*!Signal handler for SIGUSR1
+
+  Toggles state of trace generating while program is running.
+
+   @param[in] signum  The signal which triggered this handler                */
+/*---------------------------------------------------------------------------*/
+void
+toggle_trace (signum)
+     int signum;
+{
+
+  runtime.sim.hush = !runtime.sim.hush;
+
+  signal (SIGUSR1, toggle_trace);
+
+}	/* toggle_trace() */
+
 
 /*---------------------------------------------------------------------------*/
 /*!Routine poll to see if interaction is needed

@@ -1,3 +1,14 @@
+2010-12-09  Julius Baxter <julius@opencores.org>
+
+	* doc/or1ksim.texi: changed references to or32-uclinux-* to or32-elf-*.
+	Added section on using SIGUSR1 signal to control trace dumping.
+	* peripheral/eth.c: Change scheduling of TX and RX from 10 cycles to 1
+	when idling.
+	* toplevel.c: Added SIGUSR1 handler hook.
+	* toplevel-support.c: <toggle_trace>: New function to toggle the trace
+	execution control variable.
+	* toplevel-support.h: <toggle_trace>: Add function prototype.
+	
 2010-12-08  Jeremy Bennett <jeremy@jeremybennett.com>
 
 	* configure: Regenerated.
