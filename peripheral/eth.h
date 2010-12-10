@@ -243,16 +243,6 @@ struct ether_header
 /*
  * Implementatino of Ethernet MAC Registers and State
  */
-#define ETH_TXSTATE_IDLE	0
-#define ETH_TXSTATE_WAIT4BD	10
-#define ETH_TXSTATE_READFIFO	20
-#define ETH_TXSTATE_TRANSMIT	30
-
-#define ETH_RXSTATE_IDLE	0
-#define ETH_RXSTATE_WAIT4BD	10
-#define ETH_RXSTATE_RECV	20
-#define ETH_RXSTATE_WRITEFIFO	30
-
 #define ETH_RTX_FILE    0
 #define ETH_RTX_TAP     1
 #define ETH_RTX_VAPI	2

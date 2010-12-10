@@ -642,7 +642,9 @@ the region of memory to be analysed.
 @section Trace Generation
 @cindex trace generation of @value{OR1KSIM}
 
-An execution trace can be generated at run time with options passed by the command line, or via the operating system's signal passing mechanism.
+An execution trace can be generated at run time with options passed by
+the command line, or via the operating system's signal passing
+mechanism.
 
 The following, passed at run time, can be used to create an execution dump.
 
@@ -656,15 +658,23 @@ Dump instruction just executed and any register/memory location chaged
 after each instruction (one line per instruction).
 @end table
 
-Passing a signal @code{SIGUSR1} while the simulator is running toggles trace generation. This can be done with the following command, assuming @value{OR1KSIM}'s executable name is @code{or32-elf-sim}:
+Passing a signal @code{SIGUSR1} while the simulator is running toggles
+trace generation. This can be done with the following command, assuming
+@value{OR1KSIM}'s executable name is @code{or32-elf-sim}:
 
 @example
 pkill -SIGUSR1 or32-elf-sim
 @end example
 
-This is useful in the case where trace output is desired after a significant amount of simulation time, where it would be inconvenient to generate trace up to that point.
+This is useful in the case where trace output is desired after a
+significant amount of simulation time, where it would be inconvenient to
+generate trace up to that point.
 
-If the @code{pkill} utility is not available, the @code{kill} utility can be used if @value{OR1KSIM}'s process number is known. Use the following to determine the process ID of the @code{or32-elf-sim} and then send the @code{SIGUSR1} command to toggle execution trace generation:
+If the @code{pkill} utility is not available, the @code{kill} utility
+can be used if @value{OR1KSIM}'s process number is known. Use the
+following to determine the process ID of the @code{or32-elf-sim} and
+then send the @code{SIGUSR1} command to toggle execution trace
+generation:
 
 @example
 ps a | grep or32-elf-sim

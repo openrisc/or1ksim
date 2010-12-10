@@ -30,7 +30,6 @@
 
 # - <bridge> is the bridge interface to use, e.g. br0
 # - <eth> is the hardware ethernet interface to use, e.g. eth0
-# - <mac> is the MAC of the Or1ksim Linux instance
 # - <tap> is/are the persistent TAP interface(s)
 
 # The tap interfaces must have been previously set up persistently by the

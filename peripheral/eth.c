@@ -2,7 +2,7 @@
 
    Copyright (C) 2001 by Erez Volk, erez@opencores.org
                          Ivan Guzvinec, ivang@opencores.org
-   Copyright (C) 2008 Embecosm Limited
+   Copyright (C) 2008, 2001 Embecosm Limited
    Copyright (C) 2010 ORSoC
 
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
@@ -63,314 +63,512 @@
 #include "toplevel-support.h"
 #include "sim-cmd.h"
 
+
+/* Control debug messages */
+#ifndef ETH_DEBUG
+# define ETH_DEBUG  1
+#endif
+
+
+/* -------------------------------------------------------------------------- */
+/*!Structure describing the Ethernet device                                   */
+/* -------------------------------------------------------------------------- */
 struct eth_device
 {
-  /* Is peripheral enabled */
-  int enabled;
+  /* Basic stuff about the device */
+  int                enabled;		/* Is peripheral enabled */
+  oraddr_t           baseaddr;		/* Base address in memory */
+  unsigned long int  base_vapi_id;	/* Start of VAPI ID block */
 
-  /* Base address in memory */
-  oraddr_t baseaddr;
-
-  /* Which DMA controller is this MAC connected to */
+  /* DMA controller this MAC is connected to, and associated channels */
   unsigned dma;
   unsigned tx_channel;
   unsigned rx_channel;
 
-  /* Our address */
-  unsigned char mac_address[ETHER_ADDR_LEN];
+  /* Details of the hardware */
+  unsigned char      mac_address[ETHER_ADDR_LEN];  /* Ext HW address */
+  unsigned long int  phy_addr;		/* Int HW address */
+  unsigned long int  mac_int;		/* interrupt line number */
+  int                int_line_stat;	/* interrupt line status */
 
-  /* interrupt line number */
-  unsigned long mac_int;
-
-  /* interrupt line status */
-  int int_line_stat;
-
-  /* VAPI ID */
-  unsigned long base_vapi_id;
-
-  /* Ethernet PHY address */
-  unsigned long phy_addr;
-
-  /* What sort of external I/F: FILE or TAP */
-  int rtx_type;
+  /* External interface deatils */
+  int rtx_type;				/* Type of external i/f: FILE or TAP */
 
   /* RX and TX file names and handles for FILE type connection. */
-  char *rxfile, *txfile;
-  int txfd;
-  int rxfd;
-  off_t loopback_offset;
+  char  *rxfile;			/* Rx filename */
+  char  *txfile;			/* Tx filename */
+  int    txfd;				/* Rx file handle */
+  int    rxfd;				/* Tx file handle */
+  off_t  loopback_offset;		/* Circular buffer offset */
 
   /* Info for TAP type connections */
-  int   rtx_fd;
-  char *tap_dev;
+  char *tap_dev;			/* The TAP device */
+  int   rtx_fd;				/* TAP device handle */
 
   /* Current TX state */
   struct
   {
-    unsigned long state;
-    unsigned long bd_index;
-    unsigned long bd;
-    unsigned long bd_addr;
-    unsigned working, waiting_for_dma, error;
-    long packet_length;
-    unsigned minimum_length, maximum_length;
-    unsigned add_crc;
-    unsigned crc_dly;
-    unsigned long crc_value;
-    long bytes_left, bytes_sent;
+    unsigned long int  bd_index;
   } tx;
 
   /* Current RX state */
   struct
   {
-    unsigned long state;
-    unsigned long bd_index;
-    unsigned long bd;
-    unsigned long bd_addr;
-    int fd;
-    off_t *offset;
-    unsigned working, error, waiting_for_dma;
-    long packet_length, bytes_read, bytes_left;
+    enum {
+      ETH_RXSTATE_IDLE,			/* Was set to  0 */
+      ETH_RXSTATE_WAIT4BD,		/* Was set to 10 */
+      ETH_RXSTATE_RECV,			/* Was set to 20 */
+      ETH_RXSTATE_WRITEFIFO,		/* Was set to 30 */
+    }                  state;
+    unsigned long int  bd_index;
+    unsigned long int  bd;
+    unsigned long int  bd_addr;
+    int                fd;
+    off_t             *offset;
+    unsigned int       working;
+    unsigned int       waiting_for_dma;
+    unsigned int       error;
+    long int           packet_length;
+    long int           bytes_read;
+    long int           bytes_left;
   } rx;
 
   /* Visible registers */
   struct
   {
-    unsigned long moder;
-    unsigned long int_source;
-    unsigned long int_mask;
-    unsigned long ipgt;
-    unsigned long ipgr1;
-    unsigned long ipgr2;
-    unsigned long packetlen;
-    unsigned long collconf;
-    unsigned long tx_bd_num;
-    unsigned long controlmoder;
-    unsigned long miimoder;
-    unsigned long miicommand;
-    unsigned long miiaddress;
-    unsigned long miitx_data;
-    unsigned long miirx_data;
-    unsigned long miistatus;
-    unsigned long hash0;
-    unsigned long hash1;
+    unsigned long int  moder;
+    unsigned long int  int_source;
+    unsigned long int  int_mask;
+    unsigned long int  ipgt;
+    unsigned long int  ipgr1;
+    unsigned long int  ipgr2;
+    unsigned long int  packetlen;
+    unsigned long int  collconf;
+    unsigned long int  tx_bd_num;
+    unsigned long int  controlmoder;
+    unsigned long int  miimoder;
+    unsigned long int  miicommand;
+    unsigned long int  miiaddress;
+    unsigned long int  miitx_data;
+    unsigned long int  miirx_data;
+    unsigned long int  miistatus;
+    unsigned long int  hash0;
+    unsigned long int  hash1;
 
     /* Buffer descriptors */
-    unsigned long bd_ram[ETH_BD_SPACE / 4];
+    unsigned long int  bd_ram[ETH_BD_SPACE / 4];
   } regs;
 
-  unsigned char rx_buff[ETH_MAXPL];
-  unsigned char tx_buff[ETH_MAXPL];
-  unsigned char lo_buff[ETH_MAXPL];
+  unsigned char  rx_buff[ETH_MAXPL];
+  unsigned char  tx_buff[ETH_MAXPL];
+  unsigned char  lo_buff[ETH_MAXPL];
 };
 
 
-/* simulator interface */
-static void eth_vapi_read (unsigned long id, unsigned long data, void *dat);
-/* register interface */
-static void eth_write32 (oraddr_t addr, uint32_t value, void *dat);
-static uint32_t eth_read32 (oraddr_t addr, void *dat);
-/* clock */
-static void eth_controller_tx_clock (void *);
-static void eth_controller_rx_clock (void *);
-/* utility functions */
-static ssize_t eth_read_rx_file (struct eth_device *, void *, size_t);
-static void eth_skip_rx_file (struct eth_device *, off_t);
-static void eth_rx_next_packet (struct eth_device *);
-static void eth_write_tx_bd_num (struct eth_device *, unsigned long value);
-static void eth_miim_trans (void *dat);
 
-#define ETH_DEBUG 0
-
-
-/* ========================================================================== */
-/* Dummy socket routines. These are the points where we spoof an Ethernet     */
-/* network.                                                                   */
 /* -------------------------------------------------------------------------- */
+/*!Utility function to read from the ethernet RX file.
+
+   Helper function when using file I/O.
+
+   This function moves the file pointer to the current place in the packet
+   before reading. The Ethernet device datastructure contains the file
+   descriptor and offset to use.
+
+   @param[in]  eth    Ethernet device datastruture.
+   @param[out] buf    Buffer for read data.
+   @param[in]  count  Number of bytes to read.
+
+   @return  Number of bytes read, or zero on end-of-file or -1 on error.      */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_read_rx_file (struct eth_device *eth,
+		  void              *buf,
+		  size_t             count)
+{
+  ssize_t result;
+
+  if (eth->rx.fd <= 0)
+    {
+      return 0;
+    }
+
+  if (eth->rx.offset)
+    {
+      if (lseek (eth->rx.fd, *(eth->rx.offset), SEEK_SET) == (off_t) - 1)
+	{
+	  return 0;
+	}
+    }
+
+  result = read (eth->rx.fd, buf, count);
+
+  if (eth->rx.offset && result >= 0)
+    {
+      *(eth->rx.offset) += result;
+    }
+
+  return result;
+
+}	/* eth_read_rx_file () */
 
 
-/* ========================================================================= */
-/*  TX LOGIC                                                                 */
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/*!Skip bytes in the RX file.
 
-/*
- * TX clock
- * Responsible for starting and finishing TX
- */
+   Helper function when using file I/O.
+
+   This just updates the offset pointer in the ethernet device datastructure.
+
+   @param[in]  eth    Ethernet device datastruture.
+   @param[in]  count  Number of bytes to skip.                                */
+/* -------------------------------------------------------------------------- */
+static void
+eth_skip_rx_file (struct eth_device *eth,
+		  off_t              count)
+{
+  eth->rx.offset += count;
+
+}	/* eth_skip_rx_file () */
+
+
+/* -------------------------------------------------------------------------- */
+/* Move to next buffer descriptor in RX file.
+
+   Helper function when using file I/O.
+
+   Skip any remaining bytes in the Rx file for this transaction.
+
+   @param[in]  eth  Ethernet device datastruture.                           */
+/* -------------------------------------------------------------------------- */
+static void
+eth_rx_next_packet (struct eth_device *eth)
+{
+  /* Skip any possible leftovers */
+  if (eth->rx.bytes_left)
+    {
+      eth_skip_rx_file (eth, eth->rx.bytes_left);
+    }
+}	/* eth_rx_next_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Emulate MIIM transaction to ethernet PHY
+
+   @param[in]  eth  Ethernet device datastruture.                           */
+/* -------------------------------------------------------------------------- */
+static void
+eth_miim_trans (struct eth_device *eth)
+{
+  switch (eth->regs.miicommand)
+    {
+    case ((1 << ETH_MIICOMM_WCDATA_OFFSET)):
+      /* Perhaps something to emulate here later, but for now do nothing */
+      break;
+      
+    case ((1 << ETH_MIICOMM_RSTAT_OFFSET)):
+      /*
+      printf("or1ksim: eth_miim_trans: phy %d\n",(int)
+	     ((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)& 
+	      ETH_MIIADDR_FIAD_MASK));
+      printf("or1ksim: eth_miim_trans: reg %d\n",(int)
+	     ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
+	      ETH_MIIADDR_RGAD_MASK));
+      */
+      /*First check if it's the correct PHY to address */
+      if (((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)&
+	   ETH_MIIADDR_FIAD_MASK) == eth->phy_addr)
+	{
+	  /* Correct PHY - now switch based on the register address in the PHY*/
+	  switch ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
+		  ETH_MIIADDR_RGAD_MASK)
+	    {
+	    case MII_BMCR:
+	      eth->regs.miirx_data = BMCR_FULLDPLX;
+	      break;
+	    case MII_BMSR:
+	      eth->regs.miirx_data = BMSR_LSTATUS | BMSR_ANEGCOMPLETE | 
+		BMSR_10HALF | BMSR_10FULL | BMSR_100HALF | BMSR_100FULL;
+	      break;
+	    case MII_PHYSID1:
+	      eth->regs.miirx_data = 0x22; /* Micrel PHYID */
+	      break;
+	    case MII_PHYSID2:
+	      eth->regs.miirx_data = 0x1613; /* Micrel PHYID */
+	      break;
+	    case MII_ADVERTISE:
+	      eth->regs.miirx_data = ADVERTISE_FULL;
+	      break;
+	    case MII_LPA:
+	      eth->regs.miirx_data = LPA_DUPLEX | LPA_100;
+	      break;
+	    case MII_EXPANSION:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_CTRL1000:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_STAT1000:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_ESTATUS:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_DCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_FCSCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_NWAYTEST:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_RERRCOUNTER:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_SREVISION:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_RESV1:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_LBRERROR:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_PHYADDR:
+	      eth->regs.miirx_data = eth->phy_addr;
+	      break;
+	    case MII_RESV2:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_TPISTATUS:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    case MII_NCONFIG:
+	      eth->regs.miirx_data = 0;
+	      break;
+	    default:
+	      eth->regs.miirx_data = 0xffff;
+	      break;
+	    }
+	}
+      else
+	{
+	  eth->regs.miirx_data = 0xffff; /* PHY doesn't exist, read all 1's */
+	}
+
+      break;
+
+    case ((1 << ETH_MIICOMM_SCANS_OFFSET)):
+      /* From MAC's datasheet: 
+	 A host initiates the Scan Status Operation by asserting the SCANSTAT 
+	 signal. The MIIM performs a continuous read operation of the PHY 
+	 Status register. The PHY is selected by the FIAD[4:0] signals. The 
+	 link status LinkFail signal is asserted/deasserted by the MIIM module 
+	 and reflects the link status bit of the PHY Status register. The 
+	 signal NVALID is used for qualifying the validity of the LinkFail 
+	 signals and the status data PRSD[15:0]. These signals are invalid 
+	 until the first scan status operation ends. During the scan status 
+	 operation, the BUSY signal is asserted until the last read is 
+	 performed (the scan status operation is stopped).
+
+	 So for now - do nothing, leave link status indicator as permanently 
+	 with link.
+      */
+
+      break;
+      
+    default:
+      break;      
+    }
+}	/* eth_miim_trans () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Tx clock function.
+
+   The original version had 4 states, which allowed modeling the transfer of
+   data one byte per cycle.
+
+   For now we use only the one state for efficiency. When we find something in
+   a buffer descriptor, we transmit it. We should wake up for this every 10
+   cycles.
+
+   We also remove numerous calculations that are not needed here.
+
+   @todo We should eventually reinstate the one byte per cycle transfer.
+
+   Responsible for starting and completing any TX actions.
+
+   @param[in] dat  The Ethernet data structure, passed as a void pointer.    */
+/* -------------------------------------------------------------------------- */
 static void
 eth_controller_tx_clock (void *dat)
 {
   struct eth_device *eth = dat;
-  int bAdvance = 1;
-  long nwritten = 0;
-  unsigned long read_word;
 
-  switch (eth->tx.state)
+  /* First word of BD is flags and length, second is pointer to buffer */
+  unsigned long int  bd_info = eth->regs.bd_ram[eth->tx.bd_index];
+  unsigned long int  bd_addr = eth->regs.bd_ram[eth->tx.bd_index + 1];
+
+  /* If we have a buffer ready, get it and transmit it. */
+  if (TEST_FLAG (bd_info, ETH_TX_BD, READY))
     {
-    case ETH_TXSTATE_IDLE:
-      eth->tx.state = ETH_TXSTATE_WAIT4BD;
-      break;
-    case ETH_TXSTATE_WAIT4BD:
-      /* Read buffer descriptor */
-      eth->tx.bd = eth->regs.bd_ram[eth->tx.bd_index];
-      eth->tx.bd_addr = eth->regs.bd_ram[eth->tx.bd_index + 1];
+      long int  packet_length;
+      long int  bytes_sent;
+      long int  nwritten = 0;
 
-      if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, READY))
+      /* Get the packet length */
+      packet_length = GET_FIELD (bd_info, ETH_TX_BD, LENGTH);
+
+      /* Clear error status bits and retry count. */
+      CLEAR_FLAG (bd_info, ETH_TX_BD, DEFER);
+      CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
+      CLEAR_FLAG (bd_info, ETH_TX_BD, RETRANSMIT);
+      CLEAR_FLAG (bd_info, ETH_TX_BD, UNDERRUN);
+      CLEAR_FLAG (bd_info, ETH_TX_BD, NO_CARRIER);
+
+      SET_FIELD (bd_info, ETH_TX_BD, RETRY, 0);
+
+      /* Copy data from buffer descriptor address into our local tx_buff. */
+      for (bytes_sent = 0; bytes_sent < packet_length; bytes_sent +=4)
 	{
-	    /*****************/
-	  /* initialize TX */
-	  eth->tx.bytes_left = eth->tx.packet_length =
-	    GET_FIELD (eth->tx.bd, ETH_TX_BD, LENGTH);
-	  eth->tx.bytes_sent = 0;
+	  unsigned long int  read_word =
+	    eval_direct32 (bytes_sent + bd_addr, 0, 0);
 
-	  /*   Initialize error status bits */
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, DEFER);
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, COLLISION);
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, RETRANSMIT);
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, UNDERRUN);
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, NO_CARRIER);
-	  SET_FIELD (eth->tx.bd, ETH_TX_BD, RETRY, 0);
-
-	  /* Find out minimum length */
-	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, PAD) ||
-	      TEST_FLAG (eth->regs.moder, ETH_MODER, PAD))
-	    eth->tx.minimum_length =
-	      GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MINFL);
-	  else
-	    eth->tx.minimum_length = eth->tx.packet_length;
-
-	  /* Find out maximum length */
-	  if (TEST_FLAG (eth->regs.moder, ETH_MODER, HUGEN))
-	    eth->tx.maximum_length = eth->tx.packet_length;
-	  else
-	    eth->tx.maximum_length =
-	      GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MAXFL);
-
-	  /* Do we need CRC on this packet? */
-	  if (TEST_FLAG (eth->regs.moder, ETH_MODER, CRCEN) ||
-	      (TEST_FLAG (eth->tx.bd, ETH_TX_BD, CRC) &&
-	       TEST_FLAG (eth->tx.bd, ETH_TX_BD, LAST)))
-	    eth->tx.add_crc = 1;
-	  else
-	    eth->tx.add_crc = 0;
-
-	  if (TEST_FLAG (eth->regs.moder, ETH_MODER, DLYCRCEN))
-	    eth->tx.crc_dly = 1;
-	  else
-	    eth->tx.crc_dly = 0;
-	  /* XXX - For now we skip CRC calculation */
-
-	  if (eth->rtx_type == ETH_RTX_FILE)
-	    {
-	      /* write packet length to file */
-	      nwritten =
-		write (eth->txfd, &(eth->tx.packet_length),
-		       sizeof (eth->tx.packet_length));
-	    }
-
-	    /************************************************/
-	  /* start transmit with reading packet into FIFO */
-	  eth->tx.state = ETH_TXSTATE_READFIFO;
+	  eth->tx_buff[bytes_sent]     = (unsigned char) (read_word >> 24);
+	  eth->tx_buff[bytes_sent + 1] = (unsigned char) (read_word >> 16);
+	  eth->tx_buff[bytes_sent + 2] = (unsigned char) (read_word >> 8);
+	  eth->tx_buff[bytes_sent + 3] = (unsigned char) (read_word);
 	}
 
-      /* stay in this state if (TXEN && !READY) */
-      break;
-    case ETH_TXSTATE_READFIFO:
-      //if (eth->tx.bytes_sent < eth->tx.packet_length)
-      while (eth->tx.bytes_sent < eth->tx.packet_length)
-	{
-	  read_word =
-	    eval_direct32 (eth->tx.bytes_sent + eth->tx.bd_addr, 0, 0);
-	  eth->tx_buff[eth->tx.bytes_sent] =
-	    (unsigned char) (read_word >> 24);
-	  eth->tx_buff[eth->tx.bytes_sent + 1] =
-	    (unsigned char) (read_word >> 16);
-	  eth->tx_buff[eth->tx.bytes_sent + 2] =
-	    (unsigned char) (read_word >> 8);
-	  eth->tx_buff[eth->tx.bytes_sent + 3] = (unsigned char) (read_word);
-	  eth->tx.bytes_sent += 4;
-	}
-      //else
-      //	{
-	  eth->tx.state = ETH_TXSTATE_TRANSMIT;
-	  //	}
-      break;
-    case ETH_TXSTATE_TRANSMIT:
-      /* send packet */
+      /* Send packet according to interface type. */
       switch (eth->rtx_type)
 	{
 	case ETH_RTX_FILE:
-	  nwritten = write (eth->txfd, eth->tx_buff, eth->tx.packet_length);
+	  /* write packet length to file */
+	  nwritten =
+	    write (eth->txfd, &(packet_length),
+		   sizeof (packet_length));
+	  /* write data to file */
+	  nwritten = write (eth->txfd, eth->tx_buff, packet_length);
 	  break;
+
 	case ETH_RTX_TAP:
 #if ETH_DEBUG
-	  printf ("Writing TAP\n");
-	  
-	  printf("packet %d bytes:",(int) eth->tx.packet_length );
-	  int j; for (j=0;j<eth->tx.packet_length;j++)
-		   { if (j%16==0)printf("\n");
-		     else if (j%8==0) printf(" ");
-		     printf("%.2x ", eth->tx_buff[j]);
-		   }
-	  printf("\nend packet:\n");
+	  {
+	    int  j; 
+
+	    printf ("Writing TAP\n");
+	    printf ("  packet %d bytes:", (int) packet_length);
+
+	    for (j = 0; j < packet_length; j++)
+	      {
+		if (0 == (j % 16))
+		  {
+		    printf ("\n");
+		  }
+		else if (0 == (j % 8))
+		  {
+		    printf (" ");
+		  }
+
+		printf ("%.2x ", eth->tx_buff[j]);
+	      }
+
+	    printf("\nend packet:\n");
+	  }
 #endif	  
-	  nwritten = write (eth->rtx_fd, eth->tx_buff, eth->tx.packet_length);
+	  nwritten = write (eth->rtx_fd, eth->tx_buff, packet_length);
 	  break;
 	}
 
-      /* set BD status */
-      if (nwritten == eth->tx.packet_length)
+      /* Set BD status. If we didn't write the whole packet, then we retry. */
+      if (nwritten == packet_length)
 	{
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, READY);
+	  CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
 	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
-
-	  eth->tx.state = ETH_TXSTATE_WAIT4BD;
 	}
       else
 	{
-	  /* XXX - implement retry mechanism here! */
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, READY);
-	  CLEAR_FLAG (eth->tx.bd, ETH_TX_BD, COLLISION);
+	  /* Does this retry mechanism really work? */
+	  CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
+	  CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
 	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXE);
-
-	  eth->tx.state = ETH_TXSTATE_WAIT4BD;
-	  
+#if ETH_DEBUG
+	  printf ("Transmit retry request.\n");
+#endif
 	}
 
-      eth->regs.bd_ram[eth->tx.bd_index] = eth->tx.bd;
+      /* Update the flags in the buffer descriptor */
+      eth->regs.bd_ram[eth->tx.bd_index] = bd_info;
 
+      /* This looks erroneous. Surely it will conflict with the retry flag */
       SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
 
-      /* generate OK interrupt */
-      if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
-	  TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M))
+      /* Generate interrupt to indicate transfer complete, under the
+	 following criteria all being met:
+         - either INT_MASK flag for Tx (OK or error) is set
+         - the bugger descriptor has its IRQ flag set
+         - there is no interrupt in progress.
+
+         @todo We ought to warn if we get here and fail to set an IRQ. */
+      if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
+	   TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M)) &&
+	  TEST_FLAG (bd_info, ETH_TX_BD, IRQ) &&
+	  !eth->int_line_stat)
 	{
-	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, IRQ) && !eth->int_line_stat)
-	    {
 #if ETH_DEBUG
-	      printf ("ETH_TXSTATE_TRANSMIT interrupt\n");
+	  printf ("TRANSMIT interrupt\n");
 #endif
-	      report_interrupt (eth->mac_int);
-	      eth->int_line_stat = 1;
-	    }
+	  report_interrupt (eth->mac_int);
+	  eth->int_line_stat = 1;
 	}
-
-      /* advance to next BD */
-      if (bAdvance)
+      else
 	{
-	  if (TEST_FLAG (eth->tx.bd, ETH_TX_BD, WRAP) ||
-	      eth->tx.bd_index >= ETH_BD_COUNT)
-	    eth->tx.bd_index = 0;
-	  else
-	    eth->tx.bd_index += 2;
-	}
+#if ETH_DEBUG
+	  printf ("Failed to send TRANSMIT interrupt\n");
+#endif
+	}	  
 
-      break;
+      /* Advance to next BD, wrapping around if appropriate. */
+      if (TEST_FLAG (bd_info, ETH_TX_BD, WRAP) ||
+	  eth->tx.bd_index >= ETH_BD_COUNT)
+	{
+	  eth->tx.bd_index = 0;
+	}
+      else
+	{
+	  eth->tx.bd_index += 2;
+	}
     }
 
-  /* Reschedule */
+  /* Wake up again after 1 ticks (was 10, changed by Julius). */
   SCHED_ADD (eth_controller_tx_clock, dat, 1);
-}
+
+}	/* eth_controller_tx_clock () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Rx clock function.
+
+   NEEDS WRITING
+
+   The original version had 4 states, which allowed modeling the transfer of
+   data one byte per cycle.
+
+   For now we use only the one state for efficiency. When we find something in
+   a buffer descriptor, we transmit it. We should wake up for this every 10
+   cycles.
+
+   We also remove numerous calculations that are not needed here.
+
+   @todo We should eventually reinstate the one byte per cycle transfer.
+
+   Responsible for starting and completing any TX actions.
+
+   @param[in] dat  The Ethernet data structure, passed as a void pointer.    */
+/* -------------------------------------------------------------------------- */
 
 /* ========================================================================= */
 
@@ -685,56 +883,40 @@ eth_controller_rx_clock (void *dat)
       break;
     }
 
-  /* Reschedule */
+  /* Reschedule. Was 10 ticks when waiting (ETH_RXSTATE_RECV). Now always 1
+     tick. */
   SCHED_ADD (eth_controller_rx_clock, dat, 1);
 }
 
 /* ========================================================================= */
-/* Move to next RX BD */
-static void
-eth_rx_next_packet (struct eth_device *eth)
-{
-  /* Skip any possible leftovers */
-  if (eth->rx.bytes_left)
-    eth_skip_rx_file (eth, eth->rx.bytes_left);
-}
-
-/* "Skip" bytes in RX file */
-static void
-eth_skip_rx_file (struct eth_device *eth, off_t count)
-{
-  eth->rx.offset += count;
-}
-
-/*
- * Utility function to read from the ethernet RX file
- * This function moves the file pointer to the current place in the packet before reading
- */
-static ssize_t
-eth_read_rx_file (struct eth_device *eth, void *buf, size_t count)
-{
-  ssize_t result;
-
-  if (eth->rx.fd <= 0)
-    {
-      return 0;
-    }
-
-  if (eth->rx.offset)
-    if (lseek (eth->rx.fd, *(eth->rx.offset), SEEK_SET) == (off_t) - 1)
-      {
-	return 0;
-      }
-
-  result = read (eth->rx.fd, buf, count);
-  if (eth->rx.offset && result >= 0)
-    *(eth->rx.offset) += result;
-
-  return result;
-}
 
 /* ========================================================================= */
 
+
+/*
+ *   VAPI connection to outside
+ */
+static void
+eth_vapi_read (unsigned long id, unsigned long data, void *dat)
+{
+  unsigned long which;
+  struct eth_device *eth = dat;
+
+  which = id - eth->base_vapi_id;
+
+  if (!eth)
+    {
+      return;
+    }
+
+  switch (which)
+    {
+    case ETH_VAPI_DATA:
+      break;
+    case ETH_VAPI_CTRL:
+      break;
+    }
+}
 
 /* -------------------------------------------------------------------------- */
 /*!Reset the Ethernet.
@@ -1095,7 +1277,9 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
       eth->regs.collconf = value;
       return;
     case ETH_TX_BD_NUM:
-      eth_write_tx_bd_num (eth, value);
+      /* When TX_BD_NUM is written, also reset current RX BD index */
+      eth->regs.tx_bd_num = value & 0xFF;
+      eth->rx.bd_index = eth->regs.tx_bd_num << 1;
       return;
     case ETH_CTRLMODER:
       eth->regs.controlmoder = value;
@@ -1106,7 +1290,7 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
     case ETH_MIICOMMAND:
       eth->regs.miicommand = value;
       /* Perform MIIM transaction, if required */
-      eth_miim_trans(dat);
+      eth_miim_trans (eth);
       return;
     case ETH_MIIADDRESS:
       eth->regs.miiaddress = value;
@@ -1159,41 +1343,9 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 /* ========================================================================= */
 
 
-/*
- *   VAPI connection to outside
- */
-static void
-eth_vapi_read (unsigned long id, unsigned long data, void *dat)
-{
-  unsigned long which;
-  struct eth_device *eth = dat;
-
-  which = id - eth->base_vapi_id;
-
-  if (!eth)
-    {
-      return;
-    }
-
-  switch (which)
-    {
-    case ETH_VAPI_DATA:
-      break;
-    case ETH_VAPI_CTRL:
-      break;
-    }
-}
-
 /* ========================================================================= */
 
 
-/* When TX_BD_NUM is written, also reset current RX BD index */
-static void
-eth_write_tx_bd_num (struct eth_device *eth, unsigned long value)
-{
-  eth->regs.tx_bd_num = value & 0xFF;
-  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
-}
 
 /* ========================================================================= */
 
@@ -1450,136 +1602,6 @@ eth_phy_addr (union param_val  val,
   eth->phy_addr = val.int_val & ETH_MIIADDR_FIAD_MASK;
 }
 
-
-/*---------------------------------------------------------------------------*/
-/*!Emulate MIIM transaction to ethernet PHY
-
-   @param[in] dat  The config data structure                                 */
-/*---------------------------------------------------------------------------*/
-static void
-eth_miim_trans (void *dat)
-{
-  struct eth_device *eth = dat;
-  switch (eth->regs.miicommand)
-    {
-    case ((1 << ETH_MIICOMM_WCDATA_OFFSET)):
-      /* Perhaps something to emulate here later, but for now do nothing */
-      break;
-      
-    case ((1 << ETH_MIICOMM_RSTAT_OFFSET)):
-      /*
-      printf("or1ksim: eth_miim_trans: phy %d\n",(int)
-	     ((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)& 
-	      ETH_MIIADDR_FIAD_MASK));
-      printf("or1ksim: eth_miim_trans: reg %d\n",(int)
-	     ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
-	      ETH_MIIADDR_RGAD_MASK));
-      */
-      /*First check if it's the correct PHY to address */
-      if (((eth->regs.miiaddress >> ETH_MIIADDR_FIAD_OFFSET)&
-	   ETH_MIIADDR_FIAD_MASK) == eth->phy_addr)
-	{
-	  /* Correct PHY - now switch based on the register address in the PHY*/
-	  switch ((eth->regs.miiaddress >> ETH_MIIADDR_RGAD_OFFSET)&
-		  ETH_MIIADDR_RGAD_MASK)
-	    {
-	    case MII_BMCR:
-	      eth->regs.miirx_data = BMCR_FULLDPLX;
-	      break;
-	    case MII_BMSR:
-	      eth->regs.miirx_data = BMSR_LSTATUS | BMSR_ANEGCOMPLETE | 
-		BMSR_10HALF | BMSR_10FULL | BMSR_100HALF | BMSR_100FULL;
-	      break;
-	    case MII_PHYSID1:
-	      eth->regs.miirx_data = 0x22; /* Micrel PHYID */
-	      break;
-	    case MII_PHYSID2:
-	      eth->regs.miirx_data = 0x1613; /* Micrel PHYID */
-	      break;
-	    case MII_ADVERTISE:
-	      eth->regs.miirx_data = ADVERTISE_FULL;
-	      break;
-	    case MII_LPA:
-	      eth->regs.miirx_data = LPA_DUPLEX | LPA_100;
-	      break;
-	    case MII_EXPANSION:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_CTRL1000:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_STAT1000:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_ESTATUS:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_DCOUNTER:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_FCSCOUNTER:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_NWAYTEST:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_RERRCOUNTER:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_SREVISION:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_RESV1:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_LBRERROR:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_PHYADDR:
-	      eth->regs.miirx_data = eth->phy_addr;
-	      break;
-	    case MII_RESV2:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_TPISTATUS:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    case MII_NCONFIG:
-	      eth->regs.miirx_data = 0;
-	      break;
-	    default:
-	      eth->regs.miirx_data = 0xffff;
-	      break;
-	    }
-	}
-      else
-	eth->regs.miirx_data = 0xffff; /* PHY doesn't exist, read all 1's */
-      break;
-
-    case ((1 << ETH_MIICOMM_SCANS_OFFSET)):
-      /* From MAC's datasheet: 
-	 A host initiates the Scan Status Operation by asserting the SCANSTAT 
-	 signal. The MIIM performs a continuous read operation of the PHY 
-	 Status register. The PHY is selected by the FIAD[4:0] signals. The 
-	 link status LinkFail signal is asserted/deasserted by the MIIM module 
-	 and reflects the link status bit of the PHY Status register. The 
-	 signal NVALID is used for qualifying the validity of the LinkFail 
-	 signals and the status data PRSD[15:0]. These signals are invalid 
-	 until the first scan status operation ends. During the scan status 
-	 operation, the BUSY signal is asserted until the last read is 
-	 performed (the scan status operation is stopped).
-
-	 So for now - do nothing, leave link status indicator as permanently 
-	 with link.
-      */
-
-      break;
-      
-    default:
-      break;      
-    }
-
-}
 
 /*---------------------------------------------------------------------------*/
 /*!Initialize a new Ethernet configuration
