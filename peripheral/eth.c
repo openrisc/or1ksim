@@ -65,10 +65,15 @@
 
 
 /* Control debug messages */
+#define ETH_DEBUG 0
 #ifndef ETH_DEBUG
 # define ETH_DEBUG  1
 #endif
 
+
+/*! MAC address that is always accepted. */
+static const unsigned char mac_broadcast[ETHER_ADDR_LEN] =
+  { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 /* -------------------------------------------------------------------------- */
 /*!Structure describing the Ethernet device                                   */
@@ -99,39 +104,14 @@ struct eth_device
   char  *txfile;			/* Tx filename */
   int    txfd;				/* Rx file handle */
   int    rxfd;				/* Tx file handle */
-  off_t  loopback_offset;		/* Circular buffer offset */
 
   /* Info for TAP type connections */
   char *tap_dev;			/* The TAP device */
   int   rtx_fd;				/* TAP device handle */
 
-  /* Current TX state */
-  struct
-  {
-    unsigned long int  bd_index;
-  } tx;
-
-  /* Current RX state */
-  struct
-  {
-    enum {
-      ETH_RXSTATE_IDLE,			/* Was set to  0 */
-      ETH_RXSTATE_WAIT4BD,		/* Was set to 10 */
-      ETH_RXSTATE_RECV,			/* Was set to 20 */
-      ETH_RXSTATE_WRITEFIFO,		/* Was set to 30 */
-    }                  state;
-    unsigned long int  bd_index;
-    unsigned long int  bd;
-    unsigned long int  bd_addr;
-    int                fd;
-    off_t             *offset;
-    unsigned int       working;
-    unsigned int       waiting_for_dma;
-    unsigned int       error;
-    long int           packet_length;
-    long int           bytes_read;
-    long int           bytes_left;
-  } rx;
+  /* Indices into the buffer descriptors. */
+  unsigned long int  tx_bd_index;
+  unsigned long int  rx_bd_index;
 
   /* Visible registers */
   struct
@@ -158,98 +138,8 @@ struct eth_device
     /* Buffer descriptors */
     unsigned long int  bd_ram[ETH_BD_SPACE / 4];
   } regs;
-
-  unsigned char  rx_buff[ETH_MAXPL];
-  unsigned char  tx_buff[ETH_MAXPL];
-  unsigned char  lo_buff[ETH_MAXPL];
 };
 
-
-
-/* -------------------------------------------------------------------------- */
-/*!Utility function to read from the ethernet RX file.
-
-   Helper function when using file I/O.
-
-   This function moves the file pointer to the current place in the packet
-   before reading. The Ethernet device datastructure contains the file
-   descriptor and offset to use.
-
-   @param[in]  eth    Ethernet device datastruture.
-   @param[out] buf    Buffer for read data.
-   @param[in]  count  Number of bytes to read.
-
-   @return  Number of bytes read, or zero on end-of-file or -1 on error.      */
-/* -------------------------------------------------------------------------- */
-static ssize_t
-eth_read_rx_file (struct eth_device *eth,
-		  void              *buf,
-		  size_t             count)
-{
-  ssize_t result;
-
-  if (eth->rx.fd <= 0)
-    {
-      return 0;
-    }
-
-  if (eth->rx.offset)
-    {
-      if (lseek (eth->rx.fd, *(eth->rx.offset), SEEK_SET) == (off_t) - 1)
-	{
-	  return 0;
-	}
-    }
-
-  result = read (eth->rx.fd, buf, count);
-
-  if (eth->rx.offset && result >= 0)
-    {
-      *(eth->rx.offset) += result;
-    }
-
-  return result;
-
-}	/* eth_read_rx_file () */
-
-
-/* -------------------------------------------------------------------------- */
-/*!Skip bytes in the RX file.
-
-   Helper function when using file I/O.
-
-   This just updates the offset pointer in the ethernet device datastructure.
-
-   @param[in]  eth    Ethernet device datastruture.
-   @param[in]  count  Number of bytes to skip.                                */
-/* -------------------------------------------------------------------------- */
-static void
-eth_skip_rx_file (struct eth_device *eth,
-		  off_t              count)
-{
-  eth->rx.offset += count;
-
-}	/* eth_skip_rx_file () */
-
-
-/* -------------------------------------------------------------------------- */
-/* Move to next buffer descriptor in RX file.
-
-   Helper function when using file I/O.
-
-   Skip any remaining bytes in the Rx file for this transaction.
-
-   @param[in]  eth  Ethernet device datastruture.                           */
-/* -------------------------------------------------------------------------- */
-static void
-eth_rx_next_packet (struct eth_device *eth)
-{
-  /* Skip any possible leftovers */
-  if (eth->rx.bytes_left)
-    {
-      eth_skip_rx_file (eth, eth->rx.bytes_left);
-    }
-}	/* eth_rx_next_packet () */
 
 
 /* -------------------------------------------------------------------------- */
@@ -384,21 +274,250 @@ eth_miim_trans (struct eth_device *eth)
 }	/* eth_miim_trans () */
 
 
+
+/* -------------------------------------------------------------------------- */
+/*!Write an Ethernet packet to a FILE interface.
+
+   This writes a single Ethernet packet to a FILE interface. The format is to
+   write the length, then the data.
+
+   @param[in] eth     Pointer to the relevant Ethernet data structure.
+   @param[in] buf     Where to get the data.
+   @param[in] length  Length of data to write.
+
+   @return  The length if successful, a negative value otherwise.             */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_write_file_packet (struct eth_device *eth,
+		       unsigned char     *buf,
+		       unsigned long int  length)
+{
+  ssize_t  nwritten;
+
+  /* Write length to file. */
+  nwritten = write (eth->txfd, &(length), sizeof (length));
+  if (nwritten != sizeof (length))
+    {
+      fprintf (stderr, "ERROR: Failed to write Ethernet packet length: %s.\n",
+	       strerror (errno));
+      return  -1;
+    }
+
+  /* write data to file */
+  nwritten = write (eth->txfd, buf, length);
+  if (nwritten != length)
+    {
+      fprintf (stderr, "ERROR: Failed to write Ethernet packet data: %s.\n",
+	       strerror (errno));
+      return  -1;
+    }
+
+  return  nwritten;
+
+}	/* eth_write_file_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Write an Ethernet packet to a TAP interface.
+
+   This writes a single Ethernet packet to a TAP interface.
+
+   @param[in] eth     Pointer to the relevant Ethernet data structure.
+   @param[in] buf     Where to get the data.
+   @param[in] length  Length of data to write.
+
+   @return  The length if successful, a negative value otherwise.             */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_write_tap_packet (struct eth_device *eth,
+		      unsigned char     *buf,
+		      unsigned long int  length)
+{
+  ssize_t  nwritten;
+
+#if ETH_DEBUG
+  int  j; 
+
+  printf ("Writing TAP\n");
+  printf ("  packet %d bytes:", (int) length);
+
+  for (j = 0; j < length; j++)
+    {
+      if (0 == (j % 16))
+	{
+	  printf ("\n");
+	}
+      else if (0 == (j % 8))
+	{
+	  printf (" ");
+	}
+      
+      printf ("%.2x ", buf[j]);
+    }
+  
+  printf("\nend packet:\n");
+#endif	  
+
+  /* Write the data to the TAP */
+  nwritten = write (eth->rtx_fd, buf, length);
+  if (nwritten != length)
+    {
+      fprintf (stderr, "ERROR: Failed to write Ethernet packet data: %s.\n",
+	       strerror (errno));
+      return  -1;
+    }
+
+  return  nwritten;
+
+}	/* eth_write_tap_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Write an Ethernet packet.
+
+   This writes a single Ethernet packet to the outside world from the supplied
+   buffer. It deals with the different types of external interface.
+
+   @param[in] eth     Pointer to the relevant Ethernet data structure.
+   @param[in] buf     Where to get the data.
+   @param[in] length  Length of data to write.
+
+   @return  The length if successful, zero if no packet was available,
+            a negative value otherwise.                                       */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_write_packet (struct eth_device *eth,
+		  unsigned char     *buf,
+		  ssize_t            length)
+{
+  /* Send packet according to interface type. */
+  switch (eth->rtx_type)
+    {
+    case ETH_RTX_FILE: return  eth_write_file_packet (eth, buf, length);
+    case ETH_RTX_TAP:  return  eth_write_tap_packet (eth, buf, length);
+
+    default:
+      fprintf (stderr, "Unknown Ethernet write interface: ignored.\n");
+      return  (ssize_t) -1;
+    }
+}	/* eth_write_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Flush a Tx buffer descriptor to the outside world.
+
+   We know the buffer descriptor is full, so write it to the appropriate
+   outside interface.
+
+   @param[in] eth  The Ethernet data structure.                               */
+/* -------------------------------------------------------------------------- */
+static void
+eth_flush_bd (struct eth_device *eth)
+{
+  /* First word of BD is flags and length, second is pointer to buffer */
+  unsigned long int  bd_info = eth->regs.bd_ram[eth->tx_bd_index];
+  unsigned long int  bd_addr = eth->regs.bd_ram[eth->tx_bd_index + 1];
+  unsigned char      buf[ETH_MAXPL];
+  long int           packet_length;
+  long int           bytes_sent;
+
+  /* Get the packet length */
+  packet_length = GET_FIELD (bd_info, ETH_TX_BD, LENGTH);
+
+  /* Clear error status bits and retry count. */
+  CLEAR_FLAG (bd_info, ETH_TX_BD, DEFER);
+  CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
+  CLEAR_FLAG (bd_info, ETH_TX_BD, RETRANSMIT);
+  CLEAR_FLAG (bd_info, ETH_TX_BD, UNDERRUN);
+  CLEAR_FLAG (bd_info, ETH_TX_BD, NO_CARRIER);
+
+  SET_FIELD (bd_info, ETH_TX_BD, RETRY, 0);
+
+  /* Copy data from buffer descriptor address into our local buf. */
+  for (bytes_sent = 0; bytes_sent < packet_length; bytes_sent +=4)
+    {
+      unsigned long int  read_word =
+	eval_direct32 (bytes_sent + bd_addr, 0, 0);
+
+      buf[bytes_sent]     = (unsigned char) (read_word >> 24);
+      buf[bytes_sent + 1] = (unsigned char) (read_word >> 16);
+      buf[bytes_sent + 2] = (unsigned char) (read_word >> 8);
+      buf[bytes_sent + 3] = (unsigned char) (read_word);
+    }
+
+  /* Send packet according to interface type and set BD status. If we didn't
+     write the whole packet, then we retry. */
+  if (eth_write_packet (eth, buf, packet_length) == packet_length)
+    {
+      CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
+      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
+    }
+  else
+    {
+      /* Does this retry mechanism really work? */
+      CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
+      CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
+      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXE);
+#if ETH_DEBUG
+      printf ("Transmit retry request.\n");
+#endif
+    }
+
+  /* Update the flags in the buffer descriptor */
+  eth->regs.bd_ram[eth->tx_bd_index] = bd_info;
+
+  /* Generate interrupt to indicate transfer complete, under the
+     following criteria all being met:
+     - either INT_MASK flag for Tx (OK or error) is set
+     - the bugger descriptor has its IRQ flag set
+     - there is no interrupt in progress.
+
+     @todo We ought to warn if we get here and fail to set an IRQ. */
+  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
+       TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M)) &&
+      TEST_FLAG (bd_info, ETH_TX_BD, IRQ))
+    {
+      if (eth->int_line_stat)
+	{
+	  fprintf (stderr, "Warning: Interrupt active during Tx.\n");
+	}
+      else
+	{
+#if ETH_DEBUG
+	  printf ("TRANSMIT interrupt\n");
+#endif
+	  report_interrupt (eth->mac_int);
+	  eth->int_line_stat = 1;
+	}
+    }
+
+  /* Advance to next BD, wrapping around if appropriate. */
+  if (TEST_FLAG (bd_info, ETH_TX_BD, WRAP) ||
+      eth->tx_bd_index >= ((eth->regs.tx_bd_num - 1) * 2))
+    {
+      eth->tx_bd_index = 0;
+    }
+  else
+    {
+      eth->tx_bd_index += 2;
+    }
+}	/* eth_flush_bd () */
+
+
 /* -------------------------------------------------------------------------- */
 /*!Tx clock function.
 
+   Responsible for starting and completing any TX actions.
+
    The original version had 4 states, which allowed modeling the transfer of
-   data one byte per cycle.
+   data one byte per cycle.  For now we use only the one state for
+   efficiency. When we find something in a buffer descriptor, we transmit
+   it.
 
-   For now we use only the one state for efficiency. When we find something in
-   a buffer descriptor, we transmit it. We should wake up for this every 10
-   cycles.
-
-   We also remove numerous calculations that are not needed here.
+   We reschedule every cycle. There is no point in trying to do anything if
+   there is an interrupt still being processed by the core.
 
    @todo We should eventually reinstate the one byte per cycle transfer.
-
-   Responsible for starting and completing any TX actions.
 
    @param[in] dat  The Ethernet data structure, passed as a void pointer.    */
 /* -------------------------------------------------------------------------- */
@@ -407,139 +526,14 @@ eth_controller_tx_clock (void *dat)
 {
   struct eth_device *eth = dat;
 
-  /* First word of BD is flags and length, second is pointer to buffer */
-  unsigned long int  bd_info = eth->regs.bd_ram[eth->tx.bd_index];
-  unsigned long int  bd_addr = eth->regs.bd_ram[eth->tx.bd_index + 1];
-
-  /* If we have a buffer ready, get it and transmit it. */
-  if (TEST_FLAG (bd_info, ETH_TX_BD, READY))
+  /* Only do anything if there is not an interrupt outstanding. */
+  if (!eth->int_line_stat)
     {
-      long int  packet_length;
-      long int  bytes_sent;
-      long int  nwritten = 0;
-
-      /* Get the packet length */
-      packet_length = GET_FIELD (bd_info, ETH_TX_BD, LENGTH);
-
-      /* Clear error status bits and retry count. */
-      CLEAR_FLAG (bd_info, ETH_TX_BD, DEFER);
-      CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
-      CLEAR_FLAG (bd_info, ETH_TX_BD, RETRANSMIT);
-      CLEAR_FLAG (bd_info, ETH_TX_BD, UNDERRUN);
-      CLEAR_FLAG (bd_info, ETH_TX_BD, NO_CARRIER);
-
-      SET_FIELD (bd_info, ETH_TX_BD, RETRY, 0);
-
-      /* Copy data from buffer descriptor address into our local tx_buff. */
-      for (bytes_sent = 0; bytes_sent < packet_length; bytes_sent +=4)
+      /* First word of BD is flags. If we have a buffer ready, get it and
+	 transmit it. */
+      if (TEST_FLAG (eth->regs.bd_ram[eth->tx_bd_index], ETH_TX_BD, READY))
 	{
-	  unsigned long int  read_word =
-	    eval_direct32 (bytes_sent + bd_addr, 0, 0);
-
-	  eth->tx_buff[bytes_sent]     = (unsigned char) (read_word >> 24);
-	  eth->tx_buff[bytes_sent + 1] = (unsigned char) (read_word >> 16);
-	  eth->tx_buff[bytes_sent + 2] = (unsigned char) (read_word >> 8);
-	  eth->tx_buff[bytes_sent + 3] = (unsigned char) (read_word);
-	}
-
-      /* Send packet according to interface type. */
-      switch (eth->rtx_type)
-	{
-	case ETH_RTX_FILE:
-	  /* write packet length to file */
-	  nwritten =
-	    write (eth->txfd, &(packet_length),
-		   sizeof (packet_length));
-	  /* write data to file */
-	  nwritten = write (eth->txfd, eth->tx_buff, packet_length);
-	  break;
-
-	case ETH_RTX_TAP:
-#if ETH_DEBUG
-	  {
-	    int  j; 
-
-	    printf ("Writing TAP\n");
-	    printf ("  packet %d bytes:", (int) packet_length);
-
-	    for (j = 0; j < packet_length; j++)
-	      {
-		if (0 == (j % 16))
-		  {
-		    printf ("\n");
-		  }
-		else if (0 == (j % 8))
-		  {
-		    printf (" ");
-		  }
-
-		printf ("%.2x ", eth->tx_buff[j]);
-	      }
-
-	    printf("\nend packet:\n");
-	  }
-#endif	  
-	  nwritten = write (eth->rtx_fd, eth->tx_buff, packet_length);
-	  break;
-	}
-
-      /* Set BD status. If we didn't write the whole packet, then we retry. */
-      if (nwritten == packet_length)
-	{
-	  CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
-	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
-	}
-      else
-	{
-	  /* Does this retry mechanism really work? */
-	  CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
-	  CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
-	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXE);
-#if ETH_DEBUG
-	  printf ("Transmit retry request.\n");
-#endif
-	}
-
-      /* Update the flags in the buffer descriptor */
-      eth->regs.bd_ram[eth->tx.bd_index] = bd_info;
-
-      /* This looks erroneous. Surely it will conflict with the retry flag */
-      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
-
-      /* Generate interrupt to indicate transfer complete, under the
-	 following criteria all being met:
-         - either INT_MASK flag for Tx (OK or error) is set
-         - the bugger descriptor has its IRQ flag set
-         - there is no interrupt in progress.
-
-         @todo We ought to warn if we get here and fail to set an IRQ. */
-      if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
-	   TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M)) &&
-	  TEST_FLAG (bd_info, ETH_TX_BD, IRQ) &&
-	  !eth->int_line_stat)
-	{
-#if ETH_DEBUG
-	  printf ("TRANSMIT interrupt\n");
-#endif
-	  report_interrupt (eth->mac_int);
-	  eth->int_line_stat = 1;
-	}
-      else
-	{
-#if ETH_DEBUG
-	  printf ("Failed to send TRANSMIT interrupt\n");
-#endif
-	}	  
-
-      /* Advance to next BD, wrapping around if appropriate. */
-      if (TEST_FLAG (bd_info, ETH_TX_BD, WRAP) ||
-	  eth->tx.bd_index >= ETH_BD_COUNT)
-	{
-	  eth->tx.bd_index = 0;
-	}
-      else
-	{
-	  eth->tx.bd_index += 2;
+	  eth_flush_bd (eth);
 	}
     }
 
@@ -550,343 +544,388 @@ eth_controller_tx_clock (void *dat)
 
 
 /* -------------------------------------------------------------------------- */
-/*!Rx clock function.
+/*!Read an Ethernet packet from a FILE interface.
 
-   NEEDS WRITING
+   This reads a single Ethernet packet from the outside world via a FILE
+   interface.
 
-   The original version had 4 states, which allowed modeling the transfer of
-   data one byte per cycle.
+   The format is 4 bytes of packet length, followed by the packet data.
 
-   For now we use only the one state for efficiency. When we find something in
-   a buffer descriptor, we transmit it. We should wake up for this every 10
-   cycles.
+   @param[in]  eth  Pointer to the relevant Ethernet data structure
+   @param[out] buf  Where to put the data
 
-   We also remove numerous calculations that are not needed here.
-
-   @todo We should eventually reinstate the one byte per cycle transfer.
-
-   Responsible for starting and completing any TX actions.
-
-   @param[in] dat  The Ethernet data structure, passed as a void pointer.    */
+   @return  The length if successful, zero if no packet was available
+            (i.e. EOF), a negative value otherwise.                           */
 /* -------------------------------------------------------------------------- */
-
-/* ========================================================================= */
-
-
-/* ========================================================================= */
-/*  RX LOGIC                                                                 */
-/*---------------------------------------------------------------------------*/
-
-/*
- * RX clock
- * Responsible for starting and finishing RX
- */
-static void
-eth_controller_rx_clock (void *dat)
+static ssize_t
+eth_read_file_packet (struct eth_device *eth,
+		      unsigned char     *buf)
 {
-  struct eth_device *eth = dat;
-  long               nread = 0;
-  unsigned long      send_word;
-  struct pollfd      fds[1];
-  int                n;
+  ssize_t  packet_length;
+  ssize_t  nread;
 
+  /* Read packet length. We may be at EOF. */
+  nread = read (eth->rxfd, &(packet_length), sizeof (packet_length));
 
-  switch (eth->rx.state)
+  if (0 == nread)
     {
-    case ETH_RXSTATE_IDLE:
-      eth->rx.state = ETH_RXSTATE_WAIT4BD;
-      break;
+      return  0;			/* No more packets */
+    }
+  else if (nread < sizeof (packet_length))
+    {
+      fprintf (stderr, "ERROR: Failed to read length from file.\n");
+      return  -1;
+    }
 
-    case ETH_RXSTATE_WAIT4BD:
+  /* Packet must be big enough to hold a header */
+  if (packet_length < ETHER_HDR_LEN)
+    {
+      fprintf (stderr, "Warning: Ethernet packet length %zd too small.\n",
+	       packet_length);
+      return  -1;
+    }
 
-      eth->rx.bd      = eth->regs.bd_ram[eth->rx.bd_index];
-      eth->rx.bd_addr = eth->regs.bd_ram[eth->rx.bd_index + 1];
+  /* Read the packet proper. */
+  nread = read (eth->rxfd, buf, packet_length);
 
-      if (TEST_FLAG (eth->rx.bd, ETH_RX_BD, READY))
-	{
-	    /*****************/
-	  /* Initialize RX */
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, MISS);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, INVALID);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, DRIBBLE);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, UVERRUN);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, COLLISION);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, TOOBIG);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, TOOSHORT);
+  if (nread != packet_length)
+    {
+      fprintf (stderr, "ERROR: Failed to read packet from file.\n");
+      return  -1;
+    }
 
-	  /* Setup file to read from */
-	  if (TEST_FLAG (eth->regs.moder, ETH_MODER, LOOPBCK))
-	    {
-	      eth->rx.fd = eth->txfd;
-	      eth->rx.offset = &(eth->loopback_offset);
-	    }
-	  else
-	    {
-	      eth->rx.fd = eth->rxfd;
-	      eth->rx.offset = 0;
-	    }
-	  eth->rx.state = ETH_RXSTATE_RECV;
+  return  packet_length;
 
-	}
-      else if (!TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN))
-	{
-	  eth->rx.state = ETH_RXSTATE_IDLE;
-	}
-      else
-	{
-	  /* Poll to see if there is data to read */
-	  struct pollfd  fds[1];
-	  int    n;
+}	/* eth_read_file_packet () */
 
-	  fds[0].fd = eth->rtx_fd;
-	  fds[0].events = POLLIN;
+
+/* -------------------------------------------------------------------------- */
+/*!Read an Ethernet packet from a FILE interface.
+
+   This reads a single Ethernet packet from the outside world via a TAP
+   interface.
+
+   A complete packet is always read, so its length (minus CRC) is the amount
+   read.
+
+   @param[in]  eth  Pointer to the relevant Ethernet data structure
+   @param[out] buf  Where to put the data
+
+   @return  The length if successful, zero if no packet was available,
+            a negative value otherwise.                                       */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_read_tap_packet (struct eth_device *eth,
+		     unsigned char     *buf)
+{
+  struct pollfd  fds[1];
+  int            n;
+  ssize_t        packet_length;
+
+  /* Poll to see if there is data to read */
+  fds[0].fd     = eth->rtx_fd;
+  fds[0].events = POLLIN;
  
-	  n = poll (fds, 1, 0);
-	  if (n < 0)
-	    {
-	      fprintf (stderr, "Warning: Poll of WAIT4BD failed %s: ignored.\n",
-		       strerror (errno));
-	    }
-	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
-	    {
-	      printf ("Reading TAP and all BDs full = BUSY\n");
-	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
-
-	      if (nread < 0)
-		{
-		  fprintf (stderr,
-			   "Warning: Read of WAIT4BD failed %s: ignored\n",
-			   strerror (errno));
-		}
-	      else if (nread > 0)
-		{
-		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
-
-		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M) &&
-		      !eth->int_line_stat)
-		    {
-		      printf ("ETH_RXSTATE_WAIT4BD BUSY interrupt\n");
-		      report_interrupt (eth->mac_int);
-		      eth->int_line_stat = 1;
-		    }
-		}
-	    }
-	}
-
-      break;
-
-    case ETH_RXSTATE_RECV:
-
-      switch (eth->rtx_type)
+  n = poll (fds, 1, 0);
+  if (n < 0)
+    {
+      fprintf (stderr, "Warning: Poll for TAP receive failed %s: ignored.\n",
+	       strerror (errno));
+      return  -1;
+    }
+  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
+    {
+      /* Data to be read from TAP */
+      packet_length = read (eth->rtx_fd, buf, ETH_MAXPL);
+#if ETH_DEBUG
+      printf ("%d bytes read from TAP.\n", (int) packet_length);
+#endif
+      if (packet_length < 0)
 	{
-	case ETH_RTX_FILE:
-	  /* Read packet length */
-	  if (eth_read_rx_file
-	      (eth, &(eth->rx.packet_length),
-	       sizeof (eth->rx.packet_length)) <
-	      sizeof (eth->rx.packet_length))
-	    {
-	      /* TODO: just do what real ethernet would do (some kind of error
-		 state) */
-	      sim_done ();
-	      break;
-	    }
+	  fprintf (stderr, "Warning: Read of RXTATE_RECV failed: %s.\n",
+		   strerror (errno));		  		  
+	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXE);
 
-	  /* Packet must be big enough to hold a header */
-	  if (eth->rx.packet_length < ETHER_HDR_LEN)
-	    {
-	      eth_rx_next_packet (eth);
-
-	      eth->rx.state = ETH_RXSTATE_WAIT4BD;
-	      break;
-	    }
-
-	  eth->rx.bytes_read = 0;
-	  eth->rx.bytes_left = eth->rx.packet_length;
-
-	  /* for now Read entire packet into memory */
-	  nread = eth_read_rx_file (eth, eth->rx_buff, eth->rx.bytes_left);
-	  if (nread < eth->rx.bytes_left)
-	    {
-	      eth->rx.error = 1;
-	      break;
-	    }
-
-	  eth->rx.packet_length = nread;
-	  eth->rx.bytes_left = nread;
-	  eth->rx.bytes_read = 0;
-
-	  eth->rx.state = ETH_RXSTATE_WRITEFIFO;
-
-	  break;
-
-	case ETH_RTX_TAP:
-	  /* Poll to see if there is data to read */
-	  fds[0].fd     = eth->rtx_fd;
-	  fds[0].events = POLLIN;
- 
-	  n = poll (fds, 1, 0);
-	  if (n < 0)
-	    {
-	      fprintf (stderr,
-		       "Warning: Poll of RXTATE_RECV failed %s: ignored.\n",
-		       strerror (errno));
-	    }
-	  else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
-	    {
-#if ETH_DEBUG
-	      printf ("Reading TAP. ");
-#endif
-	      nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
-#if ETH_DEBUG
-	      printf ("%d bytes read.\n",(int) nread);
-#endif
-	      if (nread < 0)
-		{
-		  fprintf (stderr,
-			   "Warning: Read of RXTATE_RECV failed %s: ignored\n",
-			   strerror (errno));		  		  
-
-		  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXE);
-
-		  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXE_M) &&
-		      !eth->int_line_stat)
-		    {		      
- 		      printf ("ETH_RXTATE_RECV RXE interrupt\n");
-		      report_interrupt (eth->mac_int);
-		      eth->int_line_stat = 1;
-		    }
-		}
-	      
-	    }
-
-	  /* If not promiscouos mode, check the destination address */
-	  if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO) && nread)
-	    {
-	      if (TEST_FLAG (eth->regs.moder, ETH_MODER, IAM)
-		  && (eth->rx_buff[0] & 1))
-		{
-		  /* Nothing for now */
-		}
-
-
-	      if (((eth->mac_address[5] != eth->rx_buff[0]) && 
-		   (eth->rx_buff[5] != 0xff) ) ||
-		  ((eth->mac_address[4] != eth->rx_buff[1]) && 
-		   (eth->rx_buff[4] != 0xff) ) ||
-		  ((eth->mac_address[3] != eth->rx_buff[2]) && 
-		   (eth->rx_buff[3] != 0xff) ) ||
-		  ((eth->mac_address[2] != eth->rx_buff[3]) && 
-		   (eth->rx_buff[2] != 0xff) ) ||
-		  ((eth->mac_address[1] != eth->rx_buff[4]) && 
-		   (eth->rx_buff[1] != 0xff) ) ||
-		  ((eth->mac_address[0] != eth->rx_buff[5]) && 
-		   (eth->rx_buff[0] != 0xff)))
-		
-	      {
-#if ETH_DEBUG		
-		  printf("ETH_RXSTATE dropping packet for %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
-		       eth->rx_buff[0],
-		       eth->rx_buff[1],
-		       eth->rx_buff[2],
-		       eth->rx_buff[3],
-		       eth->rx_buff[4],
-		       eth->rx_buff[5]);
-#endif
-		break;
-	      }
-	    }
-
-	  eth->rx.packet_length = nread;
-	  eth->rx.bytes_left = nread;
-	  eth->rx.bytes_read = 0;
-
-	  if (nread)
-	    eth->rx.state = ETH_RXSTATE_WRITEFIFO;
-
-	  break;
-	case ETH_RTX_VAPI:
-	  break;
-	}
-      break;
-
-    case ETH_RXSTATE_WRITEFIFO:
-#if ETH_DEBUG
-      printf("ETH_RXSTATE_WRITEFIFO: writing to RXBD%d: %d bytes @ 0x%.8x\n",
-	     (int) eth->rx.bd_index/2,  (int)eth->rx.bytes_left, 
-	     (unsigned int)eth->rx.bd_addr);
-#endif
-      if (eth->rx.bytes_left > 0){
-	while((int) eth->rx.bytes_left){
-	  send_word = ((unsigned long) eth->rx_buff[eth->rx.bytes_read] << 24) |
-	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 1] << 16) |
-	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 2] << 8) |
-	    ((unsigned long) eth->rx_buff[eth->rx.bytes_read + 3]);
-	  set_direct32 (eth->rx.bd_addr + eth->rx.bytes_read, send_word, 0, 0);
-	  /* update counters */
-	  if (eth->rx.bytes_left >= 4)
-	    {	      
-	      eth->rx.bytes_left -= 4;
-	      eth->rx.bytes_read += 4;
-	    }
-	  else
-	    {
-	      eth->rx.bytes_read += eth->rx.bytes_left;
-	      eth->rx.bytes_left = 0;
-	    }
-	}
-	
-      }
-#if ETH_DEBUG
-      printf("ETH_RXSTATE_WRITEFIFO: bytes read: 0x%.8x\n",
-	     (unsigned int)eth->rx.bytes_read);
-#endif
-      if (eth->rx.bytes_left <= 0)
-	{
-	  /* Write result to bd */
-	  SET_FIELD (eth->rx.bd, ETH_RX_BD, LENGTH, eth->rx.packet_length + 4);
-	  CLEAR_FLAG (eth->rx.bd, ETH_RX_BD, READY);
-	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
-	  /*
-	  if (eth->rx.packet_length <
-	      (GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MINFL) - 4))
-	    SET_FLAG (eth->rx.bd, ETH_RX_BD, TOOSHORT);
-	  if (eth->rx.packet_length >
-	      GET_FIELD (eth->regs.packetlen, ETH_PACKETLEN, MAXFL))
-	    SET_FLAG (eth->rx.bd, ETH_RX_BD, TOOBIG);
-	  */
-	  eth->regs.bd_ram[eth->rx.bd_index] = eth->rx.bd;
-
-	  /* advance to next BD */
-	  if (TEST_FLAG (eth->rx.bd, ETH_RX_BD, WRAP)
-	      || eth->rx.bd_index >= ETH_BD_COUNT)
-	    eth->rx.bd_index = eth->regs.tx_bd_num << 1;
-	  else
-	    eth->rx.bd_index += 2;
-
-	  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
-
-	  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXB_M)) &&
-	      (TEST_FLAG (eth->rx.bd, ETH_RX_BD, IRQ)) &&
+	  /* Signal interrupt if enabled, and no interrupt currently in
+	     progress. */
+	  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXE_M) &&
 	      !eth->int_line_stat)
-	    {
+	    {		      
 #if ETH_DEBUG
-	      printf ("ETH_RXSTATE_WRITEFIFO interrupt\n");
+	      printf ("Ethernet failed receive interrupt\n");
 #endif
 	      report_interrupt (eth->mac_int);
 	      eth->int_line_stat = 1;
 	    }
-
-	  /* ready to receive next packet */
-	  eth->rx.state = ETH_RXSTATE_IDLE;
 	}
-      break;
+	
+      return  packet_length;
+    }
+  else
+    {
+      return  0;			/* No packet */
+    }
+}	/* eth_read_tap_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Read an Ethernet packet.
+
+   This reads a single Ethernet packet from the outside world into the
+   supplied buffer. It deals with the different types of external interface.
+
+   @param[in]  eth  Pointer to the relevant Ethernet data structure
+   @param[out] buf  Where to put the data
+
+   @return  The length if successful, zero if no packet was available,
+            a negative value otherwise.                                       */
+/* -------------------------------------------------------------------------- */
+static ssize_t
+eth_read_packet (struct eth_device *eth,
+		 unsigned char     *buf)
+{
+  switch (eth->rtx_type)
+    {
+    case ETH_RTX_FILE: return  eth_read_file_packet (eth, buf);
+    case ETH_RTX_TAP:  return  eth_read_tap_packet (eth, buf);
+
+    default:
+      fprintf (stderr, "Unknown Ethernet read interface: ignored.\n");
+      return  (ssize_t) -1;
+    }
+}	/* eth_read_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Fill a buffer descriptor
+
+   A buffer descriptor is empty. Attempt to fill it from the outside world.
+
+   @param[in] eth  The Ethernet data structure, passed as a void pointer.    */
+/* -------------------------------------------------------------------------- */
+static void
+eth_fill_bd (struct eth_device *eth)
+{
+
+  /* First word of BD is flags and length, second is pointer to buffer */
+  unsigned long int  bd_info = eth->regs.bd_ram[eth->rx_bd_index];
+  unsigned long int  bd_addr = eth->regs.bd_ram[eth->rx_bd_index + 1];
+
+  long int           packet_length;
+  long int           bytes_read;
+  unsigned char      buf[ETH_MAXPL];
+
+  /* Clear various status bits */
+  CLEAR_FLAG (bd_info, ETH_RX_BD, MISS);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, INVALID);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, DRIBBLE);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, UVERRUN);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, COLLISION);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, TOOBIG);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, TOOSHORT);
+
+  /* Loopback is permitted. We believe that Linux never uses it, so we'll
+     note the attempt and ignore.
+     
+     @todo We should support this. */
+  if (TEST_FLAG (eth->regs.moder, ETH_MODER, LOOPBCK))
+    {
+      PRINTF ("Ethernet loopback requested.\n");
+      fprintf (stderr, "ERROR: Loopback not supported. Ignored.\n");
+    }
+  
+  packet_length = eth_read_packet (eth, buf);
+  if (packet_length <= 0)
+    {
+      /* Empty packet or error. No more to do here. */
+      return;
+    }
+  
+/* Got a packet successfully. If not promiscuous mode, check the destination
+   address is meant for us. */
+  if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO))
+    {
+      if (TEST_FLAG (eth->regs.moder, ETH_MODER, IAM))
+	{
+	  /* There is little documentation of how IAM is supposed to work. It
+	     seems that some mapping function (not defined) maps the address
+	     down to a number in the range 0-63. If that bit is set in
+	     HASH0/HASH1 registers, the packet is accepted. */
+	  fprintf (stderr, "Warning: Individual Address Mode ignored.\n");
+	}
+	      
+      /* Check for HW address match. */
+      if ((0 != bcmp (eth->mac_address, buf, ETHER_ADDR_LEN)) &&
+	  (0 != bcmp (mac_broadcast,    buf, ETHER_ADDR_LEN)))
+	{
+#if ETH_DEBUG		
+	  printf ("packet for %.2x:%.2x:%.2x:%.2x:%.2x:%.2x ignored.\n",
+		  buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
+#endif
+	  /* Not for us. No more to do here. */
+	  return;
+	}
     }
 
-  /* Reschedule. Was 10 ticks when waiting (ETH_RXSTATE_RECV). Now always 1
-     tick. */
+  /* Transfer the buffer into the BD. */
+#if ETH_DEBUG
+  printf ("writing to Rx BD%d: %d bytes @ 0x%.8x\n",
+	  (int) eth->rx_bd_index / 2,  (int) packet_length, 
+	  (unsigned int)bd_addr);
+#endif
+	  
+  for (bytes_read = 0; bytes_read < packet_length; bytes_read +=4)
+    {
+      unsigned long int  send_word =
+	((unsigned long) buf[bytes_read]     << 24) |
+	((unsigned long) buf[bytes_read + 1] << 16) |
+	((unsigned long) buf[bytes_read + 2] <<  8) |
+	((unsigned long) buf[bytes_read + 3]      );
+      set_direct32 (bd_addr + bytes_read, send_word, 0, 0);
+    }
+  
+#if ETH_DEBUG
+  printf("BD filled with 0x%08lx bytes.\n", bytes_read);
+#endif
+	  
+  /* Write result to BD.
+	     
+     @todo Why is the length 4 more than the packet length? Is that for
+     the CRC? */
+  SET_FIELD (bd_info, ETH_RX_BD, LENGTH, packet_length + 4);
+  CLEAR_FLAG (bd_info, ETH_RX_BD, READY);
+  SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, RXB);
+      
+  eth->regs.bd_ram[eth->rx_bd_index] = bd_info;
+	  
+  /* Advance to next BD. The Rx BDs start after the Tx BDs. */
+  if (TEST_FLAG (bd_info, ETH_RX_BD, WRAP) ||
+      (eth->rx_bd_index >= ETH_BD_COUNT))
+    {
+      eth->rx_bd_index = eth->regs.tx_bd_num * 2;
+    }
+  else
+    {
+      eth->rx_bd_index += 2;
+    }
+  
+  /* Raise an interrupt if necessary. */
+  if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, RXB_M) &&
+      TEST_FLAG (bd_info, ETH_RX_BD, IRQ))
+    {
+      if (eth->int_line_stat)
+	{
+	  fprintf (stderr, "Warning: Interrupt active during Rx.\n");
+	}
+      else
+	{
+#if ETH_DEBUG
+	  printf ("Rx successful receive interrupt\n");
+#endif
+	  report_interrupt (eth->mac_int);
+	  eth->int_line_stat = 1;
+	}
+    }
+}	/* eth_fill_bd () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Ignore a packet from the outside world.
+
+   We don't have a BD ready, so any packets waiting should be thrown away.
+
+   @param[in] eth  The Ethernet data structure.                               */
+/* -------------------------------------------------------------------------- */
+static void
+eth_ignore_packet (struct eth_device *eth)
+{
+  unsigned char  buf[ETH_MAXPL];
+  ssize_t        nread = eth_read_packet (eth, buf);
+
+  if (nread < 0)
+    {
+      fprintf (stderr,
+	       "Warning: Read of when Ethernet busy failed %s.\n",
+	       strerror (errno));
+    }
+  else if (nread > 0)
+    {
+      /* Record that a packet was thrown away. */
+      SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, BUSY);
+      PRINTF ("Ethernet discarding %d bytes from TAP while BD full.\n",
+	      nread);
+      
+      /* Raise an interrupt if necessary. */
+      if (TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, BUSY_M))
+	{
+	  if (eth->int_line_stat)
+	    {
+	      fprintf (stderr, "Warning: Interrupt active during ignore.\n");
+	    }
+	  else
+	    {
+#if ETH_DEBUG
+	      printf ("Ethernet Rx BUSY interrupt\n");
+#endif
+	      report_interrupt (eth->mac_int);
+	      eth->int_line_stat = 1;
+	    }
+	}
+    }
+}	/* eth_ignore_packet () */
+
+
+/* -------------------------------------------------------------------------- */
+/*!Rx clock function.
+
+   Responsible for starting and completing any RX actions.
+
+   The original version had 4 states, which allowed modeling the transfer of
+   data one byte per cycle.  For now we use only the one state for
+   efficiency. When the buffer is empty, we fill it from the external world.
+
+   We schedule to wake up again each cycle. This means we will get called when
+   the core is still processing the previous interrupt. To avoid races, we do
+   nothing until the interrupt is cleared.
+
+   @todo We should eventually reinstate the one byte per cycle transfer.
+
+   @param[in] dat  The Ethernet data structure, passed as a void pointer.    */
+/* -------------------------------------------------------------------------- */
+static void
+eth_controller_rx_clock (void *dat)
+{
+  struct eth_device *eth = dat;
+
+  /* Only do anything if there is not an interrupt outstanding. */
+  if (!eth->int_line_stat)
+    {
+      /* First word of the BD is flags, where we can test if it's ready. */
+      if (TEST_FLAG (eth->regs.bd_ram[eth->rx_bd_index], ETH_RX_BD, READY))
+	{
+	  /* The BD is empty, so we try to fill it with data from the outside
+	     world. */
+	  eth_fill_bd (eth);	/* BD ready to be filled. */
+	}
+      else if ((TEST_FLAG (eth->regs.moder, ETH_MODER, RXEN)) &&
+	       (ETH_RTX_FILE == eth->rtx_type))
+	{
+	  /* The BD is full, Rx is enabled and we are reading from an external
+	     TAP interface. We can't take any more, so we'll throw oustanding
+	     input packets on the floor.
+	     
+	     @note We don't do this for file I/O, since it would discard
+	     everything immediately! */
+	  eth_ignore_packet (eth);
+	}
+    }
+
+  /* Whatever happens, we reschedule a wake up in the future. This used to be
+     every 10 ticks, but now it is very 1 tick. */
   SCHED_ADD (eth_controller_rx_clock, dat, 1);
-}
+
+}	/* eth_controller_rx_clock () */
+
 
 /* ========================================================================= */
 
@@ -982,7 +1021,6 @@ eth_reset (void *dat)
 		   eth->txfile, strerror (errno));
 	}
 
-      eth->loopback_offset = lseek (eth->txfd, 0, SEEK_END);
       break;
 
     case ETH_RTX_TAP:
@@ -1037,13 +1075,9 @@ eth_reset (void *dat)
   eth->regs.miimoder  = 0x00000064;
   eth->regs.tx_bd_num = 0x00000040;
 
-  /* Clear TX/RX status and initialize buffer descriptor index. */
-  memset (&(eth->tx), 0, sizeof (eth->tx));
-  memset (&(eth->rx), 0, sizeof (eth->rx));
-
-  /* Reset TX/RX BD indexes */
-  eth->tx.bd_index = 0;
-  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+  /* Reset TX/RX BD indexes. The Rx BD indexes start after the Tx BD indexes. */
+  eth->tx_bd_index = 0;
+  eth->rx_bd_index = eth->regs.tx_bd_num * 2;
 
   /* Reset IRQ line status */
   eth->int_line_stat = 0;
@@ -1083,8 +1117,8 @@ eth_status (void *dat)
   PRINTF ("MIIRX_DATA   : 0x%08lX\n", eth->regs.miirx_data);
   PRINTF ("MIISTATUS    : 0x%08lX\n", eth->regs.miistatus);
   PRINTF ("MAC Address  : %02X:%02X:%02X:%02X:%02X:%02X\n",
-	  eth->mac_address[0], eth->mac_address[1], eth->mac_address[2],
-	  eth->mac_address[3], eth->mac_address[4], eth->mac_address[5]);
+	  eth->mac_address[5], eth->mac_address[4], eth->mac_address[3],
+	  eth->mac_address[2], eth->mac_address[1], eth->mac_address[0]);
   PRINTF ("HASH0        : 0x%08lX\n", eth->regs.hash0);
   PRINTF ("HASH1        : 0x%08lX\n", eth->regs.hash1);
 }
@@ -1136,13 +1170,13 @@ eth_read32 (oraddr_t addr, void *dat)
     case ETH_MIISTATUS:
       return eth->regs.miistatus;
     case ETH_MAC_ADDR0:
-      return (((unsigned long) eth->mac_address[3]) << 24) |
-	(((unsigned long) eth->mac_address[2]) << 16) |
-	(((unsigned long) eth->mac_address[1]) << 8) |
-	(unsigned long) eth->mac_address[0];
+      return (((unsigned long) eth->mac_address[2]) << 24) |
+	(((unsigned long) eth->mac_address[3]) << 16) |
+	(((unsigned long) eth->mac_address[4]) << 8) |
+	(unsigned long) eth->mac_address[5];
     case ETH_MAC_ADDR1:
-      return (((unsigned long) eth->mac_address[5]) << 8) |
-	(unsigned long) eth->mac_address[4];
+      return (((unsigned long) eth->mac_address[0]) << 8) |
+	(unsigned long) eth->mac_address[1];
     case ETH_HASH0:
       return eth->regs.hash0;
     case ETH_HASH1:
@@ -1168,6 +1202,7 @@ static void
 eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 {
   struct eth_device *eth = dat;
+  unsigned char      buf[ETH_MAXPL];
 
   switch (addr)
     {
@@ -1179,7 +1214,7 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 	  TEST_FLAG (value, ETH_MODER, RXEN))
 	{
 	  // Reset RX BD index
-	  eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+	  eth->rx_bd_index = eth->regs.tx_bd_num << 1;
 	  
 	  // Clear TAP
 	  {
@@ -1200,7 +1235,7 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 		}
 	      else if ((n > 0) && ((fds[0].revents & POLLIN) == POLLIN))
 		{
-		  nread = read (eth->rtx_fd, eth->rx_buff, ETH_MAXPL);
+		  nread = read (eth->rtx_fd, buf, ETH_MAXPL);
 		  
 		  if (nread < 0)
 		    {
@@ -1221,7 +1256,7 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
       if (!TEST_FLAG (eth->regs.moder, ETH_MODER, TXEN) &&
 	  TEST_FLAG (value, ETH_MODER, TXEN))
 	{
-	  eth->tx.bd_index = 0;
+	  eth->tx_bd_index = 0;
 	  SCHED_ADD (eth_controller_tx_clock, dat, 1);
 	}
       else if (!TEST_FLAG (value, ETH_MODER, TXEN) &&
@@ -1279,7 +1314,7 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
     case ETH_TX_BD_NUM:
       /* When TX_BD_NUM is written, also reset current RX BD index */
       eth->regs.tx_bd_num = value & 0xFF;
-      eth->rx.bd_index = eth->regs.tx_bd_num << 1;
+      eth->rx_bd_index = eth->regs.tx_bd_num << 1;
       return;
     case ETH_CTRLMODER:
       eth->regs.controlmoder = value;
@@ -1310,14 +1345,14 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
       return;
 
     case ETH_MAC_ADDR0:
-      eth->mac_address[0] = value & 0xFF;
-      eth->mac_address[1] = (value >> 8) & 0xFF;
-      eth->mac_address[2] = (value >> 16) & 0xFF;
-      eth->mac_address[3] = (value >> 24) & 0xFF;
+      eth->mac_address[5] = value & 0xFF;
+      eth->mac_address[4] = (value >> 8) & 0xFF;
+      eth->mac_address[3] = (value >> 16) & 0xFF;
+      eth->mac_address[2] = (value >> 24) & 0xFF;
       return;
     case ETH_MAC_ADDR1:
-      eth->mac_address[4] = value & 0xFF;
-      eth->mac_address[5] = (value >> 8) & 0xFF;
+      eth->mac_address[1] = value & 0xFF;
+      eth->mac_address[0] = (value >> 8) & 0xFF;
       return;
     case ETH_HASH0:
       eth->regs.hash0 = value;

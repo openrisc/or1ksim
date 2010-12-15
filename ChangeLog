@@ -1,3 +1,19 @@
+2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* peripheral/eth.c <mac_address>: Defined to ff:ff:ff:ff:ff:ff.
+	<struct eth_device>: loopback_offset removed. State reduced to
+	just BD indices, buffers removed.
+	(eth_read_rx_file, eth_skip_rx_file, eth_rx_next_packet): Deleted.
+	(eth_write_file_packet, eth_write_tap_packet, eth_write_packet)
+	(eth_blush_bd): Created.
+	(eth_controller_tx_clock): Completely rewritten.
+	(eth_read_file_packet, eth_read_tap_packet, eth_read_packet)
+	(eth_fill_bd, eth_ignore_packet): Created.
+	(eth_controller_rx_clock): Completely rewritten.
+	(eth_read32, eth_write32): Rewritten for new data structures.
+
 2010-12-09  Julius Baxter <julius@opencores.org>
 
 	* doc/or1ksim.texi: changed references to or32-uclinux-* to or32-elf-*.
@@ -8,7 +24,7 @@
 	* toplevel-support.c: <toggle_trace>: New function to toggle the trace
 	execution control variable.
 	* toplevel-support.h: <toggle_trace>: Add function prototype.
-	
+
 2010-12-08  Jeremy Bennett <jeremy@jeremybennett.com>
 
 	* configure: Regenerated.
