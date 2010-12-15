@@ -1,8 +1,27 @@
 2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
 
+	* peripheral/eth.c <RTX_RESCHED_PERIOD>: Added.
+	(eth_controller_tx_clock, eth_controller_rx_clock): Reschedule for
+	RTX_RESCHED_PERIOD.
+	(eth_controller_tx_clock): dummy_crc parameter controls whether
+	CRC is added.
+	(eth_ignore_tap_packet): Deleted.
+	(eth_ignore_tap_packets): Added (based on eth_ignore_tap_packet).
+	(eth_reset): I/O opening moved into eth_open_if.
+	(eth_open_if, eth_open_file_if, eth_open_tap_if): Created.
+	(eth_regname): Created.
+	(eth_read32, eth_write32): Unified debug printing.
+	(eth_dummy_crc): Created.
+	(eth_sec_start): Initialize dummy_crc.
+	(reg_ethernet_sec): Add dummy_crc parameter.
+	* doc/or1ksim.texi: Updated Ethernet configuration section for
+	dummy_crc.
+
+2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
+
 	* configure: Regenerated.
 	* configure.ac: Updated version.
-	* peripheral/eth.c <mac_address>: Defined to ff:ff:ff:ff:ff:ff.
+	* peripheral/eth.c <mac_broadcast>: Defined to ff:ff:ff:ff:ff:ff.
 	<struct eth_device>: loopback_offset removed. State reduced to
 	just BD indices, buffers removed.
 	(eth_read_rx_file, eth_skip_rx_file, eth_rx_next_packet): Deleted.

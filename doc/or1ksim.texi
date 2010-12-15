@@ -2736,18 +2736,36 @@ specifies the TAP device to use for communication.  This should be a
 persistent TAP device configured for the system (@pxref{Ethernet TUN/TAP
 Interface, , Ethernet TUN/TAP Interface})
 
-@item vapi_id = @var{value}
-@cindex @code{vapi_id} (DMA configuration)
-@var{value} specifies the value of the Verification API (VAPI) base
-address to be used with the Ethernet PHY.  @xref{Verification API, ,
-Verification API}, for more details, which details the use of the VAPI
-with the DMA controller.
+@item phy_addr = @var{value}
+@cindex @code{phy_addr} 
+@var{value} specifies the address for emulated ethernet PHY (default
+0). If there are multiple Ethernet peripherals, they should each have a
+different PHY value.
+
+@item dummy_crc = 0|1
+@cindex @code{dummy_crc} (Ethernet configuration)
+If 1 (true, the default), the length of the data transferred to the core
+will be increased by 4 bytes, as though the CRC were included.
+
+@quotation Note
+This is for historical consistency with the OpenRISC Ethernet hardware
+MAC, which passes on the CRC in the data packet. This is unusual
+behavior for a MAC, but the OpenRISC Linux device drivers have been
+written to expect it.
+@end quotation
 
 @item phy_addr = @var{value}
 @cindex @code{phy_addr} 
 @var{value} specifies the address for emulated ethernet PHY (default
 0). If there are multiple Ethernet peripherals, they should each have a
 different PHY value.
+
+@item vapi_id = @var{value}
+@cindex @code{vapi_id} (DMA configuration)
+@var{value} specifies the value of the Verification API (VAPI) base
+address to be used with the Ethernet PHY.  @xref{Verification API, ,
+Verification API}, for more details, which details the use of the VAPI
+with the DMA controller.
 
 @end table
 

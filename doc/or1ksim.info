@@ -2261,16 +2261,31 @@ on the main OpenRISC Wishbone data bus.
      device configured for the system (*note Ethernet TUN/TAP
      Interface: Ethernet TUN/TAP Interface.)
 
-`vapi_id = VALUE'
-     VALUE specifies the value of the Verification API (VAPI) base
-     address to be used with the Ethernet PHY.  *Note Verification API:
-     Verification API, for more details, which details the use of the
-     VAPI with the DMA controller.
+`phy_addr = VALUE'
+     VALUE specifies the address for emulated ethernet PHY (default 0).
+     If there are multiple Ethernet peripherals, they should each have a
+     different PHY value.
+
+`dummy_crc = 0|1'
+     If 1 (true, the default), the length of the data transferred to
+     the core will be increased by 4 bytes, as though the CRC were
+     included.
+
+          Note: This is for historical consistency with the OpenRISC
+          Ethernet hardware MAC, which passes on the CRC in the data
+          packet. This is unusual behavior for a MAC, but the OpenRISC
+          Linux device drivers have been written to expect it.
 
 `phy_addr = VALUE'
      VALUE specifies the address for emulated ethernet PHY (default 0).
      If there are multiple Ethernet peripherals, they should each have a
      different PHY value.
+
+`vapi_id = VALUE'
+     VALUE specifies the value of the Verification API (VAPI) base
+     address to be used with the Ethernet PHY.  *Note Verification API:
+     Verification API, for more details, which details the use of the
+     VAPI with the DMA controller.
 
 
 
@@ -4106,6 +4121,8 @@ Index
                                                               (line   6)
 * doze mode (power management register): Power Management Configuration.
                                                               (line  15)
+* dummy_crc (Ethernet configuration):    Ethernet Configuration.
+                                                              (line 104)
 * dv (Interactive CLI):                  Interactive Command Line.
                                                               (line 124)
 * dynamic clock gating (power management register): Power Management Configuration.
@@ -4381,7 +4398,7 @@ Index
 * persistent TAP device creation:        Setting Up a Persistent TAP device.
                                                               (line   6)
 * phy_addr:                              Ethernet Configuration.
-                                                              (line 105)
+                                                              (line  99)
 * PIC configuration:                     Interrupt Configuration.
                                                               (line   6)
 * pio (ATA/ATAPI device configuration):  Disc Interface Configuration.
@@ -4685,7 +4702,7 @@ Index
 * vapi_id (debug interface configuration): Debug Interface Configuration.
                                                               (line  43)
 * vapi_id (DMA configuration) <1>:       Ethernet Configuration.
-                                                              (line  99)
+                                                              (line 119)
 * vapi_id (DMA configuration):           DMA Configuration.   (line  38)
 * vapi_id (GPIO configuration):          GPIO Configuration.  (line  32)
 * vapi_id (UART configuration):          UART Configuration.  (line  85)
@@ -4748,23 +4765,23 @@ Node: Memory Controller Configuration71879
 Node: UART Configuration75659
 Node: DMA Configuration79178
 Node: Ethernet Configuration81045
-Node: GPIO Configuration85690
-Node: Display Interface Configuration87323
-Node: Frame Buffer Configuration89632
-Node: Keyboard Configuration91496
-Node: Disc Interface Configuration93734
-Node: Generic Peripheral Configuration98838
-Node: Interactive Command Line101133
-Node: Verification API108107
-Node: Code Internals112537
-Node: Coding Conventions113120
-Node: Global Data Structures117547
-Node: Concepts120204
-Ref: Output Redirection120349
-Ref: Interrupts Internal120887
-Node: Internal Debugging122040
-Node: Regression Testing122564
-Node: GNU Free Documentation License126353
-Node: Index148760
+Node: GPIO Configuration86324
+Node: Display Interface Configuration87957
+Node: Frame Buffer Configuration90266
+Node: Keyboard Configuration92130
+Node: Disc Interface Configuration94368
+Node: Generic Peripheral Configuration99472
+Node: Interactive Command Line101767
+Node: Verification API108741
+Node: Code Internals113171
+Node: Coding Conventions113754
+Node: Global Data Structures118181
+Node: Concepts120838
+Ref: Output Redirection120983
+Ref: Interrupts Internal121521
+Node: Internal Debugging122674
+Node: Regression Testing123198
+Node: GNU Free Documentation License126987
+Node: Index149394
 
 End Tag Table
