@@ -1,4 +1,9 @@
-2010-12-15x  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* eth/eth.c: Fixed errors causing regression failure. Solved by enable
+	promiscuous mode, and correct BD index recording.
+
+2010-12-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Updated version.

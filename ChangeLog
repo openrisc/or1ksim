@@ -1,3 +1,8 @@
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/eth.c: <RTX_RESCHED_PERIOD>: Changed to 10000.
+	(eth_write32): Additional debug output, when enabled.
+	
 2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
 
 	* peripheral/eth.c <RTX_RESCHED_PERIOD>: Added.

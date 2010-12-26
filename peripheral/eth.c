@@ -71,7 +71,7 @@
 #endif
 
 /*! Period (clock cycles) for rescheduling Rx and Tx controllers. */
-#define  RTX_RESCHED_PERIOD  1
+#define  RTX_RESCHED_PERIOD  10000
 
 /*! MAC address that is always accepted. */
 static const unsigned char mac_broadcast[ETHER_ADDR_LEN] =
@@ -445,7 +445,7 @@ eth_read_file_packet (struct eth_device *eth,
       fprintf (stderr, "ERROR: Failed to read length from file.\n");
       return  -1;
     }
-
+  
   /* Packet must be big enough to hold a header */
   if (packet_length < ETHER_HDR_LEN)
     {
@@ -1371,23 +1371,43 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 
 #if ETH_DEBUG
   /* Only trace registers of particular interest */
+  
   switch (addr)
-    {
-    case ETH_MODER:
-    case ETH_INT_SOURCE:
-    case ETH_INT_MASK:
-    case ETH_IPGT:
-    case ETH_IPGR1:
-    case ETH_IPGR2:
-    case ETH_PACKETLEN:
-    case ETH_COLLCONF:
-    case ETH_TX_BD_NUM:
-    case ETH_CTRLMODER:
-    case ETH_MAC_ADDR0:
-    case ETH_MAC_ADDR1:
-      printf ("eth_write32: %s = 0x%08lx\n", eth_regname (addr),
-	      (unsigned long int) value);
-    }
+  {
+  case ETH_MODER:
+  case ETH_INT_SOURCE:
+  case ETH_INT_MASK:
+  case ETH_IPGT:
+  case ETH_IPGR1:
+  case ETH_IPGR2:
+  case ETH_PACKETLEN:
+  case ETH_COLLCONF:
+  case ETH_TX_BD_NUM:
+  case ETH_CTRLMODER:
+  case ETH_MAC_ADDR0:
+  case ETH_MAC_ADDR1:
+	  printf ("eth_write32: 0x%08lx to %s ", (unsigned long) value,
+		  eth_regname (addr));
+	  
+  }
+  
+  /* Detail register transitions on MODER, INT_SOURCE AND INT_MASK */
+  
+  switch (addr)
+  {
+  case ETH_MODER:
+	  printf("0x%08lx -> ", (unsigned long) eth->regs.moder);
+	  break;
+  case ETH_INT_SOURCE:
+	  printf("0x%08lx -> ", (unsigned long) eth->regs.int_source);
+	  break;
+  case ETH_INT_MASK:
+	  printf("0x%08lx -> ", (unsigned long) eth->regs.int_mask);
+	  break;    
+  }
+
+  
+
 #endif
 
   switch (addr)
@@ -1526,6 +1546,36 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 	}
       break;
     }
+
+#if ETH_DEBUG
+
+  switch (addr)
+  {
+  case ETH_MODER:
+	  printf("0x%08lx", (unsigned long) eth->regs.moder);
+	  break;
+  case ETH_INT_SOURCE:
+	  printf("0x%08lx", (unsigned long) eth->regs.int_source);
+	  break;
+  case ETH_INT_MASK:
+	  printf("0x%08lx", (unsigned long) eth->regs.int_mask);
+	  break;
+  case ETH_IPGT:
+  case ETH_IPGR1:
+  case ETH_IPGR2:
+  case ETH_PACKETLEN:
+  case ETH_COLLCONF:
+  case ETH_TX_BD_NUM:
+  case ETH_CTRLMODER:
+  case ETH_MAC_ADDR0:
+  case ETH_MAC_ADDR1:
+	  break;	  
+  }
+
+  printf("\n");
+#endif
+
+
 }	/* eth_write32 () */
 
 
