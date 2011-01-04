@@ -30,61 +30,10 @@
 
 #define MEM_RAM 0x00000000
 
-#define MC_CSR		(0x00)
-#define MC_POC		(0x04)
-#define MC_BA_MASK	(0x08)
-#define MC_CSC(i)	(0x10 + (i) * 8)
-#define MC_TMS(i)	(0x14 + (i) * 8)
-
-	.section .except, "ax"
-	l.addi	  r1,r0,0
-
 	.section .text
-
-	.org 0x100
-_reset:
-	l.movhi r1,hi(_init_mc)
-	l.ori	r1,r1,lo(_init_mc)
-	l.jr	r1
+	.global main
+main:	
 	l.nop
-	
-
-_init_mc:
- 
-	l.movhi r3,hi(MC_BASE_ADDR)
-	l.ori	r3,r3,lo(MC_BASE_ADDR)
- 
-	l.addi	r4,r3,MC_CSC(0)
-	l.movhi r5,hi(FLASH_BASE_ADDR)
-	l.srai	r5,r5,6
-	l.ori	r5,r5,0x0025
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_TMS(0)
-	l.movhi r5,hi(FLASH_TMS_VAL)
-	l.ori	r5,r5,lo(FLASH_TMS_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_BA_MASK
-	l.addi	r5,r0,MC_MASK_VAL
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_CSR
-	l.movhi r5,hi(MC_CSR_VAL)
-	l.ori	r5,r5,lo(MC_CSR_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_TMS(1)
-	l.movhi r5,hi(SDRAM_TMS_VAL)
-	l.ori	r5,r5,lo(SDRAM_TMS_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_CSC(1)
-	l.movhi r5,hi(SDRAM_BASE_ADDR)
-	l.srai	r5,r5,6
-	l.ori	r5,r5,0x0411
-	l.sw	0(r4),r5
- 
 
 _regs:
 	l.addi	r1,r0,0x1

@@ -1090,6 +1090,7 @@ int           trace_store_addr_reg;
 unsigned int  trace_store_imm;
 int           trace_store_val_reg;
 int           trace_store_width;
+int           trace_dest_spr;
 
 /* Automagically does zero- or sign- extension and also finds correct
    sign bit position if sign extension is correct extension. Which extension
@@ -1320,6 +1321,7 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
 
   /* Set trace result defaults. */
   trace_dest_reg       = -1;
+  trace_dest_spr       = -1;
   trace_store_addr_reg = -1;
   trace_store_imm      =  0;
   trace_store_val_reg  = -1;
@@ -1344,6 +1346,12 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
       else if (0 == strcmp ("l.sw", opcode->name))
 	{
 	  trace_store_width = 4;
+	}
+
+      /* Is it a move to SPR opcode? */
+      if (0 == strcmp ("l.mtspr", opcode->name))
+	{
+	  trace_dest_spr = 1;
 	}
 
       /* Copy the opcode and pad */
@@ -1411,6 +1419,17 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
 		      trace_store_imm =
 			or1ksim_extend_imm (trace_store_imm, *s);
 		    }
+
+		  if (1 == trace_dest_spr)
+		  {
+			  trace_dest_spr = 
+				  or1ksim_or32_extract ('K', opcode->encoding, 
+							insn);
+			  trace_dest_reg =
+				  or1ksim_or32_extract ('A', opcode->encoding, 
+							insn);
+		  }
+		  
 		}
 	      else
 		{

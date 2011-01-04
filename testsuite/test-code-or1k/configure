@@ -867,7 +867,7 @@ with_gnu_ld
 enable_libtool_lock
 enable_dependency_tracking
 enable_all_tests
-enable_opt
+enable_check_opt
 '
       ac_precious_vars='build_alias
 host_alias
@@ -11046,15 +11046,15 @@ fi
 
 
 # Specify our baseline CFLAGS
-CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/mc-common"
+CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
 
 # Flag to specify whether we want optimization when checking
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable optimizations when checking" >&5
 $as_echo_n "checking whether to enable optimizations when checking... " >&6; }
-# Check whether --enable-opt was given.
-if test "${enable_opt+set}" = set; then :
-  enableval=$enable_opt;
+# Check whether --enable-check-opt was given.
+if test "${enable_check_opt+set}" = set; then :
+  enableval=$enable_check_opt;
     case "$enableval" in
 	yes)
 	    CFLAGS="$CFLAGS -O"

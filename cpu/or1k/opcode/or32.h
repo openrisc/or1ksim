@@ -171,6 +171,7 @@ extern int           trace_store_addr_reg;
 extern unsigned int  trace_store_imm;
 extern int           trace_store_val_reg;
 extern int           trace_store_width;
+extern int           trace_dest_spr;
 
 /* Calculates instruction length in bytes.  Always 4 for OR32. */
 extern int or1ksim_insn_len PARAMS((int insn_index));

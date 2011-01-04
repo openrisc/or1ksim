@@ -217,8 +217,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 int_test_SOURCES = int-test.S
-int_test_LDFLAGS = -T$(srcdir)/int-test.ld
-EXTRA_DIST = int-test.ld
+int_test_LDFLAGS = -T$(srcdir)/../default.ld
 all: all-am
 
 .SUFFIXES:

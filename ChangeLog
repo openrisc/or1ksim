@@ -1,3 +1,11 @@
+2011-01-04  Julius Baxter  <julius@opencores.org>
+	* cpu/or32/or32.c: <trace_dest_spr>: Added.
+	(or1ksim_disassemble_trace_index): Added dumping of SPR content when
+	disassembling l.mtspr instruction.
+	* cpu/common/abstract.c: 
+	(disassemble_instr): Added tracing of SPR contents after l.mtspr insn.
+	* cpu/or1k/opcode/or32.h: (trace_dest_spr): Added extern definition.
+	
 2010-12-27  Julius Baxter  <julius@opencores.org>
 
 	* peripheral/eth.c: <RTX_RESCHED_PERIOD>: Changed to 10000.

@@ -250,8 +250,11 @@ tick_int_spurious (void)
   /* Allow MAX_SPURIOUS spurious spurious interrupt */
   if (++tick_cnt == MAX_SPURIOUS)
     {
-      ttmr &= ~SPR_TTMR_IE;
+      /* Clear mode register completely */
+      ttmr = 0;
       mtspr (SPR_TTMR, ttmr);
+      
+      
     }
 }	/* tick_int_spurious () */
 
@@ -574,7 +577,7 @@ main()
   tick_cnt = 0;
   clear_ip = 0;
 
-  ttcr = clear_ttcr ();
+  clear_ttcr ();
   ttmr = new_timer (0x100, SPR_TTMR_CR, SPR_TTMR_IE);
 
   while(tick_cnt != MAX_SPURIOUS)

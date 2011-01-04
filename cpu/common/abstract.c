@@ -1253,8 +1253,16 @@ disassemble_instr (oraddr_t addr)
 	  or1ksim_disassemble_trace_index (insn, index);
 	  PRINTF ("%-24s", or1ksim_disassembled);
 
-	  /* Put either the register assignment, or store */
-	  if (-1 != trace_dest_reg)
+	  /* Put either the register assignment, SPR value, or store */
+	  if (-1 != trace_dest_spr)
+	  {
+		  PRINTF ("SPR[%04x]  = %08x", (trace_dest_spr | 
+						evalsim_reg (trace_dest_reg)), 
+			  cpu_state.sprs[(trace_dest_spr | 
+					  evalsim_reg (trace_dest_reg))]);
+
+	  }
+	  else if (-1 != trace_dest_reg)
 	    {
 	      PRINTF ("r%-2u        = %" PRIxREG "", trace_dest_reg,
 		       evalsim_reg (trace_dest_reg));
@@ -1291,6 +1299,7 @@ disassemble_instr (oraddr_t addr)
 		  break;
 		}
 	    }
+	  
 
 	  /* Print the flag */
 	  PRINTF ("  flag: %u\n", cpu_state.sprs[SPR_SR] & SPR_SR_F ? 1 : 0);

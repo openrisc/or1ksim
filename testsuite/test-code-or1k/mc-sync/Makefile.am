@@ -34,6 +34,7 @@ mc_sync_SOURCES  = mc-sync.c \
 mc_sync_CPPFLAGS = -I$(srcdir)/../../../peripheral \
                    -I$(srcdir)/../../../cpu/common \
                    -I$(srcdir)/../../../cpu/or1k   \
+                    -I$(srcdir)/../mc-common		\
                    -I$(srcdir)/../../../port
 
 mc_sync_LDFLAGS  = -T$(srcdir)/../except-mc.ld

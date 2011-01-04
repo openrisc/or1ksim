@@ -81,12 +81,12 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 
 # Specify our baseline CFLAGS
-CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/mc-common"
+CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
 
 # Flag to specify whether we want optimization when checking
 AC_MSG_CHECKING(whether to enable optimizations when checking)
-AC_ARG_ENABLE(opt,
+AC_ARG_ENABLE(check-opt,
     [  --enable-check-opt      enable optimizations
   --enable-check-opt=level     same as gcc -O switch  ], [
     case "$enableval" in

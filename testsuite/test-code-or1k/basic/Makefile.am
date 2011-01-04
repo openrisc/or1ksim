@@ -30,3 +30,6 @@ check_PROGRAMS = basic
 basic_SOURCES  = basic.S
 
 basic_LDFLAGS  = -T$(srcdir)/../default.ld
+
+basic_LDADD   = ../except/except.lo      \
+	         ../support/libsupport.la

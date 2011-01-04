@@ -28,7 +28,6 @@
 MEMORY
         {
         except : ORIGIN = 0x00000000, LENGTH = 0x00002000
-        flash  : ORIGIN = 0xf0000000, LENGTH = 0x00200000
         ram    : ORIGIN = 0x00002000, LENGTH = 0x001fe000
         }
  
@@ -38,20 +37,22 @@ SECTIONS
         {
         *(.reset)
          _src_beg = .;
-        } > flash
+        } > except
+
       .text : 
-        AT ( ADDR (.reset) + SIZEOF (.reset) )
+/*        AT ( ADDR (.reset) + SIZEOF (.reset) )*/
         {
         _dst_beg = .;
         *(.text)
         } > ram
       .data :
-        AT ( ADDR (.reset) + SIZEOF (.reset) + SIZEOF (.text) )
+/*        AT ( ADDR (.reset) + SIZEOF (.reset) + SIZEOF (.text) )*/
         {
         *(.data)
 	*(.data.rel)
 	*(.data.rel.local)
         *(.rodata)
+        *(.rodata.*)
         _dst_end = .;
         } > ram
       .bss :

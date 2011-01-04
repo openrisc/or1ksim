@@ -27,10 +27,7 @@
 
 #include "spr-defs.h"
  
-	.section .except, "ax"
-	l.addi	r2,r0,0
-
-	.section .text
+	.section .except,"ax"
 	.org 0x100
 _reset:
         l.addi  r1,r0,0x7f00
@@ -39,7 +36,7 @@ _reset:
         l.jr    r2
         l.nop
 
-
+	.section .text
 _main:
 	l.addi	r2,r0,0
 

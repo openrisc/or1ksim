@@ -32,21 +32,25 @@
 #define SET_ARITH_FLAG   0  /* If this is not set this test has no meaning */
 
 	.section .except, "ax"
-  l.movhi r10,0x8000
 
-  .section .text
 	.org 0x100
 _reset:
 	l.nop
-  
-  l.movhi r10,0x8000
-  l.addi  r11,r0,-1
-  l.addi  r12,r0,2
-  l.addi  r13,r0,0x5678
-  l.movhi r14,0xdead
-  l.ori   r14,r14,0xdead
-  l.addi  r15,r0,0xdead
+	l.movhi r10,0x8000
+	l.addi  r11,r0,-1
+	l.addi  r12,r0,2
+	l.addi  r13,r0,0x5678
+	l.movhi r14,0xdead
+	l.ori   r14,r14,0xdead
+	l.addi  r15,r0,0xdead
+	l.movhi r3,hi(start)
+        l.ori   r3,r3,lo(start)
+        l.jr    r3
+	l.nop
 
+
+	.section .text
+start:	
   /* Test start */
   
 #if SET_ARITH_FLAG

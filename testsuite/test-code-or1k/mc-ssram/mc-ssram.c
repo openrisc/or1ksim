@@ -95,7 +95,7 @@ int main()
     unsigned char ch;
 
     unsigned long test;
-    unsigned long gpio_pat;
+    unsigned long gpio_pat = 0;
 
     unsigned long nAddress;
     unsigned long nMemSize;

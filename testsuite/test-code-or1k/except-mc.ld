@@ -48,6 +48,7 @@ SECTIONS
         _dst_beg = .;
         *(.text)
         *(.rodata)
+	*(.rodata.*)
         } > ram
 
       	.data :
