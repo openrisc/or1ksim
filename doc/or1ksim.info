@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2010-12-15.tar.bz2
+     tar jxf or1ksim-2011-01-05.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2010-12-15/configure --target=or32-elf ...
+     ../or1ksim-2011-01-05/configure --target=or32-elf ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -288,6 +288,7 @@ File: or1ksim.info,  Node: Usage,  Next: Configuration,  Prev: Installation,  Up
 * Trace Generation::
 * Simulator Library::
 * Ethernet TUN/TAP Interface::
+* l.nop Support::
 
 
 File: or1ksim.info,  Node: Standalone Simulator,  Next: Profiling Utility,  Up: Usage
@@ -795,7 +796,7 @@ one of the following:
 
 
 
-File: or1ksim.info,  Node: Ethernet TUN/TAP Interface,  Prev: Simulator Library,  Up: Usage
+File: or1ksim.info,  Node: Ethernet TUN/TAP Interface,  Next: l.nop Support,  Prev: Simulator Library,  Up: Usage
 
 2.6 Ethernet TUN/TAP Interface
 ==============================
@@ -976,6 +977,57 @@ If desired the TAP interface can be deleted using
      Caution: The TAP interface should not be in use when running this
      command. For example any OpenRISC Linux/BusyBox sessions should be
      closed first.
+
+
+File: or1ksim.info,  Node: l.nop Support,  Prev: Ethernet TUN/TAP Interface,  Up: Usage
+
+2.7 l.nop Opcode Support
+========================
+
+The OpenRISC `l.nop' opcode can take a parameter.  This has no effect
+on the semantics of the opcode, but can be used to trigger side effect
+behavior in a simulator.  Within Or1ksim, the following parameters are
+supported.
+
+`l.nop 0'
+     The equivalent to `l.nop' with no parameter. Has no side effects.
+
+`l.nop 1'
+     Execution of Or1ksim is terminated. This is used to implement the
+     library `exit' functions.
+
+`l.nop 2'
+     Report the value in `r3' on the console as a 32-bit hex value.
+
+`l.nop 3'
+     In earlier versions of Or1ksim this treated `r3' as a pointer to a
+     `printf' style format string, and regsiters `r4' through `r8' as
+     parameters for that format string.
+
+     This opcode is no longer supported, and has no effect if used.
+
+`l.nop 4'
+     The value in `r3' is printed to standard output as an ASCII
+     character.  All library output routines are implemented using this
+     opcode.
+
+`l.nop 5'
+     The statistics counters are reset.
+
+`l.nop 6'
+     The number of clock ticks since start of execution (a 64-bit
+     value) is returned in `r11' (low 32 bits) and `r12' (high 32 bits).
+
+`l.nop 7'
+     The number of picoseconds per clock cycle is returned in `r11'.
+     This is used with `l.nop 6' to implement timing functions.
+
+`l.nop 8'
+     Instruction tracing is turned on.
+
+`l.nop 9'
+     Instruction tracing is turned off.
+
 
 
 File: or1ksim.info,  Node: Configuration,  Next: Interactive Command Line,  Prev: Usage,  Up: Top
@@ -4285,6 +4337,17 @@ Index
 * jitter (UART configuration):           UART Configuration.  (line  78)
 * keyboard configuration:                Keyboard Configuration.
                                                               (line   6)
+* l.nop 0:                               l.nop Support.       (line  12)
+* l.nop 1 (end simulation):              l.nop Support.       (line  15)
+* l.nop 2 (report):                      l.nop Support.       (line  19)
+* l.nop 3 (printf, now obsolete):        l.nop Support.       (line  22)
+* l.nop 4 (putc):                        l.nop Support.       (line  29)
+* l.nop 5 (reset statistics counters):   l.nop Support.       (line  34)
+* l.nop 6 (get clock ticks):             l.nop Support.       (line  37)
+* l.nop 7 (get picoseconds per cycle):   l.nop Support.       (line  41)
+* l.nop 8 (turn on tracing):             l.nop Support.       (line  45)
+* l.nop 9 (turn off tracing):            l.nop Support.       (line  48)
+* l.nop opcode effects:                  l.nop Support.       (line   6)
 * library version of Or1ksim:            Simulator Library.   (line   6)
 * license for Or1ksim:                   GNU Free Documentation License.
                                                               (line   6)
@@ -4731,57 +4794,58 @@ Node: Configuring the Build1762
 Node: Build and Install7902
 Node: Known Issues8668
 Node: Usage9723
-Node: Standalone Simulator9989
-Node: Profiling Utility14549
-Node: Memory Profiling Utility15455
-Node: Trace Generation16815
-Node: Simulator Library18057
-Node: Ethernet TUN/TAP Interface28489
-Node: Setting Up a Persistent TAP device29572
-Node: Establishing a Bridge30247
-Node: Opening the Firewall31930
-Node: Disabling Ethernet Filtering32421
-Node: Networking from OpenRISC Linux and BusyBox33046
-Node: Tearing Down a Bridge34708
-Node: Configuration35451
-Node: Configuration File Format36063
-Node: Configuration File Preprocessing36448
-Node: Configuration File Syntax36745
-Node: Simulator Configuration39530
-Node: Simulator Behavior39821
-Node: Verification API Configuration44402
-Node: CUC Configuration46342
-Node: Core OpenRISC Configuration48334
-Node: CPU Configuration48836
-Node: Memory Configuration52955
-Node: Memory Management Configuration59677
-Node: Cache Configuration62054
-Node: Interrupt Configuration64440
-Node: Power Management Configuration66273
-Node: Branch Prediction Configuration67550
-Node: Debug Interface Configuration68910
-Node: Peripheral Configuration71253
-Node: Memory Controller Configuration71879
-Node: UART Configuration75659
-Node: DMA Configuration79178
-Node: Ethernet Configuration81045
-Node: GPIO Configuration86324
-Node: Display Interface Configuration87957
-Node: Frame Buffer Configuration90266
-Node: Keyboard Configuration92130
-Node: Disc Interface Configuration94368
-Node: Generic Peripheral Configuration99472
-Node: Interactive Command Line101767
-Node: Verification API108741
-Node: Code Internals113171
-Node: Coding Conventions113754
-Node: Global Data Structures118181
-Node: Concepts120838
-Ref: Output Redirection120983
-Ref: Interrupts Internal121521
-Node: Internal Debugging122674
-Node: Regression Testing123198
-Node: GNU Free Documentation License126987
-Node: Index149394
+Node: Standalone Simulator10007
+Node: Profiling Utility14567
+Node: Memory Profiling Utility15473
+Node: Trace Generation16833
+Node: Simulator Library18075
+Node: Ethernet TUN/TAP Interface28507
+Node: Setting Up a Persistent TAP device29612
+Node: Establishing a Bridge30287
+Node: Opening the Firewall31970
+Node: Disabling Ethernet Filtering32461
+Node: Networking from OpenRISC Linux and BusyBox33086
+Node: Tearing Down a Bridge34748
+Node: l.nop Support35491
+Node: Configuration37001
+Node: Configuration File Format37613
+Node: Configuration File Preprocessing37998
+Node: Configuration File Syntax38295
+Node: Simulator Configuration41080
+Node: Simulator Behavior41371
+Node: Verification API Configuration45952
+Node: CUC Configuration47892
+Node: Core OpenRISC Configuration49884
+Node: CPU Configuration50386
+Node: Memory Configuration54505
+Node: Memory Management Configuration61227
+Node: Cache Configuration63604
+Node: Interrupt Configuration65990
+Node: Power Management Configuration67823
+Node: Branch Prediction Configuration69100
+Node: Debug Interface Configuration70460
+Node: Peripheral Configuration72803
+Node: Memory Controller Configuration73429
+Node: UART Configuration77209
+Node: DMA Configuration80728
+Node: Ethernet Configuration82595
+Node: GPIO Configuration87874
+Node: Display Interface Configuration89507
+Node: Frame Buffer Configuration91816
+Node: Keyboard Configuration93680
+Node: Disc Interface Configuration95918
+Node: Generic Peripheral Configuration101022
+Node: Interactive Command Line103317
+Node: Verification API110291
+Node: Code Internals114721
+Node: Coding Conventions115304
+Node: Global Data Structures119731
+Node: Concepts122388
+Ref: Output Redirection122533
+Ref: Interrupts Internal123071
+Node: Internal Debugging124224
+Node: Regression Testing124748
+Node: GNU Free Documentation License128537
+Node: Index150944
 
 End Tag Table

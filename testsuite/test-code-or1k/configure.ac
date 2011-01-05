@@ -1,6 +1,6 @@
 # configure.ac -- OR1K test code specific autoconf configuration file
 #
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) 2010, 2011 Embecosm Limited
 #
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
@@ -24,7 +24,7 @@
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
 
-AC_INIT([or1ksim-testsuite], [2010-12-15], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite], [2011-01-05], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL

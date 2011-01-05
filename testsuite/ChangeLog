@@ -1,4 +1,9 @@
+2011-01-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* README: Updated with details of new tests.
+
 2011-01-04  Julius Baxter  <julius@opencores.org>
+
 	* libsim.tests/default.cfg: Remove superfluous sections. Change CPU
 	SR to 0x8001 (unset EPH bit).
 	* libsim.tests/int-edge.cfg: Remove MC section
@@ -20,24 +25,24 @@
 	Added all handler sections.
 	Fixed bug with DTLB handler which would -4 off EPCR.
 	Now take care to create exception stack past redzone of 128 bytes.
-	* test-code-or1k/tick/tick.c: 
-	(tick_int_spurious): Fix apparent bug with spurious interrupt test 
-	which would continue interrupting the program, not allowing it to 
+	* test-code-or1k/tick/tick.c:
+	(tick_int_spurious): Fix apparent bug with spurious interrupt test
+	which would continue interrupting the program, not allowing it to
 	proceed. Achieve by clearing ttmr when enough interrupts were seen.
 	* test-code-or1k/ext/ext.S: Add labels for linker sections.
 	* test-code-or1k/cache/cache.ld: Similar changes to default.ld
 	* test-code-or1k/cache/cache-asm.S: Remove MC init and relocation code.
 	* test-code-or1k/cache/cache.c: Remove UART code.
-	(init_cache_config): Add function for  automatic detection of cache 
+	(init_cache_config): Add function for  automatic detection of cache
 	settings.
 	* test-code-or1k/fp/fp.S: Remove MC init code.
 	(illegal_insn): Added illegal instruction handler to indicate if FPU
 	needs to be enabled.
 	* test-code-or1k/mc-ssram/mc-ssram.c: <gpio_pat>: Init to 0 to stop GCC
 	warning.
-	* test-code-or1k/mul/mul.c: 
+	* test-code-or1k/mul/mul.c:
 	(macrc): Add l.nops before l.macrc. Workaround for bug #1930.
-	* test-code-or1k/mmu/mmu.c: Almost entirely reimplemented, based on 
+	* test-code-or1k/mmu/mmu.c: Almost entirely reimplemented, based on
 	version from ORPSoC.
 	* test-code-or1k/mmu/mmu-asm.S: Clobber r3 instead of r11 in lo_immu_en
 	* test-code-or1k/cfg/cfg.S: Change section labels to allow use with new
@@ -46,7 +51,7 @@
 	Add new reset section code.
 	Add .org directives for each vector handler.
 	Change immediate of l.trap to 15 from 1
-	* test-code-or1k/except-test/except-test.c: <FLASH_START>: Removed, 
+	* test-code-or1k/except-test/except-test.c: <FLASH_START>: Removed,
 	substituted with RAM_START where appropriate.
 	<FLASH_SIZE>: Removed.
 	<RAM_SIZE>: Changed to 2MB.
@@ -60,10 +65,10 @@
 	* test-code-or1k/int-test/Makefile.am: <int_test_LDFLAGS>: Changed to
 	use default.ld.
 	* test-code-or1k/flag/flag.S: Change exceptions to be in .except section
-	* test-code-or1k/mc-sync/Makefile.am: <mc_sync_CPPFLAGS>: Added 
+	* test-code-or1k/mc-sync/Makefile.am: <mc_sync_CPPFLAGS>: Added
 	mc-common as include path.
 	* test-code-or1k/mc-async/Makefile.am: <mc_async_CPPFLAGS>: Ditto.
-	* test-code-or1k/support/support.c: 
+	* test-code-or1k/support/support.c:
 	(printf): Added ignoring of '.' in printf format fields.
 	* or1ksim.tests/default.cfg: Removed MC section.
 	* or1ksim.tests/mem-test.exp: Updated expect list.
@@ -74,9 +79,9 @@
 	* or1ksim.tests/kbdtest.cfg: Removed MC section.
 	* or1ksim.tests/int-test.exp: Updated expect list.
 	* or1ksim.tests/fp.cfg: Removed MC section.
-	* test-code/lib-upcalls/lib-upcalls.c: Added explicit handling of 
+	* test-code/lib-upcalls/lib-upcalls.c: Added explicit handling of
 	OR1KSIM_RC_HALTED return code from library run execute function.
-	
+
 2010-12-27  Julius Baxter  <julius@opencores.org>
 
 	* or1ksim.tests/eth.cfg: Ethernet section, commented out sockif setting,

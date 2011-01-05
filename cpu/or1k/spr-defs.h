@@ -623,6 +623,8 @@
 #define NOP_CNT_RESET    0x0005	     /* Reset statistics counters */
 #define NOP_GET_TICKS    0x0006	     /* JPB: Get # ticks running */
 #define NOP_GET_PS       0x0007      /* JPB: Get picosecs/cycle */
+#define NOP_TRACE_ON     0x0008      /* Turn on tracing */
+#define NOP_TRACE_OFF    0x0009      /* Turn off tracing */
 #define NOP_REPORT_FIRST 0x0400      /* Report with number */
 #define NOP_REPORT_LAST  0x03ff      /* Report with number */
 

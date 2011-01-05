@@ -355,6 +355,7 @@ code uses static global constants liberally!
 * Trace Generation::
 * Simulator Library::
 * Ethernet TUN/TAP Interface::
+* l.nop Support::
 @end menu
 
 @node Standalone Simulator
@@ -1194,6 +1195,77 @@ openvpn --rmtun -dev tap@emph{y}
 The TAP interface should not be in use when running this command. For
 example any OpenRISC Linux/BusyBox sessions should be closed first.
 @end quotation
+
+@node l.nop Support
+@section l.nop Opcode Support
+@cindex l.nop opcode effects
+
+The OpenRISC @code{l.nop} opcode can take a parameter.  This has no
+effect on the semantics of the opcode, but can be used to trigger side
+effect behavior in a simulator.  Within Or1ksim, the following parameters
+are supported.
+
+@table @code
+
+@item l.nop 0
+@cindex @code{l.nop 0}
+
+The equivalent to @code{l.nop} with no parameter. Has no side effects.
+
+@item l.nop 1
+@cindex @code{l.nop 1} (end simulation)
+
+Execution of Or1ksim is terminated. This is used to implement the
+library @code{exit} functions.
+
+@item l.nop 2
+@cindex @code{l.nop 2} (report)
+
+Report the value in @code{r3} on the console as a 32-bit hex value.
+
+@item l.nop 3
+@cindex @code{l.nop 3} (printf, now obsolete)
+
+In earlier versions of @value{OR1KSIM} this treated @code{r3} as a
+pointer to a @code{printf} style format string, and regsiters @code{r4}
+through @code{r8} as parameters for that format string.
+
+This opcode is no longer supported, and has no effect if used.
+
+@item l.nop 4
+@cindex @code{l.nop 4} (putc)
+
+The value in @code{r3} is printed to standard output as an ASCII
+character.  All library output routines are implemented using this opcode.
+
+@item l.nop 5
+@cindex @code{l.nop 5} (reset statistics counters)
+
+The statistics counters are reset.
+
+@item l.nop 6
+@cindex @code{l.nop 6} (get clock ticks)
+
+The number of clock ticks since start of execution (a 64-bit value) is
+returned in @code{r11} (low 32 bits) and @code{r12} (high 32 bits).
+
+@item l.nop 7
+@cindex @code{l.nop 7} (get picoseconds per cycle)
+
+The number of picoseconds per clock cycle is returned in @code{r11}.
+This is used with @code{l.nop 6} to implement timing functions.
+
+@item l.nop 8
+@cindex @code{l.nop 8} (turn on tracing)
+
+Instruction tracing is turned on.
+
+@item l.nop 9
+@cindex @code{l.nop 9} (turn off tracing)
+
+Instruction tracing is turned off.
+
+@end table
 
 @node Configuration
 @chapter Configuration

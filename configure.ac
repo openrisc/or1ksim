@@ -1,7 +1,7 @@
 # configure.ac -- Top level autoconf configuration file
 #
 # Copyright (C) 1999-2008 OpenCores
-# Copyright (C) 2008, 2010 Embecosm Limited
+# Copyright (C) 2008, 2010, 2011 Embecosm Limited
 #
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2010-12-15], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2011-01-05], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.

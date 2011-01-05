@@ -12,8 +12,8 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 2,537 tests compile, run and pass. That
-figure is broken down into 2,275 tests of the standalone simulator and 262
+At the time of writing a total of 2,447 tests compile, run and pass. That
+figure is broken down into 2,185 tests of the standalone simulator and 262
 tests of the library
 
 Configuration and make files are provided for further test programs. These
@@ -46,10 +46,10 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 2,275 tests of standalone Or1ksim:
+Tests of standalone Or1ksim:
 
 basic:             8 tests of a wide range of instructions and registers.
-cache:             5 tests of the Or1ksim cache modeling
+cache:            11 tests of the Or1ksim cache modeling
 cbasic:           19 tests of minimal C functionality
 cfg:              12 tests of the OR1K configuration register
 dhry:              1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
@@ -59,12 +59,9 @@ except-test:       7 tests of OR1K exception handling
 exit:              1 test that C program exits correctly
 ext:             104 tests of the sign extension (l.ext) instructions.
 fbtest:            1 test of the frame buffer.
+flag:              1 test of Supervision Register (SR) flag bits.
 fp               337 tests of floating point functionality (Feature 413).
 functest:         11 tests of the C function calling interface.
-flag:              1 test of Supervision Register (SR) flag bits.
-int-test:         86 tests of the programmable interrupt controller.
-kbdtest:          26 tests of the PS2 keyboard interface.
-local-global:      1 test of C local and global variables.
 inst-set-test:       A collection of tests of individual instructions
   is-add-test    213 tests of the l.add* instructions (Bugs 1771, 1776)
   is-and-test     80 tests of the l.and* instructions (Bugs 1782-1784)
@@ -80,14 +77,17 @@ inst-set-test:       A collection of tests of individual instructions
   is-spr-test:    28 tests of the l.mfspr and l.mtspr instructions (Bug 1779).
   is-sub-test     58 tests of the l.sub instruction (Bugs 1782-1784)
   is-xor-test     80 tests of the l.xor* instructions (Bugs 1782-1784)
+int-test:         88 tests of the programmable interrupt controller.
+kbdtest:          26 tests of the PS2 keyboard interface.
+local-global:      1 test of C local and global variables.
 mem-test:         16 tests of simple memory access.
-mmu:             110 tests of the MMU.
+mmu:              12 tests of the MMU.
 mul:               5 tests of the multiply functionality.
 mycompress:        1 test using a compression program.
 testfloat         40 tests of detailed floating point behavior
 tick:             19 tests of the OR1K tick timer.
 
-A total of 262 tests of the libsim library:
+Tests of the libsim library:
 
 int-edge:               6 tests of edge triggered interrupts.
 int-level:              3 tests of level triggered interrupts. 

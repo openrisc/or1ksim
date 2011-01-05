@@ -70,8 +70,11 @@
 # define ETH_DEBUG  1
 #endif
 
-/*! Period (clock cycles) for rescheduling Rx and Tx controllers. */
-#define  RTX_RESCHED_PERIOD  10000
+/*! Period (clock cycles) for rescheduling Rx and Tx controllers.
+    Experimenting with FTP on one machine suggests that a value of 500-2000 is
+    optimal. It's a trade off between prompt response and extra computational
+    load for Or1ksim. */
+#define  RTX_RESCHED_PERIOD  2000
 
 /*! MAC address that is always accepted. */
 static const unsigned char mac_broadcast[ETHER_ADDR_LEN] =
@@ -289,6 +292,7 @@ eth_flush_bd (struct eth_device *eth)
   unsigned char      buf[ETH_MAXPL];
   long int           packet_length;
   long int           bytes_sent;
+  int                ok_to_int_p;
 
   /* Get the packet length */
   packet_length = GET_FIELD (bd_info, ETH_TX_BD, LENGTH);
@@ -320,6 +324,7 @@ eth_flush_bd (struct eth_device *eth)
     {
       CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
       SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
+      ok_to_int_p = TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M);
     }
   else
     {
@@ -327,6 +332,7 @@ eth_flush_bd (struct eth_device *eth)
       CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
       CLEAR_FLAG (bd_info, ETH_TX_BD, COLLISION);
       SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXE);
+      ok_to_int_p = TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M);
 #if ETH_DEBUG
       printf ("Transmit retry request.\n");
 #endif
@@ -338,13 +344,11 @@ eth_flush_bd (struct eth_device *eth)
   /* Generate interrupt to indicate transfer complete, under the
      following criteria all being met:
      - either INT_MASK flag for Tx (OK or error) is set
-     - the bugger descriptor has its IRQ flag set
+     - the buffer descriptor has its IRQ flag set
      - there is no interrupt in progress.
 
      @todo We ought to warn if we get here and fail to set an IRQ. */
-  if ((TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXE_M) ||
-       TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M)) &&
-      TEST_FLAG (bd_info, ETH_TX_BD, IRQ))
+  if (ok_to_int_p && TEST_FLAG (bd_info, ETH_TX_BD, IRQ))
     {
       if (eth->int_line_stat)
 	{
@@ -406,7 +410,7 @@ eth_controller_tx_clock (void *dat)
 	}
     }
 
-  /* Wake up again after 1 ticks (was 10, changed by Julius). */
+  /* Reschedule to wake up again. */
   SCHED_ADD (eth_controller_tx_clock, dat, RTX_RESCHED_PERIOD);
 
 }	/* eth_controller_tx_clock () */
@@ -445,7 +449,7 @@ eth_read_file_packet (struct eth_device *eth,
       fprintf (stderr, "ERROR: Failed to read length from file.\n");
       return  -1;
     }
-  
+
   /* Packet must be big enough to hold a header */
   if (packet_length < ETHER_HDR_LEN)
     {
@@ -835,8 +839,7 @@ eth_controller_rx_clock (void *dat)
 	}
     }
 
-  /* Whatever happens, we reschedule a wake up in the future. This used to be
-     every 10 ticks, but now it is very 1 tick. */
+  /* Whatever happens, we reschedule a wake up in the future. */
   SCHED_ADD (eth_controller_rx_clock, dat, RTX_RESCHED_PERIOD);
 
 }	/* eth_controller_rx_clock () */
@@ -1359,6 +1362,14 @@ eth_miim_trans (struct eth_device *eth)
 /* -------------------------------------------------------------------------- */
 /*!Write a register 
 
+   @note Earlier versions of this code treated ETH_INT_SOURCE as an "interrupt
+         pending" register and reissued interrupts if ETH_INT_MASK was
+         changed, enabling an interrupt that had previously been cleared. This
+         led to spurious double interrupt. In the present version, the only
+         way an interrupt can be generated is at the time ETH_INT_SOURCE is
+         set in the Tx/Rx controllers and the only way an interrupt can be
+         cleared is by writing to ETH_INT_SOURCE.
+
    @param[in] addr   The address of the register to read (offset from base).
    @param[in] value  The value to write.
    @param[in] dat    The Ethernet interface data structure, cast to a void
@@ -1371,43 +1382,37 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
 
 #if ETH_DEBUG
   /* Only trace registers of particular interest */
-  
   switch (addr)
-  {
-  case ETH_MODER:
-  case ETH_INT_SOURCE:
-  case ETH_INT_MASK:
-  case ETH_IPGT:
-  case ETH_IPGR1:
-  case ETH_IPGR2:
-  case ETH_PACKETLEN:
-  case ETH_COLLCONF:
-  case ETH_TX_BD_NUM:
-  case ETH_CTRLMODER:
-  case ETH_MAC_ADDR0:
-  case ETH_MAC_ADDR1:
-	  printf ("eth_write32: 0x%08lx to %s ", (unsigned long) value,
-		  eth_regname (addr));
-	  
-  }
-  
+    {
+    case ETH_MODER:
+    case ETH_INT_SOURCE:
+    case ETH_INT_MASK:
+    case ETH_IPGT:
+    case ETH_IPGR1:
+    case ETH_IPGR2:
+    case ETH_PACKETLEN:
+    case ETH_COLLCONF:
+    case ETH_TX_BD_NUM:
+    case ETH_CTRLMODER:
+    case ETH_MAC_ADDR0:
+    case ETH_MAC_ADDR1:
+      printf ("eth_write32: 0x%08lx to %s ", (unsigned long int) value,
+	      eth_regname (addr));
+    }
+
   /* Detail register transitions on MODER, INT_SOURCE AND INT_MASK */
-  
   switch (addr)
-  {
-  case ETH_MODER:
-	  printf("0x%08lx -> ", (unsigned long) eth->regs.moder);
-	  break;
-  case ETH_INT_SOURCE:
-	  printf("0x%08lx -> ", (unsigned long) eth->regs.int_source);
-	  break;
-  case ETH_INT_MASK:
-	  printf("0x%08lx -> ", (unsigned long) eth->regs.int_mask);
-	  break;    
-  }
-
-  
-
+    {
+    case ETH_MODER:
+      printf (" 0x%08lx -> ", (unsigned long) eth->regs.moder);
+      break;
+    case ETH_INT_SOURCE:
+      printf (" 0x%08lx -> ", (unsigned long) eth->regs.int_source);
+      break;
+    case ETH_INT_MASK:
+      printf (" 0x%08lx -> ", (unsigned long) eth->regs.int_mask);
+      break;    
+    }
 #endif
 
   switch (addr)
@@ -1474,22 +1479,35 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
     case ETH_INT_MASK:
       eth->regs.int_mask = value;
 
-      /* If we enable interrupts, the core is not currently processing an
-	 interrupt, and there is an interrupt pending, then report that
-	 interrupt.
+      /* The old code would report an interrupt if we enabled an interrupt
+	 when if we enabled interrupts and the core was not currently
+	 processing an interrupt, and there was an interrupt pending.
+
+	 However this led (at least on some machines) to orphaned interrupts
+	 in the device driver. So in this version of the code we do not report
+	 interrupts on a mask change.
+
+	 This is not apparently consistent with the Verilog, but it does mean
+	 that the orphaned interrupts problem does not occur, and has no
+	 apparent effect on Ethernet performance. More investigation is needed
+	 to determine if this is a bug in Or1ksim interrupt handling, or a bug
+	 in the device driver, which does not manifest with real HW.
 
 	 Otherwise clear down the interrupt.
 
 	 @todo  Is this really right. */
       if ((eth->regs.int_source & eth->regs.int_mask) && !eth->int_line_stat)
 	{
-	  report_interrupt (eth->mac_int);
+#if ETH_DEBUG
+	  printf ("ETH_MASK changed with apparent pending interrupt.\n");
+#endif
 	}
       else if (eth->int_line_stat)
 	{
 	  clear_interrupt (eth->mac_int);
 	  eth->int_line_stat = 0;
 	}
+
       break;
 
     case ETH_IPGT:       eth->regs.ipgt         = value; break;
@@ -1548,33 +1566,31 @@ eth_write32 (oraddr_t addr, uint32_t value, void *dat)
     }
 
 #if ETH_DEBUG
-
   switch (addr)
-  {
-  case ETH_MODER:
-	  printf("0x%08lx", (unsigned long) eth->regs.moder);
-	  break;
-  case ETH_INT_SOURCE:
-	  printf("0x%08lx", (unsigned long) eth->regs.int_source);
-	  break;
-  case ETH_INT_MASK:
-	  printf("0x%08lx", (unsigned long) eth->regs.int_mask);
-	  break;
-  case ETH_IPGT:
-  case ETH_IPGR1:
-  case ETH_IPGR2:
-  case ETH_PACKETLEN:
-  case ETH_COLLCONF:
-  case ETH_TX_BD_NUM:
-  case ETH_CTRLMODER:
-  case ETH_MAC_ADDR0:
-  case ETH_MAC_ADDR1:
-	  break;	  
-  }
+    {
+    case ETH_MODER:
+      printf ("0x%08lx\n", (unsigned long) eth->regs.moder);
+      break;
+    case ETH_INT_SOURCE:
+      printf ("0x%08lx\n", (unsigned long) eth->regs.int_source);
+      break;
+    case ETH_INT_MASK:
+      printf ("0x%08lx\n", (unsigned long) eth->regs.int_mask);
+      break;
+    case ETH_IPGT:
+    case ETH_IPGR1:
+    case ETH_IPGR2:
+    case ETH_PACKETLEN:
+    case ETH_COLLCONF:
+    case ETH_TX_BD_NUM:
+    case ETH_CTRLMODER:
+    case ETH_MAC_ADDR0:
+    case ETH_MAC_ADDR1:
+      printf("\n");
+      break;	  
+    }
 
-  printf("\n");
 #endif
-
 
 }	/* eth_write32 () */
 

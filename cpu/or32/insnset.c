@@ -586,6 +586,12 @@ INSTRUCTION (l_nop) {
     case NOP_GET_PS:
       cpu_state.reg[11] = config.sim.clkcycle_ps;
       break;
+    case NOP_TRACE_ON:
+      runtime.sim.hush = 0;
+      break;
+    case NOP_TRACE_OFF:
+      runtime.sim.hush = 1;
+      break;
     case NOP_REPORT:
       PRINTF("report(0x%"PRIxREG");\n", evalsim_reg(3));
     default:
