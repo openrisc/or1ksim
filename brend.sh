@@ -26,23 +26,31 @@
 
 # Pre-requisites: bridge-utils must be installed.
 
-# Usage: ./brset.sh <bridge> <eth> <mac> <tap> [<tap> <tap> ...]
+# Usage: ./brend.sh <bridge> <eth> <tap>
 
 # - <bridge> is the bridge interface to use, e.g. br0
 # - <eth> is the hardware ethernet interface to use, e.g. eth0
+# - <tap> is the tap interface to use, e.g. tap0
 
-# The tap interface can subsequently be deleted (so long as no one else is
-# using it) with
+# Check we have the right number of arguments
+if [ "x$#" != "x3" ]
+then
+    echo "Usage: ./brend.sh <bridge> <eth> <tap>"
+    exit 1
+fi
 
-# openvpn --rmtun --dev tap<n>
+# Check we are root
+euid=`id -un`
+if [ "x${euid}" != "xroot" ]
+then
+    echo "Must run as root"
+    exit 1
+fi
 
-# Define Bridge Interface
+# Break out the arguments
 br=$1
-shift
-
-# Host ethernet interface to use
-eth=$1
-shift
+eth=$2
+tap=$3
 
 # Determine the IP address, netmask and broadcast of the bridge.
 eth_ip=`ifconfig $br | \
@@ -58,18 +66,53 @@ eth_broadcast=`ifconfig $br | \
         head -1 | \
         sed -e 's/^.*Bcast:\([^ \t]*\).*$/\1/'`
 
-# Define list of TAP interfaces to be bridged,
-tap=$*
+# Close the firewall to the tap and bridge
+iptables -D INPUT -i ${tap} -j ACCEPT
+iptables -D INPUT -i ${br} -j ACCEPT
+iptables -D FORWARD -i ${br} -j ACCEPT
 
-echo "Deleting bridge $br"
-echo "  Host Ethernet device: $eth"
-echo "  Host IP address:      $eth_ip"
-echo "  Host netmask:         $eth_netmask"
-echo "  Host broadcast:       $eth_broadcast"
+# Take down the bridge and delete it
+ifconfig ${br} down
 
-# Delete the bridge
-ifconfig $br down
-brctl delbr $br
+if [ $? != 0 ]
+then
+    echo "Failed to take down ${br}"
+    exit 1
+fi
 
-# Restore the Ethernet interface
-ifconfig $eth $eth_ip netmask $eth_netmask broadcast $eth_broadcast
+brctl delbr ${br}
+
+if [ $? != 0 ]
+then
+    echo "Failed to take delete ${br}"
+    exit 1
+fi
+
+# Delete the TAP interface. Note we mustn't have anything using it. It's
+# rather harsh, but we use fuser to ensure this (it will take out all users of
+# any TAP/TUN interface).
+fuser -k /dev/net/tun
+openvpn --rmtun --dev ${tap}
+
+if [ $? != 0 ]
+then
+    echo "Failed to remove ${tap}"
+    exit 1
+fi
+
+# Restore the Ethernet interface. We could use ifconfig with the IP address,
+# netmask and broadcast mask from earlier, but this does not seem to work in a
+# DHCP world
+#   ifconfig ${eth} ${eth_ip} netmask ${eth_netmask} broadcast ${eth_broadcast}
+# Instead we use a single shot dhcp configuration. In future the extant eth0
+# dhclient will refresh the lease.
+dhclient -1 -d ${eth0}
+
+if [ $? != 0 ]
+then
+    echo "Failed to get lease for ${eth}"
+    exit 1
+fi
+
+# Kill the outstanding br0 DHCL client
+kill `ps ax | grep "dhclient.*${br}" | grep -v "grep" | cut -c 1-5`

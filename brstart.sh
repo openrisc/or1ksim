@@ -26,26 +26,37 @@
 
 # Pre-requisites: bridge-utils must be installed.
 
-# Usage: ./brset.sh <bridge> <eth> <tap> [<tap> <tap> ...]
+# Usage: ./brstart.sh <username> <groupname> <bridge> <eth> <tap>
 
 # - <bridge> is the bridge interface to use, e.g. br0
 # - <eth> is the hardware ethernet interface to use, e.g. eth0
 # - <tap> is/are the persistent TAP interface(s)
 
-# The tap interfaces must have been previously set up persistently by the
-# superuser using for example:
+# Check we have the right number of arguments
+if [ "x$#" != "x5" ]
+then
+    echo "Usage: ./brstart.sh <username> <groupname> <bridge> <eth> <tap>"
+    exit 1
+fi
 
-# openvpn --mktun --dev tap<n> --user <username> --group <groupname>
+# Check we are root
+euid=`id -un`
+if [ "x${euid}" != "xroot" ]
+then
+    echo "Must run as root"
+    exit 1
+fi
 
-# Define Bridge Interface
-br=$1
-shift
+# Break out the arguments
+username=$1
+groupname=$2
+br=$3
+eth=$4
+tap=$5
 
-# Host ethernet interface to use
-eth=$1
-shift
-
-# Determine the IP address, netmask and broadcast of the host.
+# Determine the IP address, netmask and broadcast of the current Ethernet
+# interface. This is used if the bridge is set up manually, rather than using
+# DHCP.
 eth_ip=`ifconfig $eth | \
         grep "inet addr" | \
         head -1 | \
@@ -59,34 +70,56 @@ eth_broadcast=`ifconfig $eth | \
         head -1 | \
         sed -e 's/^.*Bcast:\([^ \t]*\).*$/\1/'`
 
-# Define list of TAP interfaces to be bridged,
-tap=$*
+# Create the TAP interface
+openvpn --mktun --dev ${tap} --user ${username} --group ${groupname}
 
-echo "Creating bridge $br"
-echo "  Host Ethernet device: $eth"
-echo "  Host IP address:      $eth_ip"
-echo "  Host netmask:         $eth_netmask"
-echo "  Host broadcast:       $eth_broadcast"
-echo "  Target TAP device(s): $tap"
+if [ $? != 0 ]
+then
+    echo "Failed to create ${tap}"
+    exit 1
+fi
 
 # Create the bridge
-brctl addbr $br
+brctl addbr ${br}
 
-# Add the host Ethernet and TAP interfaces
-brctl addif $br $eth
+if [ $? != 0 ]
+then
+    echo "Failed to create ${br}"
+    exit 1
+fi
 
-for t in $tap; do
-    brctl addif $br $t
+# Add the host Ethernet and TAP interfaces, removing the IP addresses of the
+# underlying interfaces.
+for i in ${eth} ${tap}
+do
+    # Add the interface
+    brctl addif ${br} ${i}
+
+    if [ $? != 0 ]
+    then
+	echo "Failed to create ${i}"
+	exit 1
+    fi
+
+    # Remove the IP address
+    ifconfig ${i} 0.0.0.0 promisc up
+
+    if [ $? != 0 ]
+    then
+	echo "Failed to remove IP interface of ${i}"
+	exit 1
+    fi
 done
 
-# Remove the IP addresses of the underlying interfaces
-ifconfig $eth 0.0.0.0 promisc up
+# Reconfigure the bridge to have the appropriate Ethernet address. This uses
+# dhclient to get the information from DHCP, but we could instead use
+# ifconfig and the data about the original IP address, netmask and broadcast
+# mask as follows:
+#   ifconfig ${br} ${eth_ip} netmask ${eth_netmask} broadcast ${eth_broadcast}
+dhclient ${br}
 
-for t in $tap; do
-    ifconfig $t 0.0.0.0 promisc up
-done
-
-# Reconfigure the bridge to have the Ethernet address that had been used just
-# by $eth.
-# ifconfig $br $eth_ip netmask $eth_netmask broadcast $eth_broadcast
-dhclient $br
+# Open up firewall to the tap and bridge. We have a generic reject at the end
+# of the chain, so we insert these at the start.
+iptables -I INPUT 1 -i ${tap} -j ACCEPT
+iptables -I INPUT 1 -i ${br} -j ACCEPT
+iptables -I FORWARD 1 -i ${br} -j ACCEPT
