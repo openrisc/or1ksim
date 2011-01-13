@@ -1226,94 +1226,104 @@ disassemble_memory (oraddr_t from, oraddr_t to, int nl)
    This is a simpler form of disassemble_memory for GDB instruction tracing.
 
    Output format is symbolic disassembly, one instruction per line. Start each
-   line with its hex address. At the end print the value of any destination
-   register, the flag and the number of cycles executed.
+   line with a flag to indicate supervisor or user mode then its hex address
+   (physical and/or virtual in that order). At the end print the value of any
+   destination register, the flag and the number of cycles executed.
 
    There are all sorts of ways to trip this up, but they are unlikely. The
    validity of a memory area is taken from the address of the start of a line
    to be printed, so assumes the following 3 bytes are present. This could be
    fooled by ridiculous memory declarations.
 
-   @param[in] addr  Address of the instruction to trace                     */
+   @param[in] phyaddr   Physical address of the instruction to trace
+   @param[in] virtaddr  Virtual address of the instruction to trace
+   @param[in] insn      The instruction just fetched and possibly executed.  */
 /*---------------------------------------------------------------------------*/
 void
-disassemble_instr (oraddr_t addr)
+disassemble_instr (oraddr_t  phyaddr,
+		   oraddr_t  virtaddr,
+		   uint32_t  insn)
 {
-  PRINTF ("%" PRIxADDR ": ", addr);
-
-  if (verify_memoryarea (addr))
+  /* Log whether we are supervisor mode */
+  printf ("%c ",
+	  (SPR_SR_SM == (cpu_state.sprs[SPR_SR] & SPR_SR_SM)) ? 'S' : 'U');
+    
+  /* The address */
+  if (runtime.sim.trace_phy)
     {
-      uint32_t insn  = eval_direct32 (addr, 0, 0);
-      int      index = or1ksim_insn_decode (insn);
+      PRINTF ("%" PRIxADDR ": ", phyaddr);
+    }
 
-      PRINTF ("%08" PRIx32 " ", insn);
+  if (runtime.sim.trace_virt)
+    {
+      PRINTF ("%" PRIxADDR ": ", virtaddr);
+    }
 
-      if (index >= 0)
+  /* The instruction details */
+  int  index = or1ksim_insn_decode (insn);
+
+  PRINTF ("%08" PRIx32 " ", insn);
+
+  if (index >= 0)
+    {
+      or1ksim_disassemble_trace_index (insn, index);
+      PRINTF ("%-24s", or1ksim_disassembled);
+
+      /* Put either the register assignment, SPR value, or store */
+      if (-1 != trace_dest_spr)
 	{
-	  or1ksim_disassemble_trace_index (insn, index);
-	  PRINTF ("%-24s", or1ksim_disassembled);
+	  PRINTF ("SPR[%04x]  = %08x", (trace_dest_spr | 
+					evalsim_reg (trace_dest_reg)), 
+		  cpu_state.sprs[(trace_dest_spr | 
+				  evalsim_reg (trace_dest_reg))]);
 
-	  /* Put either the register assignment, SPR value, or store */
-	  if (-1 != trace_dest_spr)
-	  {
-		  PRINTF ("SPR[%04x]  = %08x", (trace_dest_spr | 
-						evalsim_reg (trace_dest_reg)), 
-			  cpu_state.sprs[(trace_dest_spr | 
-					  evalsim_reg (trace_dest_reg))]);
-
-	  }
-	  else if (-1 != trace_dest_reg)
-	    {
-	      PRINTF ("r%-2u        = %" PRIxREG "", trace_dest_reg,
-		       evalsim_reg (trace_dest_reg));
-	    }
-	  else
-	    {
-	      uorreg_t  store_val  = 0;
-	      oraddr_t  store_addr = 0;
-		
-	      if (0 != trace_store_width)
-		{
-		  store_val  = evalsim_reg (trace_store_val_reg);
-		  store_addr = evalsim_reg (trace_store_addr_reg) +
-		               trace_store_imm;
-		}
-
-	      switch (trace_store_width)
-		{
-		case 1:
-		  PRINTF ("[%" PRIxADDR "] = %02x      ", store_addr,
-			  store_val);
-		  break;
-		
-		case 2:
-		  PRINTF ("[%" PRIxADDR "] = %04x    ", store_addr, store_val);
-		  break;
-		  
-		case 4:
-		  PRINTF ("[%" PRIxADDR "] = %08x", store_addr, store_val);
-		  break;
-		  
-		default:
-		  PRINTF ("                     ");
-		  break;
-		}
-	    }
-	  
-
-	  /* Print the flag */
-	  PRINTF ("  flag: %u\n", cpu_state.sprs[SPR_SR] & SPR_SR_F ? 1 : 0);
-
+	}
+      else if (-1 != trace_dest_reg)
+	{
+	  PRINTF ("r%-2u        = %" PRIxREG "", trace_dest_reg,
+		  evalsim_reg (trace_dest_reg));
 	}
       else
 	{
-	  PRINTF ("<invalid>\n");
+	  uorreg_t  store_val  = 0;
+	  oraddr_t  store_addr = 0;
+		
+	  if (0 != trace_store_width)
+	    {
+	      store_val  = evalsim_reg (trace_store_val_reg);
+	      store_addr = evalsim_reg (trace_store_addr_reg) +
+		trace_store_imm;
+	    }
+
+	  switch (trace_store_width)
+	    {
+	    case 1:
+	      PRINTF ("[%" PRIxADDR "] = %02x      ", store_addr,
+		      store_val);
+	      break;
+		
+	    case 2:
+	      PRINTF ("[%" PRIxADDR "] = %04x    ", store_addr, store_val);
+	      break;
+		  
+	    case 4:
+	      PRINTF ("[%" PRIxADDR "] = %08x", store_addr, store_val);
+	      break;
+		  
+	    default:
+	      PRINTF ("                     ");
+	      break;
+	    }
 	}
+	  
+
+      /* Print the flag */
+      PRINTF ("  flag: %u\n", cpu_state.sprs[SPR_SR] & SPR_SR_F ? 1 : 0);
+
     }
   else
     {
-      /* Not a valid memory area. Print Xs as required */
-      PRINTF ("XXXXXXXX\n");
+      PRINTF ("<invalid>\n");
     }
 }	/* disassemble_instr() */
 

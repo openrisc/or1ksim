@@ -1,5 +1,38 @@
 2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
 
+	* cpu/common/abstract.c (diassemble_instr): Added instruction
+	as third parameter. No longer look up in memory.
+	* cpu/common/abstract.h <diassemble_instr>: Updated prototype.
+	* cpu/or32/execute.c (trace_instr): Pass instruction as third
+	parameter to dissassemble_instr. Clearer message when we can't get
+	a physical address.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Start each line with a
+	flag indicating if user or supervisor mode.
+	* doc/or1ksim.texi: Updated with new trace flags and explaining
+	trace ouptut in more detail.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Control output of
+	physical/virtual address with --trace-physical and --trace-virtual
+	flags.
+	* sim-config.c (parse_args): Add --trace-physical and
+	--trace-virtual flags.
+	* sim-config.h <runtime.sim>: Add trace_phy and trace_virt flags.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Added virtual address
+	as second parameter, used for trace O/P.
+	* cpu/common/abstract.h <diassemble_instr>: Updated prototype.
+	* cpu/or32/execute.c (trace_instr): Pass virtual as well as
+	physical address to disassemble_instr.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
 	* configure: Regenerated.
 	* configure.ac: Updated version.
 	* cpu/or1k/spr-defs.h: Added definition of NOP_TRACE_ON and

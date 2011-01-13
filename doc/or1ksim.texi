@@ -415,6 +415,23 @@ option in the simulator configuration section (see @pxref{Simulator Behavior, , 
 Dump instruction just executed and any register/memory location chaged
 after each instruction (one line per instruction).
 
+@item --trace-physical
+@itemx --trace-virtual
+@cindex @code{--trace-physical}
+@cindex @code{--trace-virtual}
+When tracing instructions, show the physical address
+(@code{--trace-physical}) and/or the virtual address
+(@code{--trace-virtual}) of the instruction being executed.  Both flags
+may be specified, in which case both physical and virtual addresses are
+shown, physical first.
+
+@quotation Note
+Either or both flags may be specified without @code{--trace}, to
+indicate how addresses should be shown if subsequently enabled by a
+@code{SIGUSER1} signal or @code{l.nop 8} opcode (@pxref{Trace
+Generation, , Trace Generation}).
+@end quotation
+
 @item -f @var{file}
 @itemx --file=@var{file}
 @cindex @code{-f}
@@ -645,9 +662,9 @@ the region of memory to be analysed.
 
 An execution trace can be generated at run time with options passed by
 the command line, or via the operating system's signal passing
-mechanism.
+mechanism, or by @code{l.nop} opcodes in an application program.
 
-The following, passed at run time, can be used to create an execution dump.
+The following flag can be used to create an execution dump.
 
 @table @code
 
@@ -655,8 +672,12 @@ The following, passed at run time, can be used to create an execution dump.
 @itemx --trace
 @cindex @code{-t}
 @cindex @code{--trace}
-Dump instruction just executed and any register/memory location chaged
-after each instruction (one line per instruction).
+Dump instruction just executed and any register/memory location changed
+after each instruction (one line per instruction).  Each line starts
+with either ``S'' or ``U'' to indicate whether the processor was in
+supervisor or user mode @emph{when the instruction completed}.  It is
+worth bearing in mind that tracing happens at completion of instruction
+execution and shows the state at that time.
 @end table
 
 Passing a signal @code{SIGUSR1} while the simulator is running toggles
@@ -682,6 +703,24 @@ ps a | grep or32-elf-sim
 kill -SIGUSR1 @emph{process-number}
 @end example
 
+@cindex l.nop 8 (turn on tracing)
+@cindex l.nop 8 (turn off tracing)
+Tracing can also be enabled and disabled from within a target program
+using the @code{l.nop 8} and @code{l.nop 9} opcodes to enable and
+disable tracing respectively.
+
+@cindex @code{--trace-physical}
+@cindex @code{--trace-virtual}
+By default tracing will show the virtual address of each instruction
+traced.  This may be controlled by two options, @code{--trace-physical}
+to show the physical address and/or @code{--trace-virtual} to show the
+virtual address. If neither is specified, the virtual address is shown.
+
+@quotation Note
+Either or both flags may be specified without @code{--trace}, to
+indicate how addresses should be shown if subsequently enabled by a
+@code{SIGUSER1} signal or @code{l.nop 8} opcode.
+@end quotation
 
 @node Simulator Library
 @section Simulator Library

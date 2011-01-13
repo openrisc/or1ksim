@@ -944,6 +944,8 @@ parse_args (int argc, char *argv[])
   struct arg_lit  *quiet;
   struct arg_lit  *verbose;
   struct arg_lit  *trace;
+  struct arg_lit  *trace_phy;
+  struct arg_lit  *trace_virt;
   struct arg_lit  *report_mem_errs;
   struct arg_lit  *strict_npc;
   struct arg_lit  *profile;
@@ -968,6 +970,10 @@ parse_args (int argc, char *argv[])
   quiet = arg_lit0 ("q", "quiet", "minimal message output");
   verbose = arg_lit0 ("V", "verbose", "verbose message output");
   trace = arg_lit0 ("t", "trace", "trace each instruction");
+  trace_phy = arg_lit0 (NULL, "trace-physical",
+			"show physical instruction address when tracing");
+  trace_virt = arg_lit0 (NULL, "trace-virtual",
+			"show virtual instruction address when tracing");
   report_mem_errs = arg_lit0 (NULL, "report-memory-errors",
 			      "Report out of memory accesses");
   strict_npc = arg_lit0 (NULL, "strict-npc", "setting NPC flushes pipeline");
@@ -989,6 +995,8 @@ parse_args (int argc, char *argv[])
     quiet,
     verbose,
     trace,
+    trace_phy,
+    trace_virt,
     report_mem_errs,
     strict_npc,
     profile,
@@ -1046,8 +1054,17 @@ parse_args (int argc, char *argv[])
       config.sim.verbose = verbose->count;
     }
 
-  /* Request for tracing */
-  runtime.sim.hush = trace->count ? 0 : 1;
+  /* Request for tracing. We may ask for instructions to be recorded with
+     either the physical or virtual address. */
+  runtime.sim.hush       = trace->count ? 0 : 1;
+  runtime.sim.trace_phy  = trace_phy->count  ? 1 : 0;
+  runtime.sim.trace_virt = trace_virt->count ? 1 : 0;
+
+  /* Ensure we have a least one address type in use. */
+  if (!runtime.sim.trace_phy && !runtime.sim.trace_virt)
+    {
+      runtime.sim.trace_virt = 1;
+    }
 
   /* Request for memory errors */
   config.sim.report_mem_errs = report_mem_errs->count;

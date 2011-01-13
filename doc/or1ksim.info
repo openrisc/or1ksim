@@ -332,6 +332,19 @@ Many of the options have both a short and a long form.  For example
      Dump instruction just executed and any register/memory location
      chaged after each instruction (one line per instruction).
 
+`--trace-physical'
+`--trace-virtual'
+     When tracing instructions, show the physical address
+     (`--trace-physical') and/or the virtual address
+     (`--trace-virtual') of the instruction being executed.  Both flags
+     may be specified, in which case both physical and virtual
+     addresses are shown, physical first.
+
+          Note: Either or both flags may be specified without
+          `--trace', to indicate how addresses should be shown if
+          subsequently enabled by a `SIGUSER1' signal or `l.nop 8'
+          opcode (*note Trace Generation: Trace Generation.).
+
 `-f FILE'
 `--file=FILE'
      Read configuration commands from the specified file, looking first
@@ -519,15 +532,19 @@ File: or1ksim.info,  Node: Trace Generation,  Next: Simulator Library,  Prev: Me
 
 An execution trace can be generated at run time with options passed by
 the command line, or via the operating system's signal passing
-mechanism.
+mechanism, or by `l.nop' opcodes in an application program.
 
-The following, passed at run time, can be used to create an execution
-dump.
+The following flag can be used to create an execution dump.
 
 `-t'
 `--trace'
      Dump instruction just executed and any register/memory location
-     chaged after each instruction (one line per instruction).
+     changed after each instruction (one line per instruction).  Each
+     line starts with either "S" or "U" to indicate whether the
+     processor was in supervisor or user mode _when the instruction
+     completed_.  It is worth bearing in mind that tracing happens at
+     completion of instruction execution and shows the state at that
+     time.
 
 Passing a signal `SIGUSR1' while the simulator is running toggles trace
 generation. This can be done with the following command, assuming
@@ -546,6 +563,19 @@ command to toggle execution trace generation:
 
      ps a | grep or32-elf-sim
      kill -SIGUSR1 _process-number_
+
+Tracing can also be enabled and disabled from within a target program
+using the `l.nop 8' and `l.nop 9' opcodes to enable and disable tracing
+respectively.
+
+By default tracing will show the virtual address of each instruction
+traced.  This may be controlled by two options, `--trace-physical' to
+show the physical address and/or `--trace-virtual' to show the virtual
+address. If neither is specified, the virtual address is shown.
+
+     Note: Either or both flags may be specified without `--trace', to
+     indicate how addresses should be shown if subsequently enabled by a
+     `SIGUSER1' signal or `l.nop 8' opcode.
 
 
 File: or1ksim.info,  Node: Simulator Library,  Next: Ethernet TUN/TAP Interface,  Prev: Trace Generation,  Up: Usage
@@ -3845,7 +3875,7 @@ Index
 
 * --cumulative:                          Profiling Utility.   (line  26)
 * --debug-config:                        Standalone Simulator.
-                                                              (line  86)
+                                                              (line  99)
 * --disable-all-tests:                   Configuring the Build.
                                                               (line 105)
 * --disable-arith-flag:                  Configuring the Build.
@@ -3873,11 +3903,11 @@ Index
 * --enable-execution:                    Configuring the Build.
                                                               (line  37)
 * --enable-mprofile:                     Standalone Simulator.
-                                                              (line 120)
+                                                              (line 133)
 * --enable-ov-flag:                      Configuring the Build.
                                                               (line 132)
 * --enable-profile:                      Standalone Simulator.
-                                                              (line 117)
+                                                              (line 130)
 * --enable-profiling:                    Configuring the Build.
                                                               (line  29)
 * --enable-range-stats:                  Configuring the Build.
@@ -3885,7 +3915,7 @@ Index
 * --enable-unsigned-xori:                Configuring the Build.
                                                               (line  68)
 * --file:                                Standalone Simulator.
-                                                              (line  44)
+                                                              (line  57)
 * --filename:                            Memory Profiling Utility.
                                                               (line  51)
 * --generate:                            Profiling Utility.   (line  34)
@@ -3899,23 +3929,29 @@ Index
 * --interactive:                         Standalone Simulator.
                                                               (line  25)
 * --memory:                              Standalone Simulator.
-                                                              (line  70)
+                                                              (line  83)
 * --mode:                                Memory Profiling Utility.
                                                               (line  26)
 * --nosrv:                               Standalone Simulator.
-                                                              (line  52)
+                                                              (line  65)
 * --quiet <1>:                           Profiling Utility.   (line  30)
 * --quiet:                               Standalone Simulator.
                                                               (line  29)
 * --report-memory-errors:                Standalone Simulator.
-                                                              (line  91)
+                                                              (line 104)
 * --srv:                                 Standalone Simulator.
-                                                              (line  60)
+                                                              (line  73)
 * --strict-npc:                          Standalone Simulator.
-                                                              (line 100)
-* --trace <1>:                           Trace Generation.    (line  15)
+                                                              (line 113)
+* --trace <1>:                           Trace Generation.    (line  14)
 * --trace:                               Standalone Simulator.
                                                               (line  39)
+* --trace-physical <1>:                  Trace Generation.    (line  44)
+* --trace-physical:                      Standalone Simulator.
+                                                              (line  44)
+* --trace-virtual <1>:                   Trace Generation.    (line  44)
+* --trace-virtual:                       Standalone Simulator.
+                                                              (line  44)
 * --verbose:                             Standalone Simulator.
                                                               (line  33)
 * --version:                             Standalone Simulator.
@@ -3925,11 +3961,11 @@ Index
 * --version (profiling utility):         Profiling Utility.   (line  17)
 * -c:                                    Profiling Utility.   (line  26)
 * -d:                                    Standalone Simulator.
-                                                              (line  86)
+                                                              (line  99)
 * -f <1>:                                Memory Profiling Utility.
                                                               (line  51)
 * -f:                                    Standalone Simulator.
-                                                              (line  44)
+                                                              (line  57)
 * -g <1>:                                Memory Profiling Utility.
                                                               (line  47)
 * -g:                                    Profiling Utility.   (line  34)
@@ -3943,11 +3979,11 @@ Index
 * -m <1>:                                Memory Profiling Utility.
                                                               (line  26)
 * -m:                                    Standalone Simulator.
-                                                              (line  70)
+                                                              (line  83)
 * -q <1>:                                Profiling Utility.   (line  30)
 * -q:                                    Standalone Simulator.
                                                               (line  29)
-* -t <1>:                                Trace Generation.    (line  15)
+* -t <1>:                                Trace Generation.    (line  14)
 * -t:                                    Standalone Simulator.
                                                               (line  39)
 * -V:                                    Standalone Simulator.
@@ -4345,7 +4381,9 @@ Index
 * l.nop 5 (reset statistics counters):   l.nop Support.       (line  34)
 * l.nop 6 (get clock ticks):             l.nop Support.       (line  37)
 * l.nop 7 (get picoseconds per cycle):   l.nop Support.       (line  41)
-* l.nop 8 (turn on tracing):             l.nop Support.       (line  45)
+* l.nop 8 (turn off tracing):            Trace Generation.    (line  40)
+* l.nop 8 (turn on tracing) <1>:         l.nop Support.       (line  45)
+* l.nop 8 (turn on tracing):             Trace Generation.    (line  40)
 * l.nop 9 (turn off tracing):            l.nop Support.       (line  48)
 * l.nop opcode effects:                  l.nop Support.       (line   6)
 * library version of Or1ksim:            Simulator Library.   (line   6)
@@ -4549,9 +4587,9 @@ Index
 * Remote Serial Protocol:                Debug Interface Configuration.
                                                               (line  20)
 * Remote Serial Protocol, --nosrv:       Standalone Simulator.
-                                                              (line  52)
+                                                              (line  65)
 * Remote Serial Protocol, --srv:         Standalone Simulator.
-                                                              (line  60)
+                                                              (line  73)
 * report_interrupt:                      Concepts.            (line  20)
 * reset (Interactive CLI):               Interactive Command Line.
                                                               (line  63)
@@ -4795,57 +4833,57 @@ Node: Build and Install7902
 Node: Known Issues8668
 Node: Usage9723
 Node: Standalone Simulator10007
-Node: Profiling Utility14567
-Node: Memory Profiling Utility15473
-Node: Trace Generation16833
-Node: Simulator Library18075
-Node: Ethernet TUN/TAP Interface28507
-Node: Setting Up a Persistent TAP device29612
-Node: Establishing a Bridge30287
-Node: Opening the Firewall31970
-Node: Disabling Ethernet Filtering32461
-Node: Networking from OpenRISC Linux and BusyBox33086
-Node: Tearing Down a Bridge34748
-Node: l.nop Support35491
-Node: Configuration37001
-Node: Configuration File Format37613
-Node: Configuration File Preprocessing37998
-Node: Configuration File Syntax38295
-Node: Simulator Configuration41080
-Node: Simulator Behavior41371
-Node: Verification API Configuration45952
-Node: CUC Configuration47892
-Node: Core OpenRISC Configuration49884
-Node: CPU Configuration50386
-Node: Memory Configuration54505
-Node: Memory Management Configuration61227
-Node: Cache Configuration63604
-Node: Interrupt Configuration65990
-Node: Power Management Configuration67823
-Node: Branch Prediction Configuration69100
-Node: Debug Interface Configuration70460
-Node: Peripheral Configuration72803
-Node: Memory Controller Configuration73429
-Node: UART Configuration77209
-Node: DMA Configuration80728
-Node: Ethernet Configuration82595
-Node: GPIO Configuration87874
-Node: Display Interface Configuration89507
-Node: Frame Buffer Configuration91816
-Node: Keyboard Configuration93680
-Node: Disc Interface Configuration95918
-Node: Generic Peripheral Configuration101022
-Node: Interactive Command Line103317
-Node: Verification API110291
-Node: Code Internals114721
-Node: Coding Conventions115304
-Node: Global Data Structures119731
-Node: Concepts122388
-Ref: Output Redirection122533
-Ref: Interrupts Internal123071
-Node: Internal Debugging124224
-Node: Regression Testing124748
-Node: GNU Free Documentation License128537
-Node: Index150944
+Node: Profiling Utility15151
+Node: Memory Profiling Utility16057
+Node: Trace Generation17417
+Node: Simulator Library19602
+Node: Ethernet TUN/TAP Interface30034
+Node: Setting Up a Persistent TAP device31139
+Node: Establishing a Bridge31814
+Node: Opening the Firewall33497
+Node: Disabling Ethernet Filtering33988
+Node: Networking from OpenRISC Linux and BusyBox34613
+Node: Tearing Down a Bridge36275
+Node: l.nop Support37018
+Node: Configuration38528
+Node: Configuration File Format39140
+Node: Configuration File Preprocessing39525
+Node: Configuration File Syntax39822
+Node: Simulator Configuration42607
+Node: Simulator Behavior42898
+Node: Verification API Configuration47479
+Node: CUC Configuration49419
+Node: Core OpenRISC Configuration51411
+Node: CPU Configuration51913
+Node: Memory Configuration56032
+Node: Memory Management Configuration62754
+Node: Cache Configuration65131
+Node: Interrupt Configuration67517
+Node: Power Management Configuration69350
+Node: Branch Prediction Configuration70627
+Node: Debug Interface Configuration71987
+Node: Peripheral Configuration74330
+Node: Memory Controller Configuration74956
+Node: UART Configuration78736
+Node: DMA Configuration82255
+Node: Ethernet Configuration84122
+Node: GPIO Configuration89401
+Node: Display Interface Configuration91034
+Node: Frame Buffer Configuration93343
+Node: Keyboard Configuration95207
+Node: Disc Interface Configuration97445
+Node: Generic Peripheral Configuration102549
+Node: Interactive Command Line104844
+Node: Verification API111818
+Node: Code Internals116248
+Node: Coding Conventions116831
+Node: Global Data Structures121258
+Node: Concepts123915
+Ref: Output Redirection124060
+Ref: Interrupts Internal124598
+Node: Internal Debugging125751
+Node: Regression Testing126275
+Node: GNU Free Documentation License130064
+Node: Index152471
 
 End Tag Table

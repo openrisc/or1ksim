@@ -200,6 +200,8 @@ struct runtime
     long long reset_cycles;
 
     int  hush;			/* Is simulator to do reg dumps */
+    int  trace_phy;		/* Show physical instr addr when tracing */
+    int  trace_virt;		/* Show virtual instr addr when tracing */
   } sim;
 
   struct

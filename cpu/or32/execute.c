@@ -806,11 +806,12 @@ trace_instr ()
 
   if ((physical_pc = peek_into_itlb (cpu_state.iqueue.insn_addr)))
     {
-      disassemble_instr (physical_pc);
+      disassemble_instr (physical_pc, cpu_state.iqueue.insn_addr,
+			 cpu_state.iqueue.insn);
     }
   else
     {
-      PRINTF ("INTERNAL SIMULATOR ERROR: no trace available\n");
+      PRINTF ("Instruction address translation failed: no trace available\n");
     }
 }	/* trace_instr () */
 
