@@ -34,6 +34,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /* Package includes */
 #include "toplevel-support.h"
@@ -66,6 +69,48 @@ struct sim_reset_hook
 
 /*! The list of reset hooks. Local to this source file */
 static struct sim_reset_hook *sim_reset_hooks = NULL;
+
+
+/*---------------------------------------------------------------------------*/
+/*!Random number initialization
+
+   This has become more important, since we rely on randomness to generate
+   different MACs in Linux running on Or1ksim.
+
+   We take our seed from /dev/urandom.
+
+   If /dev/urandom is not available, we use srandom with the PID instead.    */
+/*---------------------------------------------------------------------------*/
+void
+init_randomness ()
+{
+  unsigned int   seed;
+  int            fd;
+
+  fd = open ("/dev/urandom", O_RDONLY);
+
+  if (fd >= 0)
+    {
+      if (sizeof (seed) != read (fd, (void *) &seed, sizeof (seed)))
+	{
+	  fprintf (stderr, "Warning: Unable to read /dev/random, using PID.\n");
+	  seed = getpid ();
+	}
+    }
+  else
+    {
+      fprintf (stderr, "Warning: Unable to open /dev/random, using PID.\n");
+      seed = getpid ();
+    }
+
+  srandom (seed);
+
+  /* Print out the seed just in case we ever need to debug. Note that we
+     cannot use PRINTF here, since the file handle will not yet have been set
+     up. */
+  printf ("Seeding random generator with value 0x%08x\n", seed);
+
+}	/* init_randomness () */
 
 
 /*---------------------------------------------------------------------------*/

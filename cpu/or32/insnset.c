@@ -546,7 +546,8 @@ INSTRUCTION (l_rfe) {
 }
 INSTRUCTION (l_nop) {
   uint32_t k = PARAM0;
-  switch (k) {
+  switch (k)
+    {
     case NOP_NOP:
       break;
     case NOP_EXIT:
@@ -568,6 +569,13 @@ INSTRUCTION (l_nop) {
 	  sim_done();
 	}
       break;
+    case NOP_REPORT:
+      PRINTF("report(0x%"PRIxREG");\n", evalsim_reg(3));
+      break;
+    case NOP_PUTC:		/*JPB */
+      printf( "%c", (char)(evalsim_reg( 3 ) & 0xff));
+      fflush( stdout );
+      break;
     case NOP_CNT_RESET:
       PRINTF("****************** counters reset ******************\n");
       PRINTF("cycles %lld, insn #%lld\n", runtime.sim.cycles, runtime.cpu.instructions); 
@@ -575,10 +583,6 @@ INSTRUCTION (l_nop) {
       runtime.sim.reset_cycles = runtime.sim.cycles;
       runtime.cpu.reset_instructions = runtime.cpu.instructions;
       break;    
-    case NOP_PUTC:		/*JPB */
-      printf( "%c", (char)(evalsim_reg( 3 ) & 0xff));
-      fflush( stdout );
-      break;
     case NOP_GET_TICKS:
       cpu_state.reg[11] = runtime.sim.cycles & 0xffffffff;
       cpu_state.reg[12] = runtime.sim.cycles >> 32;
@@ -592,12 +596,13 @@ INSTRUCTION (l_nop) {
     case NOP_TRACE_OFF:
       runtime.sim.hush = 1;
       break;
-    case NOP_REPORT:
-      PRINTF("report(0x%"PRIxREG");\n", evalsim_reg(3));
+    case NOP_RANDOM:
+      cpu_state.reg[11] = (unsigned int) (random () & 0xffffffff);
+      break;
+    case NOP_OR1KSIM:
+      cpu_state.reg[11] = 1;
+      break;
     default:
-      if (k >= NOP_REPORT_FIRST && k <= NOP_REPORT_LAST)
-      PRINTF("report %" PRIdREG " (0x%"PRIxREG");\n", k - NOP_REPORT_FIRST,
-             evalsim_reg(3));
       break;
   }
 }

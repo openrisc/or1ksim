@@ -962,7 +962,7 @@ parse_args (int argc, char *argv[])
   nosrv = arg_lit0 (NULL, "nosrv", "do not launch debug server");
   srv = arg_int0 (NULL, "srv", "<n>",
 		  "launch debug server on port (default random)");
-  srv->ival[0] = rand () % (65536 - 49152) + 49152;
+  srv->ival[0] = random () % (65536 - 49152) + 49152;
   srv->hdr.flag |= ARG_HASOPTVALUE;
   mem = arg_str0 ("m", "memory", "<n>", "add memory block of <n> bytes");
   dbg = arg_str0 ("d", "debug-config", "<str>", "Debug config string");

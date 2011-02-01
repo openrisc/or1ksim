@@ -19,6 +19,15 @@ New config setting for memory initialization "exitnops" fills memory with
 "l.nop 1", which will cause the simulator to exit. Good for tracking pointer
 corruption.
 
+New l.nop opcodes to turn instruction tracing on and off. Good for debugging
+applications.
+
+New l.nop opcode to return a random number. Good for applications (like the
+Linux kernel) which need access to the host entropy to ensure randomness.
+
+New l.nop opcode to identify that this is an Or1ksim session.  Allows
+applications to determine if they are running on Or1ksim or hardware.
+
 
 New in release 0.5.0rc2
 =======================

@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2011-01-05.tar.bz2
+     tar jxf or1ksim-2011-01-27.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2011-01-05/configure --target=or32-elf ...
+     ../or1ksim-2011-01-27/configure --target=or32-elf ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -1057,6 +1057,24 @@ supported.
 
 `l.nop 9'
      Instruction tracing is turned off.
+
+`l.nop 10'
+     A 32-bit random number is returned in `r11'.
+
+     The random numbers are generated using `random', which in turn is
+     seeded through `srandom' using the host `/dev/urandom' if
+     available, or else the process ID of the Or1ksim instance.
+
+     This opcode is particularly useful for situations where a target
+     program running on Or1ksim needs to obtain genuine system entropy
+     to generate random numbers.
+
+`l.nop 11'
+     Return a non-zero value in `r11'.
+
+     This opcode can be used to detect if a target is running under
+     Or1ksim.  Set `r11' to zero, issue this opcode, and look to see if
+     `r11' is non-zero.
 
 
 
@@ -4375,6 +4393,8 @@ Index
                                                               (line   6)
 * l.nop 0:                               l.nop Support.       (line  12)
 * l.nop 1 (end simulation):              l.nop Support.       (line  15)
+* l.nop 10 (return a random number):     l.nop Support.       (line  51)
+* l.nop 11 (return a non-zero value):    l.nop Support.       (line  62)
 * l.nop 2 (report):                      l.nop Support.       (line  19)
 * l.nop 3 (printf, now obsolete):        l.nop Support.       (line  22)
 * l.nop 4 (putc):                        l.nop Support.       (line  29)
@@ -4845,45 +4865,45 @@ Node: Disabling Ethernet Filtering33988
 Node: Networking from OpenRISC Linux and BusyBox34613
 Node: Tearing Down a Bridge36275
 Node: l.nop Support37018
-Node: Configuration38528
-Node: Configuration File Format39140
-Node: Configuration File Preprocessing39525
-Node: Configuration File Syntax39822
-Node: Simulator Configuration42607
-Node: Simulator Behavior42898
-Node: Verification API Configuration47479
-Node: CUC Configuration49419
-Node: Core OpenRISC Configuration51411
-Node: CPU Configuration51913
-Node: Memory Configuration56032
-Node: Memory Management Configuration62754
-Node: Cache Configuration65131
-Node: Interrupt Configuration67517
-Node: Power Management Configuration69350
-Node: Branch Prediction Configuration70627
-Node: Debug Interface Configuration71987
-Node: Peripheral Configuration74330
-Node: Memory Controller Configuration74956
-Node: UART Configuration78736
-Node: DMA Configuration82255
-Node: Ethernet Configuration84122
-Node: GPIO Configuration89401
-Node: Display Interface Configuration91034
-Node: Frame Buffer Configuration93343
-Node: Keyboard Configuration95207
-Node: Disc Interface Configuration97445
-Node: Generic Peripheral Configuration102549
-Node: Interactive Command Line104844
-Node: Verification API111818
-Node: Code Internals116248
-Node: Coding Conventions116831
-Node: Global Data Structures121258
-Node: Concepts123915
-Ref: Output Redirection124060
-Ref: Interrupts Internal124598
-Node: Internal Debugging125751
-Node: Regression Testing126275
-Node: GNU Free Documentation License130064
-Node: Index152471
+Node: Configuration39180
+Node: Configuration File Format39792
+Node: Configuration File Preprocessing40177
+Node: Configuration File Syntax40474
+Node: Simulator Configuration43259
+Node: Simulator Behavior43550
+Node: Verification API Configuration48131
+Node: CUC Configuration50071
+Node: Core OpenRISC Configuration52063
+Node: CPU Configuration52565
+Node: Memory Configuration56684
+Node: Memory Management Configuration63406
+Node: Cache Configuration65783
+Node: Interrupt Configuration68169
+Node: Power Management Configuration70002
+Node: Branch Prediction Configuration71279
+Node: Debug Interface Configuration72639
+Node: Peripheral Configuration74982
+Node: Memory Controller Configuration75608
+Node: UART Configuration79388
+Node: DMA Configuration82907
+Node: Ethernet Configuration84774
+Node: GPIO Configuration90053
+Node: Display Interface Configuration91686
+Node: Frame Buffer Configuration93995
+Node: Keyboard Configuration95859
+Node: Disc Interface Configuration98097
+Node: Generic Peripheral Configuration103201
+Node: Interactive Command Line105496
+Node: Verification API112470
+Node: Code Internals116900
+Node: Coding Conventions117483
+Node: Global Data Structures121910
+Node: Concepts124567
+Ref: Output Redirection124712
+Ref: Interrupts Internal125250
+Node: Internal Debugging126403
+Node: Regression Testing126927
+Node: GNU Free Documentation License130716
+Node: Index153123
 
 End Tag Table

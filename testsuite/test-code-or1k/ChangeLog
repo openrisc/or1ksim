@@ -1,3 +1,11 @@
+2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* support/spr-defs.h: Added definition of NOP_RANDOM and
+	NOP_OR1KSIM. Removed definitions of NOP_REPORT_FIRST and
+	NOP_REPORT_LAST.
+
 2011-01-05  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.

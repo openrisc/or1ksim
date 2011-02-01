@@ -1304,6 +1304,28 @@ Instruction tracing is turned on.
 
 Instruction tracing is turned off.
 
+@item l.nop 10
+@cindex @code{l.nop 10} (return a random number)
+
+A 32-bit random number is returned in @code{r11}.
+
+The random numbers are generated using @code{random}, which in turn is
+seeded through @code{srandom} using the host @file{/dev/urandom} if
+available, or else the process ID of the @value{OR1KSIM} instance.
+
+This opcode is particularly useful for situations where a target
+program running on Or1ksim needs to obtain genuine system entropy to
+generate random numbers.
+
+@item l.nop 11
+@cindex @code{l.nop 11} (return a non-zero value)
+
+Return a non-zero value in @code{r11}.
+
+This opcode can be used to detect if a target is running under
+Or1ksim.  Set @code{r11} to zero, issue this opcode, and look to see
+if @code{r11} is non-zero.
+
 @end table
 
 @node Configuration

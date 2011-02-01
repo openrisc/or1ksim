@@ -625,7 +625,7 @@
 #define NOP_GET_PS       0x0007      /* JPB: Get picosecs/cycle */
 #define NOP_TRACE_ON     0x0008      /* Turn on tracing */
 #define NOP_TRACE_OFF    0x0009      /* Turn off tracing */
-#define NOP_REPORT_FIRST 0x0400      /* Report with number */
-#define NOP_REPORT_LAST  0x03ff      /* Report with number */
+#define NOP_RANDOM       0x000a      /* Return 4 random bytes */
+#define NOP_OR1KSIM      0x000b      /* Return non-zero if this is Or1ksim */
 
 #endif	/* SPR_DEFS__H */

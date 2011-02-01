@@ -191,13 +191,16 @@ mem_reset (void *dat)
     case MT_RANDOM:
       if (mem->random_seed == -1)
 	{
-	  seed = time (NULL);
-	  /* Print out the seed just in case we ever need to debug */
-	  PRINTF ("Seeding random generator with value %d\n", seed);
+	  /* seed = time (NULL); */
+	  /* srandom (seed); */
+	  /* /\* Print out the seed just in case we ever need to debug *\/ */
+	  /* PRINTF ("Seeding random generator with value %d\n", seed); */
 	}
       else
-	seed = mem->random_seed;
-      srandom (seed);
+	{
+	  seed = mem->random_seed;
+	  srandom (seed);
+	}
 
       for (i = 0; i < mem->size; i++, mem_area++)
 	*mem_area = random () & 0xFF;

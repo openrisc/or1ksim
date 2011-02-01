@@ -83,7 +83,7 @@ or1ksim_init (int         argc,
 				int                data_len))
 {
   /* Initialization copied from existing main() */
-  srand (getpid ());
+  init_randomness ();
   init_defconfig ();
   reg_config_secs ();
 

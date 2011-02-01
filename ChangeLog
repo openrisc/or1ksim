@@ -1,3 +1,24 @@
+2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or32/insnset.c <l_nop>: Added behavior for NOP_RANDOM and
+	NOP_OR1KSIM. Removed default behavior.
+	* cpu/or1k/spr-defs.h: Added definition of NOP_RANDOM and
+	NOP_OR1KSIM. Removed definitions of NOP_REPORT_FIRST and
+	NOP_REPORT_LAST.
+	* doc/or1ksim.texi <l.nop Opcode Support>: Document l.nop 10 and
+	l.nop 11.
+	* libtoplevel.c (or1ksim_init): Replaced srand () by
+	init_randomness ().
+	* peripheral/memory.c (mem_reset): Do not allow general reset of
+	random number generator.
+	* sim_config.c (parse_args): Change use of rand () to random ().
+	* toplevel.c (main): Replaced srand () by init_randomness ().
+	* toplevel-profile.c (main): Replaced srand () by init_randomness ().
+	* toplevel-support.c (init_randomness): Created.
+	* toplevel-support.h <init_randomness>: Added.
+
 2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
 
 	* cpu/common/abstract.c (diassemble_instr): Added instruction
