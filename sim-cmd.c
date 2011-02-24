@@ -3,8 +3,10 @@
    Copyright (C) 1999 Damjan Lampret, lampret@opencores.org
    Copyright (C) 2005 György `nog' Jeney, nog@sdf.lonestar.org
    Copyright (C) 2008 Embecosm Limited
+   Copyright (C) 2011 Giuseppe Scrivano <gscrivano@gnu.org>
 
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+   contributor Giuseppe Scrivano <gscrivano@gnu.org>
 
    This file is part of Or1ksim, the OpenRISC 1000 Architectural Simulator.
 
@@ -691,6 +693,11 @@ handle_sim_command (void)
     {
 #ifdef HAVE_LIBREADLINE
       cur_arg = readline ("(sim) ");
+
+      if (!cur_arg)
+	{
+	  sim_done ();
+	}
 #else
       PRINTF ("(sim) ");
 

@@ -1,3 +1,13 @@
+2011-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-02-22  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	* sim-cmd.c (handle_sim_command) [HAVE_LIBREADLINE]: Exit
+	immediately if no text is read.
+
 2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
