@@ -2,8 +2,8 @@
 	      ==================================================
 
 
-New in top of tree
-==================
+New in release 0.5.0rc3
+=======================
 
 New features (shouldn't be there during a release cycle, but prompted by debug
 needs elsewhere in the tool chain).
@@ -27,6 +27,15 @@ Linux kernel) which need access to the host entropy to ensure randomness.
 
 New l.nop opcode to identify that this is an Or1ksim session.  Allows
 applications to determine if they are running on Or1ksim or hardware.
+
+No bugs are fixed.
+
+The following bugs are outstanding
+* Bug 1973: Or1ksim needs PIC tests.
+* But 1931: Or1ksim needs test for l.nop opcodes.
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
 
 
 New in release 0.5.0rc2

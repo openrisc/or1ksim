@@ -1,3 +1,18 @@
+2011-04-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.0rc3.
+
+2011-03-29  Jonas Bonn  <jonas@southpole.se>
+
+	* cpu/or1k/sprs.c (mtspr): Setting PICMR always sets the bottom
+	two bits if we have non-maskable interrupts.
+
+2011-03-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* peripheral/eth.c (eth_open_tap_if): If fail to open the TAP,
+	then also report the tap device name.
+
 2011-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.

@@ -163,7 +163,7 @@ void mtspr(uint16_t regno, const uorreg_t value)
        one. */
     if (config.pic.use_nmi)
       {
-	cpu_state.sprs[SPR_SR] |= 0x00000003;
+	cpu_state.sprs[SPR_PICMR] |= 0x00000003;
       }
 
     if(cpu_state.sprs[SPR_SR] & SPR_SR_IEE)

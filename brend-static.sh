@@ -26,7 +26,7 @@
 
 # Pre-requisites: bridge-utils must be installed.
 
-# Usage: ./brend.sh <bridge> <eth> <tap>
+# Usage: ./brend-static.sh <bridge> <eth> <tap>
 
 # - <bridge> is the bridge interface to use, e.g. br0
 # - <eth> is the hardware ethernet interface to use, e.g. eth0
@@ -35,7 +35,7 @@
 # Check we have the right number of arguments
 if [ "x$#" != "x3" ]
 then
-    echo "Usage: ./brend.sh <bridge> <eth> <tap>"
+    echo "Usage: ./brend-static.sh <bridge> <eth> <tap>"
     exit 1
 fi
 
@@ -100,17 +100,6 @@ then
     exit 1
 fi
 
-# Restore the Ethernet interface. We could use ifconfig with the IP address,
-# netmask and broadcast mask from earlier, but this does not work in a DHCP
-# world (the MAC has changed). Instead we use a single shot dhcp
-# configuration. In future the extant eth0 dhclient will refresh the lease.
-dhclient -1 -d ${eth0}
-
-if [ $? != 0 ]
-then
-    echo "Failed to get lease for ${eth}"
-    exit 1
-fi
-
-# Kill the outstanding br0 DHCL client
-kill `ps ax | grep "dhclient.*${br}" | grep -v "grep" | cut -c 1-5`
+# Restore the Ethernet interface, using the IP address, netmask and broadcast
+# mask from earlier.
+ifconfig ${eth} ${eth_ip} netmask ${eth_netmask} broadcast ${eth_broadcast}

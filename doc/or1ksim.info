@@ -64,7 +64,7 @@ File: or1ksim.info,  Node: Preparation,  Next: Configuring the Build,  Up: Insta
 Unpack the software and create a _separate_ directory in which to build
 it:
 
-     tar jxf or1ksim-2011-01-27.tar.bz2
+     tar jxf or1ksim-0.5.0rc3.tar.bz2
      mkdir builddir_or1ksim
      cd builddir_or1ksim
 
@@ -81,7 +81,7 @@ The most significant argument is `--target', which should specify the
 OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
-     ../or1ksim-2011-01-27/configure --target=or32-elf ...
+     ../or1ksim-0.5.0rc3/configure --target=or32-elf ...
 
 There are several other options available, many of which are standard
 to GNU `configure' scripts.  Use `configure --help' to see all the
@@ -1031,7 +1031,7 @@ supported.
 
 `l.nop 3'
      In earlier versions of Or1ksim this treated `r3' as a pointer to a
-     `printf' style format string, and regsiters `r4' through `r8' as
+     `printf' style format string, and registers `r4' through `r8' as
      parameters for that format string.
 
      This opcode is no longer supported, and has no effect if used.
@@ -4848,62 +4848,62 @@ Tag Table:
 Node: Top810
 Node: Installation1220
 Node: Preparation1467
-Node: Configuring the Build1762
-Node: Build and Install7902
-Node: Known Issues8668
-Node: Usage9723
-Node: Standalone Simulator10007
-Node: Profiling Utility15151
-Node: Memory Profiling Utility16057
-Node: Trace Generation17417
-Node: Simulator Library19602
-Node: Ethernet TUN/TAP Interface30034
-Node: Setting Up a Persistent TAP device31139
-Node: Establishing a Bridge31814
-Node: Opening the Firewall33497
-Node: Disabling Ethernet Filtering33988
-Node: Networking from OpenRISC Linux and BusyBox34613
-Node: Tearing Down a Bridge36275
-Node: l.nop Support37018
-Node: Configuration39180
-Node: Configuration File Format39792
-Node: Configuration File Preprocessing40177
-Node: Configuration File Syntax40474
-Node: Simulator Configuration43259
-Node: Simulator Behavior43550
-Node: Verification API Configuration48131
-Node: CUC Configuration50071
-Node: Core OpenRISC Configuration52063
-Node: CPU Configuration52565
-Node: Memory Configuration56684
-Node: Memory Management Configuration63406
-Node: Cache Configuration65783
-Node: Interrupt Configuration68169
-Node: Power Management Configuration70002
-Node: Branch Prediction Configuration71279
-Node: Debug Interface Configuration72639
-Node: Peripheral Configuration74982
-Node: Memory Controller Configuration75608
-Node: UART Configuration79388
-Node: DMA Configuration82907
-Node: Ethernet Configuration84774
-Node: GPIO Configuration90053
-Node: Display Interface Configuration91686
-Node: Frame Buffer Configuration93995
-Node: Keyboard Configuration95859
-Node: Disc Interface Configuration98097
-Node: Generic Peripheral Configuration103201
-Node: Interactive Command Line105496
-Node: Verification API112470
-Node: Code Internals116900
-Node: Coding Conventions117483
-Node: Global Data Structures121910
-Node: Concepts124567
-Ref: Output Redirection124712
-Ref: Interrupts Internal125250
-Node: Internal Debugging126403
-Node: Regression Testing126927
-Node: GNU Free Documentation License130716
-Node: Index153123
+Node: Configuring the Build1760
+Node: Build and Install7898
+Node: Known Issues8664
+Node: Usage9719
+Node: Standalone Simulator10003
+Node: Profiling Utility15147
+Node: Memory Profiling Utility16053
+Node: Trace Generation17413
+Node: Simulator Library19598
+Node: Ethernet TUN/TAP Interface30030
+Node: Setting Up a Persistent TAP device31135
+Node: Establishing a Bridge31810
+Node: Opening the Firewall33493
+Node: Disabling Ethernet Filtering33984
+Node: Networking from OpenRISC Linux and BusyBox34609
+Node: Tearing Down a Bridge36271
+Node: l.nop Support37014
+Node: Configuration39176
+Node: Configuration File Format39788
+Node: Configuration File Preprocessing40173
+Node: Configuration File Syntax40470
+Node: Simulator Configuration43255
+Node: Simulator Behavior43546
+Node: Verification API Configuration48127
+Node: CUC Configuration50067
+Node: Core OpenRISC Configuration52059
+Node: CPU Configuration52561
+Node: Memory Configuration56680
+Node: Memory Management Configuration63402
+Node: Cache Configuration65779
+Node: Interrupt Configuration68165
+Node: Power Management Configuration69998
+Node: Branch Prediction Configuration71275
+Node: Debug Interface Configuration72635
+Node: Peripheral Configuration74978
+Node: Memory Controller Configuration75604
+Node: UART Configuration79384
+Node: DMA Configuration82903
+Node: Ethernet Configuration84770
+Node: GPIO Configuration90049
+Node: Display Interface Configuration91682
+Node: Frame Buffer Configuration93991
+Node: Keyboard Configuration95855
+Node: Disc Interface Configuration98093
+Node: Generic Peripheral Configuration103197
+Node: Interactive Command Line105492
+Node: Verification API112466
+Node: Code Internals116896
+Node: Coding Conventions117479
+Node: Global Data Structures121906
+Node: Concepts124563
+Ref: Output Redirection124708
+Ref: Interrupts Internal125246
+Node: Internal Debugging126399
+Node: Regression Testing126923
+Node: GNU Free Documentation License130712
+Node: Index153119
 
 End Tag Table

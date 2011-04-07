@@ -1266,7 +1266,7 @@ Report the value in @code{r3} on the console as a 32-bit hex value.
 @cindex @code{l.nop 3} (printf, now obsolete)
 
 In earlier versions of @value{OR1KSIM} this treated @code{r3} as a
-pointer to a @code{printf} style format string, and regsiters @code{r4}
+pointer to a @code{printf} style format string, and registers @code{r4}
 through @code{r8} as parameters for that format string.
 
 This opcode is no longer supported, and has no effect if used.

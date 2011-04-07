@@ -1001,8 +1001,8 @@ eth_open_tap_if (struct eth_device *eth)
 
   if (ioctl (eth->rtx_fd, TUNSETIFF, (void *) &ifr) < 0)
     {
-      fprintf (stderr, "Warning: Failed to set TAP device: %s\n",
-	       strerror (errno));
+      fprintf (stderr, "Warning: Failed to set TAP device %s: %s\n",
+	       eth->tap_dev, strerror (errno));
       close (eth->rtx_fd);
       eth->rtx_fd = -1;
       return;
