@@ -1,12 +1,17 @@
-2011-04-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+2011-04-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
-	* configure.ac: Updated version 0.5.0rc3.
+	* configure.ac: Updated version 0.5.1rc1.
 
 2011-03-29  Jonas Bonn  <jonas@southpole.se>
 
 	* cpu/or1k/sprs.c (mtspr): Setting PICMR always sets the bottom
 	two bits if we have non-maskable interrupts.
+
+2011-03-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.0rc3.
 
 2011-03-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
