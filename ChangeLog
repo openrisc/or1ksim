@@ -1,3 +1,10 @@
+2011-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version
+	* debug/debug-unit.c (set_stall_state): Clearing stall state also
+	clears halted state.
+
 2011-04-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
@@ -245,6 +252,10 @@
 	* peripheral/eth.c (eth_miim_trans): comment out debug printf()s
 	* cpu/or32/generate.c (generate_body): Add except_handle call to all
 	generated illegal instruction cases.
+
+2010-11-22  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* peripheral/eth.c (eth-reset): PF_PACKET renamed AF_PACKET.
 
 2010-11-19  Julius Baxter  <julius@opencores.org>
 

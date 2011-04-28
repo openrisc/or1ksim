@@ -136,11 +136,13 @@ set_stall_state (int state)
 
   runtime.cpu.stalled             = state;
 
-  /* If we unstall, any changed NPC becomes valid again */
+  /* If we unstall, any changed NPC becomes valid again and we cannot be
+     halted. */
 
   if (!runtime.cpu.stalled)
     {
       cpu_state.npc_not_valid = 0;
+      runtime.cpu.halted      = 0;
     }
 }	/* set_stall_state () */
 
