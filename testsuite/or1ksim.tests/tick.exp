@@ -43,8 +43,6 @@ run_or1ksim "tick"                                                            \
           "Test succeeded Timer started counting from high value"           \
           "Test succeeded Auto-restart wrapped round"                       \
           "Test succeeded Continuous mode wrapped round"                    \
-          "Test succeeded Spurious interrupts handled with matching period" \
-          "Test succeeded Spurious interrupts handled after TTCR and TTMR"  \
 	  "!report(0xdeaddead);"                                             \
 	  "!exit(0)"]                                                        \
     "" "tick/tick"

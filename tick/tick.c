@@ -92,14 +92,14 @@ tick_restart (void *dat)
 {
   cpu_state.sprs[SPR_TTCR] = 0;
   cycles_start = runtime.sim.cycles;
-  SCHED_ADD (tick_restart, NULL, cpu_state.sprs[SPR_TTMR] & SPR_TTMR_PERIOD);
+  SCHED_ADD (tick_restart, NULL, cpu_state.sprs[SPR_TTMR] & SPR_TTMR_TP);
 }
 
 /*! Stops the timer */
 static void
 tick_one_shot (void *dat)
 {
-  cpu_state.sprs[SPR_TTCR] = cpu_state.sprs[SPR_TTMR] & SPR_TTMR_PERIOD;
+  cpu_state.sprs[SPR_TTCR] = cpu_state.sprs[SPR_TTMR] & SPR_TTMR_TP;
   tick_count = 0;
 }
 
@@ -108,8 +108,8 @@ static void
 sched_timer_job (uorreg_t prev_ttmr)
 {
   uorreg_t ttmr = cpu_state.sprs[SPR_TTMR];
-  uint32_t match_time = ttmr & SPR_TTMR_PERIOD;
-  uint32_t ttcr_period = spr_read_ttcr () & SPR_TTCR_PERIOD;
+  uint32_t match_time = ttmr & SPR_TTMR_TP;
+  uint32_t ttcr_period = spr_read_ttcr () & SPR_TTCR_CNT;
 
   /* Remove previous jobs if they exists */
   if ((prev_ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
@@ -196,7 +196,7 @@ spr_write_ttmr (uorreg_t prev_val)
   tick_count = value & SPR_TTMR_M;
 
   if ((tick_count == 0xc0000000) &&
-      (cpu_state.sprs[SPR_TTCR] == (value & SPR_TTMR_PERIOD)))
+      (cpu_state.sprs[SPR_TTCR] == (value & SPR_TTMR_TP)))
     {
       tick_count = 0;
     }

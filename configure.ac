@@ -98,7 +98,7 @@ AC_CHECK_HEADERS(unistd.h stdlib.h stdarg.h string.h strings.h      \
 		 sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
 		 termcap.h termios.h termio.h sys/file.h locale.h getopt.h    \
 		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h  \
-                 limits.h)
+                 limits.h linux/if_tun.h)
 AC_CHECK_FUNCS(strcasecmp select setenv putenv tcgetattr setlocale lstat)
 AC_CHECK_FUNCS(grantpt unlockpt ptsname on_exit)
 AC_CHECK_FUNCS(basename)

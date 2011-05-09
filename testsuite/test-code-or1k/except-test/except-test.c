@@ -372,7 +372,7 @@ void tick_init (int period, int hp_int)
   mtspr(SPR_SR, mfspr(SPR_SR) & ~SPR_SR_TEE);
 
   /* Set period of one cycle, restartable mode */
-  mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (period & SPR_TTMR_PERIOD));
+  mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (period & SPR_TTMR_TP));
   
   /* Reset counter */
   mtspr(SPR_TTCR, 0);

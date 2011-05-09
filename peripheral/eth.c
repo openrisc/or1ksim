@@ -45,8 +45,10 @@
 #include <unistd.h>
 #include <errno.h>
 
+#if HAVE_LINUX_IF_TUN_H==1
 #include <linux/if.h>
 #include <linux/if_tun.h>
+#endif
 
 /* Package includes */
 #include "arch.h"
@@ -189,6 +191,8 @@ eth_write_file_packet (struct eth_device *eth,
 }	/* eth_write_file_packet () */
 
 
+#if HAVE_LINUX_IF_TUN_H==1
+
 /* -------------------------------------------------------------------------- */
 /*!Write an Ethernet packet to a TAP interface.
 
@@ -205,7 +209,9 @@ eth_write_tap_packet (struct eth_device *eth,
 		      unsigned char     *buf,
 		      unsigned long int  length)
 {
-  ssize_t  nwritten;
+  ssize_t  nwritten = 0;
+
+
 
 #if ETH_DEBUG
   int  j; 
@@ -242,6 +248,7 @@ eth_write_tap_packet (struct eth_device *eth,
   return  nwritten;
 
 }	/* eth_write_tap_packet () */
+#endif
 
 
 /* -------------------------------------------------------------------------- */
@@ -266,7 +273,9 @@ eth_write_packet (struct eth_device *eth,
   switch (eth->rtx_type)
     {
     case ETH_RTX_FILE: return  eth_write_file_packet (eth, buf, length);
+#if HAVE_LINUX_IF_TUN_H==1
     case ETH_RTX_TAP:  return  eth_write_tap_packet (eth, buf, length);
+#endif
 
     default:
       fprintf (stderr, "Unknown Ethernet write interface: ignored.\n");
@@ -472,6 +481,8 @@ eth_read_file_packet (struct eth_device *eth,
 }	/* eth_read_file_packet () */
 
 
+#if HAVE_LINUX_IF_TUN_H==1
+
 /* -------------------------------------------------------------------------- */
 /*!Read an Ethernet packet from a FILE interface.
 
@@ -491,6 +502,7 @@ static ssize_t
 eth_read_tap_packet (struct eth_device *eth,
 		     unsigned char     *buf)
 {
+
   struct pollfd  fds[1];
   int            n;
   ssize_t        packet_length;
@@ -540,6 +552,7 @@ eth_read_tap_packet (struct eth_device *eth,
     }
 }	/* eth_read_tap_packet () */
 
+#endif
 
 /* -------------------------------------------------------------------------- */
 /*!Read an Ethernet packet.
@@ -560,7 +573,9 @@ eth_read_packet (struct eth_device *eth,
   switch (eth->rtx_type)
     {
     case ETH_RTX_FILE: return  eth_read_file_packet (eth, buf);
+#if HAVE_LINUX_IF_TUN_H==1
     case ETH_RTX_TAP:  return  eth_read_tap_packet (eth, buf);
+#endif
 
     default:
       fprintf (stderr, "Unknown Ethernet read interface: ignored.\n");
@@ -720,8 +735,11 @@ static int
 eth_ignore_tap_packets (struct eth_device *eth)
 {
   int  result = 0;
+ 
+#if HAVE_LINUX_IF_TUN_H==1
+
   int  n;
-  
+
   /* Read packets until there are none left. */
   do
     {
@@ -765,6 +783,8 @@ eth_ignore_tap_packets (struct eth_device *eth)
 	}
     }
   while (n > 0);
+
+#endif
 
   return  result;
 
@@ -959,6 +979,7 @@ eth_open_file_if (struct eth_device *eth)
     }
 }	/* eth_open_file_if () */
 
+#if HAVE_LINUX_IF_TUN_H==1
 
 /* -------------------------------------------------------------------------- */
 /*!Open the external TAP interface to the Ethernet
@@ -974,6 +995,7 @@ eth_open_file_if (struct eth_device *eth)
 static void
 eth_open_tap_if (struct eth_device *eth)
 {
+
   struct ifreq       ifr;
 
   /* We don't support re-opening. If it's open, it stays open. */
@@ -1010,7 +1032,10 @@ eth_open_tap_if (struct eth_device *eth)
 #if ETH_DEBUG
       PRINTF ("Opened TAP %s\n", ifr.ifr_name);
 #endif
+
 }	/* eth_open_tap_if () */
+
+#endif
 
 
 /* -------------------------------------------------------------------------- */
@@ -1026,7 +1051,9 @@ eth_open_if (struct eth_device *eth)
   switch (eth->rtx_type)
     {
     case ETH_RTX_FILE: eth_open_file_if (eth); break;
+#if HAVE_LINUX_IF_TUN_H==1
     case ETH_RTX_TAP:  eth_open_tap_if (eth);  break;
+#endif
 
     default:
       fprintf (stderr, "Unknown Ethernet interface: ignored.\n");
@@ -1685,11 +1712,13 @@ eth_rtx_type (union param_val  val,
       printf ("Ethernet FILE type\n");
       eth->rtx_type = ETH_RTX_FILE;
     }
+#if HAVE_LINUX_IF_TUN_H==1
   else if (0 == strcasecmp ("tap", val.str_val))
     {
       printf ("Ethernet TAP type\n");
       eth->rtx_type = ETH_RTX_TAP;
     }
+#endif
   else
     {
       fprintf (stderr, "Warning: Unknown Ethernet type: file assumed.\n");

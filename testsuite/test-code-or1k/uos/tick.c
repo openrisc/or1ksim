@@ -43,7 +43,7 @@ void tick_int()
   (*tick_inf)();
 
   /* Set new counter period iand clear inet pending bit */
-	mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (tick_period & SPR_TTMR_PERIOD));
+  mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (tick_period & SPR_TTMR_TP));
 } 
 
 /* Initialize routine */
@@ -54,7 +54,7 @@ int tick_init(unsigned long period, void (* inf)())
   tick_inf = inf;
 
   /* Set counter period, enable timer and interrupt */
-  mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (period & SPR_TTMR_PERIOD));
+  mtspr(SPR_TTMR, SPR_TTMR_IE | SPR_TTMR_RT | (period & SPR_TTMR_TP));
 	
   return 0;
 }

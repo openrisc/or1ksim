@@ -447,7 +447,7 @@ static const struct spr_def spr_pic_group[] = {
 
 /*-----------------------------------------------------[ Tick timer group ]---*/
 static const struct spr_bit_def spr_ttmr[] = {
- { "TTMR_PERIOD", SPR_TTMR_PERIOD },
+ { "TTMR_TP", SPR_TTMR_TP },
  { "TTMR_IP", SPR_TTMR_IP },
  { "TTMR_IE", SPR_TTMR_IE },
  { "TTMR_M", SPR_TTMR_M },

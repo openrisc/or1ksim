@@ -28,6 +28,8 @@
 #include "spr-defs.h"
 #include "support.h"
 
+/*! Whether to perform spurious interrupt test */
+#define DO_SPURIOUS_INT_TEST 0
 
 /*! Number of spurious interrupts we'll allow before properly disabling them */
 #define MAX_SPURIOUS  5
@@ -48,8 +50,10 @@
 /*! Global count of number of times interrupt handler has been called  */
 static volatile int tick_cnt = 0;
 
+#if DO_SPURIOUS_INT_TEST==1
 /*! Global flag to indicate if the TTMR_IP flag should be cleared */
 static int clear_ip = 1;
+#endif
 
 
 /* --------------------------------------------------------------------------*/
@@ -105,8 +109,8 @@ static unsigned long int
 set_period (unsigned long int  ttmr,
 	    unsigned long int  period)
 {
-  ttmr &= ~SPR_TTMR_PERIOD;
-  ttmr |= period & SPR_TTMR_PERIOD;
+  ttmr &= ~SPR_TTMR_TP;
+  ttmr |= period & SPR_TTMR_TP;
 
   return  ttmr;
 
@@ -220,6 +224,7 @@ tick_int (void)
 }	/* tick_count () */
 
 
+#if DO_SPURIOUS_INT_TEST==1
 /* --------------------------------------------------------------------------*/
 /*!Tick interrupt handler generting spurious interrupts
 
@@ -257,7 +262,7 @@ tick_int_spurious (void)
       
     }
 }	/* tick_int_spurious () */
-
+#endif
 
 /* --------------------------------------------------------------------------*/
 /*!Waste a little time
@@ -504,8 +509,8 @@ main()
   waste_time();
   ASSERT (GET_TTCR () > 0x20000, "Timer started counting from high value");
 
-  /* If TTCR is greater than TTMR_PERIOD then the interrupt gets delivered after
-     TTCR wraps around to 0 and counts to SPR_TTMR_PERIOD.
+  /* If TTCR is greater than TTMR_TP then the interrupt gets delivered after
+     TTCR wraps around to 0 and counts to SPR_TTMR_TP.
 
      Set up an auto-restart timer to wrap around. Reset the tick count,
      because it may have incremented since the last match. */
@@ -533,10 +538,12 @@ main()
 
   /* Wait for trigger, then check that we have carried on counting. */
   wait_match();
-  ttcr = GET_TTCR () & SPR_TTCR_PERIOD;
+  ttcr = GET_TTCR () & SPR_TTCR_CNT;
 
-  ASSERT ((0x10000 < ttcr) && (ttcr < 0xffffc00),
+  ASSERT ((0x00010000 < ttcr) && (ttcr < 0xfffffc00),
 	  "Continuous mode wrapped round");
+
+#if DO_SPURIOUS_INT_TEST==1
 
   /* Disable the timer and set up the special spurious interrupt handler, to
      check spurious interrupts occur as expected. */
@@ -583,6 +590,8 @@ main()
   while(tick_cnt != MAX_SPURIOUS)
     {
     }
+
+#endif
 
   /* If we get here everything worked. */
   report(0xdeaddead);

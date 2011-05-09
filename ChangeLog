@@ -1,3 +1,24 @@
+2011-05-09  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* configure: Regenerated.
+	* configure.ac: Added TUN/TAP header to AC_CHECK_HEADERS
+	* peripheral/eth.c: Added ifdef HAVE_LINUX_IF_TUN_H around TUN/TAP
+	code and includes.
+	* cpu/or1k/spr-defs.h: Fixed page number mask for MMU TLB registers.
+	Added TLBEIR definition.
+	Added definitions for SPR_TTMR_TP and SPR_TTCR_CNT. Removed definitions
+	of SPR_TTMR_PERIOD and SPR_TTMR_CR_PERIOD.
+	Added PICPR_IPRIO definition.
+	* testsuite/test-code-or1k/uos/tick.c:  Replace SPR_TTMR_PERIOD with
+	SPR_TTMR_TP and SPR_TTCR_PERIOD with SPR_TTCR_CNT.
+	* tick/tick.c: Ditto.
+	* cpu/or1k/spr-dump.c: Ditto.
+	* testsuite/test-code-or1k/tick/tick.c: Ditto.
+	Fix continuous timer test.
+	Remove spurious interrupt test. Believed to be an artifact of incorrect
+	TTMR/TTCR defines.
+	* testsuite/or1ksim.tests/tick.exp: Remove spurious interrupt test.
+
 2011-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
