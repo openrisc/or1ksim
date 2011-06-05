@@ -57,9 +57,6 @@ or32*)	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
 
-dlx*)	CPU_ARCH=dlx;
-	ARCH_ISA=DLX;;
-
 *)      AC_MSG_WARN(Unknown target architecture $target_cpu: OR32 ELF assumed);
 	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
@@ -219,7 +216,7 @@ execution="1"
 INCLUDES="-I\${top_builddir}/cpu/$CPU_ARCH"
 AC_MSG_CHECKING(which execution style to use)
 AC_ARG_ENABLE(execution,
-    [  --enable-execution Execution style to use (simple/complex/dynamic)],
+    [  --enable-execution Execution style to use (simple/complex)],
     [
     case "$enableval" in
     simple)
@@ -232,13 +229,8 @@ AC_ARG_ENABLE(execution,
       execution="1"
       AC_MSG_RESULT(complex)
       ;;
-    dynamic)
-      INCLUDES="-I\${top_srcdir}/cpu/$CPU_ARCH"
-      execution="2"
-      AC_MSG_RESULT(dynamic)
-      ;;
     *)
-      AC_MSG_ERROR("execution must one of simple/complex/dynamic")
+      AC_MSG_ERROR("execution must one of simple/complex")
       ;;
     esac
     ],
@@ -299,9 +291,8 @@ AC_DEFINE_UNQUOTED(HAVE_ETH_PHY, $eth_phy, [Whether we have ethernet PHY support
 AC_DEFINE_UNQUOTED(HAVE_UNSIGNED_XORI, $unsigned_xori, [Whether l.xori takes an unsigned immediate operand])
 AC_DEFINE_UNQUOTED(SIMPLE_EXECUTION, $execution == 0, [Whether we are building with simple execution module]) 
 AC_DEFINE_UNQUOTED(COMPLEX_EXECUTION, $execution == 1, [Whether we are building with complex execution module]) 
-AC_DEFINE_UNQUOTED(DYNAMIC_EXECUTION, $execution == 2, [Whether we are building with dynamic execution module]) 
 AM_CONDITIONAL(GENERATE_NEEDED, test x$execution = x1)
-AM_CONDITIONAL(DYNAMIC_EXECUTION, test x$execution = x2)
+
 
 
 test -n "$profile"  && CFLAGS="$CFLAGS $profile" LDFLAGS="$LDFLAGS $profile"
@@ -380,7 +371,6 @@ AC_CONFIG_FILES([Makefile                                 \
 
 # yuck. I don't know why I cannot just substitute $CPU_ARCH in the above
 case "$CPU_ARCH" in
-dlx)    AC_CONFIG_FILES([cpu/dlx/Makefile]);;
 *)	AC_CONFIG_FILES([cpu/or32/Makefile]);;
 esac
 

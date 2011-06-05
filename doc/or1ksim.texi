@@ -129,11 +129,9 @@ developers of @value{OR1KSIM}.
 
 @item --enable-execution=simple
 @itemx --enable-execution=complex
-@itemx --enable-execution=dynamic
 @cindex @code{--enable-execution}
 @cindex simple model
 @cindex complex model
-@cindex dynamic model
 @value{OR1KSIM} has developed to improve functionality and
 performance.  This feature allows three versions of @value{OR1KSIM} to be built
 
@@ -145,11 +143,6 @@ Build the original simple interpreting simulator
 @item --enable-execution=complex
 Build a more complex interpreting simulator.  Experiments suggest this
 is 50% faster than the simple simulator.  This is the default.
-
-@item --enable-execution=dynamic
-Build a dynamically compiling simulator.  This is the way many modern ISS are
-built.  This represents a work in progress.  Currently @value{OR1KSIM} will
-compile, but segfaults if configured with this option.
 
 @end table
 

@@ -98,9 +98,7 @@ static int  issued_per_cycle = 4;
 static int  sbuf_head              = 0;
 static int  sbuf_tail              = 0;
 static int  sbuf_count             = 0;
-#if !(DYNAMIC_EXECUTION)
 static int  sbuf_buf[MAX_SBUF_LEN] = { 0 };
-#endif
 
 static int sbuf_prev_cycles = 0;
 
@@ -109,9 +107,7 @@ static int  breakpoint;
 static int  next_delay_insn;
 
 /* Forward declaration of static functions */
-#if !(DYNAMIC_EXECUTION)
 static void decode_execute (struct iqueue_entry *current);
-#endif
 
 /*---------------------------------------------------------------------------*/
 /*!Get an actual value of a specific register
@@ -487,8 +483,6 @@ analysis (struct iqueue_entry *current)
 }	/* analysis() */
 
 
-#if !(DYNAMIC_EXECUTION)
-
 /*---------------------------------------------------------------------------*/
 /*!Store buffer analysis for store instructions
 
@@ -569,9 +563,6 @@ sbuf_load ()
       sbuf_count--;
     }
 }	/* sbuf_load() */
-
-#endif	/* !DYNAMIC_EXECUTION */
-
 
 /*---------------------------------------------------------------------------*/
 /*!Outputs dissasembled instruction                                          */
@@ -832,10 +823,7 @@ decode_execute_wrapper (struct iqueue_entry *current)
 #error HAVE_EXECUTION has to be defined in order to execute programs.
 #endif
 
-  /* FIXME: Most of this file is not needed with DYNAMIC_EXECUTION */
-#if !(DYNAMIC_EXECUTION)
   decode_execute (current);
-#endif
 
   if (breakpoint)
     {
@@ -917,10 +905,8 @@ cpu_reset ()
   pcnext       += 4;
 
   /* MM1409: All programs should set their stack pointer!  */
-#if !(DYNAMIC_EXECUTION)
   except_handle (EXCEPT_RESET, 0);
   update_pc ();
-#endif
 
   except_pending = 0;
   cpu_state.pc   = cpu_state.sprs[SPR_SR] & SPR_SR_EPH ?
@@ -1283,8 +1269,6 @@ decode_execute (struct iqueue_entry *current)
 
 #include "insnset.c"
 
-#elif defined(DYNAMIC_EXECUTION)
-
 #else
-# error "Must define SIMPLE_EXECUTION, COMPLEX_EXECUTION or DYNAMIC_EXECUTION"
+# error "Must define SIMPLE_EXECUTION, COMPLEX_EXECUTION"
 #endif

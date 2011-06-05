@@ -306,19 +306,12 @@ sim_cmd_pr (int argc, char **argv)	/* patch regs */
       return 0;
     }
   setsim_reg (strtoul (argv[1], NULL, 0), strtoul (argv[2], NULL, 0));
-#if DYNAMIC_EXECUTION
-  PRINTF
-    ("WARNING: Patching registers may not work with the dynamic execution model\n");
-#endif
   return 0;
 }
 
 static int
 sim_cmd_pc (int argc, char **argv)	/* patch PC */
 {
-#if DYNAMIC_EXECUTION
-  PRINTF ("Patching the pc in the dynamic execution model doesn't work\n");
-#else
   if (argc != 2)
     {
       PRINTF ("pc <value>\n");
@@ -327,7 +320,6 @@ sim_cmd_pc (int argc, char **argv)	/* patch PC */
 
   cpu_state.pc = strtoul (argv[1], NULL, 0);
   pcnext = cpu_state.pc + 4;
-#endif
   return 0;
 }
 
@@ -341,11 +333,6 @@ sim_cmd_breaks (int argc, char **argv)	/* print breakpoints */
 static int
 sim_cmd_break (int argc, char **argv)	/* set/clear breakpoint */
 {
-#if DYNAMIC_EXECUTION
-  PRINTF
-    ("Setting simulator breakpoints is not support with the recompiler\n");
-  return 0;
-#else
   char *p;
   oraddr_t addr;
   struct label_entry *l;
@@ -368,7 +355,6 @@ sim_cmd_break (int argc, char **argv)	/* set/clear breakpoint */
   else
     set_insnbrkpoint (addr);
   return 0;
-#endif
 }
 
 static int
@@ -499,27 +485,17 @@ sim_cmd_run (int argc, char **argv)	/* run */
 static int
 sim_cmd_stall (int argc, char **argv)	/* Added by CZ 210801 */
 {
-#if DYNAMIC_EXECUTION
-  PRINTF ("Can't stall the cpu with the dynamic recompiler\n");
-  return 0;
-#else
   set_stall_state (1);
   runtime.sim.iprompt = 0;
   runtime.sim.hush = 1;
   return 1;
-#endif
 }
 
 static int
 sim_cmd_unstall (int argc, char **argv)	/* Added by CZ 210801 */
 {
-#if DYNAMIC_EXECUTION
-  PRINTF ("Can't unstall the cpu with the dynamic recompiler\n");
-  return 0;
-#else
   set_stall_state (0);
   return 0;
-#endif
 }
 
 static int

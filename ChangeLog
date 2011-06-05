@@ -1,3 +1,62 @@
+2011-06-04  Julius Baxter  <julius@opencores.org>
+
+	* cpu/or32/rec-i386.h: Removed.
+	* cpu/or32/op-2t.h: Removed.
+	* cpu/or32/rec-i386.h: Removed.
+        * cpu/or32/op-2t.h: Removed.
+        * cpu/or32/op-mftspr-op.h: Removed.
+        * cpu/or32/op-i386.h: Removed.
+        * cpu/or32/op.c: Removed.
+        * cpu/or32/sched-i386.h: Removed.
+        * cpu/or32/dyn32-defs.h: Removed.
+        * cpu/or32/op-support.c: Removed.
+        * cpu/or32/op-lwhb-op.h: Removed.
+        * cpu/or32/op-comp-op.h: Removed.
+        * cpu/or32/op-support.h: Removed.
+        * cpu/or32/op-swhb-op.h: Removed.
+        * cpu/or32/dyn-rec.c: Removed.
+        * cpu/or32/op-arith-op.h: Removed.
+        * cpu/or32/op-1t.h: Removed.
+        * cpu/or32/dyn-rec.h: Removed.
+        * cpu/or32/op-3t.h: Removed.
+        * cpu/or32/op-ff1-op.h: Removed.
+        * cpu/or32/op-t-reg-mov-op.h: Removed.
+        * cpu/or32/dyngen-i386.c: Removed.
+        * cpu/or32/def-op-t.h: Removed.
+        * cpu/or32/op-1t-op.h: Removed.
+        * cpu/or32/op-2t-op.h: Removed.
+        * cpu/or32/op-3t-op.h: Removed.
+        * cpu/or32/common-i386.h: Removed.
+        * cpu/or32/op-extend-op.h: Removed.
+        * cpu/or32/dyngen.c: Removed.
+        * cpu/or32/dyngen-elf.c: Removed.
+        * cpu/or32/dyngen.h: Removed.
+        * cpu/or32/i386-regs.h: Removed.
+        * cpu/or32/op-mac-op.h: Removed.
+        * cpu/dlx: Removed.
+        * cpu/dlx/Makefile.in: Removed.
+        * cpu/dlx/arch.h: Removed.
+        * cpu/dlx/execute.c: Removed.
+        * cpu/dlx/Makefile.am: Removed.
+        * cpu/dlx/.cvsignore: Removed.
+        * cpu/or16: Removed.
+        * cpu/or16/.cvsignore: Removed.
+	* cpu/or32/or32.c: Remove dynamic execution-dependent
+	sections.
+	* cpu/or32/execute.c: Ditto.
+	* cpu/or32/Makefile.am: Ditto.
+	* cpu/common/abstract.c: Ditto.
+	* cpu/common/execute.h: Ditto.
+	* cpu/or1k/sprs.c: Ditto.
+	* cpu/or1k/opcode/or32.h: Ditto.
+	* cpu/or1k/except.c: Ditto.
+	* sim-cmd.c: Ditto.
+	* configure.ac: Remove dynamic-execution options.
+	Remove DLX option.
+	* configure: Regenerated.
+	* doc/or1ksim.texi <Configuring the Build>: Removed dynamic execution
+	option information.
+	
 2011-05-09  Julius Baxter  <julius.baxter@orsoc.se>
 
 	* configure: Regenerated.

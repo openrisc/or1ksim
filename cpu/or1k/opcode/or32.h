@@ -55,8 +55,6 @@
 #if defined(HAVE_EXECUTION)
 # if SIMPLE_EXECUTION
 #  include "simpl32-defs.h"
-# elif DYNAMIC_EXECUTION
-#  include "dyn32-defs.h"
 # endif
 #endif
 
@@ -112,8 +110,6 @@ struct or32_opcode {
   char *function_name;
 # elif SIMPLE_EXECUTION
   void (*exec)(struct iqueue_entry *);
-# else /* DYNAMIC_EXECUTION */
-  void (*exec)(struct op_queue *opq, int param_t[3], int);
 # endif
 #else  /* HAVE_EXECUTION */
   void (*exec)(void);

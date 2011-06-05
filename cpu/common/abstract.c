@@ -48,11 +48,6 @@
 #include "immu.h"
 #include "execute.h"
 
-#if DYNAMIC_EXECUTION
-#include "dyn-rec.h"
-#endif
-
-
 /*! Global temporary variable to increase speed.  */
 struct dev_memarea *cur_area;
 
@@ -561,12 +556,10 @@ eval_insn (oraddr_t memaddr, int *breakpoint)
     mprofile (memaddr, MPROF_32 | MPROF_FETCH);
 
   phys_memaddr = memaddr;
-#if !(DYNAMIC_EXECUTION)
   phys_memaddr = immu_translate (memaddr);
 
   if (except_pending)
     return 0;
-#endif
 
   if (config.debug.enabled)
     *breakpoint += check_debug_unit (DebugInstructionFetch, memaddr);
@@ -731,9 +724,6 @@ setsim_mem32 (oraddr_t memaddr, oraddr_t vaddr, uint32_t value)
       runtime.sim.mem_cycles += mem->ops.delayw;
       mem->ops.writefunc32 (memaddr & mem->size_mask, value,
 			    mem->ops.write_dat32);
-#if DYNAMIC_EXECUTION
-      dyn_checkwrite (memaddr);
-#endif
     }
   else
     {
@@ -763,9 +753,6 @@ setsim_mem16 (oraddr_t memaddr, oraddr_t vaddr, uint16_t value)
       runtime.sim.mem_cycles += mem->ops.delayw;
       mem->ops.writefunc16 (memaddr & mem->size_mask, value,
 			    mem->ops.write_dat16);
-#if DYNAMIC_EXECUTION
-      dyn_checkwrite (memaddr);
-#endif
     }
   else
     {
@@ -795,9 +782,6 @@ setsim_mem8 (oraddr_t memaddr, oraddr_t vaddr, uint8_t value)
       runtime.sim.mem_cycles += mem->ops.delayw;
       mem->ops.writefunc8 (memaddr & mem->size_mask, value,
 			   mem->ops.write_dat8);
-#if DYNAMIC_EXECUTION
-      dyn_checkwrite (memaddr);
-#endif
     }
   else
     {

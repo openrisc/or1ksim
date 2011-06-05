@@ -78,10 +78,6 @@ CONST struct or32_letter or32_letters[] = {
 #  else
 #   define EF(func) "func"
 #  endif
-# else /* DYNAMIC_EXECUTION */
-#  define EFN &l_none
-#  define EF(func) &(gen_ ##func)
-#  define EFI &gen_l_invalid
 # endif
 #else /* HAVE_EXECUTION */
 # define EFN &l_none

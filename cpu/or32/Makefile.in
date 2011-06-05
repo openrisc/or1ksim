@@ -58,8 +58,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@noinst_PROGRAMS = generate$(EXEEXT)
-@DYNAMIC_EXECUTION_TRUE@noinst_PROGRAMS = dyngen$(EXEEXT)
 subdir = cpu/or32
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -75,49 +73,15 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libarch_la_LIBADD =
-am__libarch_la_SOURCES_DIST = execute.c or32.c common-i386.h \
-	dyn32-defs.h dyngen.h dyn-rec.h i386-regs.h op-arith-op.h \
-	op-comp-op.h op-extend-op.h op-ff1-op.h op-i386.h op-lwhb-op.h \
-	op-mac-op.h op-mftspr-op.h op-support.h op-swhb-op.h \
-	op-t-reg-mov-op.h rec-i386.h sched-i386.h simpl32-defs.h op.c \
-	dyn-rec.c op-support.c
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@am_libarch_la_OBJECTS =  \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@	execute.lo \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@	or32.lo
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@am_libarch_la_OBJECTS =  \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@	execute.lo \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@	or32.lo
-@DYNAMIC_EXECUTION_TRUE@am_libarch_la_OBJECTS = execute.lo or32.lo \
-@DYNAMIC_EXECUTION_TRUE@	op.lo dyn-rec.lo op-support.lo
-@DYNAMIC_EXECUTION_TRUE@nodist_libarch_la_OBJECTS = gen-ops.lo \
-@DYNAMIC_EXECUTION_TRUE@	gen-ops-gen.lo gen-ops-rel.lo
+am__libarch_la_SOURCES_DIST = execute.c or32.c simpl32-defs.h
+@GENERATE_NEEDED_FALSE@am_libarch_la_OBJECTS = execute.lo or32.lo
+@GENERATE_NEEDED_TRUE@am_libarch_la_OBJECTS = execute.lo or32.lo
 am__dist_EXTRA_libarch_la_SOURCES_DIST = insnset.c
-libarch_la_OBJECTS = $(am_libarch_la_OBJECTS) \
-	$(nodist_libarch_la_OBJECTS)
-@DYNAMIC_EXECUTION_FALSE@am_libarch_la_rpath =
-@DYNAMIC_EXECUTION_TRUE@am_libarch_la_rpath =
+libarch_la_OBJECTS = $(am_libarch_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
-am__dyngen_SOURCES_DIST = dyngen.c dyngen-i386.c dyngen-elf.c \
-	common-i386.h dyn32-defs.h dyngen.h dyn-rec.h i386-regs.h \
-	op-arith-op.h op-comp-op.h op-extend-op.h op-ff1-op.h \
-	op-i386.h op-lwhb-op.h op-mac-op.h op-mftspr-op.h op-support.h \
-	op-swhb-op.h op-t-reg-mov-op.h rec-i386.h sched-i386.h \
-	simpl32-defs.h
-@DYNAMIC_EXECUTION_TRUE@am_dyngen_OBJECTS = dyngen-dyngen.$(OBJEXT) \
-@DYNAMIC_EXECUTION_TRUE@	dyngen-dyngen-i386.$(OBJEXT) \
-@DYNAMIC_EXECUTION_TRUE@	dyngen-dyngen-elf.$(OBJEXT)
-dyngen_OBJECTS = $(am_dyngen_OBJECTS)
-dyngen_LDADD = $(LDADD)
-dyngen_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(dyngen_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-am__generate_SOURCES_DIST = or32.c generate.c common-i386.h \
-	dyn32-defs.h dyngen.h dyn-rec.h i386-regs.h op-arith-op.h \
-	op-comp-op.h op-extend-op.h op-ff1-op.h op-i386.h op-lwhb-op.h \
-	op-mac-op.h op-mftspr-op.h op-support.h op-swhb-op.h \
-	op-t-reg-mov-op.h rec-i386.h sched-i386.h simpl32-defs.h
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@am_generate_OBJECTS = generate-or32.$(OBJEXT) \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@	generate-generate.$(OBJEXT)
+am__generate_SOURCES_DIST = or32.c generate.c simpl32-defs.h
+@GENERATE_NEEDED_TRUE@am_generate_OBJECTS = generate-or32.$(OBJEXT) \
+@GENERATE_NEEDED_TRUE@	generate-generate.$(OBJEXT)
 generate_OBJECTS = $(am_generate_OBJECTS)
 generate_LDADD = $(LDADD)
 generate_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -136,12 +100,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libarch_la_SOURCES) $(nodist_libarch_la_SOURCES) \
-	$(dist_EXTRA_libarch_la_SOURCES) $(dyngen_SOURCES) \
+SOURCES = $(libarch_la_SOURCES) $(dist_EXTRA_libarch_la_SOURCES) \
 	$(generate_SOURCES)
 DIST_SOURCES = $(am__libarch_la_SOURCES_DIST) \
 	$(am__dist_EXTRA_libarch_la_SOURCES_DIST) \
-	$(am__dyngen_SOURCES_DIST) $(am__generate_SOURCES_DIST)
+	$(am__generate_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -277,147 +240,29 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-@DYNAMIC_EXECUTION_FALSE@noinst_LTLIBRARIES = libarch.la
-@DYNAMIC_EXECUTION_TRUE@noinst_LTLIBRARIES = libarch.la
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@libarch_la_SOURCES = execute.c         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@                     or32.c            \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     common-i386.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     dyn32-defs.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     dyngen.h          \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     dyn-rec.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     i386-regs.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-arith-op.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-comp-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-extend-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-ff1-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-i386.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-lwhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-mac-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-mftspr-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-support.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-swhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     op-t-reg-mov-op.h \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     rec-i386.h        \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     sched-i386.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@		     simpl32-defs.h 
+noinst_LTLIBRARIES = libarch.la
+@GENERATE_NEEDED_TRUE@EXTRA_DIST = insnset.c
+@GENERATE_NEEDED_FALSE@libarch_la_SOURCES = execute.c         \
+@GENERATE_NEEDED_FALSE@                     or32.c            \
+@GENERATE_NEEDED_FALSE@		     simpl32-defs.h 
 
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@libarch_la_SOURCES = execute.c         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     or32.c            \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     common-i386.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     dyn32-defs.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     dyngen.h          \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     dyn-rec.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     i386-regs.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-arith-op.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-comp-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-extend-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-ff1-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-i386.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-lwhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-mac-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-mftspr-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-support.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-swhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-t-reg-mov-op.h \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     rec-i386.h        \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     sched-i386.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     simpl32-defs.h 
+@GENERATE_NEEDED_TRUE@libarch_la_SOURCES = execute.c         \
+@GENERATE_NEEDED_TRUE@                     or32.c            \
+@GENERATE_NEEDED_TRUE@		     simpl32-defs.h
 
-@DYNAMIC_EXECUTION_TRUE@libarch_la_SOURCES = execute.c         \
-@DYNAMIC_EXECUTION_TRUE@		     or32.c            \
-@DYNAMIC_EXECUTION_TRUE@		     op.c              \
-@DYNAMIC_EXECUTION_TRUE@		     dyn-rec.c         \
-@DYNAMIC_EXECUTION_TRUE@		     op-support.c      \
-@DYNAMIC_EXECUTION_TRUE@		     common-i386.h     \
-@DYNAMIC_EXECUTION_TRUE@		     dyn32-defs.h      \
-@DYNAMIC_EXECUTION_TRUE@		     dyngen.h          \
-@DYNAMIC_EXECUTION_TRUE@		     dyn-rec.h         \
-@DYNAMIC_EXECUTION_TRUE@	             i386-regs.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-arith-op.h     \
-@DYNAMIC_EXECUTION_TRUE@		     op-comp-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-extend-op.h    \
-@DYNAMIC_EXECUTION_TRUE@		     op-ff1-op.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-i386.h         \
-@DYNAMIC_EXECUTION_TRUE@		     op-lwhb-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-mac-op.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-mftspr-op.h    \
-@DYNAMIC_EXECUTION_TRUE@		     op-support.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-swhb-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-t-reg-mov-op.h \
-@DYNAMIC_EXECUTION_TRUE@		     rec-i386.h        \
-@DYNAMIC_EXECUTION_TRUE@		     sched-i386.h      \
-@DYNAMIC_EXECUTION_TRUE@		     simpl32-defs.h 
+@GENERATE_NEEDED_TRUE@BUILT_SOURCES = execgen.c
+@GENERATE_NEEDED_TRUE@noinst_PROGRAMS = generate$(EXEEXT)
+@GENERATE_NEEDED_TRUE@generate_SOURCES = or32.c            \
+@GENERATE_NEEDED_TRUE@                     generate.c        \
+@GENERATE_NEEDED_TRUE@                     simpl32-defs.h
 
-@DYNAMIC_EXECUTION_TRUE@nodist_libarch_la_SOURCES = gen-ops.h     \
-@DYNAMIC_EXECUTION_TRUE@			    gen-ops.c     \
-@DYNAMIC_EXECUTION_TRUE@			    gen-ops-gen.c \
-@DYNAMIC_EXECUTION_TRUE@			    gen-ops-rel.c
-
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@BUILT_SOURCES = execgen.c
-@DYNAMIC_EXECUTION_TRUE@BUILT_SOURCES = gen-ops.h     \
-@DYNAMIC_EXECUTION_TRUE@		     gen-ops.c     \
-@DYNAMIC_EXECUTION_TRUE@		     gen-ops-gen.c \
-@DYNAMIC_EXECUTION_TRUE@		     gen-ops-rel.c
-
-@DYNAMIC_EXECUTION_TRUE@dyngen_SOURCES = dyngen.c          \
-@DYNAMIC_EXECUTION_TRUE@		     dyngen-i386.c     \
-@DYNAMIC_EXECUTION_TRUE@		     dyngen-elf.c      \
-@DYNAMIC_EXECUTION_TRUE@		     common-i386.h     \
-@DYNAMIC_EXECUTION_TRUE@		     dyn32-defs.h      \
-@DYNAMIC_EXECUTION_TRUE@		     dyngen.h          \
-@DYNAMIC_EXECUTION_TRUE@		     dyn-rec.h         \
-@DYNAMIC_EXECUTION_TRUE@		     i386-regs.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-arith-op.h     \
-@DYNAMIC_EXECUTION_TRUE@		     op-comp-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-extend-op.h    \
-@DYNAMIC_EXECUTION_TRUE@		     op-ff1-op.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-i386.h         \
-@DYNAMIC_EXECUTION_TRUE@		     op-lwhb-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-mac-op.h       \
-@DYNAMIC_EXECUTION_TRUE@		     op-mftspr-op.h    \
-@DYNAMIC_EXECUTION_TRUE@		     op-support.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-swhb-op.h      \
-@DYNAMIC_EXECUTION_TRUE@		     op-t-reg-mov-op.h \
-@DYNAMIC_EXECUTION_TRUE@		     rec-i386.h        \
-@DYNAMIC_EXECUTION_TRUE@		     sched-i386.h      \
-@DYNAMIC_EXECUTION_TRUE@		     simpl32-defs.h 
-
-@DYNAMIC_EXECUTION_TRUE@dyngen_CFLAGS = $(AM_CFLAGS)
-@DYNAMIC_EXECUTION_TRUE@OP_CFLAGS = -Wall -fomit-frame-pointer -fno-reorder-blocks -O2
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@EXTRA_DIST = insnset.c
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@generate_SOURCES = or32.c            \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     generate.c        \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     common-i386.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     dyn32-defs.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     dyngen.h          \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     dyn-rec.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     i386-regs.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-arith-op.h     \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-comp-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-extend-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-ff1-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-i386.h         \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-lwhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-mac-op.h       \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-mftspr-op.h    \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-support.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     op-swhb-op.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@		     op-t-reg-mov-op.h \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     rec-i386.h        \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     sched-i386.h      \
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@                     simpl32-defs.h 
-
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@generate_CFLAGS = $(AM_CFLAGS)
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_FALSE@dist_EXTRA_libarch_la_SOURCES = insnset.c
+@GENERATE_NEEDED_TRUE@generate_CFLAGS = $(AM_CFLAGS)
+@GENERATE_NEEDED_FALSE@dist_EXTRA_libarch_la_SOURCES = insnset.c
 
 # If the simulator was first built without --enable-simple and then with it,
 # then also remove these two files
 CLEANFILES = execgen.c \
-             generate \
-             gen-ops.c \
-             gen-ops.h \
-             gen-ops-rel.c \
-             gen-ops-gen.c
+             generate
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -464,7 +309,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libarch.la: $(libarch_la_OBJECTS) $(libarch_la_DEPENDENCIES) 
-	$(LINK) $(am_libarch_la_rpath) $(libarch_la_OBJECTS) $(libarch_la_LIBADD) $(LIBS)
+	$(LINK)  $(libarch_la_OBJECTS) $(libarch_la_LIBADD) $(LIBS)
 
 clean-noinstPROGRAMS:
 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
@@ -474,9 +319,6 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-dyngen$(EXEEXT): $(dyngen_OBJECTS) $(dyngen_DEPENDENCIES) 
-	@rm -f dyngen$(EXEEXT)
-	$(dyngen_LINK) $(dyngen_OBJECTS) $(dyngen_LDADD) $(LIBS)
 generate$(EXEEXT): $(generate_OBJECTS) $(generate_DEPENDENCIES) 
 	@rm -f generate$(EXEEXT)
 	$(generate_LINK) $(generate_OBJECTS) $(generate_LDADD) $(LIBS)
@@ -487,19 +329,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dyn-rec.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dyngen-dyngen-elf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dyngen-dyngen-i386.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dyngen-dyngen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/execute.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-ops-gen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-ops-rel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-ops.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate-generate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate-or32.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/insnset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/op-support.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/op.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/or32.Plo@am__quote@
 
 .c.o:
@@ -522,48 +355,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-dyngen-dyngen.o: dyngen.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen.o -MD -MP -MF $(DEPDIR)/dyngen-dyngen.Tpo -c -o dyngen-dyngen.o `test -f 'dyngen.c' || echo '$(srcdir)/'`dyngen.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen.Tpo $(DEPDIR)/dyngen-dyngen.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen.c' object='dyngen-dyngen.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen.o `test -f 'dyngen.c' || echo '$(srcdir)/'`dyngen.c
-
-dyngen-dyngen.obj: dyngen.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen.obj -MD -MP -MF $(DEPDIR)/dyngen-dyngen.Tpo -c -o dyngen-dyngen.obj `if test -f 'dyngen.c'; then $(CYGPATH_W) 'dyngen.c'; else $(CYGPATH_W) '$(srcdir)/dyngen.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen.Tpo $(DEPDIR)/dyngen-dyngen.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen.c' object='dyngen-dyngen.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen.obj `if test -f 'dyngen.c'; then $(CYGPATH_W) 'dyngen.c'; else $(CYGPATH_W) '$(srcdir)/dyngen.c'; fi`
-
-dyngen-dyngen-i386.o: dyngen-i386.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen-i386.o -MD -MP -MF $(DEPDIR)/dyngen-dyngen-i386.Tpo -c -o dyngen-dyngen-i386.o `test -f 'dyngen-i386.c' || echo '$(srcdir)/'`dyngen-i386.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen-i386.Tpo $(DEPDIR)/dyngen-dyngen-i386.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen-i386.c' object='dyngen-dyngen-i386.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen-i386.o `test -f 'dyngen-i386.c' || echo '$(srcdir)/'`dyngen-i386.c
-
-dyngen-dyngen-i386.obj: dyngen-i386.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen-i386.obj -MD -MP -MF $(DEPDIR)/dyngen-dyngen-i386.Tpo -c -o dyngen-dyngen-i386.obj `if test -f 'dyngen-i386.c'; then $(CYGPATH_W) 'dyngen-i386.c'; else $(CYGPATH_W) '$(srcdir)/dyngen-i386.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen-i386.Tpo $(DEPDIR)/dyngen-dyngen-i386.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen-i386.c' object='dyngen-dyngen-i386.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen-i386.obj `if test -f 'dyngen-i386.c'; then $(CYGPATH_W) 'dyngen-i386.c'; else $(CYGPATH_W) '$(srcdir)/dyngen-i386.c'; fi`
-
-dyngen-dyngen-elf.o: dyngen-elf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen-elf.o -MD -MP -MF $(DEPDIR)/dyngen-dyngen-elf.Tpo -c -o dyngen-dyngen-elf.o `test -f 'dyngen-elf.c' || echo '$(srcdir)/'`dyngen-elf.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen-elf.Tpo $(DEPDIR)/dyngen-dyngen-elf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen-elf.c' object='dyngen-dyngen-elf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen-elf.o `test -f 'dyngen-elf.c' || echo '$(srcdir)/'`dyngen-elf.c
-
-dyngen-dyngen-elf.obj: dyngen-elf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -MT dyngen-dyngen-elf.obj -MD -MP -MF $(DEPDIR)/dyngen-dyngen-elf.Tpo -c -o dyngen-dyngen-elf.obj `if test -f 'dyngen-elf.c'; then $(CYGPATH_W) 'dyngen-elf.c'; else $(CYGPATH_W) '$(srcdir)/dyngen-elf.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dyngen-dyngen-elf.Tpo $(DEPDIR)/dyngen-dyngen-elf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dyngen-elf.c' object='dyngen-dyngen-elf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(dyngen_CFLAGS) $(CFLAGS) -c -o dyngen-dyngen-elf.obj `if test -f 'dyngen-elf.c'; then $(CYGPATH_W) 'dyngen-elf.c'; else $(CYGPATH_W) '$(srcdir)/dyngen-elf.c'; fi`
 
 generate-or32.o: or32.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(generate_CFLAGS) $(CFLAGS) -MT generate-or32.o -MD -MP -MF $(DEPDIR)/generate-or32.Tpo -c -o generate-or32.o `test -f 'or32.c' || echo '$(srcdir)/'`or32.c
@@ -802,16 +593,8 @@ uninstall-am:
 	tags uninstall uninstall-am
 
 
-@DYNAMIC_EXECUTION_TRUE@gen-ops.h gen-ops.c gen-ops-gen.c gen-ops-rel.c: dyngen$(EXEEXT) op-tmp.o
-@DYNAMIC_EXECUTION_TRUE@	./dyngen$(EXEEXT) op-tmp.o gen-ops.c gen-ops-gen.c gen-ops-rel.c gen-ops.h
-
-@DYNAMIC_EXECUTION_TRUE@op-tmp.o: op.c op-t-reg-mov-op.h op-i386.h op-arith-op.h op-comp-op.h \
-@DYNAMIC_EXECUTION_TRUE@      op-extend-op.h op-ff1-op.h op-mac-op.h op-mftspr-op.h op-lwhb-op.h \
-@DYNAMIC_EXECUTION_TRUE@      op-swhb-op.h
-@DYNAMIC_EXECUTION_TRUE@	$(CC) $(INCLUDES)  -I$(top_builddir) $(OP_CFLAGS) -o $@ -c $<
-
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@execgen.c: generate$(EXEEXT) insnset.c
-@DYNAMIC_EXECUTION_FALSE@@GENERATE_NEEDED_TRUE@	./generate$(EXEEXT) $(srcdir)/insnset.c execgen.c
+@GENERATE_NEEDED_TRUE@execgen.c: generate$(EXEEXT) insnset.c
+@GENERATE_NEEDED_TRUE@	./generate$(EXEEXT) $(srcdir)/insnset.c execgen.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

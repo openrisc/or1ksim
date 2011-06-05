@@ -108,16 +108,6 @@ void mtspr(uint16_t regno, const uorreg_t value)
     cpu_state.sprs[regno] |= SPR_SR_FO;
     if((value & SPR_SR_IEE) && !(prev_val & SPR_SR_IEE))
       pic_ints_en();
-#if DYNAMIC_EXECUTION
-    if((value & SPR_SR_IME) && !(prev_val & SPR_SR_IME)) {
-      TRACE_(immu)("IMMU just became enabled (%lli).\n", runtime.sim.cycles);
-      recheck_immu(IMMU_GOT_ENABLED);
-    } else if(!(value & SPR_SR_IME) && (prev_val & SPR_SR_IME)) {
-      TRACE_(immu)("Remove counting of mmu hit delay with cycles (%lli)\n",
-                   runtime.sim.cycles);
-      recheck_immu(IMMU_GOT_DISABLED);
-    }
-#endif
     break;
   case SPR_NPC:
     {
@@ -199,15 +189,6 @@ void mtspr(uint16_t regno, const uorreg_t value)
                               (value & (SPR_ITLBTR_CC | SPR_ITLBTR_CI | SPR_ITLBTR_WBC | SPR_ITLBTR_WOM |
                               SPR_ITLBTR_A | SPR_ITLBTR_D | SPR_ITLBTR_SXE | SPR_ITLBTR_UXE));
 
-#if DYNAMIC_EXECUTION
-      if(cpu_state.sprs[SPR_SR] & SPR_SR_IME) {
-        /* The immu got reconfigured.  Recheck if the current page in execution
-         * is resident in the immu ways.  This check would be done during the
-         * instruction fetch but since the dynamic execution model does not do
-         * instruction fetchs, do it now. */
-        recheck_immu(0);
-      }
-#endif
     }
 
     /* Links to GPRS */

@@ -9,9 +9,6 @@
 /* Whether we are building with complex execution module */
 #undef COMPLEX_EXECUTION
 
-/* Whether we are building with dynamic execution module */
-#undef DYNAMIC_EXECUTION
-
 /* Define to 1 if you have the `basename' function. */
 #undef HAVE_BASENAME
 

@@ -36,11 +36,6 @@
 #include "execute.h"
 #include "debug-unit.h"
 
-#if DYNAMIC_EXECUTION
-#include "sched.h"
-#include "op-support.h"
-#endif
-
 extern void op_join_mem_cycles(void);
 
 
@@ -58,19 +53,15 @@ except_handle (oraddr_t except, oraddr_t ea)
   if (debug_ignore_exception (except))
     return;
 
-#if !(DYNAMIC_EXECUTION)
   /* In the dynamic recompiler, this function never returns, so this is not
    * needed.  Ofcourse we could set it anyway, but then all code that checks
    * this variable would break, since it is never reset */
   except_pending = 1;
-#endif
 
   except_vector =
     except + (cpu_state.sprs[SPR_SR] & SPR_SR_EPH ? 0xf0000000 : 0x00000000);
 
-#if !(DYNAMIC_EXECUTION)
   pcnext = except_vector;
-#endif
 
   cpu_state.sprs[SPR_EEAR_BASE] = ea;
   cpu_state.sprs[SPR_ESR_BASE] = cpu_state.sprs[SPR_SR];
@@ -83,15 +74,6 @@ except_handle (oraddr_t except, oraddr_t ea)
   /* Address translation is always disabled when starting exception. */
   cpu_state.sprs[SPR_SR] &= ~SPR_SR_DME;
 
-#if DYNAMIC_EXECUTION
-  /* If we were called from do_scheduler and there were more jobs scheduled to
-   * run after this, they won't run unless the following call is made since this
-   * function never returns.  (If we weren't called from do_scheduler, then the
-   * job at the head of the queue will still have some time remaining) */
-  if (scheduler.job_queue->time <= 0)
-    do_scheduler ();
-#endif
-
   switch (except)
     {
       /* EPCR is irrelevent */
@@ -101,9 +83,6 @@ except_handle (oraddr_t except, oraddr_t ea)
     case EXCEPT_ITLBMISS:
     case EXCEPT_IPF:
       cpu_state.sprs[SPR_EPCR_BASE] = ea - (cpu_state.delay_insn ? 4 : 0);
-#if DYNAMIC_EXECUTION
-      op_join_mem_cycles ();
-#endif
       break;
     case EXCEPT_BUSERR:
     case EXCEPT_DPF:
@@ -113,12 +92,6 @@ except_handle (oraddr_t except, oraddr_t ea)
     case EXCEPT_RANGE:
     case EXCEPT_TRAP:
       /* All these exceptions happen during a simulated instruction */
-#if DYNAMIC_EXECUTION
-      /* Since these exceptions happen during a simulated instruction and this
-       * function jumps out to the exception vector the scheduler would never have
-       * a chance to run, therefore run it now */
-      run_sched_out_of_line ();
-#endif
       cpu_state.sprs[SPR_EPCR_BASE] =
 	cpu_state.pc - (cpu_state.delay_insn ? 4 : 0);
       break;
@@ -133,13 +106,11 @@ except_handle (oraddr_t except, oraddr_t ea)
     case EXCEPT_INT:
       cpu_state.sprs[SPR_EPCR_BASE] =
 	cpu_state.pc - (cpu_state.delay_insn ? 4 : 0);
-#if !(DYNAMIC_EXECUTION)
       /* If we don't update the pc now, then it will only happen *after* the next
        * instruction (There would be serious problems if the next instruction just
        * happens to be a branch), when it should happen NOW. */
       cpu_state.pc = pcnext;
       pcnext += 4;
-#endif
       break;
     }
 
@@ -155,7 +126,4 @@ except_handle (oraddr_t except, oraddr_t ea)
    * the delay slot of the previous instruction */
   cpu_state.delay_insn = 0;
 
-#if DYNAMIC_EXECUTION
-  do_jump (except_vector);
-#endif
 }

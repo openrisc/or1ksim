@@ -31,12 +31,6 @@
 #include "opcode/or32.h"
 #include "abstract.h"
 
-#if DYNAMIC_EXECUTION
-#include "setjmp.h"
-#include "dyn-rec.h"
-#endif
-
-
 #define CURINSN(INSN) (strcmp(cur->insn, (INSN)) == 0)
 
 /*!The main structure holding the current execution state of the CPU
@@ -61,13 +55,6 @@ struct cpu_state {
   struct iqueue_entry  iqueue;		/*!< Decode of just executed instr */
   struct iqueue_entry  icomplet;        /*!< Decode of instr before this */
 
-#if DYNAMIC_EXECUTION
-  jmp_buf              excpt_loc;	/*!< Longjump here for exception */
-  struct dyn_page     *curr_page;	/*!< Current page in execution */
-  struct dyn_page    **dyn_pages;	/*!< Pointers to recompiled pages */
-  int32_t              cycles_dec;
-  struct op_queue     *opqs;		/*!< Micro-operation queue */
-#endif
 };
 
 /*! History of execution */
