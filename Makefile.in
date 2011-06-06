@@ -108,8 +108,8 @@ libor1ksys_la_DEPENDENCIES = argtable2/libargtable2.la \
 	cpu/or1k/libor1k.la support/libsupport.la mmu/libmmu.la \
 	bpb/libbpb.la cache/libcache.la peripheral/libperipheral.la \
 	peripheral/channels/libchannels.la tick/libtick.la pm/libpm.la \
-	pic/libpic.la debug/libdebug.la vapi/libvapi.la cuc/libcuc.la \
-	softfloat/libsoftfloat.la port/libport.la
+	pic/libpic.la debug/libdebug.la pcu/libpcu.la vapi/libvapi.la \
+	cuc/libcuc.la softfloat/libsoftfloat.la port/libport.la
 am_libor1ksys_la_OBJECTS = cpu-config.lo mprofiler.lo profiler.lo \
 	sim-cmd.lo sim-config.lo toplevel-support.lo
 libor1ksys_la_OBJECTS = $(am_libor1ksys_la_OBJECTS)
@@ -347,6 +347,7 @@ SUBDIRS = argtable2  \
                         pm         \
                         pic        \
                         debug      \
+			pcu	   \
                         vapi       \
                         cuc        \
                         port       \
@@ -384,6 +385,7 @@ libor1ksys_la_LIBADD = argtable2/libargtable2.la          \
                         pm/libpm.la                        \
                         pic/libpic.la                      \
                         debug/libdebug.la                  \
+			pcu/libpcu.la                      \
                         vapi/libvapi.la                    \
                         cuc/libcuc.la                      \
 			softfloat/libsoftfloat.la	   \

@@ -61,4 +61,5 @@ EXTRA_DIST = acv-gpio.cfg      \
              mul.exp           \
              mycompress.exp    \
 	     testfloat.exp     \
-             tick.exp
+             tick.exp	       \
+	     pcu.exp

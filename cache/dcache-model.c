@@ -39,7 +39,7 @@
 #include "abstract.h"
 #include "stats.h"
 #include "misc.h"
-
+#include "pcu.h"
 
 /* Data cache */
 
@@ -185,6 +185,10 @@ dc_simulate_read (oraddr_t dataaddr, oraddr_t virt_addr, int width)
       dc[set].way[minway].lru = config.dc.ustates - 1;
       runtime.sim.mem_cycles += config.dc.load_missdelay;
 
+      if (config.pcu.enabled)
+	pcu_count_event(SPR_PCMR_DCM);
+
+
       tmp =
 	dc[set].way[minway].line[(dataaddr & (config.dc.blocksize - 1)) >> 2];
       if (width == 4)
@@ -304,6 +308,10 @@ dc_simulate_write (oraddr_t dataaddr, oraddr_t virt_addr, uint32_t data,
 	  dc[set].way[i].lru--;
       dc[set].way[minway].lru = config.dc.ustates - 1;
       runtime.sim.mem_cycles += config.dc.store_missdelay;
+      
+      if (config.pcu.enabled)
+	pcu_count_event(SPR_PCMR_DCM);
+
     }
 }
 

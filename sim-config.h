@@ -152,6 +152,11 @@ struct config
 
   struct
   {
+    int enabled;                /* Are performance counters enabled? */
+  } pcu;
+
+  struct
+  {
     int enabled;		/* branch prediction buffer analysis */
     int sbp_bnf_fwd;		/* Static BP for l.bnf uses fwd predn */
     int sbp_bf_fwd;		/* Static BP for l.bf uses fwd predn */

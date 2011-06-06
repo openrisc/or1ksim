@@ -711,12 +711,17 @@ INSTRUCTION (l_mfspr) {
   uint16_t regno = PARAM1 | PARAM2;
   uorreg_t value = mfspr(regno);
 
-  if (cpu_state.sprs[SPR_SR] & SPR_SR_SM)
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_SM) ||
+      // TODO: Check if this SPR should actually be allowed to be read with
+      // SR's SM==0 and SUMRA==1
+      (!(cpu_state.sprs[SPR_SR] & SPR_SR_SM) && 
+       (cpu_state.sprs[SPR_SR] & SPR_SR_SUMRA)))
     SET_PARAM0(value);
-  else {
-    SET_PARAM0(0);
-    PRINTF("WARNING: trying to read SPR while SR[SUPV] is cleared.\n");
-    sim_done();
+  else
+    {
+      SET_PARAM0(0);
+      PRINTF("WARNING: trying to read SPR while SR[SUPV] and SR[SUMRA] is cleared.\n");
+      sim_done();
   }
 }
 INSTRUCTION (l_sys) {

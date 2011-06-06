@@ -40,6 +40,7 @@ SUBDIRS               = argtable2  \
                         pm         \
                         pic        \
                         debug      \
+			pcu	   \
                         vapi       \
                         cuc        \
                         port       \
@@ -82,6 +83,7 @@ libor1ksys_la_LIBADD  = argtable2/libargtable2.la          \
                         pm/libpm.la                        \
                         pic/libpic.la                      \
                         debug/libdebug.la                  \
+			pcu/libpcu.la                      \
                         vapi/libvapi.la                    \
                         cuc/libcuc.la                      \
 			softfloat/libsoftfloat.la	   \

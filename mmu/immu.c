@@ -39,6 +39,7 @@
 #include "spr-dump.h"
 #include "misc.h"
 #include "sim-cmd.h"
+#include "pcu.h"
 
 
 struct immu *immu_state;
@@ -132,38 +133,16 @@ immu_translate (oraddr_t virtaddr)
 
   /* No, we didn't. */
   immu_stats.fetch_tlbmiss++;
-#if 0
-  for (i = 0; i < immu->nways; i++)
-    if (((cpu_state.sprs[SPR_ITLBMR_BASE (i) + set] & SPR_ITLBMR_LRU) >> 6) <
-	minlru)
-      minway = i;
-
-  cpu_state.sprs[SPR_ITLBMR_BASE (minway) + set] &= ~SPR_ITLBMR_VPN;
-  cpu_state.sprs[SPR_ITLBMR_BASE (minway) + set] |= vpn << 12;
-  for (i = 0; i < immu->nways; i++)
-    {
-      uorreg_t lru = cpu_state.sprs[SPR_ITLBMR_BASE (i) + set];
-      if (lru & SPR_ITLBMR_LRU)
-	{
-	  lru = (lru & ~SPR_ITLBMR_LRU) | ((lru & SPR_ITLBMR_LRU) - 0x40);
-	  cpu_state.sprs[SPR_ITLBMR_BASE (i) + set] = lru;
-	}
-    }
-  cpu_state.sprs[SPR_ITLBMR_BASE (way) + set] &= ~SPR_ITLBMR_LRU;
-  cpu_state.sprs[SPR_ITLBMR_BASE (way) + set] |= (immu->nsets - 1) << 6;
-
-  /* 1 to 1 mapping */
-  cpu_state.sprs[SPR_ITLBTR_BASE (minway) + set] &= ~SPR_ITLBTR_PPN;
-  cpu_state.sprs[SPR_ITLBTR_BASE (minway) + set] |= vpn << 12;
-
-  cpu_state.sprs[SPR_ITLBMR_BASE (minway) + set] |= SPR_ITLBMR_V;
-#endif
 
   /* if tlb refill implemented in HW */
   /* return ((cpu_state.sprs[SPR_ITLBTR_BASE(minway) + set] & SPR_ITLBTR_PPN) >> 12) * immu->pagesize + (virtaddr % immu->pagesize); */
   runtime.sim.mem_cycles += immu->missdelay;
 
   except_handle (EXCEPT_ITLBMISS, virtaddr);
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_ITLBM);
+
   return 0;
 }
 

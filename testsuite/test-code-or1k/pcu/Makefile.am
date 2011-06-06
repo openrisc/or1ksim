@@ -1,8 +1,6 @@
-# MMU test using DejaGNU under automake
+# Makefile.am for or1ksim testsuite CPU test program: pcu
 
-# Copyright (C) 2010 Embecosm Limited
-
-# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+# Contributor Julius Baxter <julius@opencores.org>
 
 # This file is part of OpenRISC 1000 Architectural Simulator.
 
@@ -23,23 +21,10 @@
 # This code is commented throughout for use with Doxygen.
 # -----------------------------------------------------------------------------
 
-# Allow up to 30 seconds to run this
-set old_timeout $timeout
-set timeout 30
 
+# A test program for the performance counters unit
+check_PROGRAMS = pcu
 
-# Run the MMU test
-run_or1ksim "mmu"                                \
-    [list "DTLB translation tests OK" \
-	 "DTLB match tests OK" \
-	 "DTLB valid bit tests OK" \
-	 "DTLB permission bit tests OK" \
-	 "ITLB translation tests OK" \
-	 "ITLB match tests OK" \
-	 "ITLB valid bit tests OK" \
-	 "ITLB permission tests OK" \
-	 "Tests completed" \
-	 "report(0xdeaddead);" \
-	 "report(0x8000000d);" \
-	 "exit(0)"] \
-    "mmu.cfg" "mmu/mmu"
+pcu_SOURCES    = pcu.S
+
+pcu_LDFLAGS    = -T$(srcdir)/../default.ld

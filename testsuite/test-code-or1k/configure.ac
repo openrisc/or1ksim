@@ -163,6 +163,7 @@ AC_CONFIG_FILES([Makefile               \
 		 support/Makefile       \
 		 tick/Makefile          \
 		 uos/Makefile           \
-		 upcalls/Makefile])
+		 upcalls/Makefile       \
+		 pcu/Makefile])
 
 AC_OUTPUT

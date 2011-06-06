@@ -73,4 +73,6 @@ SUBDIRS = support       \
 	  mycompress    \
 	  tick          \
 	  uos           \
-	  upcalls
+	  upcalls       \
+	  pcu
+

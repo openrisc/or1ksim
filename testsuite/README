@@ -86,6 +86,7 @@ mul:               5 tests of the multiply functionality.
 mycompress:        1 test using a compression program.
 testfloat         40 tests of detailed floating point behavior
 tick:             19 tests of the OR1K tick timer.
+pcu:		  27 tests of the OR1K performance counters unit.
 
 Tests of the libsim library:
 
@@ -133,4 +134,5 @@ inst-set-test:  a comprehensive test of the instruction set using C.
 
 
 Updated by Jeremy Bennett (jeremy@jeremybennett.com)
-13 June 2010
+Updated by Julius Baxter (julius@opencores.org)
+6 June 2011

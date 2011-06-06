@@ -45,7 +45,7 @@
 #include "misc.h"
 #include "stats.h"
 #include "sim-cmd.h"
-
+#include "pcu.h"
 
 #define MAX_IC_SETS        1024
 #define MAX_IC_WAYS          32
@@ -175,6 +175,11 @@ ic_simulate_fetch (oraddr_t fetchaddr, oraddr_t virt_addr)
     }
 
   runtime.sim.mem_cycles += ic->missdelay;
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_ICM);
+
+
   return *(uint32_t *) & ic->mem[way | (reload_addr & ic->block_offset_mask)];
 }
 

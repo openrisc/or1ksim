@@ -47,6 +47,7 @@
 #include "dmmu.h"
 #include "immu.h"
 #include "execute.h"
+#include "pcu.h"
 
 /*! Global temporary variable to increase speed.  */
 struct dev_memarea *cur_area;
@@ -486,12 +487,15 @@ eval_mem32 (oraddr_t memaddr, int *breakpoint)
       return 0;
     }
 
-  if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);	/* 28/05/01 CZ */
-
   phys_memaddr = dmmu_translate (memaddr, 0);
   if (except_pending)
     return 0;
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_LA);
+
+  if (config.debug.enabled)
+    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);
 
   if (config.dc.enabled)
     temp = dc_simulate_read (phys_memaddr, memaddr, 4);
@@ -499,7 +503,7 @@ eval_mem32 (oraddr_t memaddr, int *breakpoint)
     temp = evalsim_mem32 (phys_memaddr, memaddr);
 
   if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadData, temp);	/* MM170901 */
+    *breakpoint += check_debug_unit (DebugLoadData, temp);
 
   return temp;
 }
@@ -564,6 +568,9 @@ eval_insn (oraddr_t memaddr, int *breakpoint)
   if (config.debug.enabled)
     *breakpoint += check_debug_unit (DebugInstructionFetch, memaddr);
 
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_IF);
+
   if ((NULL != ic_state) && ic_state->enabled)
     temp = ic_simulate_fetch (phys_memaddr, memaddr);
   else
@@ -593,12 +600,15 @@ eval_mem16 (oraddr_t memaddr, int *breakpoint)
       return 0;
     }
 
-  if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);	/* 28/05/01 CZ */
-
   phys_memaddr = dmmu_translate (memaddr, 0);
   if (except_pending)
     return 0;
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_LA);
+
+  if (config.debug.enabled)
+    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);
 
   if (config.dc.enabled)
     temp = dc_simulate_read (phys_memaddr, memaddr, 2);
@@ -606,7 +616,7 @@ eval_mem16 (oraddr_t memaddr, int *breakpoint)
     temp = evalsim_mem16 (phys_memaddr, memaddr);
 
   if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadData, temp);	/* MM170901 */
+    *breakpoint += check_debug_unit (DebugLoadData, temp);
 
   return temp;
 }
@@ -661,12 +671,15 @@ eval_mem8 (oraddr_t memaddr, int *breakpoint)
   if (config.sim.mprofile)
     mprofile (memaddr, MPROF_8 | MPROF_READ);
 
-  if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);	/* 28/05/01 CZ */
-
   phys_memaddr = dmmu_translate (memaddr, 0);
   if (except_pending)
     return 0;
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_LA);
+
+  if (config.debug.enabled)
+    *breakpoint += check_debug_unit (DebugLoadAddress, memaddr);
 
   if (config.dc.enabled)
     temp = dc_simulate_read (phys_memaddr, memaddr, 1);
@@ -674,7 +687,7 @@ eval_mem8 (oraddr_t memaddr, int *breakpoint)
     temp = evalsim_mem8 (phys_memaddr, memaddr);
 
   if (config.debug.enabled)
-    *breakpoint += check_debug_unit (DebugLoadData, temp);	/* MM170901 */
+    *breakpoint += check_debug_unit (DebugLoadData, temp);
   return temp;
 }
 
@@ -821,6 +834,9 @@ set_mem32 (oraddr_t memaddr, uint32_t value, int *breakpoint)
   if (except_pending)
     return;
 
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_SA);
+
   if (config.debug.enabled)
     {
       *breakpoint += check_debug_unit (DebugStoreAddress, memaddr);	/* 28/05/01 CZ */
@@ -902,6 +918,9 @@ set_mem16 (oraddr_t memaddr, uint16_t value, int *breakpoint)
   if (except_pending)
     return;
 
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_SA);
+
   if (config.debug.enabled)
     {
       *breakpoint += check_debug_unit (DebugStoreAddress, memaddr);	/* 28/05/01 CZ */
@@ -976,6 +995,9 @@ set_mem8 (oraddr_t memaddr, uint8_t value, int *breakpoint)
   /* If we produced exception don't set anything */
   if (except_pending)
     return;
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_SA);
 
   if (config.debug.enabled)
     {

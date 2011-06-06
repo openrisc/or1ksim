@@ -1756,6 +1756,7 @@ but deprecated.
 * Power Management Configuration::
 * Branch Prediction Configuration::
 * Debug Interface Configuration::
+* Performance Counters Configuration::
 @end menu
 
 @node CPU Configuration
@@ -1793,7 +1794,7 @@ Data cache present (0x00000002)
 @item
 Instruction cache present (0x00000004)
 @item
-Data MMY present (0x00000008)
+Data MMU present (0x00000008)
 @item
 Instruction MMU present (0x00000010)
 @item
@@ -2464,6 +2465,25 @@ If this is specified and @var{value} is non-zero, all OpenRISC Remote
 JTAG protocol transactions will be logged to the VAPI log file, if
 enabled.  This is the only functionality associated with VAPI for the
 debug unit.  No VAPI commands are sent, nor requests handled.
+
+@end table
+
+
+
+@node Performance Counters Configuration
+@subsection Performance Counters Configuration
+@cindex configuring the performance counters unit
+@cindex performance counters unit configuration
+@cindex @code{section pcu}
+The performance counters unit is described in
+@code{@w{section pcu}}.  This section may appear at most once.  The
+following parameters may be specified.
+
+@table @code
+
+@item enabled = 0|1
+@cindex @code{enabled} (performance counters unit configuration)
+If 1 (true), the performance counters unit is enabled.  If 0 (the default), it is disabled.
 
 @end table
 

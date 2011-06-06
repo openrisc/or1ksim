@@ -1,3 +1,41 @@
+2011-06-06  Julius Baxter  <julius@opencores.org>
+	
+	* Makefile.in: Regenerated.
+	* cpu/or32/insnset.c: (mfspr): Made move-from-SPR in user mode work when
+	SR[SUMRA] bit set.
+	* cpu/common/abstract.c: Added PCU header to includes.
+	(eval_mem32): Added call to PCU event count function.
+	Moved debug breakpoint check to after exception triggers.
+	(eval_mem16): Ditto.
+	(eval_mem8): Ditto.
+	(set_mem32): Ditto.
+	(set_mem16): Ditto.
+	(set_mem8): Ditto.
+	(eval_insn): Added call to PCU event count function.
+	* configure.ac: Added newly added pcu/ path to appropriate places.
+	* cache/dcache-model.c: Added PCU header to includes.
+	(dc_simulate_read): Added call to PCU event count function.
+	* cache/icache-model.c: Added PCU header to includes.
+	(ic_simulate_read): Added call to PCU event count function.
+	* pcu/Makefile.in: Generated and added.
+	* pcu/pcu.c: Added.
+	* pcu/Makefile.am: Added.
+	* pcu/pcu.h: Added.
+	* mmu/dmmu.c: Added PCU header to includes.
+	(dmmu_translate): Added call to PCU event count function on miss.
+	Cleared away unused code surrounded by "#if 0".
+	* mmu/immu.c: Added PCU header to includes.
+	(immu_translate): Added call to PCU event count function on miss.
+	Cleared away unused code surrounded by "#if 0".
+	* configure: Regenerated.
+	* Makefile.am: <SUBDIRS>: Added pcu.
+	<libor1ksys_la_LIBADD>: Added pcu/libpcu.la.
+	* sim-config.c: Added PCU header to includes.
+	(init_defconfig): Initialise pcu config struct.
+	(reg_config_secs): Add call to pcu section setup function.
+	* sim-config.h: <struct config>: Added pcu config struct.
+	* doc/or1ksim.texi: Added information on pcu configuration.
+	
 2011-06-04  Julius Baxter  <julius@opencores.org>
 
 	* cpu/or32/rec-i386.h: Removed.

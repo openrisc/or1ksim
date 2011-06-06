@@ -44,7 +44,7 @@
 #include "sprs.h"
 #include "misc.h"
 #include "sim-cmd.h"
-
+#include "pcu.h"
 
 struct dmmu *dmmu_state;
 
@@ -140,37 +140,16 @@ dmmu_translate (oraddr_t virtaddr, int write_access)
 
   /* No, we didn't. */
   dmmu_stats.loads_tlbmiss++;
-#if 0
-  for (i = 0; i < dmmu->nways; i++)
-    if (((cpu_state.sprs[SPR_DTLBMR_BASE (i) + set] & SPR_DTLBMR_LRU) >> 6) <
-	minlru)
-      minway = i;
 
-  cpu_state.sprs[SPR_DTLBMR_BASE (minway) + set] &= ~SPR_DTLBMR_VPN;
-  cpu_state.sprs[SPR_DTLBMR_BASE (minway) + set] |= vpn << 12;
-  for (i = 0; i < dmmu->nways; i++)
-    {
-      uorreg_t lru = cpu_state.sprs[SPR_DTLBMR_BASE (i) + set];
-      if (lru & SPR_DTLBMR_LRU)
-	{
-	  lru = (lru & ~SPR_DTLBMR_LRU) | ((lru & SPR_DTLBMR_LRU) - 0x40);
-	  cpu_state.sprs[SPR_DTLBMR_BASE (i) + set] = lru;
-	}
-    }
-  cpu_state.sprs[SPR_DTLBMR_BASE (way) + set] &= ~SPR_DTLBMR_LRU;
-  cpu_state.sprs[SPR_DTLBMR_BASE (way) + set] |= (dmmu->nsets - 1) << 6;
-
-  /* 1 to 1 mapping */
-  cpu_state.sprs[SPR_DTLBTR_BASE (minway) + set] &= ~SPR_DTLBTR_PPN;
-  cpu_state.sprs[SPR_DTLBTR_BASE (minway) + set] |= vpn << 12;
-
-  cpu_state.sprs[SPR_DTLBMR_BASE (minway) + set] |= SPR_DTLBMR_V;
-#endif
   runtime.sim.mem_cycles += dmmu->missdelay;
   /* if tlb refill implemented in HW */
   /* return ((cpu_state.sprs[SPR_DTLBTR_BASE(minway) + set] & SPR_DTLBTR_PPN) >> 12) * dmmu->pagesize + (virtaddr % dmmu->pagesize); */
 
   except_handle (EXCEPT_DTLBMISS, virtaddr);
+
+  if (config.pcu.enabled)
+    pcu_count_event(SPR_PCMR_DTLBM);
+
   return 0;
 }
 

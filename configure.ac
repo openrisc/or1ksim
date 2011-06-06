@@ -335,7 +335,7 @@ INCLUDES="$INCLUDES -I\${top_srcdir} -I\${top_srcdir}/cpu/common \
 -I\${top_srcdir}/peripheral/channels -I\${top_srcdir}/pm -I\${top_srcdir}/pic \
 -I\${top_srcdir}/debug -I\${top_srcdir}/vapi -I\${top_srcdir}/support \
 -I\${top_srcdir}/cuc -I\${top_srcdir}/port -I\${top_srcdir}/argtable2 \
--I\${top_srcdir}/softfloat"
+-I\${top_srcdir}/softfloat -I\${top_srcdir}/pcu"
 AC_SUBST(INCLUDES)
 
 AC_CONFIG_FILES([Makefile                                 \
@@ -354,6 +354,7 @@ AC_CONFIG_FILES([Makefile                                 \
                  peripheral/channels/Makefile             \
                  pm/Makefile                              \
                  pic/Makefile                             \
+                 pcu/Makefile                             \
                  port/Makefile                            \
                  support/Makefile                         \
                  testsuite/Makefile                       \

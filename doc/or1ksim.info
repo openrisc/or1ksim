@@ -1441,6 +1441,7 @@ File: or1ksim.info,  Node: Core OpenRISC Configuration,  Next: Peripheral Config
 * Power Management Configuration::
 * Branch Prediction Configuration::
 * Debug Interface Configuration::
+* Performance Counters Configuration::
 
 
 File: or1ksim.info,  Node: CPU Configuration,  Next: Memory Configuration,  Up: Core OpenRISC Configuration
@@ -1472,7 +1473,7 @@ The following parameters may be specified.
 
         * Instruction cache present (0x00000004)
 
-        * Data MMY present (0x00000008)
+        * Data MMU present (0x00000008)
 
         * Instruction MMU present (0x00000010)
 
@@ -1960,7 +1961,7 @@ specified.
 
 
 
-File: or1ksim.info,  Node: Debug Interface Configuration,  Prev: Branch Prediction Configuration,  Up: Core OpenRISC Configuration
+File: or1ksim.info,  Node: Debug Interface Configuration,  Next: Performance Counters Configuration,  Prev: Branch Prediction Configuration,  Up: Core OpenRISC Configuration
 
 3.3.8 Debug Interface Configuration
 -----------------------------------
@@ -2010,6 +2011,21 @@ parameters may be specified.
      JTAG protocol transactions will be logged to the VAPI log file, if
      enabled.  This is the only functionality associated with VAPI for
      the debug unit.  No VAPI commands are sent, nor requests handled.
+
+
+
+File: or1ksim.info,  Node: Performance Counters Configuration,  Prev: Debug Interface Configuration,  Up: Core OpenRISC Configuration
+
+3.3.9 Performance Counters Configuration
+----------------------------------------
+
+The performance counters unit is described in `section pcu'.  This
+section may appear at most once.  The following parameters may be
+specified.
+
+`enabled = 0|1'
+     If 1 (true), the performance counters unit is enabled.  If 0 (the
+     default), it is disabled.
 
 
 
@@ -4145,6 +4161,8 @@ Index
                                                               (line   6)
 * configuring the memory controller:     Memory Controller Configuration.
                                                               (line   6)
+* configuring the performance counters unit: Performance Counters Configuration.
+                                                              (line   6)
 * configuring the processor:             CPU Configuration.   (line   6)
 * configuring the PS2 interface:         Keyboard Configuration.
                                                               (line   6)
@@ -4254,6 +4272,8 @@ Index
                                                               (line  44)
 * enabled (MMU configuration):           Memory Management Configuration.
                                                               (line  12)
+* enabled (performance counters unit configuration): Performance Counters Configuration.
+                                                              (line  11)
 * enabled (power management configuration): Power Management Configuration.
                                                               (line  35)
 * enabled (UART configuration):          UART Configuration.  (line  18)
@@ -4507,6 +4527,8 @@ Index
                                                               (line  82)
 * pc (Interactive CLI):                  Interactive Command Line.
                                                               (line  51)
+* performance counters unit configuration: Performance Counters Configuration.
+                                                              (line   6)
 * persistent TAP device creation:        Setting Up a Persistent TAP device.
                                                               (line   6)
 * phy_addr:                              Ethernet Configuration.
@@ -4670,6 +4692,8 @@ Index
 * section mc:                            Memory Controller Configuration.
                                                               (line   6)
 * section memory:                        Memory Configuration.
+                                                              (line   6)
+* section pcu:                           Performance Counters Configuration.
                                                               (line   6)
 * section pic:                           Interrupt Configuration.
                                                               (line   6)
@@ -4865,36 +4889,37 @@ Node: Simulator Behavior43262
 Node: Verification API Configuration47843
 Node: CUC Configuration49783
 Node: Core OpenRISC Configuration51775
-Node: CPU Configuration52277
-Node: Memory Configuration56396
-Node: Memory Management Configuration63118
-Node: Cache Configuration65495
-Node: Interrupt Configuration67881
-Node: Power Management Configuration69714
-Node: Branch Prediction Configuration70991
-Node: Debug Interface Configuration72351
-Node: Peripheral Configuration74694
-Node: Memory Controller Configuration75320
-Node: UART Configuration79100
-Node: DMA Configuration82619
-Node: Ethernet Configuration84486
-Node: GPIO Configuration89765
-Node: Display Interface Configuration91398
-Node: Frame Buffer Configuration93707
-Node: Keyboard Configuration95571
-Node: Disc Interface Configuration97809
-Node: Generic Peripheral Configuration102913
-Node: Interactive Command Line105208
-Node: Verification API112182
-Node: Code Internals116612
-Node: Coding Conventions117195
-Node: Global Data Structures121622
-Node: Concepts124279
-Ref: Output Redirection124424
-Ref: Interrupts Internal124962
-Node: Internal Debugging126115
-Node: Regression Testing126639
-Node: GNU Free Documentation License130428
-Node: Index152835
+Node: CPU Configuration52316
+Node: Memory Configuration56435
+Node: Memory Management Configuration63157
+Node: Cache Configuration65534
+Node: Interrupt Configuration67920
+Node: Power Management Configuration69753
+Node: Branch Prediction Configuration71030
+Node: Debug Interface Configuration72390
+Node: Performance Counters Configuration74776
+Node: Peripheral Configuration75261
+Node: Memory Controller Configuration75887
+Node: UART Configuration79667
+Node: DMA Configuration83186
+Node: Ethernet Configuration85053
+Node: GPIO Configuration90332
+Node: Display Interface Configuration91965
+Node: Frame Buffer Configuration94274
+Node: Keyboard Configuration96138
+Node: Disc Interface Configuration98376
+Node: Generic Peripheral Configuration103480
+Node: Interactive Command Line105775
+Node: Verification API112749
+Node: Code Internals117179
+Node: Coding Conventions117762
+Node: Global Data Structures122189
+Node: Concepts124846
+Ref: Output Redirection124991
+Ref: Interrupts Internal125529
+Node: Internal Debugging126682
+Node: Regression Testing127206
+Node: GNU Free Documentation License130995
+Node: Index153402
 
 End Tag Table

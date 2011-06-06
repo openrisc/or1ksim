@@ -46,6 +46,7 @@
 #include "icache-model.h"
 #include "pic.h"
 #include "pm.h"
+#include "pcu.h"
 #include "branch-predict.h"
 #include "debug-unit.h"
 #include "mc.h"
@@ -374,6 +375,9 @@ init_defconfig ()
     {
       cpu_state.sprs[SPR_UPR] &= ~SPR_UPR_PICP;
     }
+
+  /* Performance Counters Unit */
+  config.pcu.enabled     = 0;
 
   /* Branch Prediction */
   config.bpb.enabled     = 0;
@@ -1605,6 +1609,7 @@ reg_config_secs ()
   reg_gpio_sec ();
   reg_bpb_sec ();
   reg_pm_sec ();
+  reg_pcu_sec ();
   reg_vga_sec ();
   reg_fb_sec ();
   reg_kbd_sec ();

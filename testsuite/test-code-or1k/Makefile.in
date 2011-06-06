@@ -296,7 +296,8 @@ SUBDIRS = support       \
 	  mycompress    \
 	  tick          \
 	  uos           \
-	  upcalls
+	  upcalls       \
+	  pcu
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
