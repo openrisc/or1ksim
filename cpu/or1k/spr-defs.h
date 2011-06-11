@@ -586,7 +586,7 @@
  * Bit definitions for Tick Timer Control Register
  *
  */
-#define SPR_TTCR_CNT    0xffffffff  /* Count, time period */
+#define SPR_TTCR_CNT    0x0fffffff  /* Count, time period */
 #define SPR_TTMR_TP     0x0fffffff  /* Time period */
 #define SPR_TTMR_IP	0x10000000  /* Interrupt Pending */
 #define SPR_TTMR_IE	0x20000000  /* Interrupt Enable */
