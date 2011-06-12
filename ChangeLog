@@ -1,3 +1,20 @@
+2011-06-12  Julius Baxter  <julius@opencores.org>
+
+	* cpu/or1k/spr-defs.h: <SPR_TTCR_CNT>: Change back to 0xffffffff
+	* tick/tick.c: <cycles_start>: renamed cycle_count_at_tick_start.
+	<tick_count>: Renamed tick_counting.
+	(sched_timer_job): Various comments to detail what is going on.
+	<match_time>: Renamed match_ttmr.
+	<ttcr_period>: Renamed match_ttcr.
+	<match_ttcr>: Is now TTCR value masked with TTMR_TP.
+	<cycles_until_except>: Added, being used to calculate cycles until next
+	exception instead of match_time.
+	
+
+2011-06-10  Julius Baxter  <julius@opencores.org>
+
+	* cpu/or1k/spr-defs.h: <SPR_TTCR_CNT>: Change to 0x0fffffff
+
 2011-06-06  Julius Baxter  <julius@opencores.org>
 	
 	* Makefile.in: Regenerated.

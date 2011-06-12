@@ -49,11 +49,11 @@
 
 
 /*! When did the timer start to count */
-static long long cycles_start = 0;
+static long long cycle_count_at_tick_start = 0;
 
 /*! Indicates if the timer is actually counting.  Needed to simulate one-shot
     mode correctly */
-int tick_count;
+int tick_counting;
 
 /*! Reset. It initializes TTCR register. */
 void
@@ -66,7 +66,7 @@ tick_reset (void)
 
   cpu_state.sprs[SPR_TTCR] = 0;
   cpu_state.sprs[SPR_TTMR] = 0;
-  tick_count = 0;
+  tick_counting = 0;
 }
 
 /*! Raises a timer exception */
@@ -91,7 +91,7 @@ static void
 tick_restart (void *dat)
 {
   cpu_state.sprs[SPR_TTCR] = 0;
-  cycles_start = runtime.sim.cycles;
+  cycle_count_at_tick_start = runtime.sim.cycles;
   SCHED_ADD (tick_restart, NULL, cpu_state.sprs[SPR_TTMR] & SPR_TTMR_TP);
 }
 
@@ -100,7 +100,7 @@ static void
 tick_one_shot (void *dat)
 {
   cpu_state.sprs[SPR_TTCR] = cpu_state.sprs[SPR_TTMR] & SPR_TTMR_TP;
-  tick_count = 0;
+  tick_counting = 0;
 }
 
 /*! Schedules the timer jobs */
@@ -108,10 +108,13 @@ static void
 sched_timer_job (uorreg_t prev_ttmr)
 {
   uorreg_t ttmr = cpu_state.sprs[SPR_TTMR];
-  uint32_t match_time = ttmr & SPR_TTMR_TP;
-  uint32_t ttcr_period = spr_read_ttcr () & SPR_TTCR_CNT;
+  uint32_t match_ttmr = ttmr & SPR_TTMR_TP;
+  /* TTCR register, only concerned with part of TTCR which will trigger int */
+  uint32_t match_ttcr = spr_read_ttcr () & SPR_TTMR_TP;
+  uint32_t cycles_until_except;
 
-  /* Remove previous jobs if they exists */
+  /* On clearing TTMR interrupt signal bit remove previous jobs if they 
+     exist */
   if ((prev_ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
     {
       SCHED_FIND_REMOVE (tick_raise_except, NULL);
@@ -128,40 +131,43 @@ sched_timer_job (uorreg_t prev_ttmr)
       break;
     }
 
-  if (match_time >= ttcr_period)
+  /* Calculate cycles until next tick exception, based on current TTCR value */
+  if (match_ttmr >= match_ttcr)
     {
-      match_time -= ttcr_period;
+      cycles_until_except = match_ttmr - match_ttcr;
     }
   else
     {
-      match_time += (0xfffffffu - ttcr_period) + 1;
+      /* Cycles after "wrap" of section of TTCR which will cause a match and, 
+	 potentially, an exception */
+      cycles_until_except = match_ttmr + (0x0fffffffu - match_ttcr) + 1;
     }
 
   switch (ttmr & SPR_TTMR_M)
     {
     case 0:			/* Disabled timer */
-      if (!match_time && (ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
+      if (!cycles_until_except && (ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
 	SCHED_ADD (tick_raise_except, NULL, 0);
       break;
 
     case SPR_TTMR_RT:		/* Auto-restart timer */
-      SCHED_ADD (tick_restart, NULL, match_time);
+      SCHED_ADD (tick_restart, NULL, cycles_until_except);
       if ((ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
-	SCHED_ADD (tick_raise_except, NULL, match_time);
+	SCHED_ADD (tick_raise_except, NULL, cycles_until_except);
       break;
 
     case SPR_TTMR_SR:		/* One-shot timer */
-      if (tick_count)
+      if (tick_counting)
 	{
-	  SCHED_ADD (tick_one_shot, NULL, match_time);
+	  SCHED_ADD (tick_one_shot, NULL, cycles_until_except);
 	  if ((ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
-	    SCHED_ADD (tick_raise_except, NULL, match_time);
+	    SCHED_ADD (tick_raise_except, NULL, cycles_until_except);
 	}
       break;
 
     case SPR_TTMR_CR:		/* Continuos timer */
       if ((ttmr & SPR_TTMR_IE) && !(ttmr & SPR_TTMR_IP))
-	SCHED_ADD (tick_raise_except, NULL, match_time);
+	SCHED_ADD (tick_raise_except, NULL, cycles_until_except);
     }
 }
 
@@ -170,12 +176,12 @@ sched_timer_job (uorreg_t prev_ttmr)
 void
 spr_write_ttcr (uorreg_t value)
 {
-  cycles_start = runtime.sim.cycles - value;
+  cycle_count_at_tick_start = runtime.sim.cycles - value;
 
   sched_timer_job (cpu_state.sprs[SPR_TTMR]);
 }
 
-/*! Value is the *previous* value of SPR_TTMR.  The new one can be found in
+/*! prev_val is the *previous* value of SPR_TTMR.  The new one can be found in
     cpu_state.sprs[SPR_TTMR] */
 void
 spr_write_ttmr (uorreg_t prev_val)
@@ -186,19 +192,21 @@ spr_write_ttmr (uorreg_t prev_val)
   cpu_state.sprs[SPR_TTMR] &= ~SPR_TTMR_IP;
 
   /* If the timer was already disabled, ttcr should not be updated */
-  if (tick_count)
+  if (tick_counting)
     {
-      cpu_state.sprs[SPR_TTCR] = runtime.sim.cycles - cycles_start;
+      cpu_state.sprs[SPR_TTCR] = runtime.sim.cycles - cycle_count_at_tick_start;
     }
 
-  cycles_start = runtime.sim.cycles - cpu_state.sprs[SPR_TTCR];
+  cycle_count_at_tick_start = runtime.sim.cycles - cpu_state.sprs[SPR_TTCR];
 
-  tick_count = value & SPR_TTMR_M;
+  tick_counting = value & SPR_TTMR_M;
 
-  if ((tick_count == 0xc0000000) &&
+  /* If TTCR==TTMR_TP when setting MR, we disable counting?? 
+     I think this should be looked at - Julius */
+  if ((tick_counting == SPR_TTMR_CR) &&
       (cpu_state.sprs[SPR_TTCR] == (value & SPR_TTMR_TP)))
     {
-      tick_count = 0;
+      tick_counting = 0;
     }
 
   sched_timer_job (prev_val);
@@ -209,15 +217,15 @@ spr_read_ttcr ()
 {
   uorreg_t ret;
 
-  if (!tick_count)
+  if (!tick_counting)
     {
-      /* Report the time when the counter stoped (and don't carry on
+      /* Report the time when the counter stopped (and don't carry on
 	 counting) */
       ret = cpu_state.sprs[SPR_TTCR];
     }
   else
     {
-      ret = runtime.sim.cycles - cycles_start;
+      ret = runtime.sim.cycles - cycle_count_at_tick_start;
     }
 
   return  ret;
