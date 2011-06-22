@@ -164,7 +164,7 @@ struct eth_device
 static ssize_t
 eth_write_file_packet (struct eth_device *eth,
 		       unsigned char     *buf,
-		       unsigned long int  length)
+		       int32_t            length)
 {
   ssize_t  nwritten;
 
@@ -443,7 +443,7 @@ static ssize_t
 eth_read_file_packet (struct eth_device *eth,
 		      unsigned char     *buf)
 {
-  ssize_t  packet_length;
+  int32_t  packet_length;
   ssize_t  nread;
 
   /* Read packet length. We may be at EOF. */
@@ -462,7 +462,7 @@ eth_read_file_packet (struct eth_device *eth,
   /* Packet must be big enough to hold a header */
   if (packet_length < ETHER_HDR_LEN)
     {
-      fprintf (stderr, "Warning: Ethernet packet length %zd too small.\n",
+      fprintf (stderr, "Warning: Ethernet packet length %d too small.\n",
 	       packet_length);
       return  -1;
     }
@@ -476,7 +476,7 @@ eth_read_file_packet (struct eth_device *eth,
       return  -1;
     }
 
-  return  packet_length;
+  return  (ssize_t)packet_length;
 
 }	/* eth_read_file_packet () */
 
