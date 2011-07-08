@@ -43,7 +43,7 @@ AC_CONFIG_SUBDIRS([testsuite/test-code-or1k])
 AC_CANONICAL_TARGET([])
 AC_PROG_LIBTOOL
 AM_INIT_AUTOMAKE
-
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS([config.h])
 
 AC_REVISION([$Id$ using automake version] AC_ACVERSION)
