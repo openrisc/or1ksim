@@ -1,4 +1,9 @@
+2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1skim.tests/Makefile.am: Added pcu.cfg to EXTRA_DIST.
+
 2011-06-06  Julius Baxter <julius@opencores.rg>
+
 	* test-code-or1k/Makefile.am: Added pcu to SUBDIRS
 	* test-code-or1k/Makefile.in: Regenerated
 	* test-code-or1k/configure.ac: Added pcu/Makefile
@@ -10,7 +15,7 @@
 	* or1ksim.tests/mmu.exp: Set timeout to 30 seconds.
 	* or1ksim.tests/Makefile.in: Regenerated.
 	* README: Updated with details of PCU test.
-	
+
 2011-01-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* README: Updated with details of new tests.

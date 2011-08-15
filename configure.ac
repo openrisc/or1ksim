@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2011-04-28], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2011-08-15], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -44,6 +44,7 @@ AC_CANONICAL_TARGET([])
 AC_PROG_LIBTOOL
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
 AC_CONFIG_HEADERS([config.h])
 
 AC_REVISION([$Id$ using automake version] AC_ACVERSION)
@@ -74,7 +75,10 @@ AC_SUBST(CPU_ARCH)
 
 # Set the CFLAGS we want. We put the user flags last, so that if the user
 # changes the optimization level, that will take precedence.
-CFLAGS="-g -Wall -Werror -O2 -D$ARCH_ISA $CFLAGS"
+# CFLAGS="-g -Wall -Werror -O2 -D$ARCH_ISA $CFLAGS"
+# 15-Aug-11: Jeremy Bennett. TODO temporarily remove -Werror to get round
+#            GCC 4.6 issues.
+CFLAGS="-g -Wall -O2 -D$ARCH_ISA $CFLAGS"
 
 AM_PROG_AS
 
@@ -115,8 +119,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_STRING_H
 				                 size_t      n);
 				  #endif]],                      \
 			        [[const char *s = "test";
-				  char       *t;
-				  t = strndup (s, 3);]])], \
+				  (void) strndup (s, 3);]])], \
 	       [AC_DEFINE(HAVE_STRNDUP, 1, \
  	       	          "Whether the strndup function is available") \
 	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])
@@ -130,8 +133,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_STRINGS_H
 			          #endif]],                       \
 			        [[const char *s = "test";
 				  const char *t = "TEST";
-				  int         res;
-				  res = strcasecmp (s, t);]])], \
+				  (void) strcasecmp (s, t);]])], \
 	       [AC_DEFINE(HAVE_STRCASECMP, 1, \
  	       	          "Whether the strcasecmp function is available") \
 	        AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)])

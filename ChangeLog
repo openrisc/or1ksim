@@ -1,3 +1,15 @@
+2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version. Turned off -Werror (workaround
+	for Bug 64). Fixed custom tests for strndup, strcasecmp and
+	isblank (Bug 65).
+
+2001-07-08  Olof Kindren  <olof@opencores.org>
+
+	* configure.ac: Added AM_SILENT_RULES for nicer builds
+	* configure: Regenerated.
+
 2011-06-12  Julius Baxter  <julius@opencores.org>
 
 	* cpu/or1k/spr-defs.h: <SPR_TTCR_CNT>: Change back to 0xffffffff
@@ -9,14 +21,13 @@
 	<match_ttcr>: Is now TTCR value masked with TTMR_TP.
 	<cycles_until_except>: Added, being used to calculate cycles until next
 	exception instead of match_time.
-	
 
 2011-06-10  Julius Baxter  <julius@opencores.org>
 
 	* cpu/or1k/spr-defs.h: <SPR_TTCR_CNT>: Change to 0x0fffffff
 
 2011-06-06  Julius Baxter  <julius@opencores.org>
-	
+
 	* Makefile.in: Regenerated.
 	* cpu/or32/insnset.c: (mfspr): Made move-from-SPR in user mode work when
 	SR[SUMRA] bit set.
@@ -52,7 +63,7 @@
 	(reg_config_secs): Add call to pcu section setup function.
 	* sim-config.h: <struct config>: Added pcu config struct.
 	* doc/or1ksim.texi: Added information on pcu configuration.
-	
+
 2011-06-04  Julius Baxter  <julius@opencores.org>
 
 	* cpu/or32/rec-i386.h: Removed.
@@ -111,7 +122,7 @@
 	* configure: Regenerated.
 	* doc/or1ksim.texi <Configuring the Build>: Removed dynamic execution
 	option information.
-	
+
 2011-05-09  Julius Baxter  <julius.baxter@orsoc.se>
 
 	* configure: Regenerated.
@@ -7756,4 +7767,3 @@
 	cpu/dlx/execute.c, cpu/or32/execute.c:
 
 	Initial revision
-
