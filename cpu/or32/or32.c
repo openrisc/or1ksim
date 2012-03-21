@@ -669,7 +669,7 @@ insn_extract (param_ch, enc_initial)
 	  {
 	    opc_pos--;
 	    if (param_ch == *enc)
-	      ret |= 1UL << opc_pos;
+	      ret |= 1 << opc_pos;
 	  }
 	enc++;
       }
@@ -717,9 +717,7 @@ or32_debug (int level, const char *format, ...)
 static unsigned long *
 cover_insn (unsigned long *cur, int pass, unsigned int mask)
 {
-  int best_first = 0, last_match = -1, ninstr = 0;
-  unsigned int best_len = 0;
-  unsigned int i;
+  int best_first = 0, best_len = 0, i, last_match = -1, ninstr = 0;
   unsigned long cur_mask = mask;
   unsigned long *next;
 
@@ -781,14 +779,14 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	     best_first, ninstr);
       *cur = best_first;
       cur++;
-      *cur = (1UL << best_len) - 1;
+      *cur = (1 << best_len) - 1;
       cur++;
       next = cur;
       /* Allocate space for pointers.  */
-      cur += 1UL << best_len;
-      cur_mask = (1UL << (unsigned long) best_len) - 1;
+      cur += 1 << best_len;
+      cur_mask = (1 << (unsigned long) best_len) - 1;
 
-      for (i = 0; i < (1UL << (unsigned long) best_len); i++)
+      for (i = 0; i < (1 << (unsigned long) best_len); i++)
 	{
 	  int j;
 	  unsigned long *c;
@@ -894,7 +892,7 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
 		}
 	      cur->type = type | shr;
 	      cur->data = mask;
-	      arg &= ~(((1UL << mask) - 1) << shr);
+	      arg &= ~(((1 << mask) - 1) << shr);
 	      or32_debug (6, "|%08lX %08lX\n", cur->type, cur->data);
 	      cur++;
 	      num_cur_op++;
@@ -1103,7 +1101,7 @@ or1ksim_extend_imm (unsigned long imm, char l)
   /* First truncate all bits above valid range for this letter
      in case it is zero extend. */
   letter_bits = letter_range (l);
-  mask = (1UL << letter_bits) - 1;
+  mask = (1 << letter_bits) - 1;
   imm &= mask;
 
   /* Do sign extend if this is the right one. */
@@ -1158,7 +1156,7 @@ or1ksim_or32_extract (param_ch, enc_initial, insn)
       {
 	opc_pos--;
 	if (param_ch == *enc)
-	  ret |= 1UL << opc_pos;
+	  ret |= 1 << opc_pos;
 	enc++;
       }
     else if (*enc == param_ch)

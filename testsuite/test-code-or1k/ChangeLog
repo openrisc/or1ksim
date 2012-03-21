@@ -1,3 +1,9 @@
+2012-03-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version. Added AM_SILENT_RULES for nicer
+	builds.
+
 2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.

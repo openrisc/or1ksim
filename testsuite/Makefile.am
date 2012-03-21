@@ -41,6 +41,10 @@ EXTRA_DIST = global-conf.exp
 # Setup for DejaGNU
 AUTOMAKE_OPTIONS    = dejagnu
 
+# Without the "--status" flag, TCL syntax or runtime errors yield a zero exit
+# code, which is then taken as an indication of success (!).
+AM_RUNTESTFLAGS = --status
+
 export DEJAGNU
 
 DEJATOOL            = libsim  \
