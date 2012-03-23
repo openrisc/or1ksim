@@ -58,6 +58,11 @@ stack:
 reset_vector:
         l.nop
         l.nop
+        
+        // Clear R0 on start-up. There is no guarantee that R0 is hardwired to zero,
+        // and indeed it is not when simulating the or1200 Verilog core.
+        l.andi  r0,r0,0x0
+        
         l.addi  r4,r0,0x0
         l.addi  r5,r0,0x0
         l.addi  r6,r0,0x0

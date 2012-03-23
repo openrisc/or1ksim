@@ -200,6 +200,10 @@
 .org 0x100
 reset_vector:
 
+  // Clear R0 on start-up. There is no guarantee that R0 is hardwired to zero,
+  // and indeed it is not when simulating the or1200 Verilog core.
+  l.andi  r0,r0,0x0
+
   l.movhi r3,hi(MC_BASE_ADDR)
   l.ori   r3,r3,lo(MC_BASE_ADDR)
  

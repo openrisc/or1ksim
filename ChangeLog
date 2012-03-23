@@ -6,6 +6,11 @@
 2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
 	* configure.ac: Updated version. Turned off -Werror (workaround
 	for Bug 64). Fixed custom tests for strndup, strcasecmp and
 	isblank (Bug 65).

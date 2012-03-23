@@ -1,8 +1,20 @@
+2012-03-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Patch from R Diez <rdiezmail-openrisc@yahoo.de>
+
+	* cache/cache-asm.S, cfg/cfg.S, except-test/except-test-s.S,
+	* except/except.S, ext/ext.S, flag/flag.S, fp/fp.S,
+	* inst-set-test/inst-set-test.S, int-test/int-test.S,
+	* mc-common/except-mc.S, uos/except-or32.S: Clear R0 on
+	start-up. There is no guarantee that R0 is hardwired to zero, and
+	indeed it is not when simulating the or1200 Verilog core.
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
 2012-03-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
-	* configure.ac: Updated version. Added AM_SILENT_RULES for nicer
-	builds.
+	* configure.ac: Updated version.
 
 2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 

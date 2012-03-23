@@ -72,6 +72,10 @@ _stack:
 	.org 0x100
 	.global	_reset
 _reset:
+    // Clear R0 on start-up. There is no guarantee that R0 is hardwired to zero,
+    // and indeed it is not when simulating the or1200 Verilog core.
+    l.andi  r0,r0,0x0
+        
 	l.movhi	r1,hi(_stack)		/* Set up the stack */
 	l.ori	r1,r1,lo(_stack)
 

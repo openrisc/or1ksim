@@ -121,6 +121,10 @@
 
 	.section .text
 start_test:
+    // Clear R0 on start-up. There is no guarantee that R0 is hardwired to zero,
+    // and indeed it is not when simulating the or1200 Verilog core.
+    l.andi  r0,r0,0x0
+        
 	/* Test l.extbs */
 	CHECK_HIGH3_CLEAR(l.extbs, 0x7f)
 	CHECK_HIGH3_CLEAR(l.extbs, 0x53)

@@ -30,6 +30,10 @@
 	.section .except,"ax"
 	.org 0x100
 _reset:
+        // Clear R0 on start-up. There is no guarantee that R0 is hardwired to zero,
+        // and indeed it is not when simulating the or1200 Verilog core.
+        l.andi  r0,r0,0x0
+        
         l.addi  r1,r0,0x7f00
         l.movhi r2,hi(_main)
         l.ori   r2,r2,lo(_main)
