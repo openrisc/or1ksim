@@ -1,4 +1,10 @@
-2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+2012-04-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* MAINTAINERS: Added.
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2012-03-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* configure: Regenerated.
 	* configure.ac: Updated version.

@@ -1,3 +1,8 @@
+2012-04-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
 2012-03-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Patch from R Diez <rdiezmail-openrisc@yahoo.de>
