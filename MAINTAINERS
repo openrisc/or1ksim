@@ -46,7 +46,7 @@ MAINTAINER
 
 The following people may approve patches to Or1ksim
 
-  Julius Baxter                          juliusb@opencores.org
+  Julius Baxter                          julius@opencores.org
   Jeremy Bennett                         jeremybennett@opencores.org
 
 
@@ -55,7 +55,7 @@ WRITE AFTER APPROVAL
 
 The following people may commit patches after approval by a MAINTAINER
 
-  Julius Baxter                          juliusb@opencores.org
+  Julius Baxter                          julius@opencores.org
   Jeremy Bennett                         jeremybennett@opencores.org
 
 
