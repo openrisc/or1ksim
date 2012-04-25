@@ -24,7 +24,7 @@
 # Local macros
 ACLOCAL_AMFLAGS = -I m4
 
-DISTCHECK_CONFIGURE_FLAGS = --target=or32-elf
+DISTCHECK_CONFIGURE_FLAGS = --target=or1k-elf
 
 EXTRA_DIST = sim.cfg
 

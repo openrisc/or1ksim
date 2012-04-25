@@ -38,13 +38,13 @@ AC_PREREQ(2.59)
 # This is not nice, but it gets round the problem of the target not being
 # specified. We don't need to warn again - the main configure did that for us.
 case "$target_cpu" in
-or32*)
+or1k*)
 	;;
 
 dlx*)
 	;;
 
-*)      target_alias=or32-elf;
+*)      target_alias=or1k-elf;
 	;;
 esac
 

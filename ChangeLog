@@ -1,5 +1,12 @@
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
+	* Makefile.am: s,or32,or1k,
+	* config.guess: ditto
+	* config.sub: ditto
+	* configure.ac: ditto
+
+2012-04-27  Peter Gavin  <pgavin@gmail.com>
+
 	* configure: Regenerated.
 	* configure.ac: Updated version.
 

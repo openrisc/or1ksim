@@ -54,7 +54,7 @@ AC_PREREQ(2.59)
 
 # yuck.
 case "$target_cpu" in
-or32*)	CPU_ARCH=or32;
+or1k*)	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
 

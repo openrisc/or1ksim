@@ -1,5 +1,9 @@
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
+	* configure.ac: s,or32,or1k,
+
+2012-04-27  Peter Gavin  <pgavin@gmail.com>
+
 	* configure: Regenerated.
 	* configure.ac: Updated version.
 
