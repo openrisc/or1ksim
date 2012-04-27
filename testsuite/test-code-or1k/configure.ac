@@ -37,8 +37,8 @@ AC_PREREQ(2.59)
 
 # This is not nice, but it gets round the problem of the target not being
 # specified. We don't need to warn again - the main configure did that for us.
-case "$target_cpu" in
-or1k*)
+case "$target_alias" in
+or1k*|or1knd*)
 	;;
 
 dlx*)

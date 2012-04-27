@@ -24,9 +24,9 @@
 # Local macros
 ACLOCAL_AMFLAGS = -I m4
 
-DISTCHECK_CONFIGURE_FLAGS = --target=or1k-elf
+DISTCHECK_CONFIGURE_FLAGS = --target=$(target_alias)
 
-EXTRA_DIST = sim.cfg
+EXTRA_DIST = sim.cfg sim-nd.cfg
 
 SUBDIRS               = argtable2  \
 			cpu        \

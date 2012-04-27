@@ -19,34 +19,27 @@
 
 /* Currently only checks instruction fetch, TLB miss and cache miss counters. */
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 
 	.section .except,"ax"
 
 	.org 0x100
-	l.j	start_test
-	l.nop
+	OR1K_DELAYED_NOP(l.j	start_test)
 	.org 0x200
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x300
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x400
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x500
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x600
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x700
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0x800
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 
 	/* DTLB miss - just disable DMMU and return */
 	/* clobber r13 */
@@ -65,8 +58,7 @@
 	l.rfe
 	
 	.org 0xb00
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 
 	/* System call - switches user/supervisor mode */
 	/* Clobbers r13 */
@@ -77,14 +69,11 @@
 	l.rfe
 	
 	.org 0xd00
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0xe00
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 	.org 0xf00
-	l.jal	unhandled_except
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	unhandled_except)
 
 
 	.section .text
@@ -95,8 +84,7 @@ start_test:
 	l.andi	r2,r2,SPR_UPR_PCUP
 	l.sfnei	r2,SPR_UPR_PCUP
 	/* Fail if not present */
-	l.bf	fail
-	l.nop
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* Assumption that we are already in SM */
 
@@ -128,7 +116,7 @@ pcr_if_sm:
 	l.mfspr	r3,r1,SPR_PCCR(0)
 	//l.nop	NOP_REPORT
 	l.sfnei	r3,0
-	l.bnf	fail
+	OR1K_DELAYED_NOP(l.bnf	fail)
 
 	/* Now change to usermode, ensure the counter doesn't increment */
 	l.sys	0
@@ -136,18 +124,19 @@ pcr_if_sm:
 	l.mfspr	r6,r1,SPR_PCCR(0)
 	l.nop
 	l.nop
-	l.nop
 	l.mfspr	r7,r1,SPR_PCCR(0)
 	/* r6 and r7 should be equal */
 	l.sfne	r6,r7
-	l.bf	fail
+	OR1K_DELAYED_NOP(l.bf	fail)
 	l.sys	0
 	/* SM = 1 */
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_if_sm	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_if_sm)	/* check next set */
+        )
 	
 	
 	/* Check instruction fetch counter - user mode */
@@ -177,7 +166,7 @@ pcr_if_um:
 	l.mfspr	r7,r1,SPR_PCCR(0)
 	/* r6 should be smaller than r7 */
 	l.sfgeu	r6,r7
-	l.bf	fail
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* Now change to supervisor, ensure the counter doesn't increment */
 	l.sys	0
@@ -189,12 +178,14 @@ pcr_if_um:
 	l.mfspr	r7,r1,SPR_PCCR(0)
 	/* r6 and r7 should be equal */
 	l.sfeq	r6,r7
-	l.bnf	fail
+	OR1K_DELAYED_NOP(l.bnf	fail)
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_if_um	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_if_um)	/* check next set */
+        )
 	
 	
 	/* Check for MMU miss */
@@ -213,16 +204,20 @@ immu_clear_sets:
 	l.mtspr	r4,r0,SPR_ITLBTR_BASE(0)
 	/* End of immu sets? */
 	l.sfnei	r1,127
-	l.bf	immu_clear_sets
-	l.addi	r1,r1,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),
+	OR1K_INST(l.bf	immu_clear_sets)
+        )
 
 	/* Reset set counter */
 	l.movhi	r1,0
 	
 	/* end of immu ways? */
 	l.sfnei	r2,3
-	l.bf	immu_clear_ways
-	l.addi	r2,r2,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r2,r2,1),
+	OR1K_INST(l.bf	immu_clear_ways)
+        )
 
 	/* Check itlb miss counter */
 	/* r1 - counter of which counter (0-7) we're using */
@@ -250,12 +245,14 @@ pcr_itlbm:
 	/* Check PCCR incremented */
 	l.mfspr	r6,r1,SPR_PCCR(0)
 	l.sfeq	r6,r0
-	l.bf	fail
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_itlbm	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_itlbm)	/* check next set */
+        )
 
 	/* Check for MMU miss */
 	/* dmmu */
@@ -273,16 +270,20 @@ dmmu_clear_sets:
 	l.mtspr	r4,r0,SPR_DTLBTR_BASE(0)
 	/* End of dmmu sets? */
 	l.sfnei	r1,127
-	l.bf	dmmu_clear_sets
-	l.addi	r1,r1,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),
+	OR1K_INST(l.bf	dmmu_clear_sets)
+        )
 
 	/* Reset set counter */
 	l.movhi	r1,0
 	
 	/* end of dmmu ways? */
 	l.sfnei	r2,3
-	l.bf	dmmu_clear_ways
-	l.addi	r2,r2,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r2,r2,1),
+	OR1K_INST(l.bf	dmmu_clear_ways)
+        )
 
 	/* Check dtlb miss counter */
 	/* r1 - counter of which counter (0-7) we're using */
@@ -312,12 +313,14 @@ pcr_dtlbm:
 	/* Check PCCR incremented */
 	l.mfspr	r6,r1,SPR_PCCR(0)
 	l.sfeq	r6,r0
-	l.bf	fail
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_dtlbm	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_dtlbm)	/* check next set */
+        )
 
 
 	/* Check instruction cache miss counter */
@@ -326,8 +329,7 @@ icache_miss_test:
 	l.mfspr r3,r0,SPR_UPR
 	l.andi  r4,r3,SPR_UPR_ICP
 	l.sfeq  r4,r0
-	l.bf    dcache_miss_test
-	l.nop
+	OR1K_DELAYED_NOP(l.bf    dcache_miss_test)
 		
 	/* r1 - counter of which counter (0-7) we're using */
 	l.movhi	r1,0
@@ -384,8 +386,10 @@ pcr_icmiss:
 .L7:
 	l.mtspr r0,r6,SPR_ICBIR
 	l.sfne  r6,r5
-	l.bf    .L7
-	l.add   r6,r6,r14
+        OR1K_DELAYED(
+	OR1K_INST(l.add   r6,r6,r14),
+	OR1K_INST(l.bf    .L7)
+        )
 	
 	/* Enable IC */
 	l.mfspr r6,r0,SPR_SR
@@ -399,13 +403,14 @@ pcr_icmiss:
 	/* Should have had at least 1 miss, check this */
 	l.mfspr	r6,r1,SPR_PCCR(0)
 	l.sfeq	r6,r0
-	l.bf	fail
-	l.nop
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_icmiss	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_icmiss)	/* check next set */
+        )
 
 
 
@@ -415,8 +420,7 @@ dcache_miss_test:
         l.mfspr r3,r0,SPR_UPR
         l.andi  r4,r3,SPR_UPR_DCP
         l.sfeq  r4,r0
-        l.bf    dcache_miss_test_done
-        l.nop
+        OR1K_DELAYED_NOP(l.bf    dcache_miss_test_done)
 
 	/* r1 - counter of which counter (0-7) we're using */
 	l.movhi	r1,0
@@ -431,6 +435,7 @@ pcr_dcmiss:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
+        
 	/* Load pcmr with appropriate mode */
 	/* use r5 to hold pcmr value */
 	l.ori	r5,r0,(SPR_PCMR_CISM | SPR_PCMR_DCM | SPR_PCMR_UMRA)
@@ -438,7 +443,7 @@ pcr_dcmiss:
 	/* clear (0) pccr */
 	l.mtspr	r1,r0,SPR_PCCR(0)
 
-	        /* Disable DC */
+	/* Disable DC */
         l.mfspr r6,r0,SPR_SR
         l.addi  r5,r0,-1
         l.xori  r5,r5,SPR_SR_DCE
@@ -468,8 +473,10 @@ pcr_dcmiss:
 .L9:
         l.mtspr r0,r6,SPR_DCBIR
         l.sfne  r6,r5
-        l.bf    .L9
-	l.add   r6,r6,r14
+        OR1K_DELAYED(
+	OR1K_INST(l.add   r6,r6,r14),
+        OR1K_INST(l.bf    .L9)
+        )
         /* Enable DC */
         l.mfspr r6,r0,SPR_SR
         l.ori   r6,r6,SPR_SR_DCE
@@ -483,13 +490,14 @@ pcr_dcmiss:
 	/* Should have had 2 misses */
 	l.mfspr	r6,r1,SPR_PCCR(0)
 	l.sfnei	r6,2
-	l.bf	fail
-	l.nop
+	OR1K_DELAYED_NOP(l.bf	fail)
 
 	/* End of loop */
 	l.sfeqi	r1,7		/* Finished checking all 8 regs? */
-	l.bnf	pcr_dcmiss	/* check next set */
-	l.addi	r1,r1,1		/* increment set counter */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r1,r1,1),		/* increment set counter */
+	OR1K_INST(l.bnf	pcr_dcmiss)	/* check next set */
+        )
 
 dcache_miss_test_done:	
 	

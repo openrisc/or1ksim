@@ -41,6 +41,7 @@
  * ------------------------------------------------------------------------- */
 
 
+#include "or1k-asm.h"
 #include "inst-set-test.h"
 
 /* ----------------------------------------------------------------------------
@@ -66,18 +67,17 @@
 	l.mfspr	r2,r0,SPR_EPCR_BASE	/* What triggered exception */	;\
 	PUSH (r2)			/* Save EPCR for later */	;\
 	PUTS ("  Jump to 0x")						;\
-	PUTH (51f + offset)						;\
+	PUTH (offset)							;\
 	PUTS (" using register 0x")					;\
 	PUTHQ (dest)							;\
 	PUTS (" failed\n")						;\
-	l.j	52f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	52f)					;\
 									;\
 	/* Jump succeeded we get here */				;\
 51:	l.mfspr	r2,r0,SPR_EPCR_BASE	/* What triggered exception */	;\
 	PUSH (r2)			/* Save EPCR for later */	;\
 	PUTS ("  Jump to 0x")						;\
-	PUTH (51b + offset)						;\
+	PUTH (offset)							;\
 	PUTS (" using register 0x")					;\
 	PUTHQ (dest)							;\
 	PUTS (" OK\n")							;\
@@ -87,11 +87,10 @@
 	LOAD_CONST (r4, 50b)		/* The opcode of interest */	;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	l.bnf	53f							;\
+	OR1K_DELAYED_NOP(l.bnf	53f)					;\
 									;\
 	PUTS ("  - exception triggered: TRUE\n")			;\
-	l.j	54f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	54f)					;\
 									;\
 53:	PUTS ("  - exception triggered: FALSE\n")			;\
 54:	
@@ -109,8 +108,7 @@ _start:
  * ------------------------------------------------------------------------- */
 _jalr:	
 	LOAD_STR (r3, "l.jalr\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Test with various alignment offsets */
 	TEST_JUMP (0x48000000, 5, 0)		/* No offset */
@@ -126,8 +124,7 @@ _jalr:
  * ------------------------------------------------------------------------- */
 _jr:	
 	LOAD_STR (r3, "l.jr\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Test with various alignment offsets */
 	TEST_JUMP (0x44000000, 5, 0)			/* No offset */
@@ -143,7 +140,6 @@ _jr:
  * ------------------------------------------------------------------------- */
 _exit:
 	LOAD_STR (r3, "Test completed\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	TEST_EXIT

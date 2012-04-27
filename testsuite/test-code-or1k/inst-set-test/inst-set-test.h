@@ -22,6 +22,7 @@
    with this program.  If not, see <http:  www.gnu.org/licenses/>.  */
 
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -122,8 +123,7 @@
 #define PUTS(s)								 \
 	LOAD_STR (r3, s)						;\
 	PUSH (r9)							;\
-	l.jal	_puts							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_puts)					;\
 	POP (r9)
 	
 /* ----------------------------------------------------------------------------
@@ -135,8 +135,7 @@
 #define PUTH(v)								 \
 	LOAD_CONST (r3, v)						;\
 	PUSH (r9)							;\
-	l.jal	_puth							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_puth)					;\
 	POP (r9)
 	
 /* ----------------------------------------------------------------------------
@@ -148,8 +147,7 @@
 #define PUTHH(v)							 \
 	LOAD_CONST (r3, v)						;\
 	PUSH (r9)							;\
-	l.jal	_puthh							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_puthh)					;\
 	POP (r9)
 	
 /* ----------------------------------------------------------------------------
@@ -161,8 +159,7 @@
 #define PUTHQ(v)							 \
 	LOAD_CONST (r3, v)						;\
 	PUSH (r9)							;\
-	l.jal	_puthq							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_puthq)					;\
 	POP (r9)
 	
 /* ----------------------------------------------------------------------------
@@ -185,26 +182,24 @@
 	PUSH (reg)			/* Save the register to test */	;\
 									;\
 	LOAD_CONST (r3,2b)		/* Print out the string */	;\
-	l.jal	_ptest							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptest)					;\
 									;\
 	LOAD_CONST(r2,val)		/* The desired result */	;\
 	POP (reg)			/* The register to test */	;\
 	PUSH (reg)			/* May need again later */	;\
 	l.sfeq	r2,reg			/* Does the result match? */	;\
-	l.bf	3f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bf	3f)					;\
 									;\
-	l.jal	_pfail			/* Test failed */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfail)	/* Test failed */		;\
 	POP (reg)			/* Report the register */	;\
 	l.add	r3,r0,reg						;\
-	l.j	4f							;\
-	l.nop	NOP_REPORT						;\
+        OR1K_DELAYED(							\
+	OR1K_INST(l.nop	NOP_REPORT),					\
+	OR1K_INST(l.j	4f)						\
+	)								;\
 3:									;\
 	POP (reg)			/* Discard the register */	;\
-	l.jal	_pok			/* Test succeeded */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pok)	/* Test succeeded */		;\
 4:
 	
 /* ----------------------------------------------------------------------------
@@ -224,56 +219,45 @@
 	.string	str							;\
 									;\
 	.section .text							;\
-	l.bnf	7f			/* Branch if result FALSE */	;\
+	OR1K_DELAYED_NOP(l.bnf	7f)	/* Branch if result FALSE */	;\
 									;\
 	/* Branch for TRUE result */					;\
 	LOAD_CONST (r3,5b)		/* The string to print */	;\
-	l.jal	_ptest							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptest)					;\
 									;\
 	l.addi	r2,r0,TRUE		/* Was it expected? */		;\
 	l.addi	r3,r0,res						;\
 	l.sfeq	r2,r3							;\
-	l.bnf	6f			/* Branch if not expected */	;\
+	OR1K_DELAYED_NOP(l.bnf	6f)	/* Branch if not expected */	;\
 									;\
 	/* Sub-branch for TRUE found and expected */			;\
-	l.jal	_ptrue							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptrue)					;\
 	PUTC ('\n')							;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 6:									;\
 	/* Sub-branch for TRUE found and not expected */		;\
-	l.jal	_ptrue							;\
-	l.nop								;\
-	l.jal	_punexpected						;\
-	l.nop								;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptrue)					;\
+	OR1K_DELAYED_NOP(l.jal	_punexpected)				;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 									;\
 7:									;\
 	/* Branch for FALSE result */					;\
 	LOAD_CONST (r3,5b)		/* The string to print */	;\
-	l.jal	_ptest							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptest)					;\
 									;\
 	l.addi	r2,r0,FALSE		/* Was it expected? */		;\
 	l.addi	r3,r0,res						;\
 	l.sfeq	r2,r3							;\
-	l.bnf	8f			/* Branch if not expected */	;\
+	OR1K_DELAYED_NOP(l.bnf	8f)	/* Branch if not expected */	;\
 									;\
 	/* Sub-branch for FALSE found and expected */			;\
-	l.jal	_pfalse							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfalse)				;\
 	PUTC ('\n')							;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 8:									;\
 	/* Sub-branch for FALSE found and not expected */		;\
-	l.jal	_pfalse							;\
-	l.nop								;\
-	l.jal	_punexpected						;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfalse)				;\
+	OR1K_DELAYED_NOP(l.jal	_punexpected)				;\
 9:
 
 /* ----------------------------------------------------------------------------
@@ -297,19 +281,19 @@
 	POP (reg1)			/* First register to test */	;\
 	PUSH (reg1)			/* May need again later */	;\
 	l.sfeq	r2,reg1			/* Does the result match? */	;\
-	l.bf	10f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bf	10f)					;\
 									;\
 	/* First register failed. */					;\
-	l.jal	_pfail			/* Test failed */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfail)	/* Test failed */		;\
 	POP (reg1)			/* Report the registers */	;\
 	l.add	r3,r0,reg1						;\
 	l.nop	NOP_REPORT						;\
 	POP (reg2)			/* Report the registers */	;\
 	l.add	r3,r0,reg2						;\
-	l.j	12f							;\
-	l.nop	NOP_REPORT						;\
+        OR1K_DELAYED(							\
+	OR1K_INST(l.nop	NOP_REPORT),					\
+	OR1K_INST(l.j	12f)						\
+	)								;\
 									;\
 	/* First register matched, check the second */			;\
 10:									;\
@@ -319,26 +303,25 @@
 	PUSH (reg2)			/* May need again later */	;\
 	PUSH (reg1)			/* May need again later */	;\
 	l.sfeq	r2,reg2			/* Does the result match? */	;\
-	l.bf	11f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bf	11f)					;\
 									;\
 	/* Second register failed. */					;\
-	l.jal	_pfail			/* Test failed */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfail)	/* Test failed */		;\
 	POP (reg1)			/* Report the registers */	;\
 	l.add	r3,r0,reg1						;\
 	l.nop	NOP_REPORT						;\
 	POP (reg2)			/* Report the registers */	;\
 	l.add	r3,r0,reg2						;\
-	l.j	12f							;\
-	l.nop	NOP_REPORT						;\
+        OR1K_DELAYED(							\
+	OR1K_INST(l.nop	NOP_REPORT),					\
+	OR1K_INST(l.j	12f)						\
+	)								;\
 									;\
 	/* Both registers passed */					;\
 11:									;\
 	POP (reg1)			/* Discard the registers */	;\
 	POP (reg2)			/* Discard the registers */	;\
-	l.jal	_pok			/* Test succeeded */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pok)	/* Test succeeded */		;\
 12:
 	
 /* ----------------------------------------------------------------------------
@@ -359,19 +342,18 @@
 	LOAD_CONST(r2,val)		/* The desired result */	;\
 	PUSH (reg)			/* May need again later */	;\
 	l.sfeq	r2,reg			/* Does the result match? */	;\
-	l.bf	13f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bf	13f)					;\
 									;\
-	l.jal	_pfail			/* Test failed */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfail)	/* Test failed */		;\
 	POP (reg)			/* Report the register */	;\
 	l.add	r3,r0,reg						;\
-	l.j	14f							;\
-	l.nop	NOP_REPORT						;\
+        OR1K_DELAYED(							\
+	OR1K_INST(l.nop	NOP_REPORT),					\
+	OR1K_INST(l.j	14f)						\
+	)								;\
 13:									;\
 	POP (reg)			/* Discard the register */	;\
-	l.jal	_pok			/* Test succeeded */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pok)	/* Test succeeded */		;\
 14:
 	
 /* ----------------------------------------------------------------------------

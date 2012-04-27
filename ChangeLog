@@ -1,3 +1,28 @@
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	add or1knd (no-delay slot) target
+	* sim-nd.cfg: new file: configuration for no-delay target.
+	essentially a copy of sim.cfg.
+	* Makefile.am:
+	(DISTCHECK_CONFIGURE_FLAGS) use $(target_alias) instead of or1k-elf
+	(EXTRA_DIST) add sim-nd.cfg
+	* config.sub: add or1knd target
+	* config.guess: ditto
+	* configure.ac: ditto
+	* cpu/or1k/spr-defs.h:
+	(SPR_CPUCFGR_ND) no-delay slot flag
+	* cpu-config.c:
+	(cpu_cfgr) allow SPR_CPUCFGR_ND bit to be set in the argument
+	* cpu/or32/insnset.c:
+	(l_j) check if ND bit is set; if so, don't use delay slot. this is
+	done by setting pcnext directly, and *not* setting next_delay_insn
+	or cpu_state.pc_delay, which are ignored altogether in nodelay mode.
+	(l_jal) ditto
+	(l_jr) ditto
+	(l_jalr) ditto
+	(l_bf) ditto
+	(l_bnf) ditto
+
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
 	* Makefile.am: s,or32,or1k,

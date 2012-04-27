@@ -25,6 +25,7 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -86,8 +87,7 @@ reset_vector:
 
         l.movhi r3,hi(start)
         l.ori   r3,r3,lo(start)
-        l.jr    r3
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 start:
 
         l.movhi r1,hi(stack)
@@ -96,8 +96,7 @@ start:
 	
         l.movhi r3,hi(main)
         l.ori   r3,r3,lo(main)
-        l.jr    r3
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
         .section .text
 
@@ -115,8 +114,10 @@ ic_enable:
 1:
         l.mtspr r0,r13,SPR_ICBIR
         l.sfne  r13,r11
-        l.bf    1b
-        l.addi  r13,r13,16
+        OR1K_DELAYED(
+        OR1K_INST(l.addi  r13,r13,16),
+        OR1K_INST(l.bf    1b)
+        )
 
         /* Enable IC */
         l.mfspr r13,r0,SPR_SR
@@ -128,8 +129,7 @@ ic_enable:
         l.nop
         l.nop
 
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 ic_disable:
         /* Disable IC */
@@ -139,8 +139,7 @@ ic_disable:
         l.and   r11,r13,r11
         l.mtspr r0,r11,SPR_SR
 
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 dc_enable:
         /* Disable DC */
@@ -156,16 +155,17 @@ dc_enable:
 1:
         l.mtspr r0,r13,SPR_DCBIR
         l.sfne  r13,r11
-        l.bf    1b
-        l.addi  r13,r13,16
+        OR1K_DELAYED(
+        OR1K_INST(l.addi  r13,r13,16),
+        OR1K_INST(l.bf    1b)
+        )
 
         /* Enable DC */
         l.mfspr r13,r0,SPR_SR
         l.ori   r13,r13,SPR_SR_DCE
         l.mtspr r0,r13,SPR_SR
 
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r9)
 
 dc_disable:
         /* Disable DC */
@@ -175,8 +175,7 @@ dc_disable:
         l.and   r11,r13,r11
         l.mtspr r0,r11,SPR_SR
 
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r9)
 
 dc_inv:
         l.mfspr r4,r0,SPR_SR
@@ -186,8 +185,7 @@ dc_inv:
         l.mtspr r0,r5,SPR_SR
         l.mtspr r0,r3,SPR_DCBIR        
         l.mtspr r0,r4,SPR_SR
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r9)
 
         .align  0x10
 ic_inv_test:
@@ -204,8 +202,7 @@ ic_test_1:
 3:      l.addi  r3,r3,1
 
         l.sfeqi r4,0x01
-        l.bnf   1f
-        l.nop
+        OR1K_DELAYED_NOP(l.bnf   1f)
 
         l.mfspr r8,r0,SPR_SR
         l.addi  r11,r0,-1
@@ -214,8 +211,7 @@ ic_test_1:
         l.mtspr r0,r11,SPR_SR
         l.mtspr r0,r7,SPR_ICBIR
         l.mtspr r0,r8,SPR_SR
-        l.bf    2f
-        l.nop
+        OR1K_DELAYED_NOP(l.bf    2f)
 
 1:      l.lwz   r6,0(r7)
         l.addi  r6,r6,1
@@ -223,12 +219,13 @@ ic_test_1:
 
 2:      l.addi  r5,r5,1
         l.sfeqi r5,10
-        l.bnf   3b
-        l.xori  r4,r4,0x01
+        OR1K_DELAYED(
+        OR1K_INST(l.xori  r4,r4,0x01),
+        OR1K_INST(l.bnf   3b)
+        )
         
         l.addi  r11,r3,0
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 dc_inv_test:
         l.movhi r4,hi(0x08040201)
@@ -240,8 +237,8 @@ dc_inv_test:
         l.sw    0x28(r3),r4
 
         l.addi  r8,r9,0
-        l.jal   dc_enable
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   dc_enable))
+        
         l.addi  r9,r8,0
 
         l.lbz   r4,0x03(r3)
@@ -282,5 +279,4 @@ dc_inv_test:
 
         l.addi  r11,r4,0x0
 1:      
-        l.jr  r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr  r9))

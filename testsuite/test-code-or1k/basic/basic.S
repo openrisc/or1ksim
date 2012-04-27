@@ -25,6 +25,7 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -417,34 +418,50 @@ _flag:
 _jump:
 	l.addi	r8,r0,0
 
-	l.j	_T1
-	l.addi	r8,r8,1
+	OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+        OR1K_INST(l.j	_T1)
+        )
 
-_T2:	l.jr	r9
-	l.addi	r8,r8,1
+_T2:
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+        OR1K_INST(l.jr	r9)
+        )
 
-_T1:	l.jal	_T2
-	l.addi	r8,r8,1
+_T1:
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+        OR1K_INST(l.jal	_T2)
+        )
 
 	l.sfeqi	r0,0
-	l.bf	_T3
-	l.addi	r8,r8,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+	OR1K_INST(l.bf	_T3)
+        )
 
 _T3:	l.sfeqi	r0,1
-	l.bf	_T4
-	l.addi	r8,r8,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+	OR1K_INST(l.bf	_T4)
+        )
 	
 	l.addi	r8,r8,1
 
 _T4:	l.sfeqi r0,0
-	l.bnf	 _T5
-	l.addi	r8,r8,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+	OR1K_INST(l.bnf	 _T5)
+        )
 
 	l.addi	r8,r8,1
 
 _T5:	l.sfeqi r0,1
-	l.bnf	 _T6
-	l.addi	r8,r8,1
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r8,r8,1),
+	OR1K_INST(l.bnf	 _T6)
+        )
  
 	l.addi	r8,r8,1
 

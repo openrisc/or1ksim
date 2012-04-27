@@ -39,9 +39,17 @@ proc run_or1ksim { testname match_list config_file progname } {
 
     # Construct the filename
     if {0 == [string length $config_file]} {
-	set config_full_file "$srcdir/or1ksim.tests/default.cfg";
+        if { [istarget "or1knd-*-*"] } {
+            set config_full_file "$srcdir/or1ksim.tests/cfg/or1knd/default.cfg"
+        } else {
+            set config_full_file "$srcdir/or1ksim.tests/cfg/or1k/default.cfg"
+        }
     } else {
-	set config_full_file "$srcdir/or1ksim.tests/$config_file";
+        if { [istarget "or1knd-*-*"] } {
+            set config_full_file "$srcdir/or1ksim.tests/cfg/or1knd/$config_file"
+        } else {
+            set config_full_file "$srcdir/or1ksim.tests/cfg/or1k/$config_file"
+        }
     }
 
     set prog_full_name "$objdir/test-code-or1k/$progname"

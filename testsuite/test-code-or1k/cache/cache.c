@@ -85,7 +85,9 @@ void jump_and_link(void)
 {
 	asm("jalr:");
   asm("l.jr\tr9");
+#ifndef __OR1K_NODELAY__
   asm("l.nop");
+#endif
 }
 
 void jump(void)
@@ -100,7 +102,9 @@ void jump(void)
 	/* Jump to that address */
 	asm("l.jr\t\tr3") ;
 	/* Report that we succeeded */
+#ifndef __OR1K_NODELAY__
 	asm("l.nop\t0");
+#endif
 }
 
 void copy_jr(unsigned long add)
@@ -113,7 +117,9 @@ void call(unsigned long add)
   asm("l.movhi\tr11,hi(jump_indx)" : :);
   asm("l.ori\tr11,r11,lo(jump_indx)" : :);
 	asm("l.jalr\t\t%0" : : "r" (add) : "r11", "r9");
+#ifndef __OR1K_NODELAY__
 	asm("l.nop" : :);
+#endif
 }
 
 /* Determine cache configuration from cache configuration registers */

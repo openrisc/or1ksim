@@ -459,9 +459,13 @@ INSTRUCTION (l_bf) {
     bpb_update(current->insn_addr, cpu_state.sprs[SPR_SR] & SPR_SR_F ? 1 : 0);
   }
   if(cpu_state.sprs[SPR_SR] & SPR_SR_F) {
-    cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+    if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+      pcnext = cpu_state.pc + (orreg_t)PARAM0 * 4;
+    } else {
+      cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+      next_delay_insn = 1;
+    }
     btic_update(pcnext);
-    next_delay_insn = 1;
   } else {
     btic_update(cpu_state.pc);
   }
@@ -473,32 +477,58 @@ INSTRUCTION (l_bnf) {
     bpb_update(current->insn_addr, cpu_state.sprs[SPR_SR] & SPR_SR_F ? 0 : 1);
   }
   if (!(cpu_state.sprs[SPR_SR] & SPR_SR_F)) {
-    cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+    if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+      pcnext = cpu_state.pc + (orreg_t)PARAM0 * 4;
+    } else {
+      cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+      next_delay_insn = 1;
+    }
     btic_update(pcnext);
-    next_delay_insn = 1;
   } else {
     btic_update(cpu_state.pc);
   }
 }
 INSTRUCTION (l_j) {
-  cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
-  next_delay_insn = 1;
+  if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+    pcnext = cpu_state.pc + (orreg_t)PARAM0 * 4;
+  } else {
+    cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+    next_delay_insn = 1;
+  }
 }
 INSTRUCTION (l_jal) {
-  cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
+  if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+    pcnext = cpu_state.pc + (orreg_t)PARAM0 * 4;
+
+    setsim_reg(LINK_REGNO, cpu_state.pc + 4);
+
+    if (config.sim.profile) {
+      struct label_entry *tmp;
+      if (verify_memoryarea(pcnext) && (tmp = get_label (pcnext)))
+        fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" %s\n",
+                 runtime.sim.cycles, cpu_state.pc + 4, pcnext,
+                 tmp->name);
+      else
+        fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" @%"PRIxADDR"\n",
+                 runtime.sim.cycles, cpu_state.pc + 4, pcnext,
+                 pcnext);
+    }
+  } else {
+    cpu_state.pc_delay = cpu_state.pc + (orreg_t)PARAM0 * 4;
   
-  setsim_reg(LINK_REGNO, cpu_state.pc + 8);
-  next_delay_insn = 1;
-  if (config.sim.profile) {
-    struct label_entry *tmp;
-    if (verify_memoryarea(cpu_state.pc_delay) && (tmp = get_label (cpu_state.pc_delay)))
-      fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" %s\n",
-               runtime.sim.cycles, cpu_state.pc + 8, cpu_state.pc_delay,
-               tmp->name);
-    else
-      fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" @%"PRIxADDR"\n",
-               runtime.sim.cycles, cpu_state.pc + 8, cpu_state.pc_delay,
-               cpu_state.pc_delay);
+    setsim_reg(LINK_REGNO, cpu_state.pc + 8);
+    next_delay_insn = 1;
+    if (config.sim.profile) {
+      struct label_entry *tmp;
+      if (verify_memoryarea(cpu_state.pc_delay) && (tmp = get_label (cpu_state.pc_delay)))
+        fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" %s\n",
+                 runtime.sim.cycles, cpu_state.pc + 8, cpu_state.pc_delay,
+                 tmp->name);
+      else
+        fprintf (runtime.sim.fprof, "+%08llX %"PRIxADDR" %"PRIxADDR" @%"PRIxADDR"\n",
+                 runtime.sim.cycles, cpu_state.pc + 8, cpu_state.pc_delay,
+                 cpu_state.pc_delay);
+    }
   }
 }
 INSTRUCTION (l_jalr) {
@@ -515,9 +545,14 @@ INSTRUCTION (l_jalr) {
     }
   else
     {
-      cpu_state.pc_delay = temp1;
-      setsim_reg(LINK_REGNO, cpu_state.pc + 8);
-      next_delay_insn = 1;
+      if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+        pcnext = temp1;
+        setsim_reg(LINK_REGNO, cpu_state.pc + 4);
+      } else {
+        cpu_state.pc_delay = temp1;
+        setsim_reg(LINK_REGNO, cpu_state.pc + 8);
+        next_delay_insn = 1;
+      }
     }
 }
 INSTRUCTION (l_jr) {
@@ -530,14 +565,24 @@ INSTRUCTION (l_jr) {
     }
   else
     {
-      cpu_state.pc_delay = temp1;
-      next_delay_insn = 1;
+      if(cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_ND) {
+        pcnext = temp1;
 
-      if (config.sim.profile)
-	{
-	  fprintf (runtime.sim.fprof, "-%08llX %"PRIxADDR"\n",
-		   runtime.sim.cycles, cpu_state.pc_delay);
-	}
+        if (config.sim.profile)
+          {
+            fprintf (runtime.sim.fprof, "-%08llX %"PRIxADDR"\n",
+                     runtime.sim.cycles, pcnext);
+          }
+      } else {
+        cpu_state.pc_delay = temp1;
+        next_delay_insn = 1;
+
+        if (config.sim.profile)
+          {
+            fprintf (runtime.sim.fprof, "-%08llX %"PRIxADDR"\n",
+                     runtime.sim.cycles, cpu_state.pc_delay);
+          }
+      }
     }
 }
 INSTRUCTION (l_rfe) {

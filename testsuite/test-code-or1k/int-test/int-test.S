@@ -47,6 +47,7 @@
    assertion routine at the end.
 */
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -95,8 +96,7 @@ _reset_vector:
 
   l.movhi r3,hi(_start)
   l.ori   r3,r3,lo(_start)
-  l.jr    r3
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
 	.org 0x500
 _tick_handler:	
@@ -119,36 +119,35 @@ _tick_handler:
   
   l.addi  r3,r31,0    # restore r3
   l.sfeqi r25, 0x00
-  l.bf    _i00
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i00))
   l.sfeqi r25, 0x04
-  l.bf    _i04
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i04))
   l.sfeqi r25, 0x08
-  l.bf    _i08
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i08))
   l.sfeqi r25, 0x0c
-  l.bf    _i0c
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i0c))
   l.sfeqi r25, 0x10
-  l.bf    _i10
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i10))
   l.sfeqi r25, 0x14
-  l.bf    _i14
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i14))
   l.sfeqi r25, 0x18
-  l.bf    _i18
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i18))
   l.sfeqi r25, 0x1c
-  l.bf    _i1c
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i1c))
   l.sfeqi r25, 0x20
-  l.bf    _i20
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i20))
   l.sfeqi r25, 0x24
-  l.bf    _i24
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i24))
   l.sfeqi r25, 0x28
-  l.bf    _i28
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i28))
   l.sfeqi r25, 0x2c
-  l.bf    _i2c
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i2c))
   l.sfeqi r25, 0x30
-  l.bf    _i30
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i30))
   l.sfeqi r25, 0x34
-  l.bf    _i34
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i34))
   l.sfeqi r25, 0x38
-  l.bf    _i38
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    _i38))
 
 # value not defined
 _die:
@@ -159,8 +158,7 @@ _die:
   l.addi  r3,r0,1
   l.nop   1
 1:
-  l.j     1b
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.j     1b))
 
 
 .section .text
@@ -169,8 +167,7 @@ _start:
 	
   l.movhi r3,hi(_main)
   l.ori   r3,r3,lo(_main)
-  l.jr    r3
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
 	
 _main:
@@ -228,87 +225,81 @@ _ie_start:
   l.lwz   r3,0(r3)          #0c
   l.movhi r3,hi(RAM_START)  #10
   l.addi  r3,r3,4           #14
-  l.j     1f                #18
-  l.lwz   r3,0(r3)          #1c
+  OR1K_DELAYED(
+  OR1K_INST(l.lwz   r3,0(r3)),
+  OR1K_INST(l.j     1f)
+  ) #18,1c
   l.addi  r3,r3,1           #20
 1:
   l.sfeqi r3,0xdead         #24
-  l.jal   2f                #28
-  l.addi  r3,r0,0x5678      #2c
+  OR1K_DELAYED(
+  OR1K_INST(l.addi  r3,r0,0x5678),
+  OR1K_INST(l.jal   2f)
+  ) #28,2c
 
 _return_addr:
 2:
-  l.bf    _die              #30
-  l.sw    8(r23),r3         #34
+  OR1K_DELAYED(
+  OR1K_INST(l.sw    8(r23),r3),
+  OR1K_INST(l.bf    _die)
+  ) #30,34
 _ie_end:
   l.nop                     #38
 ##### END OF TEST CODE #####
 
 # do some testing
 
-  l.j     _main_loop
-  l.nop
+  OR1K_DELAYED_NOP(l.j     _main_loop)
 
 _i00:
   l.sfeqi r3,0xaaaa
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i04:
   l.movhi  r26,0x1234
   l.sfeq   r3,r26
-  l.bnf   _die
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
   l.lwz   r26,0(r23)
   l.sfeqi r26,0xaaaa
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i08:
   l.movhi r26,0x1234
   l.sfeq  r3,r26
-  l.bnf   _die
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
   l.lwz   r27,0(r23)
   l.sfeq  r27,r26
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i0c:
   l.sfeq  r3,r23
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i10:
   l.movhi r26,0x1234
   l.sfeq  r26,r3
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i14:
   l.sfeq  r3,r23
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i18:
   l.addi  r26,r23,4
   l.sfeq  r3,r26
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i1c:
+#ifndef __OR1K_NODELAY__
   l.j     _die
   l.nop
+#else
+  l.sfeqi r3,0xbbbb
+  l.bnf   _die
+  l.j     _resume
+#endif
 _i20:
-  l.j     _die
-  l.nop
+  OR1K_DELAYED_NOP(l.j     _die)
 _i24:
   l.mfspr r26,r0,SPR_ESR_BASE
   l.addi  r30,r3,0
@@ -317,13 +308,10 @@ _i24:
   l.addi  r3,r30,0
   l.andi  r26,r26,SPR_SR_F
   l.sfeq  r26,r0
-/*  l.bnf   _die */
-  l.nop
+/*  OR1K_DELAYED_NOP(l.bnf   _die) */
   l.sfeqi  r3,0xbbbb
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i28:
   l.mfspr r26,r0,SPR_ESR_BASE
   l.addi  r30,r3,0
@@ -332,17 +320,17 @@ _i28:
   l.addi  r3,r30,0
   l.andi  r26,r26,SPR_SR_F
   l.sfeq  r26,r0
-  l.bnf    _die
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
   l.sfeqi  r22,1
-  l.bf     _resume
-  l.addi   r22,r0,1
+  OR1K_DELAYED(
+  OR1K_INST(l.addi   r22,r0,1),
+  OR1K_INST(l.bf     _resume)
+  )
   l.sfeqi  r9,0xbbbb
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i2c:
+#ifndef __OR1K_NODELAY__
   l.movhi  r26,hi(_return_addr)
   l.ori    r26,r26,lo(_return_addr)
   l.sfeq   r9,r26
@@ -353,27 +341,32 @@ _i2c:
   l.nop
   l.j     _resume
   l.nop
+#else
+  l.sfeqi r3,0x5678
+  l.bnf   _die
+  l.sfeqi r9,0xbbbb
+  l.bnf   _die
+  l.j     _resume
+#endif
 _i30:
   l.sfeqi  r3,0x5678
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop  
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i34:
   l.sfeqi  r3,0x5678
-  l.bnf   _die
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
   l.lwz    r26,8(r23)
+#ifndef __OR1K_NODELAY__
   l.sfeqi  r26,0xaaaa
-  l.bnf   _die
-  l.nop
-  l.j     _resume
-  l.nop  
+#else
+  l.sfeqi  r3,0x5678
+#endif
+  OR1K_DELAYED_NOP(l.bnf   _die)
+  OR1K_DELAYED_NOP(l.j     _resume)
 _i38:
   l.lwz    r26,8(r23)
   l.sfeqi  r26,0x5678
-  l.bnf   _die
-  l.nop
+  OR1K_DELAYED_NOP(l.bnf   _die)
 #
 # mark finished ok
 #
@@ -383,8 +376,7 @@ _i38:
   l.addi  r3,r0,0
   l.nop   1
 _ok:
-  l.j     _ok
-  l.nop
+  OR1K_DELAYED_NOP(l.j     _ok)
 
 _resume:
   l.mfspr  r27,r0,SPR_ESR_BASE

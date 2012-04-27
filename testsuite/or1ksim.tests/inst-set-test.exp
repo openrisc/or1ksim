@@ -483,33 +483,33 @@ run_or1ksim "find-test"                 \
 # Run the l.jalf and l.jr test
 run_or1ksim "jump-test"                                     \
     [list "!l.jalr"                                         \
-          "  Jump to 0x000010dc using register 0x05 OK"     \
+          "  Jump to 0x00000000 using register 0x05 OK"     \
           "  - exception triggered: FALSE"                  \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x000012b9 using register 0x05 failed" \
+          "  Jump to 0x00000001 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x00001496 using register 0x05 failed" \
+          "  Jump to 0x00000002 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x00001673 using register 0x05 failed" \
+          "  Jump to 0x00000003 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
           "  ILLEGAL INSTRUCTION exception"                 \
-          "  Jump to 0x0000184c using register 0x09 failed" \
+          "  Jump to 0x00000000 using register 0x09 failed" \
           "  - exception triggered: TRUE"                   \
           "!l.jr"                                           \
-          "  Jump to 0x00001a38 using register 0x05 OK"     \
+          "  Jump to 0x00000000 using register 0x05 OK"     \
           "  - exception triggered: FALSE"                  \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x00001c15 using register 0x05 failed" \
+          "  Jump to 0x00000001 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x00001df2 using register 0x05 failed" \
+          "  Jump to 0x00000002 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
           "  ALIGNMENT exception"                           \
-          "  Jump to 0x00001fcf using register 0x05 failed" \
+          "  Jump to 0x00000003 using register 0x05 failed" \
           "  - exception triggered: TRUE"                   \
-          "  Jump to 0x000021a8 using register 0x09 OK"     \
+          "  Jump to 0x00000000 using register 0x09 OK"     \
           "  - exception triggered: FALSE"                  \
           "!Test completed"                                 \
           "!report(0xdeaddead);"                            \
