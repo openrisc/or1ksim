@@ -1,3 +1,7 @@
+2012-04-25  Peter Gavin  <pgavin@gmail.com>
+
+	* lib/libsim.exp, lib/or1ksim.exp: kill test processes that timeout
+
 2012-03-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	Patch from R Diez <rdiezmail-openrisc@yahoo.de>

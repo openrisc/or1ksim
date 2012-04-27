@@ -135,6 +135,7 @@ proc run_or1ksim { testname match_list config_file progname } {
 	    timeout {
 		perror "Timeout";
 		unresolved "$testname: timeout";
+                close
 		return
 	    }
 	}

@@ -23,7 +23,7 @@
 # Configure script for the OpenRISC 1000 simulator test suite OR1K code
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
-AC_INIT([or1ksim-testsuite], [2012-04-07], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite], [2012-04-27], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL

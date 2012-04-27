@@ -116,6 +116,7 @@ proc run_libsim { testname match_list libprog config or1kprog args } {
 	    timeout {
 		perror "Timeout";
 		unresolved "$testname: timeout";
+                close
 		return
 	    }
 	}
