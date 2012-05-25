@@ -765,6 +765,7 @@ int illegal_insn_test (void)
      instruction occurs in a delay slot (like this one), then the exception
      PC is the address of the jump instruction. */
   ret = call (RAM_START + (RAM_SIZE/2), 0 );	/* JPB */
+  (void) ret; /* suppress unused variable warning */
 
   ASSERT(except_count == 1);
   ASSERT(except_mask == (1 << V_ILLINSN));

@@ -307,7 +307,7 @@ int
 main( int argc, char **argv )
 {
   //char *argPtr;
-    flag functionArgument;
+  //flag functionArgument;
     uint8 functionCode;
     int8 operands, roundingPrecision, roundingMode, tininessMode;
     /*
@@ -322,7 +322,7 @@ main( int argc, char **argv )
     maxErrorCount = 5000;
     trueFlagsPtr = &slow_float_exception_flags;
     testFlagsFunctionPtr = clearFlags;
-    functionArgument = TRUE;
+    //functionArgument = TRUE;
     functionCode = 0;
     operands = 0;
     roundingPrecision = 0;
