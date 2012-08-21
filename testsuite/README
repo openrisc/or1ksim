@@ -12,9 +12,9 @@ chain. This can be found in the "test-code-or1k" directory.
 Tests are provided for the standalone simulator (or1ksim) and for the library
 (libsim.a).
 
-At the time of writing a total of 1,063 tests compile, run and pass. That
-figure is broken down into 799 tests of the standalone simulator and 264 tests
-of the library
+At the time of writing a total of 2,499 tests compile, run and pass. That
+figure is broken down into 2,235 tests of the standalone simulator and 264
+tests of the library
 
 Configuration and make files are provided for further test programs. These
 come in three categories.
@@ -46,31 +46,45 @@ mc-common:  A library to support the memory controller tests.
 Working tests
 =============
 
-A total of 799 tests of standalone Or1ksim:
+A total of 2,235 tests of standalone Or1ksim:
 
-basic:          8 tests of a wide range of instructions and registers.
-cache:	        5 tests of the Or1ksim cache modeling
-cbasic:        19 tests of minimal C functionality
-cfg:           12 tests of the OR1K configuration register
-dhry:           1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
-dmatest:        3 tests of DMA.
-eth:	       12 tests of the Ethernet interface.
-except-test:    7 tests of OR1K exception handling
-exit:           1 test that C program exits correctly
-ext:          104 tests of the sign extension (l.ext) instructions.
-fbtest:         1 test of the frame buffer.
-fp	      337 tests of floating point functionality (Feature 413).
-functest:      11 tests of the C function calling interface.
-flag:           1 test of Supervision Register (SR) flag bits.
-int-test:      86 tests of the programmable interrupt controller.
-kbdtest:       26 tests of the PS2 keyboard interface.
-local-global:   1 test of C local and global variables.
-lws-test:      13 tests of the l.lws instruction (Bug 1767).
-mem-test:      16 tests of simple memory access.
-mmu:          110 tests of the MMU.
-mul:            5 tests of the multiply functionality.
-mycompress:     1 test using a compression program.
-tick:          19 tests of the OR1K tick timer.
+basic:             8 tests of a wide range of instructions and registers.
+cache:             5 tests of the Or1ksim cache modeling
+cbasic:           19 tests of minimal C functionality
+cfg:              12 tests of the OR1K configuration register
+dhry:              1 Dhrystone 2.1 benchmark using Or1ksim's timing facility.
+dmatest:           3 tests of DMA.
+eth:              12 tests of the Ethernet interface.
+except-test:       7 tests of OR1K exception handling
+exit:              1 test that C program exits correctly
+ext:             104 tests of the sign extension (l.ext) instructions.
+fbtest:            1 test of the frame buffer.
+fp               337 tests of floating point functionality (Feature 413).
+functest:         11 tests of the C function calling interface.
+flag:              1 test of Supervision Register (SR) flag bits.
+int-test:         86 tests of the programmable interrupt controller.
+kbdtest:          26 tests of the PS2 keyboard interface.
+local-global:      1 test of C local and global variables.
+inst-set-test:       A collection of tests of individual instructions
+  is-add-test    213 tests of the l.add* instructions (Bugs 1771, 1776)
+  is-and-test     80 tests of the l.and* instructions (Bugs 1782-1784)
+  is-div-test:   101 tests of the l.div and l.divu instructions (Bug 1770).
+  is-find-test:   14 tests of the l.ff1 and l.fl1 instructions (Bug 1772).
+  is-jump-test:   27 tests of the jump instructions (Bug 1775).
+  is-lws-test:    13 tests of the l.lws instruction (Bug 1767).
+  is-mac-test:   189 tests of the MAC instructions (Bugs 1773, 1777).
+  is-mul-test:   186 tests of the l.mul* instructions (Bug 1774).
+  is-or-test      80 tests of the l.or* instructions (Bugs 1782-1784)
+  is-ror-test:    36 tests of the l.ror and l.rori instructions (Bug 1778).
+  is-shift-test: 344 tests of the shift instructions (Bug 1782-1784).
+  is-spr-test:    28 tests of the l.mfspr and l.mtspr instructions (Bug 1779).
+  is-sub-test     58 tests of the l.sub instruction (Bugs 1782-1784)
+  is-xor-test     80 tests of the l.xor* instructions (Bugs 1782-1784)
+mem-test:         16 tests of simple memory access.
+mmu:             110 tests of the MMU.
+mul:               5 tests of the multiply functionality.
+mycompress:        1 test using a compression program.
+tick:             19 tests of the OR1K tick timer.
 
 A total of 264 tests of the libsim library:
 
@@ -118,4 +132,4 @@ inst-set-test:  a comprehensive test of the instruction set using C.
 
 
 Updated by Jeremy Bennett (jeremy@jeremybennett.com)
-3 June 2010
+13 June 2010

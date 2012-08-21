@@ -72,7 +72,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am_eth_OBJECTS = eth-eth.$(OBJEXT)
+am_eth_OBJECTS = eth.$(OBJEXT)
 eth_OBJECTS = $(am_eth_OBJECTS)
 eth_DEPENDENCIES = ../except/except.lo ../support/libsupport.la
 eth_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -210,8 +210,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-eth_SOURCES = eth.c
-eth_CPPFLAGS = -I$(srcdir)/../../../peripheral
+eth_SOURCES = eth.c    \
+	 	 eth.h    \
+		 fields.h
+
 eth_LDFLAGS = -T$(srcdir)/../default.ld
 eth_LDADD = ../except/except.lo      \
 	         ../support/libsupport.la
@@ -269,7 +271,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eth-eth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eth.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -291,20 +293,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-eth-eth.o: eth.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(eth_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eth-eth.o -MD -MP -MF $(DEPDIR)/eth-eth.Tpo -c -o eth-eth.o `test -f 'eth.c' || echo '$(srcdir)/'`eth.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eth-eth.Tpo $(DEPDIR)/eth-eth.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='eth.c' object='eth-eth.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(eth_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eth-eth.o `test -f 'eth.c' || echo '$(srcdir)/'`eth.c
-
-eth-eth.obj: eth.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(eth_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT eth-eth.obj -MD -MP -MF $(DEPDIR)/eth-eth.Tpo -c -o eth-eth.obj `if test -f 'eth.c'; then $(CYGPATH_W) 'eth.c'; else $(CYGPATH_W) '$(srcdir)/eth.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/eth-eth.Tpo $(DEPDIR)/eth-eth.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='eth.c' object='eth-eth.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(eth_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o eth-eth.obj `if test -f 'eth.c'; then $(CYGPATH_W) 'eth.c'; else $(CYGPATH_W) '$(srcdir)/eth.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

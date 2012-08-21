@@ -31,7 +31,7 @@
 #include "mc-async.h"
 
 #include "config.h"
-#include "mc.h"
+#include "mc-defines.h"
 #include "gpio.h"
 #include "fields.h"
 

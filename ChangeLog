@@ -1,6 +1,102 @@
+2010-06-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.4.0.
+	* NEWS: Updated for 0.4.0.
+
+2010-06-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.4.0rc2. New conditional to
+	allow l.xori to have unsigned immediate operand.
+	* cpu/or32/or32.c <or32_opcodes>: l.xori optionally uses unsigned
+	immediate.
+	* doc/or1ksim.texi: Updated with enable-unsigned-xori config
+	option.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date. enable-arith-flag
+	and enable-ov-flag config options removed.
+	* cpu/or32/insnset.c <l_mfspr, l_mtspr>: Use bitwise OR, not
+	addition to calculate SPR address.
+	<l_and, l_or, l_sll, l_sra, l_srl, l_xor>: Do not now affect CY and OV
+	flags.
+	<l_sub>: Sets OV and CY flags correctly, and triggers Range
+	Exception if required.
+	* doc/or1ksim.texi: Updated to remove enable-arith-flag	and
+	enable-ov-flag config options.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/generate.c (gen_eval_operands): Generate macro
+	REG_PARAM0 to identify register. Corrected undef of SET_PARAM0.
+	* cpu/or32/insnset.c <l_jalr>: Trigger exceptions on use of link
+	register as destination or non-aligned effective address.
+	<l_jr>: Trigger exception on use of non-aligned effective address.
+	<l_ror>: Created.
+	* cpu/or32/or32.c <or32_opcodes>: l.ror and l.rori enabled.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/generate.c (generate_header): stdint.h included in header.
+	* cpu/or32/insnset.c <l_mul>: Overflow and carry flags computed and
+	range exception triggered if SR[OVE] is set.
+	<l_mulu>: Created
+	* cpu/or32/or32.c <or32_opcodes>: l.mulu enabled.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or32/insnset.c <l_maci>: Intermediate result computed as 32
+	bits, then sign extended.
+	<l_macrc>: Computation corrected.
+	* cpu/or32/or32.c <or32_opcodes>: l.maci bit pattern corrected.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* cpu/or32/insnset.c <l_fl1>: New entry.
+	* cpu/or32/or32.c <or32_opcodes>: l.fl1 enabled.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* peripheral/Makefile.am: mc-defines.h added to sources.
+	* cpu/or32/insnset.c <l_addc>: Updated to handle overflow and
+	exceptions correctly.
+	* cpu/or32/or32.c <or32_opcodes>: l.addic enabled.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date. Removed
+	enable_ov_flag as option for configuration.
+	* cpu/or32/insnset.c <l_add>: Updated to handle overflow and
+	exceptions correctly.
+	* peripheral/Makefile.am: mc-defines.h added to sources.
+	* NEWS: Updated with new bugs fixed.
+
+2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* peripheral/mc.h: mc_defines.h -> mc-defines.h.
+	* peripherals/mc-defines.h: Renamed from mc_defines.h
+
+2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
+	* peripherals/mc.h: Moved defines to peripherals/mc_defines.h
+	* peripherals/mc_defines.h: Created.
+
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date.
+	* cpu/or32/insnset.c <l_div, l_divu>: Corrected divide by zero
+	exception. Set carry flag on divide by zero.
+	* NEWS: Updated with bugs fixed.
+
 2010-06-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* cpu/or32/generate.c (generate_header): Include math.h.
-	* cpu/or32/insnset.c <lf_lws>: Added definition.
+	* cpu/or32/insnset.c <l_lws>: Added definition.
 	* cpu/or32/insnset.c <lf_rem_s>: Corrected implementation.
 	* cpu/or32/or32.c <or32_opcodes>: Made l.lws valid, rather than
 	ignored.

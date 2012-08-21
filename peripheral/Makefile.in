@@ -269,6 +269,7 @@ libperipheral_la_SOURCES = generic.c        \
                            16450.c          \
                            dma.c            \
                            mc.c             \
+                           mc-defines.h     \
                            eth.c            \
                            crc32.c          \
                            gpio.c           \

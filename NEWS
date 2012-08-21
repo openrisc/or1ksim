@@ -2,6 +2,45 @@
 	      ==================================================
 
 
+New in release 0.4.0
+====================
+
+No new features or bugs. This is the full release based on 0.4.0rc2.
+
+
+New in release 0.4.0rc2
+=======================
+
+No new features are provided, pending full release of 0.4.0.
+
+The configuration options --enable-arith-flag and --enable-ov-flag have been
+removed, since they were the source of bugs, notably Bugs 1782, 1783 and 1784.
+
+The configuration option --enable-unsigned-xori has been added to allow a
+conditional solution to Bug 1790.
+
+The following bugs are fixed.
+* Bug 1770: l.div does not set carry or give correct exception.
+* Bug 1771: l.add* do not correctly set the overflow flag.
+* Bug 1772: l.fl1 not implemented.
+* Bug 1773: l.maci not correctly implemented.
+* Bug 1774: l.mulu not implemented.
+* Bug 1775: l.jalr and l.jr don't trigger alignment exceptions.
+* Bug 1776: l.addic is not implemented.
+* Bug 1777: l.macrc not correctly implemented.
+* Bug 1778: l.ror and l.rori are not implemented.
+* Bug 1779: l.mtspr implementation is incorrect.
+* Bug 1782: Or1ksim setting of overflow flag is wrong.
+* Bug 1783: Or1ksim definition of overflow is wrong.
+* Bug 1784: Or1ksim does not trigger overflow exceptions.
+* Bug 1790: l.xori implementation is incorrect.
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
 New in release 0.4.0rc1
 =======================
 

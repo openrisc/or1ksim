@@ -1,4 +1,4 @@
-# Makefile.am for or1ksim testsuite CPU test program: inst-set-test
+# Makefile.am for or1ksim instruction set test programs:
 
 # Copyright (C) Embecosm Limited, 2010
 
@@ -24,15 +24,114 @@
 # -----------------------------------------------------------------------------
 
 
-# A test of the instruction set. Currently not working. Builds with warnings
-# and runs with errors.
+# Tests of the instruction set. Broken out into separate tests, to avoid them
+# getting too large. The original instruction set test is still here, but not
+# built by default.
+EXTRA_DIST = inst-set-test.ld  
+
 if BUILD_ALL_TESTS
-check_PROGRAMS        = inst-set-test
+INST_SET_TEST_OLD = inst-set-test-old
+else
+INST_SET_TEST_OLD = 
 endif
 
-inst_set_test_SOURCES = inst-set-test.c
+# Support library for use when testing the instruction set.
+check_LTLIBRARIES           = libinst-set-test.la
 
-inst_set_test_LDFLAGS = -T$(srcdir)/../default.ld
+libinst_set_test_la_SOURCES = inst-set-test.S
 
-inst_set_test_LDADD   = ../except/except.lo      \
-	                ../support/libsupport.la
+# The test programs
+check_PROGRAMS = is-add-test          \
+		 is-and-test          \
+		 is-div-test          \
+		 is-find-test         \
+		 is-jump-test         \
+		 is-lws-test          \
+		 is-mac-test          \
+		 is-mul-test          \
+		 is-or-test           \
+		 is-ror-test          \
+		 is-shift-test        \
+		 is-spr-test          \
+		 is-sub-test          \
+		 is-xor-test          \
+	         $(INST_SET_TEST_OLD)
+
+# The new instruction set tests.
+is_add_test_SOURCES   = inst-set-test.h \
+	                is-add-test.S
+is_add_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_add_test_LDADD     = inst-set-test.lo
+
+is_and_test_SOURCES   = inst-set-test.h \
+	                is-and-test.S
+is_and_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_and_test_LDADD     = inst-set-test.lo
+
+is_div_test_SOURCES   = inst-set-test.h \
+	                is-div-test.S
+is_div_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_div_test_LDADD     = inst-set-test.lo
+
+is_find_test_SOURCES  = inst-set-test.h \
+	                is-find-test.S
+is_find_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_find_test_LDADD    = inst-set-test.lo
+
+is_jump_test_SOURCES  = inst-set-test.h \
+	                is-jump-test.S
+is_jump_test_LDFLAGS  = -T$(srcdir)/inst-set-test.ld
+is_jump_test_LDADD    = inst-set-test.lo
+
+is_lws_test_SOURCES   = inst-set-test.h \
+	                is-lws-test.S
+is_lws_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_lws_test_LDADD     = inst-set-test.lo
+
+is_mac_test_SOURCES   = inst-set-test.h \
+	                is-mac-test.S
+is_mac_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_mac_test_LDADD     = inst-set-test.lo
+
+is_mul_test_SOURCES   = inst-set-test.h \
+	                is-mul-test.S
+is_mul_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_mul_test_LDADD     = inst-set-test.lo
+
+is_or_test_SOURCES    = inst-set-test.h \
+	                is-or-test.S
+is_or_test_LDFLAGS    = -T$(srcdir)/inst-set-test.ld
+is_or_test_LDADD      = inst-set-test.lo
+
+is_ror_test_SOURCES   = inst-set-test.h \
+	                is-ror-test.S
+is_ror_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_ror_test_LDADD     = inst-set-test.lo
+
+is_shift_test_SOURCES = inst-set-test.h \
+	                 is-shift-test.S
+is_shift_test_LDFLAGS = -T$(srcdir)/inst-set-test.ld
+is_shift_test_LDADD   = inst-set-test.lo
+
+is_spr_test_SOURCES   = inst-set-test.h \
+	                is-spr-test.S
+is_spr_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_spr_test_LDADD     = inst-set-test.lo
+
+is_sub_test_SOURCES   = inst-set-test.h \
+	                is-sub-test.S
+is_sub_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_sub_test_LDADD     = inst-set-test.lo
+
+is_xor_test_SOURCES   = inst-set-test.h \
+	                is-xor-test.S
+is_xor_test_LDFLAGS   = -T$(srcdir)/inst-set-test.ld
+is_xor_test_LDADD     = inst-set-test.lo
+
+# The old test which builds with warnings and runs with errors
+inst_set_test_old_SOURCES = inst-set-test-old.c
+
+inst_set_test_old_LDFLAGS = -T$(srcdir)/../default.ld
+
+inst_set_test_old_LDADD   = ../except/except.lo      \
+	                    ../support/libsupport.la

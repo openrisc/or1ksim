@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [0.4.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim], [0.4.0], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -94,7 +94,8 @@ AC_TYPE_SIGNAL
 AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h      \
 		 sys/ptem.h sys/pte.h sys/stream.h sys/stropts.h sys/select.h \
 		 termcap.h termios.h termio.h sys/file.h locale.h getopt.h    \
-		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h)
+		 net/ethernet.h sys/ethernet.h malloc.h inttypes.h libintl.h  \
+                 limits.h)
 AC_CHECK_FUNCS(strcasecmp select setenv putenv tcgetattr setlocale lstat)
 AC_CHECK_FUNCS(grantpt unlockpt ptsname on_exit)
 AC_CHECK_FUNCS(basename)
@@ -233,7 +234,7 @@ AC_ARG_ENABLE(execution,
       AC_MSG_RESULT(dynamic)
       ;;
     *)
-      AC_MSG_ERROR("excecution must one of simple/complex/dynamic")
+      AC_MSG_ERROR("execution must one of simple/complex/dynamic")
       ;;
     esac
     ],
@@ -252,6 +253,16 @@ AC_ARG_ENABLE(ethphy,
 ])
 AC_MSG_RESULT(${enable_eth_phy-no})
 
+unsigned_xori="0"
+AC_MSG_CHECKING(whether l.xori takes an unsigned immediate operand)
+AC_ARG_ENABLE(unsigned-xori,
+    [  --enable-unsigned-xori    l.xori immediate operand treated as unsigned], [
+    case "$enableval" in
+  no)  unsigned_xori="0" ;;
+	yes) unsigned_xori="1" ;;
+    esac
+])
+AC_MSG_RESULT(${enable_unsigned_xori-no})
 
 raw_range_stats="0"
 AC_MSG_CHECKING(whether to use raw range stats)
@@ -263,28 +274,6 @@ AC_ARG_ENABLE(range_stats,
     esac
 ])
 AC_MSG_RESULT(${enable_range_stats-no})
-
-set_ov_flag="0"
-AC_MSG_CHECKING(whether instructions set overflow flag)
-AC_ARG_ENABLE(ov_flag,
-    [  --enable-ov-flag      Whether instructions set overflow flag.], [
-    case "$enableval" in
-    no)  set_ov_flag="0" ;;
-    yes) set_ov_flag="1" ;;
-    esac
-])
-AC_MSG_RESULT(${enable_ov_flag-no})
-
-set_arith_flag="0"
-AC_MSG_CHECKING(whether arithmethic instructions set flag)
-AC_ARG_ENABLE(arith_flag,
-    [  --enable-arith-flag      Whether arithmethic instructions setflag.], [
-    case "$enableval" in
-  no)  set_arith_flag="0" ;;
-	yes) set_arith_flag="1" ;;
-    esac
-])
-AC_MSG_RESULT(${enable_arith_flag-no})
 
 # check for --enable-debug argument (for argtable2)
 AC_ARG_ENABLE(
@@ -302,9 +291,8 @@ AC_ARG_ENABLE(
 AC_SUBST(DEBUGFLAGS)
 
 AC_DEFINE_UNQUOTED(RAW_RANGE_STATS, $raw_range_stats, [ Specifies, whether we should do register accesses over time analysis. Simple execution must be enabled!])
-AC_DEFINE_UNQUOTED(SET_OV_FLAG, $set_ov_flag, [ Whether instructions set overflow flag])
-AC_DEFINE_UNQUOTED(ARITH_SET_FLAG, $set_arith_flag, [Whether arithmethic instructions set flag on zero])
 AC_DEFINE_UNQUOTED(HAVE_ETH_PHY, $eth_phy, [Whether we have ethernet PHY support])
+AC_DEFINE_UNQUOTED(HAVE_UNSIGNED_XORI, $unsigned_xori, [Whether l.xori takes an unsigned immediate operand])
 AC_DEFINE_UNQUOTED(SIMPLE_EXECUTION, $execution == 0, [Whether we are building with simple execution module]) 
 AC_DEFINE_UNQUOTED(COMPLEX_EXECUTION, $execution == 1, [Whether we are building with complex execution module]) 
 AC_DEFINE_UNQUOTED(DYNAMIC_EXECUTION, $execution == 2, [Whether we are building with dynamic execution module]) 

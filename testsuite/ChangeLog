@@ -1,3 +1,44 @@
+2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added tests for l.mfspr and
+	l.mtspr, l.sub, logical and shift instructions.
+
+2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Modified output from RANGE
+	exception. Added tests for jump and rotate right instructions.
+
+2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added multiplication
+	tests. Extended divistion tests. Changed output to match new
+	format from existing tests.
+	* README: Updated with new tests.
+
+2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added MAC tests.
+	* or1ksim.tests/mul.exp: Corrected erroneous expected results.
+	* README: Updated with new tests.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added find tests.
+	* README: Updated with new tests.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Extended addition tests.
+	* README: Updated with new tests.
+
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.exp: Added division and addition tests.
+	* README: Updated with new tests.
+
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+	* or1ksim.tests/inst-set-test.cfg: Created.
+	* or1ksim.tests/inst-set-test.exp: Created.
+	* or1ksim.tests/Makefile.am: Updated to reflect added and deleted
+	files.
+	* or1ksim.tests/Makefile.in: Regenerated
+	* or1ksim.tests/lws-test.exp: Deleted (incorporated within
+	inst-set-test.ex).
+	* README: Updated to reflect new structure.
+
 2010-06-03  Jeremy Bennett <jeremy.bennett@embecosm.com>
 	* or1ksim.tests/fp.exp: Removed timeout change
 	* or1ksim.tests/lws-test.exp: Created.

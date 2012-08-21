@@ -787,15 +787,6 @@ decode_execute_wrapper (struct iqueue_entry *current)
   decode_execute (current);
 #endif
 
-#if SET_OV_FLAG
-  /* Check for range exception */
-  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) &&
-      (cpu_state.sprs[SPR_SR] & SPR_SR_OV))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.sprs[SPR_EEAR_BASE]);
-    }
-#endif
-
   if (breakpoint)
     {
       except_handle (EXCEPT_TRAP, cpu_state.sprs[SPR_EEAR_BASE]);

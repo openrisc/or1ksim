@@ -3,9 +3,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* Whether arithmethic instructions set flag on zero */
-#undef ARITH_SET_FLAG
-
 /* "Whether the compiler supports 'long long'." */
 #undef CC_HAS_LONG_LONG
 
@@ -65,6 +62,9 @@
 
 /* Define to 1 if you have the `readline' library (-lreadline). */
 #undef HAVE_LIBREADLINE
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
 
 /* Define to 1 if you have the <locale.h> header file. */
 #undef HAVE_LOCALE_H
@@ -197,6 +197,9 @@
 /* Define to 1 if you have the `unlockpt' function. */
 #undef HAVE_UNLOCKPT
 
+/* Whether l.xori takes an unsigned immediate operand */
+#undef HAVE_UNSIGNED_XORI
+
 /* Define to 1 if you have the <varargs.h> header file. */
 #undef HAVE_VARARGS_H
 
@@ -243,9 +246,6 @@
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
-
-/* Whether instructions set overflow flag */
-#undef SET_OV_FLAG
 
 /* Whether we are building with simple execution module */
 #undef SIMPLE_EXECUTION

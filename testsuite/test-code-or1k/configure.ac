@@ -24,7 +24,7 @@
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
 
-AC_INIT([or1ksim-testsuite],[0.4.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite],[0.4.0], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
@@ -138,7 +138,6 @@ AC_CONFIG_FILES([Makefile               \
 		 kbdtest/Makefile       \
 		 local-global/Makefile  \
 		 loop/Makefile          \
-		 lws-test/Makefile      \
 		 mc-async/Makefile      \
 		 mc-dram/Makefile       \
 		 mc-ssram/Makefile      \
