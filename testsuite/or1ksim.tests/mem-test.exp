@@ -27,20 +27,20 @@
 # Run the simple memory test.
 run_or1ksim "mem-test"          \
     [list "report(0x12345678);" \
-          "report(0x00001234);" \
-          "report(0x00005678);" \
-          "report(0x00000012);" \
-          "report(0x00000034);" \
-          "report(0x00000056);" \
-          "report(0x00000078);" \
-          "report(0xdeaddead);" \
-          "report(0x5678dead);" \
-          "report(0x56781234);" \
-          "report(0xdd781234);" \
-          "report(0xddcc1234);" \
-          "report(0xddccbb34);" \
-          "report(0xddccbbaa);" \
-          "report(0xda25e544);" \
-          "report(0xdeaddead);" \
-	  "!exit(0)"]            \
+	 "report(0x00001234);" \
+	 "report(0x00005678);" \
+	 "report(0x00000012);" \
+	 "report(0x00000034);" \
+	 "report(0x00000056);" \
+	 "report(0x00000078);" \
+	 "report(0xdeaddead);" \
+	 "report(0x5678dead);" \
+	 "report(0x56781234);" \
+	 "report(0xdd781234);" \
+	 "report(0xddcc1234);" \
+	 "report(0xddccbb34);" \
+	 "report(0xddccbbaa);" \
+	 "report(0xda25e544);" \
+	 "report(0xdeaddead);" \
+	 "!exit(0)"] \
     "" "mem-test/mem-test"

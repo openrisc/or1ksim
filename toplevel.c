@@ -63,7 +63,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  srand (getpid ());
+  init_randomness ();
   init_defconfig ();
   reg_config_secs ();
 
@@ -74,8 +74,8 @@ main (int   argc,
 
   print_config ();
   signal (SIGINT, ctrl_c);
+  signal (SIGUSR1, toggle_trace);
 
-  runtime.sim.hush = 1;
   do_stats         = config.cpu.superscalar ||
                      config.cpu.dependstats ||
                      config.sim.history     ||

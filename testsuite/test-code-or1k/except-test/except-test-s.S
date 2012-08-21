@@ -30,12 +30,6 @@
 
 #define reset main
 
-#define MC_CSR          (0x00)
-#define MC_POC          (0x04)
-#define MC_BA_MASK      (0x08)
-#define MC_CSC(i)       (0x10 + (i) * 8)
-#define MC_TMS(i)       (0x14 + (i) * 8)
-
         .global except_basic
         .global lo_dmmu_en
         .global lo_immu_en
@@ -74,250 +68,10 @@ stack:
         .extern excpt_break
         .extern excpt_trap
 
-  .section .except, "ax"
-
-buserr_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_buserr)
-        l.ori   r10,r10,lo(excpt_buserr)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-dpfault_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_dpfault)
-        l.ori   r10,r10,lo(excpt_dpfault)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-ipfault_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_ipfault)
-        l.ori   r10,r10,lo(excpt_ipfault)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-tick_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_tick)
-        l.ori   r10,r10,lo(excpt_tick)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-align_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_align)
-        l.ori   r10,r10,lo(excpt_align)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-illinsn_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_illinsn)
-        l.ori   r10,r10,lo(excpt_illinsn)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-int_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_int)
-        l.ori   r10,r10,lo(excpt_int)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-dtlbmiss_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_dtlbmiss)
-        l.ori   r10,r10,lo(excpt_dtlbmiss)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-itlbmiss_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_itlbmiss)
-        l.ori   r10,r10,lo(excpt_itlbmiss)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-range_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_range)
-        l.ori   r10,r10,lo(excpt_range)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-syscall_vector:
-        l.addi  r3,r3,4
-
-        l.mfspr r4,r0,SPR_SR
-        l.andi  r4,r4,7
-        l.add   r6,r0,r4
-        
-        l.mfspr r4,r0,SPR_EPCR_BASE
-        l.movhi r5,hi(sys1)
-        l.ori r5,r5,lo(sys1)
-        l.sub r5,r4,r5
-        
-        l.mfspr r4,r0,SPR_ESR_BASE  /* ESR - set supvisor mode */
-        l.ori r4,r4,SPR_SR_SM
-        l.mtspr r0,r4,SPR_ESR_BASE  
-        
-        l.movhi r4,hi(sys2)
-        l.ori r4,r4,lo(sys2)
-        l.mtspr r0,r4,SPR_EPCR_BASE
-        
-        l.rfe
-        l.addi  r3,r3,8
-
-break_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_break)
-        l.ori   r10,r10,lo(excpt_break)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
-trap_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_trap)
-        l.ori   r10,r10,lo(excpt_trap)
-        l.jr    r9
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-        l.nop
-
 	/* Our special text section is used to guarantee this code goes first
 	   when linking. */
-	.section .except-text
+
+	.section .except,"ax"
 
         .org    0x100
 reset_vector:
@@ -357,99 +111,286 @@ reset_vector:
         l.movhi r3,hi(start)
         l.ori   r3,r3,lo(start)
         l.jr    r3
+	l.nop
+
+
+	.org 0x200
+buserr_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_buserr)
+        l.ori   r10,r10,lo(excpt_buserr)
+        l.jr    r9
         l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+	
+	.org 0x300
+dpfault_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_dpfault)
+        l.ori   r10,r10,lo(excpt_dpfault)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x400
+ipfault_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_ipfault)
+        l.ori   r10,r10,lo(excpt_ipfault)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x500
+tick_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_tick)
+        l.ori   r10,r10,lo(excpt_tick)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x600
+align_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_align)
+        l.ori   r10,r10,lo(excpt_align)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x700
+illinsn_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_illinsn)
+        l.ori   r10,r10,lo(excpt_illinsn)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x800
+int_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_int)
+        l.ori   r10,r10,lo(excpt_int)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0x900
+dtlbmiss_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_dtlbmiss)
+        l.ori   r10,r10,lo(excpt_dtlbmiss)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0xa00
+itlbmiss_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_itlbmiss)
+        l.ori   r10,r10,lo(excpt_itlbmiss)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0xb00
+range_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_range)
+        l.ori   r10,r10,lo(excpt_range)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0xc00
+syscall_vector:
+        l.addi  r3,r3,4
+
+        l.mfspr r4,r0,SPR_SR
+        l.andi  r4,r4,7
+        l.add   r6,r0,r4
+        
+        l.mfspr r4,r0,SPR_EPCR_BASE
+        l.movhi r5,hi(sys1)
+        l.ori r5,r5,lo(sys1)
+        l.sub r5,r4,r5
+        
+        l.mfspr r4,r0,SPR_ESR_BASE  /* ESR - set supvisor mode */
+        l.ori r4,r4,SPR_SR_SM
+        l.mtspr r0,r4,SPR_ESR_BASE  
+        
+        l.movhi r4,hi(sys2)
+        l.ori r4,r4,lo(sys2)
+        l.mtspr r0,r4,SPR_EPCR_BASE
+        
+        l.rfe
+        l.addi  r3,r3,8
+
+	.org 0xd00
+break_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_break)
+        l.ori   r10,r10,lo(excpt_break)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+
+	.org 0xe00
+trap_vector:
+        l.addi  r1,r1,-120
+        l.sw    0x1c(r1),r9
+        l.sw    0x20(r1),r10
+        l.movhi r9,hi(store_regs)
+        l.ori   r9,r9,lo(store_regs)
+        l.movhi r10,hi(excpt_trap)
+        l.ori   r10,r10,lo(excpt_trap)
+        l.jr    r9
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+        l.nop
+		
+
+	.section .text
+	
 start:
-        l.jal   init_mc
-        l.nop
 
         l.movhi r1,hi(stack)
         l.ori   r1,r1,lo(stack)
+	l.ori	r2,r1,0
 
-        /* Setup exception wrappers */
-        l.movhi r3,hi(_src_beg)
-        l.ori   r3,r3,lo(_src_beg)
-        l.addi  r7,r0,0x100
-
-1:      l.addi  r7,r7,0x100
-        l.sfeqi r7,0xf00
-        l.bf    1f
-        l.nop
-        l.addi  r4,r7,0
-        l.addi  r5,r0,0
-2:
-        l.lwz   r6,0(r3)
-        l.sw    0(r4),r6
-        l.addi  r3,r3,4
-        l.addi  r4,r4,4
-        l.addi  r5,r5,1
-        l.sfeqi r5,16
-        l.bf    1b
-        l.nop
-        l.j     2b  
-        l.nop
-1:
-        /* Copy data section */
-        l.movhi r4,hi(_dst_beg)
-        l.ori   r4,r4,lo(_dst_beg)
-        l.movhi r5,hi(_dst_end)
-        l.ori   r5,r5,lo(_dst_end)
-        l.sub   r5,r5,r4
-        l.sfeqi r5,0
-        l.bf    2f
-        l.nop
-1:      l.lwz   r6,0(r3)
-        l.sw    0(r4),r6
-        l.addi  r3,r3,4
-        l.addi  r4,r4,4
-        l.addi  r5,r5,-4
-        l.sfgtsi r5,0
-        l.bf   	1b
-        l.nop
-
-2:
-
-        l.movhi r2,hi(reset)
-        l.ori   r2,r2,lo(reset)
-        l.jr    r2
-        l.nop
-
-init_mc:
- 
-        l.movhi r3,hi(MC_BASE_ADDR)
-        l.ori   r3,r3,lo(MC_BASE_ADDR)
- 
-        l.addi  r4,r3,MC_CSC(0)
-        l.movhi r5,hi(FLASH_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0025
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(0)
-        l.movhi r5,hi(FLASH_TMS_VAL)
-        l.ori   r5,r5,lo(FLASH_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_BA_MASK
-        l.addi  r5,r0,MC_MASK_VAL
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSR
-        l.movhi r5,hi(MC_CSR_VAL)
-        l.ori   r5,r5,lo(MC_CSR_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(1)
-        l.movhi r5,hi(SDRAM_TMS_VAL)
-        l.ori   r5,r5,lo(SDRAM_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSC(1)
-        l.movhi r5,hi(SDRAM_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0411
-        l.sw    0(r4),r5
- 
-        l.jr    r9
+bss_clear:	
+	/* Clear BSS */
+	l.movhi r3, hi(_bstart)
+	l.ori	r3, r3, lo(_bstart)
+	l.movhi r4, hi(_bend)
+	l.ori	r4, r4, lo(_bend)
+bss_clear_loop:
+	l.sw	0(r3),	r0
+	l.sfgtu	r3, r4
+	l.bnf	bss_clear_loop
+	l.addi	r3, r3, 4
+	
+	
+        l.movhi r3,hi(reset)
+        l.ori   r3,r3,lo(reset)
+        l.jr    r3
         l.nop
 
 store_regs:
@@ -534,8 +475,6 @@ end_except:
         l.mtspr r0,r9,SPR_EPCR_BASE
         l.rfe
         l.nop 
-
-  .section .text
 
 except_basic:
 sys1:
@@ -642,7 +581,7 @@ load_b_acc_32:
 b_trap:
         l.jr    r9
 trap: 
-        l.trap  1
+        l.trap  15
         l.jr    r9
         l.nop
 
@@ -668,4 +607,3 @@ jump_back:
         l.addi  r11,r0,0
         l.jr    r9
         l.addi  r11,r11,1
-

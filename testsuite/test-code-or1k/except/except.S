@@ -25,17 +25,14 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
+/* Support file for c based tests */
 #include "spr-defs.h"
-#include "board.h"
 
 #define reset reset
 
-#define MC_CSR          (0x00)
-#define MC_POC          (0x04)
-#define MC_BA_MASK      (0x08)
-#define MC_CSC(i)       (0x10 + (i) * 8)
-#define MC_TMS(i)       (0x14 + (i) * 8)
-
+#define REDZONE_SIZE 128
+#define EXCEPT_STACK_SIZE (116 + REDZONE_SIZE)
+	
         .section .stack
         .space 0x1000
 stack:
@@ -56,173 +53,11 @@ stack:
         .extern excpt_break
         .extern excpt_trap
 
-
-	.section .except, "ax"
-buserr_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_buserr)
-        l.ori   r10,r10,lo(excpt_buserr)
-        l.jr    r9
-        l.nop
-buserr_vector_end:
-
-dpfault_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_dpfault)
-        l.ori   r10,r10,lo(excpt_dpfault)
-        l.jr    r9
-        l.nop
-dpfault_vector_end:
-
-ipfault_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_ipfault)
-        l.ori   r10,r10,lo(excpt_ipfault)
-        l.jr    r9
-        l.nop
-ipfault_vector_end:
-
-lpint_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_tick)
-        l.ori   r10,r10,lo(excpt_tick)
-        l.jr    r9
-        l.nop
-lpint_vector_end:
-
-align_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_align)
-        l.ori   r10,r10,lo(excpt_align)
-        l.jr    r9
-        l.nop
-align_vector_end:
-
-illinsn_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_illinsn)
-        l.ori   r10,r10,lo(excpt_illinsn)
-        l.jr    r9
-        l.nop
-illinsn_vector_end:
-
-hpint_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_int)
-        l.ori   r10,r10,lo(excpt_int)
-        l.jr    r9
-        l.nop
-hpint_vector_end:
-
-dtlbmiss_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_dtlbmiss)
-        l.ori   r10,r10,lo(excpt_dtlbmiss)
-        l.jr    r9
-        l.nop
-dtlbmiss_vector_end:
-
-itlbmiss_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_itlbmiss)
-        l.ori   r10,r10,lo(excpt_itlbmiss)
-        l.jr    r9
-        l.nop
-itlbmiss_vector_end:
-
-range_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_range)
-        l.ori   r10,r10,lo(excpt_range)
-        l.jr    r9
-        l.nop
-range_vector_end:
-
-syscall_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_syscall)
-        l.ori   r10,r10,lo(excpt_syscall)
-        l.jr    r9
-        l.nop
-syscall_vector_end:
-
-break_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_break)
-        l.ori   r10,r10,lo(excpt_break)
-        l.jr    r9
-        l.nop
-break_vector_end:
-
-trap_vector:
-        l.addi  r1,r1,-120
-        l.sw    0x1c(r1),r9
-        l.sw    0x20(r1),r10
-        l.movhi r9,hi(store_regs)
-        l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_trap)
-        l.ori   r10,r10,lo(excpt_trap)
-        l.jr    r9
-        l.nop
-trap_vector_end:
-
-	/* Our special text section is used to guarantee this code goes first
-	   when linking. */
-	.section .except-text
-
-        .org    0x100
-	.align  4
+	.section .except,"ax"
+	.org	0x100
 reset_vector:
-        l.addi  r2,r0,0x0
-        l.addi  r3,r0,0x0
+        l.nop
+        l.nop
         l.addi  r4,r0,0x0
         l.addi  r5,r0,0x0
         l.addi  r6,r0,0x0
@@ -251,172 +86,269 @@ reset_vector:
         l.addi  r29,r0,0x0
         l.addi  r30,r0,0x0
         l.addi  r31,r0,0x0
-
-        l.movhi r3,hi(start)
-        l.ori   r3,r3,lo(start)
-        l.jr    r3
+        l.j     start
         l.nop
-	.global	start
-start:
-        l.jal   init_mc
+	
+        .org    0x200
+buserr_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
         l.nop
-
-        l.movhi r1,hi(stack)
-        l.ori   r1,r1,lo(stack)
-
-        /* Setup exception wrappers */
-        l.movhi r3,hi(_src_beg)
-        l.ori   r3,r3,lo(_src_beg)
-        l.addi  r7,r0,0x100
-
-1:      l.addi  r7,r7,0x100
-        l.sfeqi r7,0xf00
-        l.bf    1f
-        l.nop
-        l.addi  r4,r7,0
-        l.addi  r5,r0,0
-2:
-        l.lwz   r6,0(r3)
-        l.sw    0(r4),r6
-        l.addi  r3,r3,4
-        l.addi  r4,r4,4
-        l.addi  r5,r5,1
-        l.sfeqi r5,9
-        l.bf    1b
-        l.nop
-        l.j     2b  
-        l.nop
-1:
-        /* Copy data section */
-        l.movhi r4,hi(_dst_beg)
-        l.ori   r4,r4,lo(_dst_beg)
-        l.movhi r5,hi(_dst_end)
-        l.ori   r5,r5,lo(_dst_end)
-        l.sub   r5,r5,r4
-        l.sfeqi r5,0
-        l.bf    2f
-        l.nop
-1:      l.lwz   r6,0(r3)
-        l.sw    0(r4),r6
-        l.addi  r3,r3,4
-        l.addi  r4,r4,4
-        l.addi  r5,r5,-4
-        l.sfgtsi r5,0
-        l.bf   	1b
-        l.nop
-
-2:
-
-        l.movhi r2,hi(reset)
-        l.ori   r2,r2,lo(reset)
-        l.jr    r2
-        l.nop
-
-init_mc:
- 
-        l.movhi r3,hi(MC_BASE_ADDR)
-        l.ori   r3,r3,lo(MC_BASE_ADDR)
- 
-        l.addi  r4,r3,MC_CSC(0)
-        l.movhi r5,hi(FLASH_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0025
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(0)
-        l.movhi r5,hi(FLASH_TMS_VAL)
-        l.ori   r5,r5,lo(FLASH_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_BA_MASK
-        l.addi  r5,r0,MC_MASK_VAL
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSR
-        l.movhi r5,hi(MC_CSR_VAL)
-        l.ori   r5,r5,lo(MC_CSR_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(1)
-        l.movhi r5,hi(SDRAM_TMS_VAL)
-        l.ori   r5,r5,lo(SDRAM_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSC(1)
-        l.movhi r5,hi(SDRAM_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0411
-        l.sw    0(r4),r5
- 
-        l.jr    r9
-        l.nop
-
-store_regs:
-        l.sw    0x00(r1),r2
-        l.sw    0x04(r1),r3
-        l.sw    0x08(r1),r4
-        l.sw    0x0c(r1),r5
-        l.sw    0x10(r1),r6
-        l.sw    0x14(r1),r7
-        l.sw    0x18(r1),r8
-        l.sw    0x24(r1),r11
-        l.sw    0x28(r1),r12
-        l.sw    0x2c(r1),r13
-        l.sw    0x30(r1),r14
-        l.sw    0x34(r1),r15
-        l.sw    0x38(r1),r16
-        l.sw    0x3c(r1),r17
-        l.sw    0x40(r1),r18
-        l.sw    0x44(r1),r19
-        l.sw    0x48(r1),r20
-        l.sw    0x4c(r1),r21
-        l.sw    0x50(r1),r22
-        l.sw    0x54(r1),r23
-        l.sw    0x58(r1),r24
-        l.sw    0x5c(r1),r25
-        l.sw    0x60(r1),r26
-        l.sw    0x64(r1),r27
-        l.sw    0x68(r1),r28
-        l.sw    0x6c(r1),r29
-        l.sw    0x70(r1),r30
-        l.sw    0x74(r1),r31
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_buserr)
+        l.ori   r10,r10,lo(excpt_buserr)
+        l.lwz   r10,0x0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x300
+dpfault_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_dpfault)
+        l.ori   r10,r10,lo(excpt_dpfault)
         l.lwz   r10,0(r10)
         l.jr    r10
         l.nop
 
+        .org    0x400
+ipfault_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_ipfault)
+        l.ori   r10,r10,lo(excpt_ipfault)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x500
+lpint_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_tick)
+        l.ori   r10,r10,lo(excpt_tick)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x600
+align_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_align)
+        l.ori   r10,r10,lo(excpt_align)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x700
+illinsn_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_illinsn)
+        l.ori   r10,r10,lo(excpt_illinsn)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x800
+hpint_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_int)
+        l.ori   r10,r10,lo(excpt_int)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0x900
+dtlbmiss_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_dtlbmiss)
+        l.ori   r10,r10,lo(excpt_dtlbmiss)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0xa00
+itlbmiss_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_itlbmiss)
+        l.ori   r10,r10,lo(excpt_itlbmiss)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0xb00
+range_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_range)
+        l.ori   r10,r10,lo(excpt_range)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0xc00
+syscall_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_syscall)
+        l.ori   r10,r10,lo(excpt_syscall)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0xd00
+break_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_break)
+        l.ori   r10,r10,lo(excpt_break)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+        .org    0xe00
+trap_vector:
+        l.addi  r1,r1,-EXCEPT_STACK_SIZE
+        l.sw    0x18(r1),r9
+        l.jal   store_regs
+        l.nop
+        l.movhi r9,hi(end_except)
+        l.ori   r9,r9,lo(end_except)
+        l.movhi r10,hi(excpt_trap)
+        l.ori   r10,r10,lo(excpt_trap)
+        l.lwz   r10,0(r10)
+        l.jr    r10
+        l.nop
+
+	.section .text
+	
+start:  l.movhi r1,hi(stack)
+        l.ori   r1,r1,lo(stack)
+	l.ori	r2,r1, 0
+
+	/* Call reset() function, in support library, which calls main() */
+        l.movhi r4,hi(reset)
+        l.ori   r4,r4,lo(reset)
+        l.jr    r4
+        l.nop
+
+	
+store_regs:
+        l.sw    0x00(r1),r3
+        l.sw    0x04(r1),r4
+        l.sw    0x08(r1),r5
+        l.sw    0x0c(r1),r6
+        l.sw    0x10(r1),r7
+        l.sw    0x14(r1),r8
+        l.sw    0x1c(r1),r10
+        l.sw    0x20(r1),r11
+        l.sw    0x24(r1),r12
+        l.sw    0x28(r1),r13
+        l.sw    0x2c(r1),r14
+        l.sw    0x30(r1),r15
+        l.sw    0x34(r1),r16
+        l.sw    0x38(r1),r17
+        l.sw    0x3c(r1),r18
+        l.sw    0x40(r1),r19
+        l.sw    0x44(r1),r20
+        l.sw    0x48(r1),r21
+        l.sw    0x4c(r1),r22
+        l.sw    0x50(r1),r23
+        l.sw    0x54(r1),r24
+        l.sw    0x58(r1),r25
+        l.sw    0x5c(r1),r26
+        l.sw    0x60(r1),r27
+        l.sw    0x64(r1),r28
+        l.sw    0x68(r1),r29
+        l.sw    0x6c(r1),r30
+        l.sw    0x70(r1),r31
+        l.jr    r9
+        l.nop
+
 end_except:
-        l.lwz   r2,0x00(r1)
-        l.lwz   r3,0x04(r1)
-        l.lwz   r4,0x08(r1)
-        l.lwz   r5,0x0c(r1)
-        l.lwz   r6,0x10(r1)
-        l.lwz   r7,0x14(r1)
-        l.lwz   r8,0x18(r1)
-        l.lwz   r9,0x1c(r1)
-        l.lwz   r10,0x20(r1)
-        l.lwz   r11,0x24(r1)
-        l.lwz   r12,0x28(r1)
-        l.lwz   r13,0x2c(r1)
-        l.lwz   r14,0x30(r1)
-        l.lwz   r15,0x34(r1)
-        l.lwz   r16,0x38(r1)
-        l.lwz   r17,0x3c(r1)
-        l.lwz   r18,0x40(r1)
-        l.lwz   r19,0x44(r1)
-        l.lwz   r20,0x48(r1)
-        l.lwz   r21,0x4c(r1)
-        l.lwz   r22,0x50(r1)
-        l.lwz   r23,0x54(r1)
-        l.lwz   r24,0x58(r1)
-        l.lwz   r25,0x5c(r1)
-        l.lwz   r26,0x60(r1)
-        l.lwz   r27,0x64(r1)
-        l.lwz   r28,0x68(r1)
-        l.lwz   r29,0x6c(r1)
-        l.lwz   r30,0x70(r1)
-        l.lwz   r31,0x74(r1)
-        l.addi  r1,r1,120
+        l.lwz   r3,0x00(r1)
+        l.lwz   r4,0x04(r1)
+        l.lwz   r5,0x08(r1)
+        l.lwz   r6,0x0c(r1)
+        l.lwz   r7,0x10(r1)
+        l.lwz   r8,0x14(r1)
+        l.lwz   r9,0x18(r1)
+        l.lwz   r10,0x1c(r1)
+        l.lwz   r11,0x20(r1)
+        l.lwz   r12,0x24(r1)
+        l.lwz   r13,0x28(r1)
+        l.lwz   r14,0x2c(r1)
+        l.lwz   r15,0x30(r1)
+        l.lwz   r16,0x34(r1)
+        l.lwz   r17,0x38(r1)
+        l.lwz   r18,0x3c(r1)
+        l.lwz   r19,0x40(r1)
+        l.lwz   r20,0x44(r1)
+        l.lwz   r21,0x48(r1)
+        l.lwz   r22,0x4c(r1)
+        l.lwz   r23,0x50(r1)
+        l.lwz   r24,0x54(r1)
+        l.lwz   r25,0x58(r1)
+        l.lwz   r26,0x5c(r1)
+        l.lwz   r27,0x60(r1)
+        l.lwz   r28,0x64(r1)
+        l.lwz   r29,0x68(r1)
+        l.lwz   r30,0x6c(r1)
+        l.lwz   r31,0x70(r1)
+        l.addi  r1,r1,EXCEPT_STACK_SIZE
         l.rfe
         l.nop 
+

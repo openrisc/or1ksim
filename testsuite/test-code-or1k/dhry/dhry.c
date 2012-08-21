@@ -184,34 +184,19 @@ int main ()
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
 
-#if DBG
-	report(1);
-	report(Run_Index);
-#endif
     Proc_5();
-#if DBG
-	report(2);
-#endif
+
     Proc_4();
-#if DBG
-	report(3);
-#endif
+
       /* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */
     Int_1_Loc = 2;
     Int_2_Loc = 3;
     strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
     Enum_Loc = Ident_2;
-#if DBG
-	report(0x31);
-	report((unsigned long)Str_1_Loc);
-	report((unsigned long)Str_2_Loc);
-#endif
     
     Bool_Glob = ! Func_2 (Str_1_Loc, Str_2_Loc);
+
       /* Bool_Glob == 1 */
-#if DBG
-	report(4);
-#endif
     while (Int_1_Loc < Int_2_Loc)  /* loop body executed once */
     {
       Int_3_Loc = 5 * Int_1_Loc - Int_2_Loc;
@@ -220,31 +205,12 @@ int main ()
         /* Int_3_Loc == 7 */
       Int_1_Loc += 1;
     } /* while */
-#if DBG
-	report(5);
-#endif
+
       /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
-#if DBG
-      printf("a) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("a) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("a) Int_3_Loc: %x\n\n", Int_3_Loc);
-#endif
     Proc_8 (Arr_1_Glob, Arr_2_Glob, Int_1_Loc, Int_3_Loc);
       /* Int_Glob == 5 */
-#if DBG
-      printf("b) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("b) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("b) Int_3_Loc: %x\n\n", Int_3_Loc);
-	report(6);
-#endif
 
     Proc_1 (Ptr_Glob);
-#if DBG
-      printf("c) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("c) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("c) Int_3_Loc: %x\n\n", Int_3_Loc);
-	report(7);
-#endif
 
     for (Ch_Index = 'A'; Ch_Index <= Ch_2_Glob; ++Ch_Index)
                              /* loop body executed twice */
@@ -256,39 +222,17 @@ int main ()
         strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 3'RD STRING");
         Int_2_Loc = Run_Index;
         Int_Glob = Run_Index;
-#if DBG
-      printf("d) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("d) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("d) Int_3_Loc: %x\n\n", Int_3_Loc);
-#endif
         }
     }
-#if DBG
-    	report(8);
-#endif
 
       /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
-#if DBG
-      printf("e) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("e) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("e) Int_3_Loc: %x\n", Int_3_Loc);
-      printf("e) Ch_1_Glob: %c\n\n", Ch_1_Glob);
-#endif
     Int_2_Loc = Int_2_Loc * Int_1_Loc;
     Int_1_Loc = Int_2_Loc / Int_3_Loc;
     Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc;
       /* Int_1_Loc == 1, Int_2_Loc == 13, Int_3_Loc == 7 */
     Proc_2 (&Int_1_Loc);
-#if DBG
-	report(9);
-#endif
 
       /* Int_1_Loc == 5 */
-#if DBG
-      printf("f) Int_1_Loc: %x\n", Int_1_Loc);
-      printf("f) Int_2_Loc: %x\n", Int_2_Loc);
-      printf("f) Int_3_Loc: %x\n\n", Int_3_Loc);
-#endif
 
   } /* loop "for Run_Index" */
 

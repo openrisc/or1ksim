@@ -2,6 +2,72 @@
 	      ==================================================
 
 
+New in release 0.5.1rc1
+=======================
+
+New features (shouldn't be there during a release cycle, but prompted by debug
+needs elsewhere in the tool chain).
+
+New option --trace provides a one line dump of instruction executed and any
+register or memory location changed after each instruction.
+
+A new configuration option "use_nmi" is added to the programmable interrupt
+controller (PIC). This causes interrupt lines 0 and 1 to be non-maskable, but
+only in the sense that the corresponding bits in PICMR are hard-wired to 1.
+
+New config setting for memory initialization "exitnops" fills memory with
+"l.nop 1", which will cause the simulator to exit. Good for tracking pointer
+corruption.
+
+New l.nop opcodes to turn instruction tracing on and off. Good for debugging
+applications.
+
+New l.nop opcode to return a random number. Good for applications (like the
+Linux kernel) which need access to the host entropy to ensure randomness.
+
+New l.nop opcode to identify that this is an Or1ksim session.  Allows
+applications to determine if they are running on Or1ksim or hardware.
+
+No bugs are fixed.
+
+The following bugs are outstanding
+* Bug 1973: Or1ksim needs PIC tests.
+* But 1931: Or1ksim needs test for l.nop opcodes.
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.5.0rc3
+=======================
+
+No bugs are fixed.
+
+The following bugs are outstanding
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.5.0rc2
+=======================
+
+No new features. This is purely bug fixes post-0.5.0rc1.
+
+The following bugs are fixed.
+* Bug 1847: Build issues with RSP server (duplicate of 1815).
+* Bug 1846: Casting errors.
+* Bug 1824: Memory controller issue (marked as duplicate of Bug 1758).
+* Bug 1816: Error message when target not set is obscure (duplicate of 1813).
+* Bug 1815: Build errors with RSP server.
+* Bug 1813: "make check" fails before installation.
+
+The following bugs are outstanding
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
 New in release 0.5.0rc1
 =======================
 
@@ -36,8 +102,6 @@ handled silently, unless requested by --report-memory-errors.
 
 The following feature requests have been accepted.
 * Feature  393: Integrate Or1ksim in GDB.
-
-The following feature requests have been rejected.
 
 The following bugs are fixed.
 * Bug 1821: Reference configuration file has defective debug section.

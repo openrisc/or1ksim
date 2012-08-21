@@ -795,6 +795,28 @@ dumpreg ()
 
 
 /*---------------------------------------------------------------------------*/
+/*!Trace an instruction
+
+   Supports GDB tracing                                                      */
+/*---------------------------------------------------------------------------*/
+void
+trace_instr ()
+{
+  oraddr_t  physical_pc;
+
+  if ((physical_pc = peek_into_itlb (cpu_state.iqueue.insn_addr)))
+    {
+      disassemble_instr (physical_pc, cpu_state.iqueue.insn_addr,
+			 cpu_state.iqueue.insn);
+    }
+  else
+    {
+      PRINTF ("Instruction address translation failed: no trace available\n");
+    }
+}	/* trace_instr () */
+
+
+/*---------------------------------------------------------------------------*/
 /*!Wrapper around real decode_execute function
 
    Some statistics here only
@@ -1010,6 +1032,12 @@ exec_main ()
 	      /* A breakpoint has been hit, drop to interactive mode */
 	      handle_sim_command ();
 	    }
+	}
+
+      /* If we are tracing, dump after each instruction. */
+      if (!runtime.sim.hush)
+	{
+	  trace_instr ();
 	}
 
       if (config.vapi.enabled && runtime.vapi.enabled)

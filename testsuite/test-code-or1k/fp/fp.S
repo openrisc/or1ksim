@@ -46,7 +46,7 @@
 /* ----------------------------------------------------------------------------
  * Coding conventions
  *
- * A simple rising stack is provided to starting at _stack and pointed to by
+v * A simple rising stack is provided to starting at _stack and pointed to by
  * r1. r1 points to the next free word. Only 32-bit registers may be pushed
  * onto the stack.
  *
@@ -66,12 +66,6 @@
  * ------------------------------------------------------------------------- */
 
 #define MEM_RAM 0x00000000
-
-#define MC_CSR		(0x00)
-#define MC_POC		(0x04)
-#define MC_BA_MASK	(0x08)
-#define MC_CSC(i)	(0x10 + (i) * 8)
-#define MC_TMS(i)	(0x14 + (i) * 8)
 
 /* ----------------------------------------------------------------------------
  * Floating point constants (IEEE 754)
@@ -355,20 +349,46 @@ _stack:
 /* ----------------------------------------------------------------------------
  * reset exception
  * ------------------------------------------------------------------------- */
-	.section .except, "ax"
-	l.addi	  r1,r0,0
-	
-	.section .text
+	.section .except,"ax"
+
 	.org 0x100
 _reset:
 	l.movhi	r1,hi(_stack)		/* Set up the stack */
 	l.ori	r1,r1,lo(_stack)
-	
-	l.movhi r3,hi(_init_mc)		/* Code starts with MC setup */
-	l.ori	r3,r3,lo(_init_mc)
+		
+	l.movhi r3,hi(start)		/* Jump to test start */
+	l.ori	r3,r3,lo(start)
 	l.jr	r3
 	l.nop
+
+	.org 0x700
+illegal_insn:
+	l.nop
+	.section .rodata						;\
+1:									;\
+	.string	"Illegal instruction. Enable hardware FPU.\n" 		;\
+									;\
+	.section .except,"ax"							;\
+	l.movhi	r3,hi(1b)						;\
+	l.ori	r3,r3,lo(1b)
+	l.jal	_puts
+	l.nop
+
+	.section .rodata						;\
+1:									;\
+	.string	"Exiting.\n"						;\
+									;\
+	.section .except,"ax"							;\
+	l.movhi	r3,hi(1b)						;\
+	l.ori	r3,r3,lo(1b)
+	l.jal	_puts
+	l.nop
+
+	l.addi	r3,r0,1
+	l.nop	NOP_EXIT
+
 	
+	.section .text
 /* ----------------------------------------------------------------------------
  * Subroutine to print out a string
  *
@@ -492,48 +512,15 @@ _punexpected:
 	l.jr	r9
 
 /* ----------------------------------------------------------------------------
- * Memory controller initialization initialization
+ * Start of tests
  * ------------------------------------------------------------------------- */
-_init_mc:
- 
-	l.movhi r3,hi(MC_BASE_ADDR)
-	l.ori	r3,r3,lo(MC_BASE_ADDR)
- 
-	l.addi	r4,r3,MC_CSC(0)
-	l.movhi r5,hi(FLASH_BASE_ADDR)
-	l.srai	r5,r5,6
-	l.ori	r5,r5,0x0025
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_TMS(0)
-	l.movhi r5,hi(FLASH_TMS_VAL)
-	l.ori	r5,r5,lo(FLASH_TMS_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_BA_MASK
-	l.addi	r5,r0,MC_MASK_VAL
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_CSR
-	l.movhi r5,hi(MC_CSR_VAL)
-	l.ori	r5,r5,lo(MC_CSR_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_TMS(1)
-	l.movhi r5,hi(SDRAM_TMS_VAL)
-	l.ori	r5,r5,lo(SDRAM_TMS_VAL)
-	l.sw	0(r4),r5
- 
-	l.addi	r4,r3,MC_CSC(1)
-	l.movhi r5,hi(SDRAM_BASE_ADDR)
-	l.srai	r5,r5,6
-	l.ori	r5,r5,0x0411
-	l.sw	0(r4),r5
- 
+	
+start:	
+	
 /* ----------------------------------------------------------------------------
  * Test of single precision add: lf.add.s
  * ------------------------------------------------------------------------- */
-	.section .text
+
 _add_s:
 	LOAD_STR (r3, "lf.add.s\n")
 	l.jal	_puts

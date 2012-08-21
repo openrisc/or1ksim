@@ -29,6 +29,4 @@ check_PROGRAMS   = int-test
 
 int_test_SOURCES = int-test.S
 
-int_test_LDFLAGS = -T$(srcdir)/int-test.ld
-
-EXTRA_DIST     = int-test.ld
+int_test_LDFLAGS  = -T$(srcdir)/../default.ld

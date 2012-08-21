@@ -29,123 +29,37 @@
 #include "spr-defs.h"
 
 
-#undef  UART
-
 #define MEM_RAM 0x00100000
 
+/* Linker script symbols */
+extern unsigned int _ram_end;
+
+unsigned int program_ram_end;
+
+unsigned int ic_present;
+unsigned int dc_present;
+
 /* Number of IC sets (power of 2) */
-#define IC_SETS 256
-#define DC_SETS 256
+unsigned int ic_sets;
+#define IC_SETS ic_sets
+unsigned int dc_sets;
+#define DC_SETS dc_sets
 
 /* Block size in bytes (1, 2, 4, 8, 16, 32 etc.) */
-#define IC_BLOCK_SIZE 16
-#define DC_BLOCK_SIZE 16
+unsigned int ic_bs;
+#define IC_BLOCK_SIZE ic_bs
+unsigned int dc_bs;
+#define DC_BLOCK_SIZE dc_bs
  
 /* Number of IC ways (1, 2, 3 etc.). */
-#define IC_WAYS 1
-#define DC_WAYS 1
+unsigned int ic_ways;
+#define IC_WAYS ic_ways
+unsigned int dc_ways;
+#define DC_WAYS dc_ways
  
 /* Cache size */
 #define IC_SIZE (IC_WAYS*IC_SETS*IC_BLOCK_SIZE)
 #define DC_SIZE (DC_WAYS*DC_SETS*DC_BLOCK_SIZE)
-
-#if UART
-#include "uart.h"
-#define IN_CLK  20000000
-#define UART_BASE  0x9c000000
-#define UART_BAUD_RATE 9600
- 
-#define BOTH_EMPTY (UART_LSR_TEMT | UART_LSR_THRE)
-
-#define WAIT_FOR_XMITR \
-        do { \
-                lsr = REG8(UART_BASE + UART_LSR); \
-        } while ((lsr & BOTH_EMPTY) != BOTH_EMPTY)
-
-#define WAIT_FOR_THRE \
-        do { \
-                lsr = REG8(UART_BASE + UART_LSR); \
-        } while ((lsr & UART_LSR_THRE) != UART_LSR_THRE)
-
-#define CHECK_FOR_CHAR \
-        (REG8(UART_BASE + UART_LSR) & UART_LSR_DR)
-
-#define WAIT_FOR_CHAR \
-         do { \
-                lsr = REG8(UART_BASE + UART_LSR); \
-         } while ((lsr & UART_LSR_DR) != UART_LSR_DR)
-
-#define UART_TX_BUFF_LEN 32
-#define UART_TX_BUFF_MASK (UART_TX_BUFF_LEN -1)
-
-#define print_n(x)  \
-  { \
-    uart_putc(s[((x) >> 28) & 0x0f]); \
-    uart_putc(s[((x) >> 24) & 0x0f]); \
-    uart_putc(s[((x) >> 20) & 0x0f]); \
-    uart_putc(s[((x) >> 16) & 0x0f]); \
-    uart_putc(s[((x) >> 12) & 0x0f]); \
-    uart_putc(s[((x) >> 8) & 0x0f]);  \
-    uart_putc(s[((x) >> 4) & 0x0f]);  \
-    uart_putc(s[((x) >> 0) & 0x0f]);  \
-  }
-
-const char s[] = "0123456789abcdef";
-
-void uart_init(void)
-{
-        int devisor;
- 
-        /* Reset receiver and transmiter */
-        REG8(UART_BASE + UART_FCR) = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT | UART_FCR_TRIGGER_14;
- 
-        /* Disable all interrupts */
-        REG8(UART_BASE + UART_IER) = 0x00;
- 
-        /* Set 8 bit char, 1 stop bit, no parity */
-        REG8(UART_BASE + UART_LCR) = UART_LCR_WLEN8 & ~(UART_LCR_STOP | UART_LCR_PARITY);
- 
-        /* Set baud rate */
-        devisor = IN_CLK/(16 * UART_BAUD_RATE);
-        REG8(UART_BASE + UART_LCR) |= UART_LCR_DLAB;
-        REG8(UART_BASE + UART_DLL) = devisor & 0x000000ff;
-        REG8(UART_BASE + UART_DLM) = (devisor >> 8) & 0x000000ff;
-        REG8(UART_BASE + UART_LCR) &= ~(UART_LCR_DLAB);
- 
-        return;
-}
-
-static inline void uart_putc(char c)
-{
-        unsigned char lsr;
-        
-        WAIT_FOR_THRE;
-        REG8(UART_BASE + UART_TX) = c;
-        if(c == '\n') {
-          WAIT_FOR_THRE;
-          REG8(UART_BASE + UART_TX) = '\r';
-        }
-        WAIT_FOR_XMITR;
-}
-
-static inline void print_str(char *str)
-{
-  while(*str != 0) {
-    uart_putc(*str);
-    str++;
-  }
-}
-
-static inline char uart_getc()
-{
-        unsigned char lsr;
-        char c;
-
-        WAIT_FOR_CHAR;
-        c = REG8(UART_BASE + UART_RX);
-        return c;
-}
-#endif
 
 extern void ic_enable(void);
 extern void ic_disable(void);
@@ -162,7 +76,8 @@ extern void (*jr)(void);
 unsigned long jump_indx;
 
 /* Jump address table */
-unsigned long jump_add[15*IC_WAYS];
+#define MAX_IC_WAYS 32
+unsigned long jump_addr[15*MAX_IC_WAYS];
 
 void dummy();
 
@@ -199,6 +114,61 @@ void call(unsigned long add)
   asm("l.ori\tr11,r11,lo(jump_indx)" : :);
 	asm("l.jalr\t\t%0" : : "r" (add) : "r11", "r9");
 	asm("l.nop" : :);
+}
+
+/* Determine cache configuration from cache configuration registers */
+void init_cache_config(void)
+{
+
+	unsigned long iccfgr, dccfgr;
+	unsigned long upr;
+
+	ic_present = dc_present = 0;
+	
+	upr = mfspr (SPR_UPR);
+
+	if (!(upr & SPR_UPR_ICP))
+	{
+		printf("No instruction cache present. Skipping tests.\n");
+	}
+	else
+	{
+		iccfgr = mfspr (SPR_ICCFGR);
+		
+		/* Number of ways */
+		ic_ways = (1 << (iccfgr & SPR_ICCFGR_NCW));
+		
+		/* Number of sets */
+		ic_sets = 1 << ((iccfgr & SPR_ICCFGR_NCS) >> 
+				SPR_ICCFGR_NCS_OFF);
+		
+		/* Block size */
+		ic_bs = 16 << ((iccfgr & SPR_ICCFGR_CBS) >> SPR_ICCFGR_CBS_OFF);
+
+		ic_present = 1;
+	}
+
+	if (!(upr & SPR_UPR_DCP))
+	{
+		printf("No data cache present. Skipping tests.\n");
+	}
+	else
+	{
+		dccfgr = mfspr (SPR_DCCFGR);
+		
+		/* Number of ways */
+		dc_ways = (1 << (dccfgr & SPR_DCCFGR_NCW));
+		
+		/* Number of sets */
+		dc_sets = 1 << ((dccfgr & SPR_DCCFGR_NCS) >> 
+				SPR_DCCFGR_NCS_OFF);
+		
+		/* Block size */
+		dc_bs = 16 << ((dccfgr & SPR_DCCFGR_CBS) >> SPR_DCCFGR_CBS_OFF);
+
+		dc_present = 1;
+	}
+		
 }
 
 int dc_test(void)
@@ -299,55 +269,60 @@ int dc_test(void)
 int ic_test(void)
 {
         int i;
-        unsigned long base, add;
+        unsigned long base, addr;
  
-        base = (((unsigned long)MEM_RAM / (IC_SETS*IC_BLOCK_SIZE)) * IC_SETS*IC_BLOCK_SIZE) + IC_SETS*IC_BLOCK_SIZE;
-  
+        base = (((unsigned int)program_ram_end / (IC_SETS*IC_BLOCK_SIZE)) * 
+		IC_SETS*IC_BLOCK_SIZE) + IC_SETS*IC_BLOCK_SIZE;
+	//printf("ic_test\n");
+	//printf("Test program from base at 0x%08x\n",(unsigned int)base);
         /* Copy jr to various location */
-        add = base;
+        addr = base;
         for(i = 0; i < IC_WAYS; i++) {
-                copy_jr(add);
-                copy_jr(add + 2*IC_BLOCK_SIZE + 4);
-                copy_jr(add + 4*IC_BLOCK_SIZE + 8);
-                copy_jr(add + 6*IC_BLOCK_SIZE + 12);
+                copy_jr(addr);
+                copy_jr(addr + 2*IC_BLOCK_SIZE + 4);
+                copy_jr(addr + 4*IC_BLOCK_SIZE + 8);
+                copy_jr(addr + 6*IC_BLOCK_SIZE + 12);
  
-                copy_jr(add + (IC_SETS - 2)*IC_BLOCK_SIZE + 0);
-                copy_jr(add + (IC_SETS - 4)*IC_BLOCK_SIZE + 4);
-                copy_jr(add + (IC_SETS - 6)*IC_BLOCK_SIZE + 8);
-                copy_jr(add + (IC_SETS - 8)*IC_BLOCK_SIZE + 12);
-                add += IC_SETS*IC_BLOCK_SIZE;
+                copy_jr(addr + (IC_SETS - 2)*IC_BLOCK_SIZE + 0);
+                copy_jr(addr + (IC_SETS - 4)*IC_BLOCK_SIZE + 4);
+                copy_jr(addr + (IC_SETS - 6)*IC_BLOCK_SIZE + 8);
+                copy_jr(addr + (IC_SETS - 8)*IC_BLOCK_SIZE + 12);
+                addr += IC_SETS*IC_BLOCK_SIZE;
         }
  
-        /* Load execution table which starts at address 4 (at address 0 is table index) */
-        add = base;
+        /* Load execution table which starts at address 4 
+	   (at address 0 is table index) */
+        addr = base;
         for(i = 0; i < IC_WAYS; i++) {
                 /* Cache miss */
-                jump_add[15*i + 0] = add + 2*IC_BLOCK_SIZE + 4;
-                jump_add[15*i + 1] = add + 4*IC_BLOCK_SIZE + 8;
-                jump_add[15*i + 2] = add + 6*IC_BLOCK_SIZE + 12;
+                jump_addr[15*i + 0] = addr + 2*IC_BLOCK_SIZE + 4;
+                jump_addr[15*i + 1] = addr + 4*IC_BLOCK_SIZE + 8;
+                jump_addr[15*i + 2] = addr + 6*IC_BLOCK_SIZE + 12;
                 /* Cache hit/miss */
-                jump_add[15*i + 3] = add;
-                jump_add[15*i + 4] = add + (IC_SETS - 2)*IC_BLOCK_SIZE + 0;
-                jump_add[15*i + 5] = add + 2*IC_BLOCK_SIZE + 4;
-                jump_add[15*i + 6] = add + (IC_SETS - 4)*IC_BLOCK_SIZE + 4;
-                jump_add[15*i + 7] = add + 4*IC_BLOCK_SIZE + 8;
-                jump_add[15*i + 8] = add + (IC_SETS - 6)*IC_BLOCK_SIZE + 8;
-                jump_add[15*i + 9] = add + 6*IC_BLOCK_SIZE + 12;
-                jump_add[15*i + 10] = add + (IC_SETS - 8)*IC_BLOCK_SIZE + 12;
+                jump_addr[15*i + 3] = addr;
+                jump_addr[15*i + 4] = addr + (IC_SETS - 2)*IC_BLOCK_SIZE + 0;
+                jump_addr[15*i + 5] = addr + 2*IC_BLOCK_SIZE + 4;
+                jump_addr[15*i + 6] = addr + (IC_SETS - 4)*IC_BLOCK_SIZE + 4;
+                jump_addr[15*i + 7] = addr + 4*IC_BLOCK_SIZE + 8;
+                jump_addr[15*i + 8] = addr + (IC_SETS - 6)*IC_BLOCK_SIZE + 8;
+                jump_addr[15*i + 9] = addr + 6*IC_BLOCK_SIZE + 12;
+                jump_addr[15*i + 10] = addr + (IC_SETS - 8)*IC_BLOCK_SIZE + 12;
                 /* Cache hit */
-                jump_add[15*i + 11] = add + (IC_SETS - 2)*IC_BLOCK_SIZE + 0;
-                jump_add[15*i + 12] = add + (IC_SETS - 4)*IC_BLOCK_SIZE + 4;
-                jump_add[15*i + 13] = add + (IC_SETS - 6)*IC_BLOCK_SIZE + 8;
-                jump_add[15*i + 14] = add + (IC_SETS - 8)*IC_BLOCK_SIZE + 12;
+                jump_addr[15*i + 11] = addr + (IC_SETS - 2)*IC_BLOCK_SIZE + 0;
+                jump_addr[15*i + 12] = addr + (IC_SETS - 4)*IC_BLOCK_SIZE + 4;
+                jump_addr[15*i + 13] = addr + (IC_SETS - 6)*IC_BLOCK_SIZE + 8;
+                jump_addr[15*i + 14] = addr + (IC_SETS - 8)*IC_BLOCK_SIZE + 12;
 
-                add += IC_SETS*IC_BLOCK_SIZE;
+                addr += IC_SETS*IC_BLOCK_SIZE;
         }
  
         /* Go home */
-        jump_add[15*i] = (unsigned long)&jalr;
+	/* Warning - if using all 32 sets, the SET_MAX define above will need
+	 to be incremented*/
+        jump_addr[15*i] = (unsigned long)&jalr;
  
         /* Initilalize table index */
-        jump_indx = (unsigned long)&jump_add[0];
+        jump_indx = (unsigned long)&jump_addr[0];
  
         ic_enable();
 
@@ -365,67 +340,61 @@ int main(void)
 {
 	unsigned long rc, ret = 0;
 
-#ifdef UART
-  /* Initialize controller */
-  uart_init();
-#endif
+	program_ram_end = (unsigned int)&_ram_end;
+	program_ram_end += 4;
 
-#ifdef UART
-  print_str("DC test :            ");
-#endif
-	rc = dc_test();
-  ret += rc;
-#ifdef UART
-  print_n(rc+0xdeaddca1);
-  print_str("\n");
-#else
-	report(rc + 0xdeaddca1);
-#endif
+
+	/* Read UPR and configuration registers, extract cache settings */
+	init_cache_config();
+
+	if (dc_present)
+	{
+		report(0);
+		
+		rc = dc_test();
+		
+		ret += rc;
+
+		report(rc + 0xdeaddca1);
+		
+		report(1);
+		
+		rc = dc_inv_test(MEM_RAM);
+		
+		ret += rc;
+		
+		report(rc + 0x9e8daa91);
+	}
+
+	if (ic_present)
+	{
+		report(2);
+		
+		rc = ic_test();
+		
+		ret += rc;
+		
+		report(rc + 0xdeaddead);
+
+		report(3);
+		
+		ic_enable();
+		
+		report(4);
 	
-#ifdef UART
-  print_str("DC invalidate test : ");
-#endif
-	rc = dc_inv_test(MEM_RAM);
-  ret += rc;
-#ifdef UART
-  print_n(rc + 0x9e8daa91);
-  print_str("\n");
-#else
-	report(rc + 0x9e8daa91);
-#endif
-
-#ifdef UART
-  print_str("IC test :            ");
-#endif
-	rc = ic_test();
-  ret += rc;
-#ifdef UART
-  print_n(rc + 0xdeaddead);
-  print_str("\n");
-#else
-	report(rc + 0xdeaddead);
-#endif
-
-
-#ifdef UART
-  print_str("IC invalidate test : ");
-#endif
-  ic_enable();
-  rc = ic_inv_test();
-  ret += rc;
-#ifdef UART
-  print_n(rc + 0xdeadde8f);
-  print_str("\n");
-  while(1);
-#else
-	report(rc + 0xdeadde8f);
-#endif
-
-
-	report(ret + 0x9e8da867);
-  exit(0);
+		rc = ic_inv_test();
+		
+		ret += rc;
+		
+		report(rc + 0xdeadde8f);
+		
+		report(ret + 0x9e8da867);
+	}
+	
+	exit(0);
 
 	return 0;
+
 }
 
 /* just for size calculation */

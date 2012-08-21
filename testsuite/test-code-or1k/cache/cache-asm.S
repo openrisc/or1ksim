@@ -31,13 +31,6 @@
 #define IC_ENABLE 0
 #define DC_ENABLE 0
 
-#define MC_CSR          (0x00)
-#define MC_POC          (0x04)
-#define MC_BA_MASK      (0x08)
-#define MC_CSC(i)       (0x10 + (i) * 8)
-#define MC_TMS(i)       (0x14 + (i) * 8)
-
-
         .extern main
 
         .global ic_enable
@@ -92,76 +85,15 @@ reset_vector:
         l.jr    r3
         l.nop
 start:
-        l.jal   init_mc
-        l.nop
 
         l.movhi r1,hi(stack)
         l.ori   r1,r1,lo(stack)
-
-        /* Copy data section */
-        l.movhi r3,hi(_src_beg)
-        l.ori   r3,r3,lo(_src_beg)
-        l.movhi r4,hi(_dst_beg)
-        l.ori   r4,r4,lo(_dst_beg)
-        l.movhi r5,hi(_dst_end)
-        l.ori   r5,r5,lo(_dst_end)
-        l.sub   r5,r5,r4
-        l.sfeqi r5,0
-        l.bf    2f
+	l.ori	r2,r1, 0
+	
+        l.movhi r3,hi(main)
+        l.ori   r3,r3,lo(main)
+        l.jr    r3
         l.nop
-1:      l.lwz   r6,0(r3)
-        l.sw    0(r4),r6
-        l.addi  r3,r3,4
-        l.addi  r4,r4,4
-        l.addi  r5,r5,-4
-        l.sfgtsi r5,0
-        l.bf   	1b
-        l.nop
-2:
-        l.movhi r2,hi(main)
-        l.ori   r2,r2,lo(main)
-        l.jr    r2
-        l.nop
-
-init_mc:
- 
-        l.movhi r3,hi(MC_BASE_ADDR)
-        l.ori   r3,r3,lo(MC_BASE_ADDR)
- 
-        l.addi  r4,r3,MC_CSC(0)
-        l.movhi r5,hi(FLASH_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0025
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(0)
-        l.movhi r5,hi(FLASH_TMS_VAL)
-        l.ori   r5,r5,lo(FLASH_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_BA_MASK
-        l.addi  r5,r0,MC_MASK_VAL
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSR
-        l.movhi r5,hi(MC_CSR_VAL)
-        l.ori   r5,r5,lo(MC_CSR_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_TMS(1)
-        l.movhi r5,hi(SDRAM_TMS_VAL)
-        l.ori   r5,r5,lo(SDRAM_TMS_VAL)
-        l.sw    0(r4),r5
- 
-        l.addi  r4,r3,MC_CSC(1)
-        l.movhi r5,hi(SDRAM_BASE_ADDR)
-        l.srai  r5,r5,6
-        l.ori   r5,r5,0x0411
-        l.sw    0(r4),r5
- 
-        l.jr    r9
-        l.nop
-
 
         .section .text
 

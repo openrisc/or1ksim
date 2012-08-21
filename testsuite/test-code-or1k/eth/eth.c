@@ -1,10 +1,11 @@
 /* eth.c. Test of Or1ksim Ethernet
 
-   Copyright (C) 1999-2006 OpenCores
+   Copyright (C) 1999-2006, 2010 OpenCores
    Copyright (C) 2010 Embecosm Limited
 
    Contributors various OpenCores participants
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+   Contributor Julius Baxter <julius@opencores.org>
 
    This file is part of OpenRISC 1000 Architectural Simulator.
 
@@ -24,6 +25,9 @@
 /* ----------------------------------------------------------------------------
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
+
+/* TODO: Add loopback test. 
+*/
 
 #include "spr-defs.h"
 #include "support.h"
@@ -58,8 +62,10 @@ REGISTER
 	eth_bd_base = (unsigned long *)(ETH_BASE + ETH_BD_BASE);
 
 volatile unsigned int_happend;
-unsigned char r_packet[2000];
-unsigned char s_packet[1003];
+#define R_PACKET_SIZE 2000
+unsigned char r_packet[R_PACKET_SIZE];
+#define S_PACKET_SIZE 1003
+unsigned char s_packet[S_PACKET_SIZE];
 unsigned tx_bindex;
 unsigned rx_bindex;
 
@@ -120,13 +126,13 @@ static void set_mac( void )
 static void transmit_one_packet( void )
 {
 	unsigned i;
-	
+
 	/* Initialize packet */
-	for ( i = 0; i < sizeof(s_packet); ++ i )
+	for ( i = 0; i < S_PACKET_SIZE; ++ i )
 		s_packet[i] = (unsigned char)i;
 
 	/* Set Ethernet BD */
-	SET_FIELD(eth_bd_base[tx_bindex], ETH_TX_BD, LENGTH, sizeof(s_packet));
+	SET_FIELD(eth_bd_base[tx_bindex], ETH_TX_BD, LENGTH, S_PACKET_SIZE);
 	eth_bd_base[tx_bindex + 1] = (unsigned long)s_packet;
 
 	/* Start Ethernet */
@@ -146,12 +152,12 @@ static void transmit_one_packet_int( void )
 	int_happend = 0;
 	/* Initialize packet */
 	printf("Init\n");
-	for ( i = 0; i < sizeof(s_packet); ++ i )
+	for ( i = 0; i < S_PACKET_SIZE; ++ i )
 		s_packet[i] = (unsigned char)i;
 
 	/* Set Ethernet BD */
 	printf("Set BD\n");
-	SET_FIELD(eth_bd_base[tx_bindex], ETH_TX_BD, LENGTH, sizeof(s_packet));
+	SET_FIELD(eth_bd_base[tx_bindex], ETH_TX_BD, LENGTH, S_PACKET_SIZE);
 	eth_bd_base[tx_bindex + 1] = (unsigned long)s_packet;
 
 	/* Start Ethernet */
@@ -175,7 +181,7 @@ static void receive_one_packet(void)
   while ( TEST_FLAG( eth_bd_base[rx_bindex], ETH_RX_BD, READY ) );  
   CLEAR_FLAG(*eth_moder, ETH_MODER, RXEN);
   *eth_int_source = 0x7f;
-    
+
   len = GET_FIELD(eth_bd_base[rx_bindex], ETH_RX_BD, LENGTH);
   for (i=0; i<len; i++)
       if (r_packet[i] != (unsigned char)i)
@@ -201,21 +207,27 @@ int main()
 {
 	printf( "Starting Ethernet test\n" );
 
+	/* Buffer descriptor indexes. These are not changed in between the 
+	polling tests, as the RXEN and TXEN bits in the MODER are disabled
+	between tests, resetting the respective buffer descriptor indexes,
+	and so these should stay at their initial values. */
 	tx_bindex = 0;
 	rx_bindex = *eth_tx_bd_num << 1;
 
 	set_mac();
-	
+
+	/* Set promiscuous mode */
+	*eth_moder |= (1 << ETH_MODER_PRO_OFFSET);
+
 	/*-------------------*/
 	/* non iterrupt test */
 	transmit_one_packet();
-	tx_bindex += 2;	
+
 	receive_one_packet();
-	rx_bindex += 2;
+
 	transmit_one_packet();
-	tx_bindex += 2;
+
 	receive_one_packet();
-	rx_bindex += 2;
 	
 	
 	/*-------------------*/

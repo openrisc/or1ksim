@@ -352,7 +352,8 @@ static int generate_includes (FILE *fo)
 }
 
 /* Generates .c file footer */
-static int generate_footer (FILE *fo)
+static int 
+generate_footer (FILE *fo)
 {
   fprintf (fo, "}\n");
   return 0;
@@ -363,7 +364,8 @@ static int generate_footer (FILE *fo)
 
    JPB: Added code to generate an illegal instruction exception for invalid
    instructions. */
-static int generate_body (FILE *fo, unsigned long *a, unsigned long cur_mask, int level)
+static int 
+generate_body (FILE *fo, unsigned long *a, unsigned long cur_mask, int level)
 {
   unsigned long shift = *a;
   unsigned long mask;
@@ -382,6 +384,8 @@ static int generate_body (FILE *fo, unsigned long *a, unsigned long cur_mask, in
       } else {
         if(prev_inv) {
           shift_fprintf (++level, fo, "/* Invalid instruction(s) */\n");
+	  shift_fprintf (level, fo,
+			 "except_handle (EXCEPT_ILLEGAL, cpu_state.pc);\n");
           shift_fprintf (level--, fo, "break;\n");
         }
         shift_fprintf (level, fo, "case 0x%x:\n", i);

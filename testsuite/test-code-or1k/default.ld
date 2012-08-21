@@ -28,41 +28,32 @@
 MEMORY
         {
         except : ORIGIN = 0x00000000, LENGTH = 0x00002000
-        flash  : ORIGIN = 0xf0000000, LENGTH = 0x00200000
         ram    : ORIGIN = 0x00002000, LENGTH = 0x001fe000
         }
 
 SECTIONS
 {
-	/* Section .except-text guarantees that the code for exception
-	   handling is placed first. For some reason the linker script can't
-	   see the _reset_vector symbol (even if we declare it global), so we
-	   explicitly set it. */
+	  /*
+	  For some reason the linker script can't see the _reset_vector symbol 
+	  (even if we declare it global), so we explicitly set it. */
+
+	.except :
+	{
+        _except_beg = .;
+        *(.except)	
+	_reset_vector = DEFINED (_reset_vector) ? _reset_vector : 0x00000100;
+        _except_end = .;
+	} > except
+
 	.text :
         {
-	*(.except-text)
+        _src_beg = .;
         *(.text)
         *(.rodata)
         *(.rodata.*)
-	_reset_vector = DEFINED (_reset_vector) ? _reset_vector : 0x00000100;
-        _src_beg = .;
-        } > flash
-
-        .dummy ALIGN(0x4):
-        {
-         _src_beg = .;
-        } > flash
-
-        .except :
-        AT ( ADDR (.dummy))
-        {
-        _except_beg = .;
-        *(.except)
-        _except_end = .;
-        } > except
+        } > ram
 
         .data :
-        AT ( ADDR (.dummy) + SIZEOF (.except))
         {
         _dst_beg = .;
         *(.data)
@@ -73,7 +64,9 @@ SECTIONS
 
         .bss :
         {
+	_bstart = .;
         *(.bss)
+	_bend = .;
         } > ram
 
         .stack  ALIGN(0x10) (NOLOAD):

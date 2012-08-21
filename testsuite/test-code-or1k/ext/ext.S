@@ -27,6 +27,8 @@
 
 #include "spr-defs.h"
 
+	.section .except,"ax"
+
 	.org 0x100
 	l.j	start_test
 	l.nop
@@ -117,6 +119,7 @@
 	l.bf	ext_fail; \
 	l.nop;
 
+	.section .text
 start_test:
 	/* Test l.extbs */
 	CHECK_HIGH3_CLEAR(l.extbs, 0x7f)

@@ -34,12 +34,13 @@
 /* Package includes */
 #include "sim-config.h"
 #include "profiler.h"
+#include "toplevel-support.h"
 
 
 int  main (int   argc,
 	   char *argv[])
 {
-  srand(getpid());
+  init_randomness ();
   init_defconfig();
   reg_config_secs();
 

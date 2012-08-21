@@ -1,3 +1,100 @@
+2011-04-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.1rc1.
+
+2011-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.0rc3.
+	* support/spr-defs.h: Added definition of NOP_RANDOM and
+	NOP_OR1KSIM. Removed definitions of NOP_REPORT_FIRST and
+	NOP_REPORT_LAST.
+
+2011-01-05  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* support/spr-defs.h: Added definition of NOP_TRACE_ON and
+	NOP_TRACE_OFF.
+
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* eth/eth.c: Fixed errors causing regression failure. Solved by enable
+	promiscuous mode, and correct BD index recording.
+
+2010-12-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-12-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-12-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-11-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-11-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* support/spr-defs.h: References to PICPR removed.
+
+2010-11-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* int-logger/int-logger-edge.c: Deleted.
+	* int-logger/int-logger-level.c: Deleted.
+	* int-logger/int-logger.c: Created.
+	* int-logger/Makefile.am: Changed to create a single program,
+	int-logger.
+	* int-logger/Makefile.in: Regenerated.
+
+2010-11-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-10-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version updated
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version updated
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* Release 0.5.0rc2.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc2.
+	* support/spr-defs.h <SPR_VR_RES>: Definition corrected.
+
+2010-09-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Handle the case where target_cpu is not set.
+
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* mc-common/except-mc.S: Remove leading underscores from global

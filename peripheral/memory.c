@@ -63,7 +63,8 @@ struct mem_config
   {
     MT_UNKNOWN,
     MT_PATTERN,
-    MT_RANDOM
+    MT_RANDOM,
+    MT_EXITNOPS
   } type;
 };
 
@@ -190,13 +191,16 @@ mem_reset (void *dat)
     case MT_RANDOM:
       if (mem->random_seed == -1)
 	{
-	  seed = time (NULL);
-	  /* Print out the seed just in case we ever need to debug */
-	  PRINTF ("Seeding random generator with value %d\n", seed);
+	  /* seed = time (NULL); */
+	  /* srandom (seed); */
+	  /* /\* Print out the seed just in case we ever need to debug *\/ */
+	  /* PRINTF ("Seeding random generator with value %d\n", seed); */
 	}
       else
-	seed = mem->random_seed;
-      srandom (seed);
+	{
+	  seed = mem->random_seed;
+	  srandom (seed);
+	}
 
       for (i = 0; i < mem->size; i++, mem_area++)
 	*mem_area = random () & 0xFF;
@@ -206,6 +210,21 @@ mem_reset (void *dat)
 	*mem_area = mem->pattern;
       break;
     case MT_UNKNOWN:
+      break;
+    case MT_EXITNOPS:
+      /* Fill memory with OR1K exit NOP */
+      for (i = 0; i < mem->size; i++, mem_area++)
+	switch(i & 0x3) {
+	case 3:
+	  *mem_area = 0x15;
+	  break;
+	case 0:
+	  *mem_area = 0x01;
+	  break;
+	default:
+	  *mem_area = 0x00;
+	  break;
+	}
       break;
     default:
       fprintf (stderr, "Invalid memory configuration type.\n");
@@ -273,6 +292,11 @@ memory_type (union param_val val, void *dat)
   else if (0 == strcasecmp (val.str_val, "zero"))
     {
       mem->type = MT_PATTERN;
+      mem->pattern = 0;
+    }
+  else if (0 == strcasecmp (val.str_val, "exitnops"))
+    {
+      mem->type = MT_EXITNOPS;
       mem->pattern = 0;
     }
   else

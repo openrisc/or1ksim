@@ -83,7 +83,7 @@ or1ksim_init (int         argc,
 				int                data_len))
 {
   /* Initialization copied from existing main() */
-  srand (getpid ());
+  init_randomness ();
   init_defconfig ();
   reg_config_secs ();
 
@@ -103,7 +103,6 @@ or1ksim_init (int         argc,
   print_config ();		/* Will go eventually */
   signal (SIGINT, ctrl_c);	/* Not sure we want this really */
 
-  runtime.sim.hush = 1;		/* Not sure if this is needed */
   do_stats = config.cpu.superscalar ||
              config.cpu.dependstats ||
              config.sim.history     ||
@@ -185,6 +184,12 @@ or1ksim_run (double duration)
 	  return runtime.cpu.halted ? OR1KSIM_RC_HALTED : OR1KSIM_RC_BRKPT;
 	}
 
+      /* If we are tracing, dump after each instruction. */
+      if (!runtime.sim.hush)
+	{
+	  trace_instr ();
+	}
+
       /* If we were single stepping, stall immediately. */
       if (cpu_state.sprs[SPR_DMR1] & SPR_DMR1_ST)
 	{
@@ -214,9 +219,9 @@ or1ksim_run (double duration)
 	    }
 	}
 
-      /* Clear any interrupts as requested. For edge triggered interrupts this
-	 will happen in the same cycle. For level triggered, it must be an
-	 explicit call. */
+      /* Clear any interrupts as requested. This only applies to level
+	 sensitive interrupts. Edge triggered are cleared by writing to
+	 PICSR. */
       if (0 != runtime.sim.ext_int_clr)
 	{
 	  for (i = 0; i < num_ints; i++)
@@ -343,8 +348,8 @@ or1ksim_clock_rate ()
 /*---------------------------------------------------------------------------*/
 /*!Trigger an edge triggered interrupt
 
-   This function is appropriate for edge triggered interrupts, which are taken
-   and then immediately cleared.
+   This function is appropriate for edge triggered interrupts. These are
+   cleared by writing to the PICSR SPR.
 
    @note There is no check that the specified interrupt number is reasonable
    (i.e. <= 31).
@@ -362,7 +367,6 @@ or1ksim_interrupt (int i)
   else
     {
       runtime.sim.ext_int_set |= 1 << i;	// Better not be > 31!
-      runtime.sim.ext_int_clr |= 1 << i;	// Better not be > 31!
     }
 }	/* or1ksim_interrupt () */
 
@@ -568,9 +572,9 @@ or1ksim_read_mem (unsigned long int  addr,
    @return  Number of bytes written, or zero if error.                       */
 /*---------------------------------------------------------------------------*/
 int
-or1ksim_write_mem (unsigned long int  addr,
-		   unsigned char     *buf,
-		   int                len)
+or1ksim_write_mem (unsigned long int    addr,
+		   const unsigned char *buf,
+		   int                  len)
 {
   int             off;			/* Offset into the memory */
 

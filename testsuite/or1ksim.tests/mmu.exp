@@ -24,118 +24,18 @@
 # -----------------------------------------------------------------------------
 
 
-# Run the Ethernet test
+# Run the MMU test
 run_or1ksim "mmu"                                \
-    [list "ea = 0017bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0017e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0027bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0027e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0047bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0047e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0087bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0087e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0107bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0107e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0207bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0207e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0407bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0407e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0807bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 0807e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 1007bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 1007e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 2007bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 2007e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 4007bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 4007e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 8007bffc set = 61 way = 0"       \
-          "tlbtr = 0017b3c0 dtlb_val = 000003c0" \
-          "ea = 8007e000 set = 63 way = 0"       \
-          "tlbtr = 0017e3c0 dtlb_val = 000003c0" \
-          "ea = 0027c000 set = 62 way = 0"       \
-          "tlbtr = 0017c3c0 dtlb_val = 000003c0" \
-          "ea = 0027c000 set = 62 way = 0"       \
-          "tlbtr = 0017c3c0 dtlb_val = 000003c0" \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "ea = 0017bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0017e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0027bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0027e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0047bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0047e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0087bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0087e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0107bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0107e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0207bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0207e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0407bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0407e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0807bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 0807e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 1007bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 1007e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 2007bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 2007e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 4007bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 4007e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 8007bff8 set = 61 way = 0"       \
-          "ta = 0017bff8"                        \
-          "ea = 8007e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0027e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0027e000 set = 63 way = 0"       \
-          "ta = 0017e000"                        \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "ea = 0017c000 set = 62 way = 0"       \
-          "!report(0xdeaddead);"                  \
-	  "!exit(0)"]                             \
+    [list "DTLB translation tests OK" \
+	 "DTLB match tests OK" \
+	 "DTLB valid bit tests OK" \
+	 "DTLB permission bit tests OK" \
+	 "ITLB translation tests OK" \
+	 "ITLB match tests OK" \
+	 "ITLB valid bit tests OK" \
+	 "ITLB permission tests OK" \
+	 "Tests completed" \
+	 "report(0xdeaddead);" \
+	 "report(0x8000000d);" \
+	 "exit(0)"] \
     "mmu.cfg" "mmu/mmu"

@@ -24,21 +24,12 @@
 # -----------------------------------------------------------------------------
 
 
-# Test programs which report on interrupts received. One for edge triggered,
-# one for level triggered.
-check_PROGRAMS = int-logger-edge  \
-		 int-logger-level
+# Test program which reports on interrupts received.
+check_PROGRAMS      = int-logger
 
-int_logger_edge_SOURCES  = int-logger-edge.c
+int_logger_SOURCES  = int-logger.c
 
-int_logger_edge_LDFLAGS  = -T$(srcdir)/../default.ld
+int_logger_LDFLAGS  = -T$(srcdir)/../default.ld
 
-int_logger_edge_LDADD    = ../except/except.lo      \
-	         	   ../support/libsupport.la
-
-int_logger_level_SOURCES = int-logger-level.c
-
-int_logger_level_LDFLAGS = -T$(srcdir)/../default.ld
-
-int_logger_level_LDADD   = ../except/except.lo      \
-	         	   ../support/libsupport.la
+int_logger_LDADD    = ../except/except.lo      \
+	              ../support/libsupport.la

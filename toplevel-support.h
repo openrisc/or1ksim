@@ -32,7 +32,9 @@
 #define TOPLEVEL_SUPPORT__H
 
 /* Prototypes for external use */
+extern void  init_randomness ();
 extern void  ctrl_c (int  signum);
+extern void  toggle_trace (int signum);
 extern void  reg_sim_reset (void (*reset_hook) (void *), void *dat);
 extern void  sim_done ();
 extern void  check_int (void *dat);

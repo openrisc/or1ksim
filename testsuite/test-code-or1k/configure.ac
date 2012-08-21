@@ -1,6 +1,6 @@
 # configure.ac -- OR1K test code specific autoconf configuration file
 #
-# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) 2010, 2011 Embecosm Limited
 #
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
@@ -23,8 +23,7 @@
 # Configure script for the OpenRISC 1000 simulator test suite OR1K code
 # directory. This uses a different tool chain, so has its own configuration
 # script. Process this file with autoconf to produce a configure script.
-
-AC_INIT([or1ksim-testsuite], [0.5.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim-testsuite], [0.5.1rc1], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_LIBTOOL
@@ -33,6 +32,19 @@ AC_CONFIG_HEADERS([config.h])
 
 # make sure we are using a recent autoconf version
 AC_PREREQ(2.59)
+
+# This is not nice, but it gets round the problem of the target not being
+# specified. We don't need to warn again - the main configure did that for us.
+case "$target_cpu" in
+or32*)
+	;;
+
+dlx*)
+	;;
+
+*)      target_alias=or32-elf;
+	;;
+esac
 
 # check for --enable-all-tests argument, in which case we attempt to build all
 # tests, even those that do not compile properly.
@@ -68,12 +80,12 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 
 # Specify our baseline CFLAGS
-CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/mc-common"
+CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
 
 # Flag to specify whether we want optimization when checking
 AC_MSG_CHECKING(whether to enable optimizations when checking)
-AC_ARG_ENABLE(opt,
+AC_ARG_ENABLE(check-opt,
     [  --enable-check-opt      enable optimizations
   --enable-check-opt=level     same as gcc -O switch  ], [
     case "$enableval" in

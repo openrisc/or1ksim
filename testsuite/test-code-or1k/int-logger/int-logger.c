@@ -1,4 +1,4 @@
-/* int-logger-level.c. Test of Or1ksim handling of level triggered interrupts
+/* int-logger.c. Test of Or1ksim handling of interrupts
 
    Copyright (C) 2010 Embecosm Limited
 
@@ -60,27 +60,93 @@ getreg (unsigned long addr)
 
 
 /* --------------------------------------------------------------------------*/
+/*!Count the number of ones in a register
+
+   SIMD Within A Register (SWAR) algorithm from Aggregate Magic Algorithms
+   (http://aggregate.org/MAGIC/) from the University of Kentucky.
+
+   32-bit recursive reduction using SWAR. First step is mapping 2-bit
+   values into sum of 2 1-bit values in sneaky way.
+
+   @param[in] x  The 32-bit register whose bits are to be counted.
+
+   @return  The number of bits that are set to 1.                             */
+/* --------------------------------------------------------------------------*/
+static int
+ones32 (unsigned long int  x)
+{
+  x -=  ((x >>  1)      & 0x55555555);
+  x  = (((x >>  2)      & 0x33333333) + (x & 0x33333333));
+  x  = (((x >>  4) + x) & 0x0f0f0f0f);
+  x +=   (x >>  8);
+  x +=   (x >> 16);
+
+  return (x & 0x0000003f);
+
+}	/* ones32 () */
+
+/* --------------------------------------------------------------------------*/
+/*!Count the number of ones in a register
+
+   SIMD Within A Register (SWAR) algorithm from Aggregate Magic Algorithms
+   (http://aggregate.org/MAGIC/) from the University of Kentucky.
+
+   Compute the log to base 2 of a supplied numger. In this case we know it will
+   be an exact power of 2. We return -1 if asked for log (0).
+
+   @param[in] x  The 32-bit register whose log to base 2 we want.
+
+   @return  The log to base 2 of the argument, or -1 if the argument was
+            zero.                                                            */
+/* --------------------------------------------------------------------------*/
+static int
+int_log2 (unsigned int  x)
+{
+  x |= (x >> 1);
+  x |= (x >> 2);
+  x |= (x >> 4);
+  x |= (x >> 8);
+  x |= (x >> 16);
+
+  return  ones32 (x) - 1;
+
+}	/* int_log2 () */
+
+
+/* --------------------------------------------------------------------------*/
 /*!Generic interrupt handler
 
-   This should receive the interrupt exception. Report the value in
-   PICSR. Clearing will be done externally.                                  */
+   This should receive the interrupt exception. Report the value in PICSR.
+
+   Potentially PICSR has multiple bits set, so we report the least significant
+   bit. This is consistent with an approach which gives highest priority to
+   any NMI lines (0 or 1).
+
+   It is up to the external agent to clear the interrupt. We prompt it by
+   writing the number of the interrupt we have just received.                */
 /* --------------------------------------------------------------------------*/
 static void
 interrupt_handler ()
 {
   unsigned long int  picsr = mfspr (SPR_PICSR);
 
-  /* Report the interrupt */
   printf ("PICSR = 0x%08lx\n", picsr);
-
-  /* Request the interrupt be cleared with a write upcall. */
-  setreg (GENERIC_BASE, 0);
+  setreg (GENERIC_BASE, int_log2 (picsr & -picsr));
 
 }	/* interrupt_handler () */
 
 
 /* --------------------------------------------------------------------------*/
 /*!Main program to set up interrupt handler
+
+   We make a series of read upcalls, after 500 us and then every 1000us, which
+   prompt some interrupts being set and cleared. By doing this, our upcalls
+   should always be well clear of any calling function interrupt generation,
+   which is on millisecond boundaries.
+
+   A read upcall is a request to trigger an interrupt. We will subsequently
+   use a write upcall in the interrupt handler to request clearing of the
+   interrupt.
 
    @return  The return code from the program (always zero).                  */
 /* --------------------------------------------------------------------------*/
@@ -95,7 +161,7 @@ main ()
   mtspr (SPR_SR, mfspr(SPR_SR) | SPR_SR_IEE);
   mtspr (SPR_PICMR, 0xffffffff);
 
-  /* Loop forever, upcalling reads every 500us to generate interrupts. */
+  /* Loop forever, upcalling at the desired intervals. */
   unsigned long int  start = read_timer ();
 
   while (1)
@@ -106,8 +172,11 @@ main ()
 	{
 	}
 
-      /* Do our memory mapped upcall read to generate an interrupt. */
+      /* Read to request an interrupt */
       (void)getreg (GENERIC_BASE);
+
+      /* Wait 1000us before next upcall. */
+      end_time += 1000;
     }
 
   /* We don't actually ever return */

@@ -1,3 +1,360 @@
+2011-04-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.1rc1.
+
+2011-03-29  Jonas Bonn  <jonas@southpole.se>
+
+	* cpu/or1k/sprs.c (mtspr): Setting PICMR always sets the bottom
+	two bits if we have non-maskable interrupts.
+
+2011-03-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.0rc3.
+
+2011-03-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* peripheral/eth.c (eth_open_tap_if): If fail to open the TAP,
+	then also report the tap device name.
+
+2011-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-02-22  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	* sim-cmd.c (handle_sim_command) [HAVE_LIBREADLINE]: Exit
+	immediately if no text is read.
+
+2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or32/insnset.c <l_nop>: Added behavior for NOP_RANDOM and
+	NOP_OR1KSIM. Removed default behavior.
+	* cpu/or1k/spr-defs.h: Added definition of NOP_RANDOM and
+	NOP_OR1KSIM. Removed definitions of NOP_REPORT_FIRST and
+	NOP_REPORT_LAST.
+	* doc/or1ksim.texi <l.nop Opcode Support>: Document l.nop 10 and
+	l.nop 11.
+	* libtoplevel.c (or1ksim_init): Replaced srand () by
+	init_randomness ().
+	* peripheral/memory.c (mem_reset): Do not allow general reset of
+	random number generator.
+	* sim_config.c (parse_args): Change use of rand () to random ().
+	* toplevel.c (main): Replaced srand () by init_randomness ().
+	* toplevel-profile.c (main): Replaced srand () by init_randomness ().
+	* toplevel-support.c (init_randomness): Created.
+	* toplevel-support.h <init_randomness>: Added.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Added instruction
+	as third parameter. No longer look up in memory.
+	* cpu/common/abstract.h <diassemble_instr>: Updated prototype.
+	* cpu/or32/execute.c (trace_instr): Pass instruction as third
+	parameter to dissassemble_instr. Clearer message when we can't get
+	a physical address.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Start each line with a
+	flag indicating if user or supervisor mode.
+	* doc/or1ksim.texi: Updated with new trace flags and explaining
+	trace ouptut in more detail.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Control output of
+	physical/virtual address with --trace-physical and --trace-virtual
+	flags.
+	* sim-config.c (parse_args): Add --trace-physical and
+	--trace-virtual flags.
+	* sim-config.h <runtime.sim>: Add trace_phy and trace_virt flags.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* cpu/common/abstract.c (diassemble_instr): Added virtual address
+	as second parameter, used for trace O/P.
+	* cpu/common/abstract.h <diassemble_instr>: Updated prototype.
+	* cpu/or32/execute.c (trace_instr): Pass virtual as well as
+	physical address to disassemble_instr.
+
+2011-01-05  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or1k/spr-defs.h: Added definition of NOP_TRACE_ON and
+	NOP_TRACE_OFF.
+	* cpu/or32/insnset.c <l_nop>: Added behavior for NOP_TRACE_ON and
+	NOP_TRACE_OFF
+	* doc/or1ksim.texi: New section documenting l.nop opcodes.
+
+2011-01-04  Julius Baxter  <julius@opencores.org>
+
+	* cpu/or32/or32.c: <trace_dest_spr>: Added.
+	(or1ksim_disassemble_trace_index): Added dumping of SPR content when
+	disassembling l.mtspr instruction.
+	* cpu/common/abstract.c:
+	(disassemble_instr): Added tracing of SPR contents after l.mtspr insn.
+	* cpu/or1k/opcode/or32.h: (trace_dest_spr): Added extern definition.
+
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/eth.c: <RTX_RESCHED_PERIOD>: Changed to 10000.
+	(eth_write32): Additional debug output, when enabled.
+
+2010-12-18  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* peripheral/eth.c (eth_write320): Setting ETH_INT_MASK has no
+	impact on interrupt processing.
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* peripheral/eth.c <RTX_RESCHED_PERIOD>: Added.
+	(eth_controller_tx_clock, eth_controller_rx_clock): Reschedule for
+	RTX_RESCHED_PERIOD.
+	(eth_controller_tx_clock): dummy_crc parameter controls whether
+	CRC is added.
+	(eth_ignore_tap_packet): Deleted.
+	(eth_ignore_tap_packets): Added (based on eth_ignore_tap_packet).
+	(eth_reset): I/O opening moved into eth_open_if.
+	(eth_open_if, eth_open_file_if, eth_open_tap_if): Created.
+	(eth_regname): Created.
+	(eth_read32, eth_write32): Unified debug printing.
+	(eth_dummy_crc): Created.
+	(eth_sec_start): Initialize dummy_crc.
+	(reg_ethernet_sec): Add dummy_crc parameter.
+	* doc/or1ksim.texi: Updated Ethernet configuration section for
+	dummy_crc.
+
+2010-12-15  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* peripheral/eth.c <mac_broadcast>: Defined to ff:ff:ff:ff:ff:ff.
+	<struct eth_device>: loopback_offset removed. State reduced to
+	just BD indices, buffers removed.
+	(eth_read_rx_file, eth_skip_rx_file, eth_rx_next_packet): Deleted.
+	(eth_write_file_packet, eth_write_tap_packet, eth_write_packet)
+	(eth_blush_bd): Created.
+	(eth_controller_tx_clock): Completely rewritten.
+	(eth_read_file_packet, eth_read_tap_packet, eth_read_packet)
+	(eth_fill_bd, eth_ignore_packet): Created.
+	(eth_controller_rx_clock): Completely rewritten.
+	(eth_read32, eth_write32): Rewritten for new data structures.
+
+2010-12-09  Julius Baxter <julius@opencores.org>
+
+	* doc/or1ksim.texi: changed references to or32-uclinux-* to or32-elf-*.
+	Added section on using SIGUSR1 signal to control trace dumping.
+	* peripheral/eth.c: Change scheduling of TX and RX from 10 cycles to 1
+	when idling.
+	* toplevel.c: Added SIGUSR1 handler hook.
+	* toplevel-support.c: <toggle_trace>: New function to toggle the trace
+	execution control variable.
+	* toplevel-support.h: <toggle_trace>: Add function prototype.
+
+2010-12-08  Jeremy Bennett <jeremy@jeremybennett.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: Updated Ethernet configuration section. Added
+	new section on configurating TUN/TAP.
+
+2010-12-01  Julius Baxter <julius@opencores.org>
+
+	* peripheral/eth.c: <define ETH_DEBUG>: controlling debug printouts.
+	<struct eth_device>: Added int_line_stat to hold status of IRQ line.
+	(eth_controller_tx_clock, eth_controller_rx_clock): Add setting of
+	interrupts dependent on line state, added setting of INT_SOURCE reg.
+	regardless of INT_MASK bits or line state.
+
+2010-11-30  Julius Baxter <julius@opencores.org>
+
+	* cpu/or1k/sprs.c: Clarify commenting on PIC_PICSR register.
+	* peripheral/eth.c: Many changes.
+
+2010-11-26  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* peripheral/eth.c: Now uses TUN/TAP tunnelling. ETH_PHY
+	conditional compilation removed throughout.
+	<struct eth_device>: Redundant fields removed. New fields added.
+	(eth_controller_tx_clock): Use write to TAP instead of sendto
+	socket.
+	(eth_controller_rx_clock): Use read from TAP instead of recv from
+	socket.
+	(eth_reset): Socket initialization replaced by opening TAP.
+	(eth_rtx_type): Now string parameter. Currently "FILE" or "TAP"
+	permitted.
+	(eth_tap_dev): Created.
+	(eth_sock_if): Deleted.
+	(eth_sec_start, eth_sec_end, reg_ethernet_sec): Updated to add
+	tap_dev.
+	* peripheral/etch.h: ETH_PHY conditional compilation removed
+	throughout.
+
+2010-11-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or1k/sprs.c (mtspr): Setting PICMR considers NMI usage.
+	* doc/or1ksim.texi <Interrupt Configuration>: Documented the PIC
+	use_nmi config.
+	* libtoplevel.c (or1ksim_interrupt): Does not clear interrupts
+	immediately.
+	* NEWS: Updated regarding PIC configuration.
+	* pic/pic.c (pic_reset): Reference to PICPR
+	removed. Initialization considers NMI use.
+	(report_interrupt): NMI now handled through PICMR, rather than
+	directly in the code.
+	(pic_use_nmi): Created.
+	(pic_reg_sec): Added "use_nmi" option.
+	* sim-config.c (init_defconfig): config.pic.use_nmi initialized.
+	* sim-config.h <config.pic>: New entry use_nmi added.
+
+2010-11-24  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: More clarification of interrupt behavior when
+	edge or level triggered.
+	* pic/pic.c (report_interrupt): Improved warning when interrupt is
+	reported while previous one is pending.
+	(clear_interrupt): Now works for both level and edge triggered
+	interrupts.
+
+2010-11-22  Julius Baxter  <julius@opencores.org>
+
+	* cpu/common/execute.h <cpu_state>: removed pic_lines variable.
+	* cpu/or1k/sprs.c: Added comment clarifying PICSR behavior.
+	* pic/pic.c: Removed use of pic_lines variable, added commenting
+	clarifying behavior.
+	<clear_interrupt>: only clear PICSR when level triggered.
+	* doc/or1ksim.texi (Interrupt Configuration): Added clarification of
+	interrupt behavior when edge or level triggered.
+
+2010-11-22  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/eth.c (eth_miim_trans): comment out debug printf()s
+	* cpu/or32/generate.c (generate_body): Add except_handle call to all
+	generated illegal instruction cases.
+
+2010-11-19  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/eth.c: Added new variable phy_addr to device struct and
+	ability to set it in config script section. <eth_miim_trans>: function
+	to emulate MIIM transactions, mainly PHYID regs at the moment.
+	* peripheral/eth.h: Added MIIM bus defines.
+	* doc/or1ksim.texi: Added information in eth sectin for phy_addr value
+
+2010-11-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* doc/or1ksim.texi: Added information about --trace option
+	* NEWS: Updated.
+
+2010-10-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/common/abstract.c (disassemble_instr): Initialize store_val
+	and store_addr to avoid any compiler warnings.
+	* cpu/or32/or32.c (or1ksim_disassemble_trace_index): Sign extend
+	trace_store_imm.
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* cpu/or32/or32.c <trace_dest_reg, trace_store_addr_reg>: New globals.
+	<trace_store_imm, trace_store_val_reg, trace_store_width>: New
+	globals.
+	(or1ksim_disassemble_trace_index): Result now void, passes back all
+	info via globals (yuk, but consistent with what exists). Handles
+	store addresses.
+	* cpu/or32/execute.c (trace_instr): Simplified.
+	* cpu/common/abstract.c (disassemble_instr): Result now void, all
+	reg info printed here. Handles store addresses.
+	* cpu/common/abstract.h <disassemble_instr>: Change return type.
+	* cpu/or1k/opcode/or32.h <trace_dest_reg, trace_store_addr_reg>:
+	New globals marked extern.
+	<trace_store_imm, trace_store_val_reg, trace_store_width>: New
+	globals marked extern.
+	<or1ksim_disassemble_trace_index>: Change return type.
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* cpu/or32/or32.c (or1ksim_disassemble_trace_index): Added.
+	* cpu/or32/execute.c (trace_instr): Added.
+	(exec_main): Call trace_instr rather than dumpreg if tracing.
+	* cpu/common/abstract.c (disassemble_instr): Added.
+	* cpu/common/execute.h <trace_instr>: Added.
+	* cpu/common/abstract.h <diassemble_instr>: Added.
+	* cpu/or1k/opcode/or32.h <or1ksim_disassemble_trace_index>: Added.
+	* libtoplevel.c (or1ksim_run): Call trace_instr rather than
+	dumpreg if tracing.
+
+2010-10-02  Julius Baxter  <julius@opencores.org>
+
+	* peripheral/memory.c: Added support for exitnops memory fill option
+	* doc/or1ksim.texi: Added information about exitnops option
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* Release 0.5.0rc2.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Fixed DEJAGNU to always be set, with no user override.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc2.
+	* debug/rsp-server.c (rsp_query): Simplified handling of
+	"qTStatus" to indicate we just do not support tracing.
+	* doc/or1ksim.texi <Configuring the Build>: No longer mandatory to
+	specify the target.
+	<Memory Configuration>: Warns about issues with memory controller.
+	<Memory Controller Configuration>: Warns about issues with memory
+	controller and advises not to use it.
+	<Standalone Simulator>: Details for options with arguments updated.
+	* NEWS: Updated for 0.5.0rc2.
+	* peripheral/mc.c (mc_poc): Use constant MC_POC_VALID
+	(mc_index): Ensure value is valid.
+	* peripheral/mc-defines.h <MC_CE_VALID>: Defined.
+
+2010-09-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure.ac: Minor tidy ups.
+	* configure: Regenerated.
+
+2010-09-24 Julius Baxter <julius.baxter@orsoc.se>
+
+	* debug/rsp-server.c: Added rsp_query handler entries for new packets
+	seen with gdb-7.2.
+
+2010-09-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* cpu/or32/execute.c (exec_main): Dump regs if tracing enabled.
+	* doc/or1ksim.texi <Usage>: Document -t/--trace.
+	<Simulator Library>: or1ksim_write_mem second argument is now
+	const.
+	* libtoplevel.c (or1ksim_run): Dump regs if tracing enabled.
+	(or1ksim_write_mem): Second argument is now const.
+	* or1ksim.h <or1ksim_write_mem>: Second argument is now const.
+	* sim-config.c (parse_args): New option -t/--trace.
+	* toplevel.c (main): Remove setting of runtim.sim.hush.
+
 2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* config.h.in: Regenerated.

@@ -61,6 +61,7 @@
 #define MC_CSC_MEMTYPE_ASYNC      2
 #define MC_CSC_MEMTYPE_SYNC       3
 
+#define MC_CE_VALID             (N_CE - 1)
 #define MC_CSR_VALID		0xFF000703LU
 #define MC_POC_VALID		0x0000000FLU
 #define MC_BA_MASK_VALID	0x000003FFLU

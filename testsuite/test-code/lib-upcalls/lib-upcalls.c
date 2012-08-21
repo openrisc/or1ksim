@@ -357,14 +357,18 @@ main (int   argc,
 	case OR1KSIM_RC_OK:
 	  break;
 
+	case OR1KSIM_RC_HALTED:
+	  printf ("Test completed successfully: hit exit l.nop.\n");
+	  return  0;
+
 	case OR1KSIM_RC_BRKPT:
 	  printf ("Test completed successfully: hit breakpoint.\n");
 	  return  0;
-
+	
 	default:
 	  printf ("ERROR: run failed\n");
 	  return  1;
-	}
+	} 
     }
   while (upcall_count > 0);
 
@@ -373,6 +377,10 @@ main (int   argc,
     {
     case OR1KSIM_RC_OK:
       printf ("Test completed successfully: All upcalls processed.\n");
+      return  0;
+
+    case OR1KSIM_RC_HALTED:
+      printf ("Test completed successfully: hit exit l.nop.\n");
       return  0;
 
     case OR1KSIM_RC_BRKPT:

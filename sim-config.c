@@ -364,6 +364,7 @@ init_defconfig ()
   /* Programmable Interrupt Controller */
   config.pic.enabled      = 0;
   config.pic.edge_trigger = 1;
+  config.pic.use_nmi      = 1;
 
   if (config.pic.enabled)
     {
@@ -942,6 +943,9 @@ parse_args (int argc, char *argv[])
   struct arg_lit  *command;
   struct arg_lit  *quiet;
   struct arg_lit  *verbose;
+  struct arg_lit  *trace;
+  struct arg_lit  *trace_phy;
+  struct arg_lit  *trace_virt;
   struct arg_lit  *report_mem_errs;
   struct arg_lit  *strict_npc;
   struct arg_lit  *profile;
@@ -955,15 +959,21 @@ parse_args (int argc, char *argv[])
   cfg_file = arg_file0 ("f", "file", "<file>",
 			"config file (default \"sim.cfg\")");
   cfg_file->filename[0] = "sim.cfg";
-  nosrv = arg_lit0 (NULL, "nosrv", "do not launch JTAG proxy server");
-  srv = arg_int0 (NULL, "srv", "<n>", "port number (default random)");
-  srv->ival[0] = rand () % (65536 - 49152) + 49152;
+  nosrv = arg_lit0 (NULL, "nosrv", "do not launch debug server");
+  srv = arg_int0 (NULL, "srv", "<n>",
+		  "launch debug server on port (default random)");
+  srv->ival[0] = random () % (65536 - 49152) + 49152;
   srv->hdr.flag |= ARG_HASOPTVALUE;
   mem = arg_str0 ("m", "memory", "<n>", "add memory block of <n> bytes");
   dbg = arg_str0 ("d", "debug-config", "<str>", "Debug config string");
   command = arg_lit0 ("i", "interactive", "launch interactive prompt");
   quiet = arg_lit0 ("q", "quiet", "minimal message output");
   verbose = arg_lit0 ("V", "verbose", "verbose message output");
+  trace = arg_lit0 ("t", "trace", "trace each instruction");
+  trace_phy = arg_lit0 (NULL, "trace-physical",
+			"show physical instruction address when tracing");
+  trace_virt = arg_lit0 (NULL, "trace-virtual",
+			"show virtual instruction address when tracing");
   report_mem_errs = arg_lit0 (NULL, "report-memory-errors",
 			      "Report out of memory accesses");
   strict_npc = arg_lit0 (NULL, "strict-npc", "setting NPC flushes pipeline");
@@ -984,6 +994,9 @@ parse_args (int argc, char *argv[])
     command,
     quiet,
     verbose,
+    trace,
+    trace_phy,
+    trace_virt,
     report_mem_errs,
     strict_npc,
     profile,
@@ -1039,6 +1052,18 @@ parse_args (int argc, char *argv[])
   else
     {
       config.sim.verbose = verbose->count;
+    }
+
+  /* Request for tracing. We may ask for instructions to be recorded with
+     either the physical or virtual address. */
+  runtime.sim.hush       = trace->count ? 0 : 1;
+  runtime.sim.trace_phy  = trace_phy->count  ? 1 : 0;
+  runtime.sim.trace_virt = trace_virt->count ? 1 : 0;
+
+  /* Ensure we have a least one address type in use. */
+  if (!runtime.sim.trace_phy && !runtime.sim.trace_virt)
+    {
+      runtime.sim.trace_virt = 1;
     }
 
   /* Request for memory errors */

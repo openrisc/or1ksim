@@ -26,10 +26,15 @@
 
 # Run the cache test
 run_or1ksim "cache" \
-    [list "report(0xdeaddead);" \
-          "report(0xdeaddead);" \
-          "report(0xdeaddead);" \
-          "report(0xdeaddead);" \
-          "report(0xdeaddead);" \
-          "!exit(0)"] \
+    [list "report(0x00000000);" \
+	 "report(0xdeaddead);" \
+	 "report(0x00000001);" \
+	 "report(0xdeaddead);" \
+	 "report(0x00000002);" \
+	 "report(0xdeaddead);" \
+	 "report(0x00000003);" \
+	 "report(0x00000004);" \
+	 "report(0xdeaddead);" \
+	 "report(0xdeaddead);" \
+	 "exit(0)"] \
     "" "cache/cache"

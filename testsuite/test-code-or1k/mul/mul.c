@@ -37,6 +37,8 @@
 #define MACRC macrc()
 static inline long macrc() {
   long x;
+  asm volatile ("l.nop\t");
+  asm volatile ("l.nop\t");
   asm volatile ("l.macrc\t%0" : "=r" (x));
   return x;
 }

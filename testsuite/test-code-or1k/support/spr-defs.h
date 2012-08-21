@@ -153,7 +153,6 @@
 
 /* PIC group */
 #define SPR_PICMR (SPRGROUP_PIC + 0)
-#define SPR_PICPR (SPRGROUP_PIC + 1)
 #define SPR_PICSR (SPRGROUP_PIC + 2)
 
 /* Tick Timer group */
@@ -166,7 +165,7 @@
  */
 #define SPR_VR_VER	0xff000000  /* Processor version */
 #define SPR_VR_CFG	0x00ff0000  /* Processor configuration */
-#define SPR_VR_RES	0x00ff0000  /* Reserved */
+#define SPR_VR_RES	0x0000ffc0  /* Reserved */
 #define SPR_VR_REV	0x0000003f  /* Processor revision */
 
 #define SPR_VR_VER_OFF	24
@@ -569,12 +568,6 @@
 #define SPR_PICMR_IUM	0xfffffffc  /* Interrupt unmask */
 
 /*
- * Bit definitions for PICPR
- *
- */
-#define SPR_PICPR_IPRIO	0xfffffffc  /* Interrupt priority */
-
-/*
  * Bit definitions for PICSR
  *
  */
@@ -630,7 +623,9 @@
 #define NOP_CNT_RESET    0x0005	     /* Reset statistics counters */
 #define NOP_GET_TICKS    0x0006	     /* JPB: Get # ticks running */
 #define NOP_GET_PS       0x0007      /* JPB: Get picosecs/cycle */
-#define NOP_REPORT_FIRST 0x0400      /* Report with number */
-#define NOP_REPORT_LAST  0x03ff      /* Report with number */
+#define NOP_TRACE_ON     0x0008      /* Turn on tracing */
+#define NOP_TRACE_OFF    0x0009      /* Turn off tracing */
+#define NOP_RANDOM       0x000a      /* Return 4 random bytes */
+#define NOP_OR1KSIM      0x000b      /* Return non-zero if this is Or1ksim */
 
 #endif	/* SPR_DEFS__H */

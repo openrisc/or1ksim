@@ -218,6 +218,7 @@ mc_ssram_SOURCES = mc-ssram.c \
 mc_ssram_CPPFLAGS = -I$(srcdir)/../../../peripheral \
                     -I$(srcdir)/../../../cpu/common \
                     -I$(srcdir)/../../../cpu/or1k   \
+                    -I$(srcdir)/../mc-common		\
                     -I$(srcdir)/../../../port
 
 mc_ssram_LDFLAGS = -T$(srcdir)/../except-mc.ld

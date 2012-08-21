@@ -5,7 +5,7 @@
 @include config.texi
 @dircategory Embedded development
 @direntry
-* Or1ksim: (or32-uclinux-or1ksim).	The OpenRISC 1000 Architectural
+* Or1ksim: (or32-elf-or1ksim).	The OpenRISC 1000 Architectural
                                         Simulator
 @end direntry
 
@@ -86,9 +86,9 @@ Unpack the software and create a @emph{separate} directory in which to
 build it:
 
 @example
-@kbd{tar jxf or1ksim-@value{VERSION}.tar.bz2}
-@kbd{mkdir builddir_or1ksim}
-@kbd{cd builddir_or1ksim}
+tar jxf or1ksim-@value{VERSION}.tar.bz2
+mkdir builddir_or1ksim
+cd builddir_or1ksim
 @end example
 
 @node Configuring the Build
@@ -102,7 +102,7 @@ the OpenRISC 1000 32-bit architecture.  If this argument is omitted, it will
 default to OpenRISC 1000 32-bit with a warning
 
 @example
-@kbd{../or1ksim-@value{VERSION}/configure --target=or32-uclinux ...}
+../or1ksim-@value{VERSION}/configure --target=or32-elf ...
 @end example
 
 There are several other options available, many of which are standard
@@ -111,9 +111,9 @@ all the options.  The most useful is @code{--prefix} to specify a
 directory for installation of the tools.
 
 For testing (using @command{make check}), the @code{--target} parameter
-@emph{must} be specified, to allow the target tool chain to be
-selected.  If the tools have been installed using the standard OpenRISC
-script, then this should be set to @code{or32-elf}.
+may be specified, to allow the target tool chain to be selected.  If not
+specified, it will default to @code{or32-elf}, which is the same prefix
+used with the standard OpenRISC toolchain installation script.
 
 A number of @value{OR1KSIM} specific features in the simulator do
 require enabling at configuration.  These include
@@ -183,7 +183,7 @@ to be inverted in a single instruction using:
 @code{l.xori  rD,rA,-1}
 @end example
 
-This flag causes Or1ksim to treat the immediate operand as unsigned (i.e
+This flag causes @value{OR1KSIM} to treat the immediate operand as unsigned (i.e
 to zero-extend rather than sign-extend).
 
 The default is to sign-extend, so that existing code will continue to
@@ -234,7 +234,7 @@ get the missing test(s) working.
 @end table
 
 A number of configuration flags have been removed since version 0.3.0,
-because they led to invalid behavior of Or1ksim.  Those removed are:
+because they led to invalid behavior of @value{OR1KSIM}.  Those removed are:
 
 @table @code
 
@@ -288,33 +288,33 @@ and @code{l.xori}) do not.
 Build the tool with:
 
 @example
-@kbd{make all}
+make all
 @end example
 
 If you have the OpenRISC tool chain and DejaGNU installed, you can
 verify the tool as follows (otherwise omit this step):
 
 @example
-@kbd{make check}
+make check
 @end example
 
 Install the tool with:
 
 @example
-@kbd{make install}
+make install
 @end example
 
 This will install the three variations of the @value{OR1KSIM} tool,
-@command{or32-uclinux-sim}, @command{or32-uclinux-psim} and
-@command{or32-uclinux-mpsim}, the @value{OR1KSIM} library, @file{libsim}, the
+@command{or32-elf-sim}, @command{or32-elf-psim} and
+@command{or32-elf-mpsim}, the @value{OR1KSIM} library, @file{libsim}, the
 header file, @file{or1ksim.h} and this documentation in @command{info} format.
 
 The documentation may be created and installed in alternative formats (PDF,
 Postscript, DVI, HTML) with for example:
 
 @example
-@kbd{make pdf}
-@kbd{make install-pdf}
+make pdf
+make install-pdf
 @end example
 
 @node Known Issues
@@ -327,7 +327,7 @@ feature requests.  It may be found at
 @url{http://opencores.org/project,or1k,bugtracker}.
 
 The following issues are long standing and unlikely to be fixed in
-Or1ksim in the near future.
+@value{OR1KSIM} in the near future.
 
 @itemize @bullet
 @item
@@ -352,7 +352,10 @@ code uses static global constants liberally!
 * Standalone Simulator::
 * Profiling Utility::
 * Memory Profiling Utility::
+* Trace Generation::
 * Simulator Library::
+* Ethernet TUN/TAP Interface::
+* l.nop Support::
 @end menu
 
 @node Standalone Simulator
@@ -362,7 +365,7 @@ code uses static global constants liberally!
 The general form the standalone command is:
 
 @example
-or32-uclinux-sim [-vhiqV] [-f @var{file}] [--nosrv] [--srv=[@var{n}]]
+or32-elf-sim [-vhiqVt] [-f @var{file}] [--nosrv] [--srv=[@var{n}]]
                  [-m <n>][-d @var{str}]
                  [--enable-profile] [--enable-mprofile] [@var{file}]
 @end example
@@ -405,8 +408,32 @@ Do not generate any information messages, only error messages.
 Generate extra output messages (equivalent of specifying the ``verbose''
 option in the simulator configuration section (see @pxref{Simulator Behavior, , Simulator Behavior}).
 
+@item -t
+@itemx --trace
+@cindex @code{-t}
+@cindex @code{--trace}
+Dump instruction just executed and any register/memory location chaged
+after each instruction (one line per instruction).
+
+@item --trace-physical
+@itemx --trace-virtual
+@cindex @code{--trace-physical}
+@cindex @code{--trace-virtual}
+When tracing instructions, show the physical address
+(@code{--trace-physical}) and/or the virtual address
+(@code{--trace-virtual}) of the instruction being executed.  Both flags
+may be specified, in which case both physical and virtual addresses are
+shown, physical first.
+
+@quotation Note
+Either or both flags may be specified without @code{--trace}, to
+indicate how addresses should be shown if subsequently enabled by a
+@code{SIGUSER1} signal or @code{l.nop 8} opcode (@pxref{Trace
+Generation, , Trace Generation}).
+@end quotation
+
 @item -f @var{file}
-@itemx --file @var{file}
+@itemx --file=@var{file}
 @cindex @code{-f}
 @cindex @code{--file}
 Read configuration commands from the specified file, looking first in
@@ -436,7 +463,7 @@ server, otherwise a random value from the private port range
 @code{--nosrv}.  If it is, a rude message is printed and the
 @code{--nosrv} option is ignored.
 
-@item -m=@var{size}
+@item -m @var{size}
 @itemx --memory=@var{size}
 @cindex @code{-m}
 @cindex @code{--memory}
@@ -446,7 +473,7 @@ zero.  The size may be followed by @samp{k}, @samp{K}, @samp{m},
 bytes), megabytes (@math{2^{20}} bytes) and gigabytes (@math{2^{30}}
 bytes).
 
-This is mainly intended for use when Or1ksim is used without a
+This is mainly intended for use when @value{OR1KSIM} is used without a
 configuration file, to allow just the processor and memory to be set
 up.  This is the equivalent of specifying a configuration memory section
 with @code{baseaddr = 0} and @code{size = @var{size}} and all other
@@ -455,7 +482,7 @@ parameters taking their default value.
 If a configuration file is also used, it should be sure not to specify
 an overlapping memory block.
 
-@item -d=@var{config_string}
+@item -d @var{config_string}
 @itemx --debug-config=@var{config_string}
 @cindex @code{-d}
 @cindex @code{--debug-config}
@@ -469,7 +496,7 @@ By default all exceptions are now handled silently.  If this option is
 specified, bus exceptions will be reported with a message to standard
 error indicating the address at which the exception occurred.
 
-This was the default behaviour up to Or1ksim 0.4.0.  This flag is
+This was the default behaviour up to @value{OR1KSIM} 0.4.0.  This flag is
 provided for those who wish to keep that behavior.
 
 @item --strict-npc
@@ -509,7 +536,7 @@ This utility analyses instruction profile data generated by
 the @value{OR1KSIM} CLI.  The general form the standalone command is:
 
 @example
-or32-uclinux-profile [-vhcq] [-g=@var{file}]
+or32-elf-profile [-vhcq] [-g=@var{file}]
 @end example
 
 Many of the options have both a short and a long form.  For example
@@ -560,7 +587,7 @@ This utility analyses memory profile data generated by
 the @value{OR1KSIM} CLI.  The general form the standalone command is:
 
 @example
-or32-uclinux-mprofile  [-vh] [-m=@var{m}] [-g=@var{n}] [-f=@var{file}] @var{from} @var{to}
+or32-elf-mprofile  [-vh] [-m=@var{m}] [-g=@var{n}] [-f=@var{file}] @var{from} @var{to}
 @end example
 
 Many of the options have both a short and a long form.  For example
@@ -629,6 +656,72 @@ the region of memory to be analysed.
 
 @end table
 
+@node Trace Generation
+@section Trace Generation
+@cindex trace generation of @value{OR1KSIM}
+
+An execution trace can be generated at run time with options passed by
+the command line, or via the operating system's signal passing
+mechanism, or by @code{l.nop} opcodes in an application program.
+
+The following flag can be used to create an execution dump.
+
+@table @code
+
+@item -t
+@itemx --trace
+@cindex @code{-t}
+@cindex @code{--trace}
+Dump instruction just executed and any register/memory location changed
+after each instruction (one line per instruction).  Each line starts
+with either ``S'' or ``U'' to indicate whether the processor was in
+supervisor or user mode @emph{when the instruction completed}.  It is
+worth bearing in mind that tracing happens at completion of instruction
+execution and shows the state at that time.
+@end table
+
+Passing a signal @code{SIGUSR1} while the simulator is running toggles
+trace generation. This can be done with the following command, assuming
+@value{OR1KSIM}'s executable name is @code{or32-elf-sim}:
+
+@example
+pkill -SIGUSR1 or32-elf-sim
+@end example
+
+This is useful in the case where trace output is desired after a
+significant amount of simulation time, where it would be inconvenient to
+generate trace up to that point.
+
+If the @code{pkill} utility is not available, the @code{kill} utility
+can be used if @value{OR1KSIM}'s process number is known. Use the
+following to determine the process ID of the @code{or32-elf-sim} and
+then send the @code{SIGUSR1} command to toggle execution trace
+generation:
+
+@example
+ps a | grep or32-elf-sim
+kill -SIGUSR1 @emph{process-number}
+@end example
+
+@cindex l.nop 8 (turn on tracing)
+@cindex l.nop 8 (turn off tracing)
+Tracing can also be enabled and disabled from within a target program
+using the @code{l.nop 8} and @code{l.nop 9} opcodes to enable and
+disable tracing respectively.
+
+@cindex @code{--trace-physical}
+@cindex @code{--trace-virtual}
+By default tracing will show the virtual address of each instruction
+traced.  This may be controlled by two options, @code{--trace-physical}
+to show the physical address and/or @code{--trace-virtual} to show the
+virtual address. If neither is specified, the virtual address is shown.
+
+@quotation Note
+Either or both flags may be specified without @code{--trace}, to
+indicate how addresses should be shown if subsequently enabled by a
+@code{SIGUSER1} signal or @code{l.nop 8} opcode.
+@end quotation
+
 @node Simulator Library
 @section Simulator Library
 @cindex library version of @value{OR1KSIM}
@@ -640,12 +733,15 @@ library, the flag, @code{-lsim} should be added to the link command.
 The header file @file{or1ksim.h} contains appropriate declarations of
 the functions exported by the @value{OR1KSIM} library.  These are:
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_init (int @var{argc}, char *@var{argv}, void *@var{class_ptr},
-int (*@var{upr})(void *@var{class_ptr}, unsigned long int @var{addr},
-unsigned char @var{mask}[], unsigned char @var{rdata}[], int
-@var{data_len}), int (*@var{upw})(void *@var{class_ptr}, unsigned long
-int @var{addr}, unsigned char @var{mask}[], unsigned char @var{wdata}[],
-int @var{data_len}))
+@deftypefn {@file{or1ksim.h}} int or1ksim_init (int @var{argc}, @
+           char *@var{argv}, void *@var{class_ptr}, @
+           int (*@var{upr})(void *@var{class_ptr}, @
+           unsigned long int @var{addr}, unsigned char @var{mask}[], @
+           unsigned char @var{rdata}[], int @var{data_len}), @
+           int (*@var{upw})(void *@var{class_ptr}, @
+           unsigned long int @var{addr}, @
+           unsigned char @var{mask}[], unsigned char @var{wdata}[], @
+           int @var{data_len}))
 
 The initialization function is supplied with a vector of arguments,
 which are interpreted as arguments to the standalone version (see
@@ -683,7 +779,7 @@ representation in SystemC TLM 2.0.
 @end quotation
 
 @quotation Note
-The current implementation of Or1ksim always transfers single words (4
+The current implementation of @value{OR1KSIM} always transfers single words (4
 bytes), using masks if smaller values are required.  In this it mimcs the
 behavior of the WishBone bus.
 @end quotation
@@ -746,21 +842,25 @@ specified in the configuration file.
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt (int  @var{i})
 
-Generate an edge-triggered interrupt on interrupt line @var{i}.  The interrupt
-is then immediately cleared automatically.  A warning will be generated and the
-interrupt request ignored if level sensitive interrupts have been configured
-with the programmable interrupt controller (@pxref{Interrupt Configuration, ,
-Interrupt Configuration}).
+Generate an edge-triggered interrupt on interrupt line @var{i}.  The
+interrupt must be cleared separately by clearing the corresponding bit
+in the PICSR SPR.  Until the interrupt is cleared, any further
+interrupts on the same line will be ignored with a warning.  A warning
+will be generated and the interrupt request ignored if level sensitive
+interrupts have been configured with the programmable interrupt
+controller (@pxref{Interrupt Configuration, , Interrupt Configuration}).
 
 @end deftypefn
 
 @deftypefn {@file{or1ksim.h}} void or1ksim_interrupt_set (int  @var{i})
 
-Assert a level-triggered interrupt on interrupt line @var{i}.  The interrupt
-must be cleared separately by an explicit call to
-@code{or1ksim_interrupt_clear}.  A warning will be generated, and the interrupt
-request ignored if edge sensitive interrupts have been configured with the
-programmable interrupt controller (@pxref{Interrupt Configuration, , Interrupt
+Assert a level-triggered interrupt on interrupt line @var{i}.  The
+interrupt must be cleared separately by an explicit call to
+@code{or1ksim_interrupt_clear}.  Until the interrupt is cleared, any
+further setting of interrupts on the same line will be ignored with a
+warning.  A warning will be generated, and the interrupt request ignored
+if edge sensitive interrupts have been configured with the programmable
+interrupt controller (@pxref{Interrupt Configuration, , Interrupt
 Configuration}).
 
 @end deftypefn
@@ -784,8 +884,8 @@ reset (5 JTAG cycles) could take 50 processor clock cycles to complete.
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir (unsigned
-char *@var{jreg}, int @var{num_bits})
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_ir @
+           (unsigned char *@var{jreg}, int @var{num_bits})
 
 Shift the supplied register through the JTAG instruction register.
 Return the (model) time taken for this action.  The register is supplied
@@ -799,8 +899,8 @@ For example a 12-bit register would have bits 0-7 in byte 0 and bits
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_dr (unsigned
-char *@var{jreg}, int @var{num_bits})
+@deftypefn {@file{or1ksim.h}} double or1ksim_jtag_shift_dr @
+           (unsigned char *@var{jreg}, int @var{num_bits})
 
 Shift the supplied register through the JTAG data register.  Return the
 (model) time taken for this action.  The register is supplied as a byte
@@ -814,87 +914,88 @@ For example a 12-bit register would have bits 0-7 in byte 0 and bits
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_mem (unsigned
-long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_mem @
+           (unsigned long int @var{addr}, unsigned char *@var{buf}, @
+           int @var{len})
 
 Read @var{len} bytes from @var{addr}, placing the result in @var{buf}.
 Return @var{len} on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_mem (unsigned
-long int @var{addr}, unsigned char *@var{buf}, int @var{len})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_mem @
+           (unsigned long int @var{addr}, const unsigned char *@var{buf}, @
+           int @var{len})
 
 Write @var{len} bytes to @var{addr}, taking the data from @var{buf}.
 Return @var{len} on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_spr (int @var{sprnum}, unsigned
-long int *@var{sprval_ptr})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_spr (int @var{sprnum}, @
+           unsigned long int *@var{sprval_ptr})
 
 Read the SPR specified by @var{sprnum}, placing the result in
 @var{sprval_ptr}.  Return non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_spr (int @var{sprnum}, unsigned
-long int @var{sprva})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_spr (int @var{sprnum}, @
+           unsigned long int @var{sprva})
 
 Write @var{sprval} to the SPR specified by @var{sprnum}.  Return
 non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_read_reg (int @var{regnum}, unsigned
-long int *@var{regval_ptr})
+@deftypefn {@file{or1ksim.h}} int or1ksim_read_reg (int @var{regnum}, @
+           unsigned long int *@var{regval_ptr})
 
 Read the general purpose register specified by @var{regnum}, placing the
 result in @var{regval_ptr}.  Return non-zero on success and 0 on
 failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} int or1ksim_write_reg (int @var{regnum}, unsigned
-long int @var{regva})
+@deftypefn {@file{or1ksim.h}} int or1ksim_write_reg (int @var{regnum}, @
+           unsigned long int @var{regva})
 
 Write @var{regval} to the general purpose register specified by
 @var{regnum}.  Return non-zero on success and 0 on failure.
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
 
-@deftypefn {@file{or1ksim.h}} void or1ksim_set_stall_state (int
-@var{state})
+@deftypefn {@file{or1ksim.h}} void or1ksim_set_stall_state (int @var{state})
 
 Set the processor's state according to @var{state} (1 = stalled, 0 = not
 stalled).
 
 @quotation Note
-This function was added in Or1ksim 0.5.0.
+This function was added in @value{OR1KSIM} 0.5.0.
 @end quotation
 
 @end deftypefn
@@ -941,6 +1042,291 @@ gcc ...  -Wl,--rpath -Wl,/opt/or1ksim/lib ...
 Add the library directory to @file{/etc/ld.so.conf}
 
 @end itemize
+
+@node Ethernet TUN/TAP Interface
+@section Ethernet TUN/TAP Interface
+@cindex configuring the Ethernet TUN/TAP interface
+
+When an Ethernet peripheral is configured (@pxref{Ethernet
+Configuration, , Ethernet Configuration}), one option is to tunnel
+traffic through a TUN/TAP interface.  The low level TAP interface is used
+to tunnel raw Ethernet datagrams.
+
+The TAP interface can then be connected to a physical Ethernet through a
+bridge, allowing the @value{OR1KSIM} model to connect to a physical
+network.  This is particularly when @value{OR1KSIM} is running the
+OpenRISC Linux kernel image.
+
+This section explains how to set up a bridge for use by @value{OR1KSIM}. It does
+require superuser access to the host machine (or at least the relevant
+network capabilities). A system administrator can modify these
+guidelines so they are executed on reboot if appropriate.
+
+@menu
+* Setting Up a Persistent TAP device::
+* Establishing a Bridge::
+* Opening the Firewall::
+* Disabling Ethernet Filtering::
+* Networking from OpenRISC Linux and BusyBox::
+* Tearing Down a Bridge::
+@end menu
+
+@node Setting Up a Persistent TAP device
+@subsection Setting Up a Persistent TAP device
+@cindex persistent TAP device creation
+@cindex TAP device creation
+
+TUN/TAP devices can be created dynamically, but this requires superuser
+privileges (or at least @code{CAP_NET_ADMIN} capability).  The solution
+is to create a persistent TAP device.  This can be done using either
+@command{openvpn} or @command{tunctl}.  In either case the package must
+be installed on the host system.  Using @command{openvpn}, the following
+would set up a TAP interface for a specified user and group.
+
+@example
+openvpn --mktun --dev tap@emph{n} --user @emph{username} --group @emph{groupname}
+@end example
+
+@node Establishing a Bridge
+@subsection Establishing a Bridge
+@cindex bridge setup
+@cindex Ethernet bridge setup
+
+A bridge is a ``virtual'' local area network interfaces, subsuming two or more
+existing network interfaces.  In this case we will bridge the physical
+Ethernet interface of the host with the TAP interface that will be used
+by @value{OR1KSIM}.
+
+The Ethernet and TAP must lose their own individual IP addresses (by
+setting them to 0.0.0.0) and are replaced by the IP address of the
+bridge interface. To do this we use the @command{bridge-utils} package,
+which must be installed on the host system. These commands are require
+superuser privileges or @code{CAP_NET_ADMIN} capability. To create a new
+interface @code{br@emph{n}} the following commands are appropriate.
+
+@example
+brctl addbr br@emph{n}
+brctl addif br@emph{n} eth@emph{x}
+brctl addif br@emph{n} tap@emph{y}
+
+ifconfig eth@emph{x} 0.0.0.0 promisc up
+ifconfig tap@emph{y} 0.0.0.0 promisc up
+
+dhclient br@emph{n}
+@end example
+
+The last command instructs the bridge to obtain its IP address, netmask,
+broadcast address, gateway and nameserver information using DHCP.  In a
+network without DHCP it should be replaced by @command{ifconfig} to set
+a static IP address, netmask and broadcast address.
+
+@quotation Note
+This will leave a spare dhclient process running in the background,
+which should be killed for tidiness. There is a technique to avoid this
+using @command{omshell}, but that is beyond the scope of this guide.
+@end quotation
+
+@quotation Note
+It is not clear to the author why the existing interfaces need to be
+brought up in promiscuous mode, but it seems to cure various problems.
+@end quotation
+
+@node Opening the Firewall
+@subsection  Opening the Firewall
+@cindex firewall with Ethernet bridge and TAP/TUN
+
+Firewall rules should be added to ensure traffic flows freely through
+the TAP and bridge interfaces. As superuser the following commands are
+appropriate.
+
+@example
+iptables -A INPUT -i tap@emph{y} -j ACCEPT
+iptables -A INPUT -i br@emph{n} -j ACCEPT
+iptables -A FORWARD -i br@emph{n} -j ACCEPT
+@end example
+
+@node Disabling Ethernet Filtering
+@subsection Disabling Ethernet Filtering
+
+Some systems may have ethernet filtering enabled (@command{ebtables},
+@command{bridge-nf}, @command{arptables}) which will stop traffic
+flowing through the bridge.
+
+The easiest way to disable this is by writing zero to all
+@file{bridge-nf-*} entries in @file{/proc/sys/net/bridge}. As superuser
+the following commands will achieve this.
+
+@example
+cd /proc/sys/net/bridge
+for f in bridge-nf-*; do echo 0 > $f; done
+@end example
+
+@node Networking from OpenRISC Linux and BusyBox
+@subsection Networking from OpenRISC Linux and BusyBox
+@cindex BusyBox and Ethernet
+@cindex Linux (OpenRISC) and Ethernet
+
+The main use of this style of Ethernet interface to @value{OR1KSIM} is when
+running the OpenRISC Linux kernel with BusyBox. The following commands
+in the BusyBox console window will configure the Ethernet interface
+(assumed to be @code{eth0}) and bring it up with a DHCP assigned
+address.
+
+@example
+ifconfig eth0
+ifup eth0
+@end example
+
+At this stage interface to IP addresses will work correctly.
+
+For DNS to work the BusyBox system needs to know where to find a
+nameserver.  Under BusyBox, @command{udhcp} does not configure
+@file{/etc/resolv.conf} automatically.
+
+The solution is to duplicate the nameserver entry from the
+@file{/etc/resolv.conf} file of the host on the BusyBox system. A
+typical file might be as follows:
+
+@example
+@code{nameserver 192.168.0.1}
+@end example
+
+It is convenient to make this permanent within the Linux initramfs. Add
+the file as @code{arch/openrisc/support/initramfs/etc/resolv.conf}
+within the Linux source tree and rebuild @code{vmlinux}. It will then be
+present automatically.
+
+One of the most useful functions that is possible is to mount
+the host file system through NFS. For example, from the BusyBox console:
+
+@example
+mount -t nfs -o nolock 192.168.0.60:/home /mnt
+@end example
+
+Another useful technique is to telnet into the BusyBox system from the
+host. This is particularly valuable when a console process locks up,
+since the @command{xterm} console will not recognize ctrl-C. Instead the
+rogue process can be killed from a telnet connection.
+
+@node Tearing Down a Bridge
+@subsection Tearing Down a Bridge
+
+There is little reason why a bridge should ever need to be torn down,
+but if desired, the following commands will achieve the effect.
+
+@example
+ifconfig br@emph{n} down
+brctl delbr br@emph{n}
+
+dhclient eth@emph{x}
+@end example
+
+As before this will leave a spare @command{dhclient} process in the
+background which should be killed.
+
+If desired the TAP interface can be deleted using
+
+@example
+openvpn --rmtun -dev tap@emph{y}
+@end example
+
+@quotation Caution
+The TAP interface should not be in use when running this command. For
+example any OpenRISC Linux/BusyBox sessions should be closed first.
+@end quotation
+
+@node l.nop Support
+@section l.nop Opcode Support
+@cindex l.nop opcode effects
+
+The OpenRISC @code{l.nop} opcode can take a parameter.  This has no
+effect on the semantics of the opcode, but can be used to trigger side
+effect behavior in a simulator.  Within Or1ksim, the following parameters
+are supported.
+
+@table @code
+
+@item l.nop 0
+@cindex @code{l.nop 0}
+
+The equivalent to @code{l.nop} with no parameter. Has no side effects.
+
+@item l.nop 1
+@cindex @code{l.nop 1} (end simulation)
+
+Execution of Or1ksim is terminated. This is used to implement the
+library @code{exit} functions.
+
+@item l.nop 2
+@cindex @code{l.nop 2} (report)
+
+Report the value in @code{r3} on the console as a 32-bit hex value.
+
+@item l.nop 3
+@cindex @code{l.nop 3} (printf, now obsolete)
+
+In earlier versions of @value{OR1KSIM} this treated @code{r3} as a
+pointer to a @code{printf} style format string, and registers @code{r4}
+through @code{r8} as parameters for that format string.
+
+This opcode is no longer supported, and has no effect if used.
+
+@item l.nop 4
+@cindex @code{l.nop 4} (putc)
+
+The value in @code{r3} is printed to standard output as an ASCII
+character.  All library output routines are implemented using this opcode.
+
+@item l.nop 5
+@cindex @code{l.nop 5} (reset statistics counters)
+
+The statistics counters are reset.
+
+@item l.nop 6
+@cindex @code{l.nop 6} (get clock ticks)
+
+The number of clock ticks since start of execution (a 64-bit value) is
+returned in @code{r11} (low 32 bits) and @code{r12} (high 32 bits).
+
+@item l.nop 7
+@cindex @code{l.nop 7} (get picoseconds per cycle)
+
+The number of picoseconds per clock cycle is returned in @code{r11}.
+This is used with @code{l.nop 6} to implement timing functions.
+
+@item l.nop 8
+@cindex @code{l.nop 8} (turn on tracing)
+
+Instruction tracing is turned on.
+
+@item l.nop 9
+@cindex @code{l.nop 9} (turn off tracing)
+
+Instruction tracing is turned off.
+
+@item l.nop 10
+@cindex @code{l.nop 10} (return a random number)
+
+A 32-bit random number is returned in @code{r11}.
+
+The random numbers are generated using @code{random}, which in turn is
+seeded through @code{srandom} using the host @file{/dev/urandom} if
+available, or else the process ID of the @value{OR1KSIM} instance.
+
+This opcode is particularly useful for situations where a target
+program running on Or1ksim needs to obtain genuine system entropy to
+generate random numbers.
+
+@item l.nop 11
+@cindex @code{l.nop 11} (return a non-zero value)
+
+Return a non-zero value in @code{r11}.
+
+This opcode can be used to detect if a target is running under
+Or1ksim.  Set @code{r11} to zero, issue this opcode, and look to see
+if @code{r11} is non-zero.
+
+@end table
 
 @node Configuration
 @chapter Configuration
@@ -1524,17 +1910,17 @@ memory.
 
 @quotation Caution
 The user may choose whether or not to enable a memory controller.  If a
-memory controller is enabled, then the standard OpenRISC C libraries
-will initialize it to expect 64MB memory blocks, and any memory
-declarations @emph{must} reflect this.  The section describing memory
-controller configuration describes the steps necessary for using smaller
-or larger memory sections (@pxref{Memory Controller Configuration, ,
-Memory Controller Configuration}).
+memory controller is enabled, then appropriate initalization code must
+be provided.  The section describing memory controller configuration
+describes the steps necessary for using smaller or larger memory
+sections (@pxref{Memory Controller Configuration, , Memory Controller
+Configuration}).
 
-If a memory controller is @emph{not} enabled, then the standard C
-library code will generate memory access errors.  The solution is to
-declare an additional writable memory block, mimicing the memory
-controller's register bank as follows.
+The @dfn{uClibc} startup code initalizes a memory controller, assumed to
+be mapped at 0x93000000.  If a memory controller is @emph{not} enabled,
+then the standard C library code will generate memory access errors.
+The solution is to declare an additional writable memory block, mimicing
+the memory controller's register bank as follows.
 
 @example
 section memory
@@ -1555,7 +1941,7 @@ The following parameters may be specified.
 
 @table @code
 
-@item type=random|pattern|unknown|zero
+@item type=random|pattern|unknown|zero|exitnops
 @cindex @code{type} (memory configuration)
 Specifies the values to which memory should be initialized.  The
 default value is @code{unknown}.
@@ -1591,6 +1977,12 @@ As a consequence, if the @code{pattern} field is @emph{subsequently}
 specified in this section, the value in that field will be used
 instead of zero to initialize the memory.
 @end quotation
+
+@item exitnops
+@cindex @code{type=exitnops} (memory configuration)
+Set the memory values to be an instruction used to signal end of
+simulation. This is useful for causing immediate end of simulation
+when PC corruption occurs.
 
 @end table
 
@@ -1880,6 +2272,30 @@ If 1 (true), the programmable interrupt controller is enabled.  If 0
 If 1 (true, the default), the programmable interrupt controller is
 edge triggered.  If 0 (false), it is level triggered.
 
+The library interface (@pxref{Simulator Library, , Simulator Library})
+provides different functions for setting the different types of
+interrupt, and a function to clear level sensitive interrupts. Edge
+sensitive interrupts must be cleared by clearing the corresponding bit
+in the PICSR SPR.
+
+Internal functions to set and clear interrupts are also provided for
+peripherals implemented within @value{OR1KSIM}. @xref{Interrupts Internal, ,
+Interrupts Internal} for more details.
+
+@item use_nmi = 0|1
+@cindex @code{use_nmi} (interrupt controller)
+If 1 (true, the default), interrupt lines 0 and 1 are non-maskable. In
+other words the least significant 2 bits of the PICMR SPR are hard-wired
+to 1.  If 0 (false), all interrupt lines are treated as equivalent.
+
+@quotation Note
+These are not non-maskable in the true sense that they will pre-empt
+other interrupts.  Rather they can never be masked out using the PICMR
+register. It is up the interrupt exception handler to give these
+interrupt lines priority, and indeed to decide on the priority order in
+general.
+@end quotation
+
 @end table
 
 @node Power Management Configuration
@@ -2093,10 +2509,20 @@ The memory controller configuration is described in @code{@w{section
 mc}}.  This section may appear multiple times, specifying multiple
 memory controllers.
 
+@quotation Warning
+There are known to be problems with the current memory controller, which
+currently is not included in the regression test suite. Users are
+advised not to use the memory controller in the current release.
+@end quotation
+
 @quotation Caution
-The standard OpenRISC C libraries will initialize the memory
-controller to expect 64MB memory blocks, and any memory declarations
-@emph{must} reflect this.
+There is no initialization code in the standard @dfn{newlib}
+library.
+
+The standard @dfn{uClibc} library assumes a memory controller
+mapped at 0x93000000 and will initialize the memory controller to expect
+64MB memory blocks, and any memory declarations @emph{must} reflect
+this.
 
 If smaller memory blocks are declared with a memory controller, then
 sufficient memory will not be allocated by @value{OR1KSIM}, but out of
@@ -2330,17 +2756,17 @@ with the DMA controller.
 @cindex configuring the Ethernet interface
 @cindex Ethernet configuration
 @cindex @code{section ethernet}
-The Ethernet MAC used in @value{OR1KSIM} is the component implemented
-at OpenCores, and found in the top level SVN directory, @file{ethmac}.
-It also forms part of the OpenRISC SoC, ORPSoC.  It is described in
-the document @cite{Ethernet IP Core Specification} by Igor Mohor,
-which can be found in the @file{doc} subdirectory.  It is a memory
-mapped component, which resides on the main OpenRISC Wishbone data
-bus.
-
 Ethernet configuration is described in @code{section ethernet}.  This
 section may appear multiple times, specifying multiple Ethernet
 interfaces.  The following parameters may be specified.
+
+The Ethernet MAC used in @value{OR1KSIM} corresponds to the Verilog
+implementation in project @dfn{ethmac}. It's source code can be found in
+the top level SVN directory, @file{ethmac}.  It also forms part of the
+OpenRISC reference SoC, ORPSoC.  It is described in the document
+@cite{Ethernet IP Core Specification} by Igor Mohor, which can be found
+in the @file{doc} subdirectory.  It is a memory mapped component, which
+resides on the main OpenRISC Wishbone data bus.
 
 @table @code
 
@@ -2380,21 +2806,26 @@ Configuration}).
 @cindex @code{dma} (Ethernet configuration)
 Use @var{value} as the IRQ number of this Ethernet MAC.  Default value 0.
 
-@item rtx_type = 0|1
+@item rtx_type = "file"|"tap"
 @cindex @code{rtx_type} (Ethernet configuration)
-If 1 (true) use a socket interface to the Ethernet (see parameter
-@code{sockif} below).  If 0 (the default), use a file interface,
-reading and writing from and to the files specified in the
+Specifies whether to use a TUN/TAP interface or file interface (the default)
+to model the external connection of the Ethernet.
+
+If a TUN/TAP interface is requested, Ethernet packets will be sent and
+received through the pesistent TAP interface specified in parameter
+@code{tap_dev} (see below).
+
+More details on configuring the TUN/TAP interface are given in the Usage
+section (@pxref{Ethernet TUN/TAP Interface, , Ethernet TUN/TAP
+Interface}).
+
+If a file interface (the default), is requested, the Ethernet will be
+modelled by reading and writing from and to the files specified in the
 @code{rxfile} and @code{txfile} parameters (see below).
 
-@quotation Note
-By default the socket interface is not provided in @value{OR1KSIM}.  If
-it is required, this must be requested when configuring, by use of the
-@code{--enable-ethphy} option to @command{configure}.
-
-@example
-configure --target=or32-uclinux --enable-ethphy ...
-@end example
+@quotation Caution
+If a file interface is specified, @value{OR1KSIM} will terminate once the
+receive file specified by @code{rxfile} is exhausted.
 @end quotation
 
 @item rx_channel = @var{rxvalue}
@@ -2427,11 +2858,40 @@ The input file must exist and be readable.  The output file must be
 writable and will be created if necessary.  If either of these
 conditions is not met, a warning will be given.
 
-@item sockif = "@var{service}"
-@cindex @code{sockif} (Ethernet configuration)
-When @code{rtx_type} is 1 (see above), @var{service} specifies the
-service to use for communication.  This may be TCP/IP or UDP/IP.  The
-default value of this parameter is @code{"or1ksim_eth"}.
+@quotation Caution
+@value{OR1KSIM} will terminate once the @var{rxfile} is exhausted.
+@end quotation
+
+@item tap_dev = "@var{tap}"
+@cindex @code{tap_dev} (Ethernet configuration)
+When @code{rtx_type} is @code{"tap"} (see above), @var{tap_dev}
+specifies the TAP device to use for communication.  This should be a
+persistent TAP device configured for the system (@pxref{Ethernet TUN/TAP
+Interface, , Ethernet TUN/TAP Interface})
+
+@item phy_addr = @var{value}
+@cindex @code{phy_addr} 
+@var{value} specifies the address for emulated ethernet PHY (default
+0). If there are multiple Ethernet peripherals, they should each have a
+different PHY value.
+
+@item dummy_crc = 0|1
+@cindex @code{dummy_crc} (Ethernet configuration)
+If 1 (true, the default), the length of the data transferred to the core
+will be increased by 4 bytes, as though the CRC were included.
+
+@quotation Note
+This is for historical consistency with the OpenRISC Ethernet hardware
+MAC, which passes on the CRC in the data packet. This is unusual
+behavior for a MAC, but the OpenRISC Linux device drivers have been
+written to expect it.
+@end quotation
+
+@item phy_addr = @var{value}
+@cindex @code{phy_addr} 
+@var{value} specifies the address for emulated ethernet PHY (default
+0). If there are multiple Ethernet peripherals, they should each have a
+different PHY value.
 
 @item vapi_id = @var{value}
 @cindex @code{vapi_id} (DMA configuration)
@@ -2687,6 +3147,11 @@ the document @cite{ATA/ATAPI-5 Core Specification} by Richard
 Herveille, which can be found in the @file{doc} subdirectory.  It is a
 memory mapped component, which resides on the main OpenRISC Wishbone
 data bus.
+
+@quotation Warning
+In the current release of @value{OR1KSIM}, parsing of the ATA section is
+broken. Users should not configure the disc interface in this release.
+@end quotation
 
 ATA/ATAPI configuration is described in @code{@w{section ata}}.  This section
 may appear multiple times, specifying multiple disc controllers.  The
@@ -3617,6 +4082,37 @@ processor is reset by calling @code{reg_sim_reset}, providing a
 function and pointer to a data structure as arguments.  On reset that
 function will be called with the data stucture pointer as argument.
 
+@anchor{Interrupts Internal}
+@item Interrupts
+@cindex interrupts
+@findex report_interrupt
+@findex clear_interrupt
+@findex mtspr
+An internal peripheral can model the effect of an interrupt being
+asserted by calling @code{report_interrupt}.  This is used for both edge
+and level sensitive interrupts.
+
+The effect is to set the corresponding bit in the PICSR SPR and to queue
+an interrupt exception to take place after the current instruction
+completes execution.
+
+Externally, the different interrupts require different mechanisms for
+clearing.  Level sensitive interrupts should be cleared by deasserting
+the interrupt line, edge sensitive interrupts by clearing the
+corresponding bit in the PICSR SPR.
+
+Internally this amounts to the same thing (clearing the PICSPR bit), so
+a single function is provided, @code{clear_interrupt}.  Note however that
+when level sensitive interrupts are configured, PICSR is read only, and
+can only be cleared by calling @code{clear_interrupt}.  Using the two
+functions provided will ensure the peripheral works correctly whichever
+type of interrupt is used.
+
+@quotation Note
+Until an interrupt is cleared, all subsequent interrupts are ignored
+with a warning.
+@end quotation
+
 @end table
 
 @node Internal Debugging
@@ -3687,10 +4183,11 @@ procedures for common use among the tests.
 @item libsim.tests
 @itemx or1ksim.tests
 @cindex DejaGNU tests directories
-These are the directories of tests of the Or1ksim library.  They also include
-@value{OR1KSIM} configuration files and each has a @file{Makefile.am} file.
-@file{Makefile.am} should be updated whenever files are added to this
-directory, to ensure they are included in the distribution.
+These are the directories of tests of the @value{OR1KSIM} library.  They
+also include @value{OR1KSIM} configuration files and each has a
+@file{Makefile.am} file.  @file{Makefile.am} should be updated whenever
+files are added to this directory, to ensure they are included in the
+distribution.
 
 @item test-code
 @cindex host test code

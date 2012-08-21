@@ -477,6 +477,10 @@ printf(const char *fmt,
 	  /* Decode the field */
 	  i++;
 
+	  /* Ignore periods */
+	  if ('.' == fmt[i])
+		  i++;
+
 	  /* Are leading zeros requested? */
 	  if ('0' == fmt[i])
 	    {

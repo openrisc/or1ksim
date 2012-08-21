@@ -55,7 +55,7 @@
 
 
 /* Define to log each packet */
-/* #define RSP_TRACE  1 */
+/*#define RSP_TRACE  1*/
 
 /*! Name of the Or1ksim RSP service */
 #define OR1KSIM_RSP_SERVICE  "or1ksim-rsp"
@@ -1848,6 +1848,11 @@ rsp_query (struct rsp_buf *buf)
 	       'R', 'u', 'n', 'n', 'a', 'b', 'l', 'e', 0);
       buf->len = strlen (buf->data);
       put_packet (buf);
+    }
+  else if (0 == strncmp ("qTStatus", buf->data, strlen ("qTStatus")))  
+    {
+      /* We don't support tracing, so return empty packet. */
+      put_str_packet ("");
     }
   else if (0 == strncmp ("qXfer:", buf->data, strlen ("qXfer:")))
     {

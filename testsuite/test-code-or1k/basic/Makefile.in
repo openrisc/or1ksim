@@ -74,7 +74,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am_basic_OBJECTS = basic.$(OBJEXT)
 basic_OBJECTS = $(am_basic_OBJECTS)
-basic_LDADD = $(LDADD)
+basic_DEPENDENCIES = ../except/except.lo ../support/libsupport.la
 basic_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(basic_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -218,6 +218,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 basic_SOURCES = basic.S
 basic_LDFLAGS = -T$(srcdir)/../default.ld
+basic_LDADD = ../except/except.lo      \
+	         ../support/libsupport.la
+
 all: all-am
 
 .SUFFIXES:

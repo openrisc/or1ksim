@@ -1,7 +1,7 @@
 # configure.ac -- Top level autoconf configuration file
 #
 # Copyright (C) 1999-2008 OpenCores
-# Copyright (C) 2008, 2010 Embecosm Limited
+# Copyright (C) 2008, 2010, 2011 Embecosm Limited
 #
 # Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 #
@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [0.5.0rc1], [openrisc@opencores.org])
+AC_INIT([or1ksim], [0.5.1rc1], [openrisc@opencores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -56,9 +56,11 @@ case "$target_cpu" in
 or32*)	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
+
 dlx*)	CPU_ARCH=dlx;
 	ARCH_ISA=DLX;;
-*)      AC_MSG_WARN(Unknown target architecture $target_cpu: OR32 assumed);
+
+*)      AC_MSG_WARN(Unknown target architecture $target_cpu: OR32 ELF assumed);
 	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
@@ -306,10 +308,7 @@ test -n "$profile"  && CFLAGS="$CFLAGS $profile" LDFLAGS="$LDFLAGS $profile"
 
 # Check for a DejaGNU global config file. If not set, then set it
 # ourselves. This stops runtest complaining
-if test x"$DEJAGNU" = x
-then
-  DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
-fi
+DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
 
 AC_SUBST(DEJAGNU)
 

@@ -34,6 +34,7 @@ mc_async_SOURCES  = mc-async.c \
 mc_async_CPPFLAGS = -I$(srcdir)/../../../peripheral \
                     -I$(srcdir)/../../../cpu/common \
                     -I$(srcdir)/../../../cpu/or1k   \
+                    -I$(srcdir)/../mc-common		\
                     -I$(srcdir)/../../../port
 
 mc_async_LDFLAGS  = -T$(srcdir)/../except-mc.ld
