@@ -22,3 +22,7 @@ install can be done with
 
 Full details on installation are provided in the user manual, in the *doc*
 directory.
+
+
+Jeremy Bennett <jeremy.bennett@embecosm.com>
+21 August 2012
