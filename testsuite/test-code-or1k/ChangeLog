@@ -1,0 +1,580 @@
+2012-04-27  Peter Gavin  <pgavin@gmail.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2012-04-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2012-03-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Patch from R Diez <rdiezmail-openrisc@yahoo.de>
+
+	* cache/cache-asm.S, cfg/cfg.S, except-test/except-test-s.S,
+	* except/except.S, ext/ext.S, flag/flag.S, fp/fp.S,
+	* inst-set-test/inst-set-test.S, int-test/int-test.S,
+	* mc-common/except-mc.S, uos/except-or32.S: Clear R0 on
+	start-up. There is no guarantee that R0 is hardwired to zero, and
+	indeed it is not when simulating the or1200 Verilog core.
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2012-03-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version. Added AM_SILENT_RULES for nicer
+	builds.
+
+2011-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version
+
+2011-04-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.1rc1.
+
+2011-02-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2011-01-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version 0.5.0rc3.
+	* support/spr-defs.h: Added definition of NOP_RANDOM and
+	NOP_OR1KSIM. Removed definitions of NOP_REPORT_FIRST and
+	NOP_REPORT_LAST.
+
+2011-01-05  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* support/spr-defs.h: Added definition of NOP_TRACE_ON and
+	NOP_TRACE_OFF.
+
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* eth/eth.c: Fixed errors causing regression failure. Solved by enable
+	promiscuous mode, and correct BD index recording.
+
+2010-12-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-12-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-12-08  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-11-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-11-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* support/spr-defs.h: References to PICPR removed.
+
+2010-11-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+	* int-logger/int-logger-edge.c: Deleted.
+	* int-logger/int-logger-level.c: Deleted.
+	* int-logger/int-logger.c: Created.
+	* int-logger/Makefile.am: Changed to create a single program,
+	int-logger.
+	* int-logger/Makefile.in: Regenerated.
+
+2010-11-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Updated version.
+
+2010-10-27  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version updated
+
+2010-10-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version updated
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* Release 0.5.0rc2.
+
+2010-10-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc2.
+	* support/spr-defs.h <SPR_VR_RES>: Definition corrected.
+
+2010-09-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Handle the case where target_cpu is not set.
+
+2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* mc-common/except-mc.S: Remove leading underscores from global
+	symbols.
+	* except/except.S: Remove leading underscores from global symbols.
+	* cache/cache-asm.S: Remove leading underscores from global symbols.
+	* cache/cache.c (jump_and_link): Remove leading underscore from
+	label.
+	(jump): Remove leading underscore from label.
+	(all): Remove leading underscore from global symbol references.
+	* testfloat/systfloat.S: Remove leading underscores from global
+	symbols.
+	* mmu/mmu.c (jump): Remove leading underscore from label.
+	* mmu/mmu-asm.S: Remove leading underscores from global symbols.
+	* except-test/except-test.c: Remove leading underscores from
+	global symbols.
+	* except-test/except-test-s.S: Remove leading underscores from
+	global symbols.
+	* uos/except-or32.S: Remove leading underscores from global
+	symbols.
+
+2010-09-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.5.0rc1.
+
+2010-08-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date
+
+2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* testsuite/test-code-or1k/fp/fp.S: Update to work with softfloat FPU
+	* testsuite/test-code-or1k/support/support.c: Added rand() function
+	* testsuite/test-code-or1k/support/support.h: Added rand() fn. prototype
+	* testsuite/test-code-or1k/support/spr-defs.h: sync up with main defs
+	* testsuite/test-code-or1k/testfloat: Directory for new OR1K test
+	of FPU.
+	* testsuite/test-code-or1k/testfloat/Makefile.am: Created.
+	* testsuite/test-code-or1k/testfloat/Makefile.in: Regenerated.
+	* testsuite/test-code-or1k/testfloat/README: Created.
+	* testsuite/test-code-or1k/testfloat/fail.c: Created.
+	* testsuite/test-code-or1k/testfloat/fail.h: Created.
+	* testsuite/test-code-or1k/testfloat/milieu.h: Created.
+	* testsuite/test-code-or1k/testfloat/or1k-gcc.h: Created.
+	* testsuite/test-code-or1k/testfloat/random.c: Created.
+	* testsuite/test-code-or1k/testfloat/random.h: Created.
+	* testsuite/test-code-or1k/testfloat/slowfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/slowfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/softfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/softfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/systflags.c: Created.
+	* testsuite/test-code-or1k/testfloat/systflags.h: Created.
+	* testsuite/test-code-or1k/testfloat/systfloat.S: Created.
+	* testsuite/test-code-or1k/testfloat/systfloat.h: Created.
+	* testsuite/test-code-or1k/testfloat/systmodes.c: Created.
+	* testsuite/test-code-or1k/testfloat/systmodes.h: Created.
+	* testsuite/test-code-or1k/testfloat/testCases.c: Created.
+	* testsuite/test-code-or1k/testfloat/testCases.h: Created.
+	* testsuite/test-code-or1k/testfloat/testFunction.c: Created.
+	* testsuite/test-code-or1k/testfloat/testFunction.h: Created.
+	* testsuite/test-code-or1k/testfloat/testLoops.c: Created.
+	* testsuite/test-code-or1k/testfloat/testLoops.h: Created.
+	* testsuite/test-code-or1k/testfloat/testfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/testsoftfloat.c: Created.
+	* testsuite/test-code-or1k/testfloat/writeHex.c: Created.
+	* testsuite/test-code-or1k/testfloat/writeHex.h: Created.
+
+2010-08-01  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date
+
+2010-06-31  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date
+
+2010-06-29  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to current date
+
+2010-06-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Version changed to 0.4.0.
+
+2010-06-16  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Changed version to 0.4.0rc2.
+
+2010-06-15  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/is-and-test.S: Created.
+	* inst-set-test/is-or-test.S: Created.
+	* inst-set-test/is-shift-test.S: Created.
+	* inst-set-test/is-spr-test.S: Created.
+	* inst-set-test/is-sub-test.S: Created.
+	* inst-set-test/is-xor-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-14  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/inst-set-test.S <range>: Just output
+	identification string.
+	<align>: Alignment exception handler.
+	<illegal>: Illegal instruction exception handler.
+	* inst-set-test/is-jump-test.S: Created.
+	* inst-set-test/is-ror-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-13  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/inst-set-test.h <PUTHH, PUTHQ, CHECK_RES1>: New
+	macros created.
+	* inst-set-test/inst-set-test.S (puthh, puthq): Created.
+	* inst-set-test/is-add-test.S <TEST_ADD, TEST_ADDI>: Macros
+	changed to use CHECK_RES1, rather than CHECK_RES. Check for
+	failure to generate exception, as well as generation of exception.
+	* inst-set-test/is-div-test.S Wider range of tests.
+	<TEST_DIV>: Macro changed to use CHECK_RES1, rather than
+	CHECK_RES. Check for failure to generate exception, as well as
+	generation of exception.
+	* inst-set-test/is-find-test.S <TEST_FIND>: Macro changed to use
+	CHECK_RES1, rather than CHECK_RES.
+	* inst-set-test/is-mul-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/inst-set-test.h: Calling conventions updated.
+	<CHECK_RES2>: New macro created.
+	<PUTS>: New macro created.
+	<PUTH>: New macro created.
+	* inst-set-test/inst-set-test.S: New calling convention
+	implemented throughout.
+	(puth): Created.
+	* inst-set-test/is-mac-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+	* mul/mul.c: Corrected expected results.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/is-add-test.S: Commenting corrected.
+	* inst-set-test/is-find-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-10  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/is-add-test.S: Added tests for l.addi and l.addic
+
+2010-06-09  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* inst-set-test/is-add-test.S: Created.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+
+2010-06-08  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* mc-sync/mc-sync.c: mc_defines.h -> mc-defines.h.
+	* mc-ssram/mc-ssram.c: mc_defines.h -> mc-defines.h.
+	* mc-dram/mc-dram.c: mc_defines.h -> mc-defines.h.
+	* mc-async/mc-async.c: mc_defines.h -> mc-defines.h.
+
+2010-06-08  Julius Baxter <julius.baxter@orsoc.se>
+
+	* eth/eth.h: Created from ethernet peripheral's header.
+	* eth/Makefile.am: Removed eth_CPPFLAGS.
+	* mc-sync/mc-sync.c: Changed include of mc.h to mc_defines.h
+	* mc-ssram/mc-ssram.c: Changed include of mc.h to mc_defines.h
+	* mc-dram/mc-dram.c: Changed include of mc.h to mc_defines.h
+	* mc-async/mc-async.c: Changed include of mc.h to mc_defines.h
+
+2010-06-06  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Removed	creation of lws-test makefile.
+	* fp/fp.S (_puts): Fixed register usage.
+	* inst-set-test/inst-set-test.ld: Created.
+	* inst-set-test/inst-set-test.S: Created using functions
+	lws-test/lws-test.S
+	* inst-set-test/is-div-test.S: Created.
+	* inst-set-test/inst-set-test.h: Created using macros from
+	lws-test/lws-test.S.
+	* inst-set-test/Makefile.am: Updated for new tests
+	* inst-set-test/Makefile.in: Regenerated.
+	* inst-set-test/is-lws-test.S: Created from lws-test/lws-test.S
+	* lws-test: Directory deleted.
+	* lws-test/lws-test.S: Deleted.
+	* lws-test/Makefile.am: Deleted.
+	* lws-test/Makefile.in: Deleted.
+	* Makefile.am: Removed lws-test directory
+	* Makefile.in: Regenerated.
+
+2010-06-04  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Added creation of lws-test makefile
+	* fp/fp.S (_puts): Fixed register usage.
+	* lws-test: Directory created.
+	* lws-test/lws-test.S: Created.
+	* lws-test/Makefile.am: Created.
+	* lws-test/Makefile.in: Generated.
+	* Makefile.am: Added lws-test directory
+	* Makefile.in: Regenerated.
+
+2010-06-02  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure: Regenerated.
+	* configure.ac: Added creation of FP test makefile
+	* fp: Directory created.
+	* fp/fp.S: Created.
+	* fp/Makefile.am: Created.
+	* fp/Makefile.in: Generated.
+	* Makefile.am: Added FP test directory
+	* Makefile.in: Regenerated.
+
+2010-05-18  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* loop/loop-init.c (main): Initialize top of each memory block.
+	* loop/loop-report.c (main): Rewritten to ensure reliable
+	reporting of results.
+
+2010-05-11  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* loop/loop-init.c: Looping program with SPR and memory
+	initialization.
+	* loop/loop-report.c: Looping program which reports changes to SPR
+	and memory.
+	* loop/Makefile.am: Update for new programs.
+	* loop/Makefile.in: Regenerated.
+
+2010-04-28  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* int-logger/int-logger-edge.c: Created.
+	* int-logger/Makefile.am: Added int-logger-edge.
+	* int-logger/Makefile.in: Regenerated.
+	* upcalls/upcall-basic.c: Created.
+	* upcalls/upcall-misaligned.c: Created.
+	* upcalls/Makefile.am: Created.
+	* upcalls/Makefile.in: Regenerated.
+
+2010-04-25  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* kbdtest/kbdtest.c (print_escaped_char): Added	function to print
+	chars more clearly.
+
+2010-04-23  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* configure.ac: Added new interrupt test make files.
+	* configure: Regenerated.
+	* int-logger/int-logger-level.c: Created.
+	* int-logger/Makefile.am: Created.
+	* int-logger/Makefile.in: Regenerated.
+
+2010-04-22  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* support/support.c (print_base, printf_unsigned_base): Value and
+	base made unsigned.
+	(print_decimal): cast value to unsigned for call to print_base.
+
+2010-04-21  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* AUTHORS: Moved from parent directory
+	* configure: Regenerated.
+	* configure.ac: Moved from parent directory and updated.
+	* COPYING: Moved from parent directory.
+	* INSTALL: Moved from parent directory.
+	* NEWS: Moved from parent directory
+	* README: Updated for new structure.
+
+2010-04-20  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* support/spr-defs.h: NOP_PRINTF definition removed.
+	* except-test/except-test.c (illegal_insn_test):
+  	  Generate and check a correct sequence for illegal instruction.
+	* except-test/except-test.c (except_priority_test):
+	  Generate a properly illegal instruction.
+
+2010-04-19  Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+	* acv-gpio: New directory.
+	* acv-gpio/acv-gpio.c: Created.
+	* acv-gpio/Makefile.am: Created.
+	* acv-gpio/Makefile.in: Regenerated.
+	* acv-uart: New directory.
+	* acv-uart/acv-uart.c: Created.
+	* acv-uart/Makefile.am: Created.
+	* acv-uart/Makefile.in: Regenerated.
+	* basic: New directory.
+	* basic/basic.S: Created.
+	* basic/Makefile.am: Created.
+	* basic/Makefile.in: Regenerated.
+	* board.h: Created.
+	* cache: New directory.
+	* cache/cache-asm.S: Created.
+	* cache/cache.c: Created.
+	* cache/cache.ld: Updated from old test directory.
+	* cache/Makefile.am: Created.
+	* cache/Makefile.in: Regenerated.
+	* cbasic: New directory.
+	* cbasic/cbasic.c: Created.
+	* cbasic/Makefile.am: Created.
+	* cbasic/Makefile.in: Regenerated.
+	* cfg: New directory.
+	* cfg/cfg.S: Created.
+	* cfg/Makefile.am: Created.
+	* cfg/Makefile.in: Regenerated.
+	* default.ld: Updated from old test directory.
+	* dhry: New directory.
+	* dhry/dhry.c: Created.
+	* dhry/dhry.h: Created.
+	* dhry/Makefile.am: Created.
+	* dhry/Makefile.in: Regenerated.
+	* dmatest: New directory.
+	* dmatest/dmatest.c: Created.
+	* dmatest/Makefile.am: Created.
+	* dmatest/Makefile.in: Regenerated.
+	* eth: New directory.
+	* eth/eth.c: Created.
+	* eth/Makefile.am: Created.
+	* eth/Makefile.in: Regenerated.
+	* except: New directory.
+	* except/except.S: Created.
+	* except/Makefile.am: Created.
+	* except/Makefile.in: Regenerated.
+	* except-mc.ld: Updated from old test directory.
+	* except-test: New directory.
+	* except-test/except-test.c: Created.
+	* except-test/except-test-s.S: Created.
+	* except-test/Makefile.am: Created.
+	* except-test/Makefile.in: Regenerated.
+	* exit: New directory.
+	* exit/exit.c: Created.
+	* exit/Makefile.am: Created.
+	* exit/Makefile.in: Regenerated.
+	* ext: New directory.
+	* ext/ext.S: Created.
+	* ext/Makefile.am: Created.
+	* ext/Makefile.in: Regenerated.
+	* fbtest: New directory.
+	* fbtest/fbtest.c: Created.
+	* fbtest/Makefile.am: Created.
+	* fbtest/Makefile.in: Regenerated.
+	* flag: New directory.
+	* flag/flag.S: Created.
+	* flag/Makefile.am: Created.
+	* flag/Makefile.in: Regenerated.
+	* functest: New directory.
+	* functest/functest.c: Created.
+	* functest/Makefile.am: Created.
+	* functest/Makefile.in: Regenerated.
+	* inst-set-test: New directory.
+	* inst-set-test/inst-set-test.c: Created.
+	* inst-set-test/Makefile.am: Created.
+	* inst-set-test/Makefile.in: Regenerated.
+	* int-test: New directory.
+	* int-test/int-test.ld: Updated from old test directory.
+	* int-test/int-test.S: Created.
+	* int-test/Makefile.am: Created.
+	* int-test/Makefile.in: Regenerated.
+	* kbdtest: New directory.
+	* kbdtest/kbdtest.c: Created.
+	* kbdtest/Makefile.am: Created.
+	* kbdtest/Makefile.in: Regenerated.
+	* local-global: New directory.
+	* local-global/local-global.c: Created.
+	* local-global/Makefile.am: Created.
+	* local-global/Makefile.in: Regenerated.
+	* Makefile.am: Created.
+	* Makefile.in: Regenerated.
+	* mc-async: New directory.
+	* mc-async/Makefile.am: Created.
+	* mc-async/Makefile.in: Regenerated.
+	* mc-async/mc-async.c: Created.
+	* mc-async/mc-async.h: Created.
+	* mc-common: New directory.
+	* mc-common/except-mc.S: Created.
+	* mc-common/Makefile.am: Created.
+	* mc-common/Makefile.in: Regenerated.
+	* mc-common/mc-common.c: Created.
+	* mc-common/mc-common.h: Created.
+	* mc-dram: New directory.
+	* mc-dram/Makefile.am: Created.
+	* mc-dram/Makefile.in: Regenerated.
+	* mc-dram/mc-dram.c: Created.
+	* mc-dram/mc-dram.h: Created.
+	* mc-ssram: New directory.
+	* mc-ssram/Makefile.am: Created.
+	* mc-ssram/Makefile.in: Regenerated.
+	* mc-ssram/mc-ssram.c: Created.
+	* mc-ssram/mc-ssram.h: Created.
+	* mc-sync: New directory.
+	* mc-sync/Makefile.am: Created.
+	* mc-sync/Makefile.in: Regenerated.
+	* mc-sync/mc-sync.c: Created.
+	* mc-sync/mc-sync.h: Created.
+	* mem-test: New directory.
+	* mem-test/Makefile.am: Created.
+	* mem-test/Makefile.in: Regenerated.
+	* mem-test/mem-test.c: Created.
+	* mmu: New directory.
+	* mmu/Makefile.am: Created.
+	* mmu/Makefile.in: Regenerated.
+	* mmu/mmu-asm.S: Created.
+	* mmu/mmu.c: Created.
+	* mul: New directory.
+	* mul/Makefile.am: Created.
+	* mul/Makefile.in: Regenerated.
+	* mul/mul.c: Created.
+	* mycompress: New directory.
+	* mycompress/Makefile.am: Created.
+	* mycompress/Makefile.in: Regenerated.
+	* mycompress/mycompress.c: Created.
+	* support: New directory.
+	* support/int.c: Created.
+	* support/int.h: Created.
+	* support/Makefile.am: Created.
+	* support/Makefile.in: Regenerated.
+	* support/spr-defs.h: Created.
+	* support/support.c: Created.
+	* support/support.h: Created.
+	* tick: New directory.
+	* tick/Makefile.am: Created.
+	* tick/Makefile.in: Regenerated.
+	* tick/tick.c: Created.
+	* uos: New directory.
+	* uos/except-or32.S: Created.
+	* uos/ipc.h: Created.
+	* uos/Makefile.am: Created.
+	* uos/Makefile.in: Regenerated.
+	* uos/README: Created.
+	* uos/task.c: Created.
+	* uos/tick.c: Created.
+	* uos/uos.c: Created.
+	* uos/uos.h: Created.

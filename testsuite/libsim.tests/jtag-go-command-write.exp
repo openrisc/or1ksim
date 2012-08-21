@@ -1,0 +1,2232 @@
+# jtag-go-command-write.exp. Tests of the library JTAG GO_COMMAND for writing
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# These tests check all the behavior associated with the JTAG GO_COMMAND when
+# writing.
+
+# NOTE. All these tests return timing information, but we ignore it, since in
+#       general it will not be repeatable.
+
+# Tests of the GO_COMMAND for writing to different modules. This should work
+# fine for Wishbone and CPU0. Other modules will have been weeded out by the
+# prior WRITE_COMMAND. We specify 4 bytes to read each time.
+
+# We use the loop-report OpenRISC program here, since we must be sure that
+# values written make it to the target As SPR's we use MACLO (0x2801) and
+# MACHI (0x2802). As Wishbone we use address 0x100000 - 0x12ffff. Changes to
+# values in the first 16 bytes following 0x100000, 0x110000 and 0x120000 are
+# reported.
+
+# When testing GO_COMMAND (write) after invalid module selection, we cannot
+# guarantee a CRC mismatch (or at least I can't do the maths to prove that no
+# register of all zeros can have a valid CRC field for the possible GO_COMMAND
+# register lengths, although it is highly likely), so we just look for the
+# error message.
+
+# GO_COMMAND writing with no module selection (address 0x100000).
+run_libsim "JTAG SELECT_MODULE GO_COMMAND (write) no module"    \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken: "                                      \
+          "Execution step completed OK."                        \
+          "Processing WRITE_COMMAND."                           \
+          "  shifting in:  0x00000000018f4396f780000000100088"  \
+          "ERROR: JTAG WRITE_COMMAND with no module selected."  \
+          "  shifted out:  0x164841bc600000000000000000000000"  \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing GO_COMMAND_WRITE."                        \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"      \
+          "ERROR: JTAG GO_COMMAND with no prior WRITE_COMMAND." \
+          "  shifted out:  0x0000000000000000000000000000"      \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8"   \
+         "WRITE_COMMAND" "2" "100000" "4" "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND writing with only invalid module selected.
+run_libsim "JTAG GO_COMMAND (write) invalid module"             \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000001993c98e69"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing WRITE_COMMAND."                           \
+          "  shifting in:  0x0000000001933eb7e580010028000088"  \
+          "ERROR: JTAG WRITE_COMMAND for CPU1 not supported."   \
+          "  shifted out:  0x164841bc600000000000000000000000"  \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing GO_COMMAND_WRITE."                        \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"      \
+          "ERROR: JTAG GO_COMMAND with no prior WRITE_COMMAND." \
+          "  shifted out:  0x0000000000000000000000000000"      \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "2" "WRITE_COMMAND" "2" "2801" "4"        \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND writing with invalid module selected after valid module
+run_libsim "JTAG GO_COMMAND (write) invalid after valid module" \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x0000000000174841bc61"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000001efe0d976d"              \
+          "  shifted out:  0x01893c98e68000000000"              \
+          "  status:       0x2"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing WRITE_COMMAND."                           \
+          "  shifting in:  0x0000000001933eb7e580010028000088"  \
+          "ERROR: JTAG WRITE_COMMAND with no module selected."  \
+          "  shifted out:  0x164841bc600000000000000000000000"  \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing GO_COMMAND_WRITE."                        \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"      \
+          "ERROR: JTAG GO_COMMAND with no prior WRITE_COMMAND." \
+          "  shifted out:  0x0000000000000000000000000000"      \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION"   \
+         "8" "SELECT_MODULE" "0" "SELECT_MODULE" "6" "WRITE_COMMAND" "2" \
+         "2801" "4" "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND writing with valid module selected after invalid module
+run_libsim "JTAG GO_COMMAND (write) valid after invalid module" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001efe0d976d"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION"   \
+         "8" "SELECT_MODULE" "6" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" \
+         "100000" "4" "GO_COMMAND_WRITE" "deadbeef"
+
+# Verify that writing works correctly from both valid modules, WishBone and
+# CPU0.
+
+# GO_COMMAND writing for Wishbone (address 0x100000).
+run_libsim "JTAG SELECT_MODULE GO_COMMAND (write) WB"          \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"         \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND writing for CPU0 (address 0x2801, MACLO).
+run_libsim "JTAG SELECT_MODULE GO_COMMAND (write) CPU0"        \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"           \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# Tests of GO_COMMAND_WRITE with different access alignments, boundaries and
+# lengths for WishBone. For this we use the loop-report program, which reports
+# any changes in values at 0x100000-0x10000f, 0x110000-0x11000f and
+# 0x120000-0x12000f or the SPRs MACLO (0x2801) and MACHI (0x2800), all of
+# which are initialized to zero.
+
+# First check that a single aligned unit can be written for each access type
+# at its allowed alignments.
+
+# GO_COMMAND writing one byte for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 1 byte, aligned byte 0" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000319cf96400000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0164841bc6000000000000"           \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "New byte at 0x00100000 = 0xde"                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "1"        \
+         "GO_COMMAND_WRITE" "de"
+
+# GO_COMMAND writing one byte for Wishbone aligned at byte 1.
+run_libsim "JTAG GO_COMMAND (write) WB 1 byte, aligned byte 1" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001f3f6ce6400010000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0164841bc6000000000000"           \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "New byte at 0x00100001 = 0xde"                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100001" "1"        \
+         "GO_COMMAND_WRITE" "de"
+
+# GO_COMMAND writing one byte for Wishbone aligned at byte 2.
+run_libsim "JTAG GO_COMMAND (write) WB 1 byte, aligned byte 2" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000d0a9e2e400008000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0164841bc6000000000000"           \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "New byte at 0x00100002 = 0xde"                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100002" "1"        \
+         "GO_COMMAND_WRITE" "de"
+
+# GO_COMMAND writing one byte for Wishbone aligned at byte 3.
+run_libsim "JTAG GO_COMMAND (write) WB 1 byte, aligned byte 3" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000112c3d5e400018000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0164841bc6000000000000"           \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "New byte at 0x00100003 = 0xde"                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100003" "1"        \
+         "GO_COMMAND_WRITE" "de"
+
+# GO_COMMAND writing one half word for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 1 half word, aligned byte 0" \
+    [list "Initalization succeeded."                                \
+          "Execution step completed OK."                            \
+          "Resetting JTAG."                                         \
+          "Execution step completed OK."                            \
+          "Shifting instruction."                                   \
+          "  shifting in:  0x01"                                    \
+          "  shifted out:  0x01"                                    \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Selecting module."                                       \
+          "  shifting in:  0x0000000000174841bc61"                  \
+          "  shifted out:  0x0164841bc60000000000"                  \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing WRITE_COMMAND."                               \
+          "  shifting in:  0x0000000000fac02ac100000000100108"      \
+          "  shifted out:  0x164841bc600000000000000000000000"      \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing GO_COMMAND_WRITE."                            \
+          "  shifting in:  0x00000000000e463a0ad6af60"              \
+          "  shifted out:  0x0164841bc600000000000000"              \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "New byte at 0x00100000 = 0xde"                           \
+          "New byte at 0x00100001 = 0xad"                           \
+          "Execution step completed OK."                            \
+          "Test completed successfully."]                           \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "2"        \
+         "GO_COMMAND_WRITE" "dead"
+
+# GO_COMMAND writing one half word for Wishbone aligned at byte 2.
+run_libsim "JTAG GO_COMMAND (write) WB 1 half word, aligned byte 2" \
+    [list "Initalization succeeded."                                \
+          "Execution step completed OK."                            \
+          "Resetting JTAG."                                         \
+          "Execution step completed OK."                            \
+          "Shifting instruction."                                   \
+          "  shifting in:  0x01"                                    \
+          "  shifted out:  0x01"                                    \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Selecting module."                                       \
+          "  shifting in:  0x0000000000174841bc61"                  \
+          "  shifted out:  0x0164841bc60000000000"                  \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing WRITE_COMMAND."                               \
+          "  shifting in:  0x00000000001bf5314100008000100108"      \
+          "  shifted out:  0x164841bc600000000000000000000000"      \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing GO_COMMAND_WRITE."                            \
+          "  shifting in:  0x00000000000e463a0ad6af60"              \
+          "  shifted out:  0x0164841bc600000000000000"              \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "New byte at 0x00100002 = 0xde"                           \
+          "New byte at 0x00100003 = 0xad"                           \
+          "Execution step completed OK."                            \
+          "Test completed successfully."]                           \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100002" "2"        \
+         "GO_COMMAND_WRITE" "dead"
+
+# GO_COMMAND writing one word for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 1 word, aligned byte 0" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "New byte at 0x00100000 = 0xde"                      \
+          "New byte at 0x00100001 = 0xad"                      \
+          "New byte at 0x00100002 = 0xbe"                      \
+          "New byte at 0x00100003 = 0xef"                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"        \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# Verify that longer writes work OK, at different boundaries. For byte access
+# write 9 bytes, for half-word access write 10 bytes and for word access write
+# 12 bytes.
+
+# GO_COMMAND writing 9 bytes for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 9 bytes, aligned byte 0"      \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x00000000000af2d9ac20000000100008"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000" \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100000 = 0xde"                            \
+          "New byte at 0x00100001 = 0xad"                            \
+          "New byte at 0x00100002 = 0xbe"                            \
+          "New byte at 0x00100003 = 0xef"                            \
+          "New byte at 0x00100004 = 0xca"                            \
+          "New byte at 0x00100005 = 0xfe"                            \
+          "New byte at 0x00100006 = 0xba"                            \
+          "New byte at 0x00100007 = 0xbe"                            \
+          "New byte at 0x00100008 = 0xba"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "9"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND writing 9 bytes for Wishbone aligned at byte 1.
+run_libsim "JTAG GO_COMMAND (write) WB 9 bytes, aligned byte 1"      \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x0000000001c898eeac20010000100008"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000" \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100001 = 0xde"                            \
+          "New byte at 0x00100002 = 0xad"                            \
+          "New byte at 0x00100003 = 0xbe"                            \
+          "New byte at 0x00100004 = 0xef"                            \
+          "New byte at 0x00100005 = 0xca"                            \
+          "New byte at 0x00100006 = 0xfe"                            \
+          "New byte at 0x00100007 = 0xba"                            \
+          "New byte at 0x00100008 = 0xbe"                            \
+          "New byte at 0x00100009 = 0xba"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100001" "9"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND writing 9 bytes for Wishbone aligned at byte 2.
+run_libsim "JTAG GO_COMMAND (write) WB 9 bytes, aligned byte 2"      \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x0000000000ebc7c22c20008000100008"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000" \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100002 = 0xde"                            \
+          "New byte at 0x00100003 = 0xad"                            \
+          "New byte at 0x00100004 = 0xbe"                            \
+          "New byte at 0x00100005 = 0xef"                            \
+          "New byte at 0x00100006 = 0xca"                            \
+          "New byte at 0x00100007 = 0xfe"                            \
+          "New byte at 0x00100008 = 0xba"                            \
+          "New byte at 0x00100009 = 0xbe"                            \
+          "New byte at 0x0010000a = 0xba"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100002" "9"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND writing 9 bytes for Wishbone aligned at byte 3.
+run_libsim "JTAG GO_COMMAND (write) WB 9 bytes, aligned byte 3"      \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x000000000129adf52c20018000100008"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000" \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100003 = 0xde"                            \
+          "New byte at 0x00100004 = 0xad"                            \
+          "New byte at 0x00100005 = 0xbe"                            \
+          "New byte at 0x00100006 = 0xef"                            \
+          "New byte at 0x00100007 = 0xca"                            \
+          "New byte at 0x00100008 = 0xfe"                            \
+          "New byte at 0x00100009 = 0xba"                            \
+          "New byte at 0x0010000a = 0xbe"                            \
+          "New byte at 0x0010000b = 0xba"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100003" "9"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND writing 5 half words for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 5 half words, aligned byte 0"   \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000c1ae0a0920000000100108"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing GO_COMMAND_WRITE."                               \
+          "  shifting in:  0x0000000000185f4b7296abafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc6000000000000000000000000000000" \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "New byte at 0x00100000 = 0xde"                              \
+          "New byte at 0x00100001 = 0xad"                              \
+          "New byte at 0x00100002 = 0xbe"                              \
+          "New byte at 0x00100003 = 0xef"                              \
+          "New byte at 0x00100004 = 0xca"                              \
+          "New byte at 0x00100005 = 0xfe"                              \
+          "New byte at 0x00100006 = 0xba"                              \
+          "New byte at 0x00100007 = 0xbe"                              \
+          "New byte at 0x00100008 = 0xba"                              \
+          "New byte at 0x00100009 = 0xad"                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "a"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabebaad"
+
+# GO_COMMAND writing 5 half words for Wishbone aligned at byte 2.
+run_libsim "JTAG GO_COMMAND (write) WB 5 half words, aligned byte 2"   \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000209b118920008000100108"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing GO_COMMAND_WRITE."                               \
+          "  shifting in:  0x0000000000185f4b7296abafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc6000000000000000000000000000000" \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "New byte at 0x00100002 = 0xde"                              \
+          "New byte at 0x00100003 = 0xad"                              \
+          "New byte at 0x00100004 = 0xbe"                              \
+          "New byte at 0x00100005 = 0xef"                              \
+          "New byte at 0x00100006 = 0xca"                              \
+          "New byte at 0x00100007 = 0xfe"                              \
+          "New byte at 0x00100008 = 0xba"                              \
+          "New byte at 0x00100009 = 0xbe"                              \
+          "New byte at 0x0010000a = 0xba"                              \
+          "New byte at 0x0010000b = 0xad"                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100002" "a"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabebaad"
+
+# GO_COMMAND writing 3 words for Wishbone aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) WB 3 words, aligned byte 0"            \
+    [list "Initalization succeeded."                                       \
+          "Execution step completed OK."                                   \
+          "Resetting JTAG."                                                \
+          "Execution step completed OK."                                   \
+          "Shifting instruction."                                          \
+          "  shifting in:  0x01"                                           \
+          "  shifted out:  0x01"                                           \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Selecting module."                                              \
+          "  shifting in:  0x0000000000174841bc61"                         \
+          "  shifted out:  0x0164841bc60000000000"                         \
+          "  status:       0x0"                                            \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Processing WRITE_COMMAND."                                      \
+          "  shifting in:  0x0000000001b42db63fa0000000100088"             \
+          "  shifted out:  0x164841bc600000000000000000000000"             \
+          "  status:       0x0"                                            \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Processing GO_COMMAND_WRITE."                                   \
+          "  shifting in:  0x000000000014adb55b7601f6abafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000000000" \
+          "  status:       0x0"                                            \
+          "  time taken:"                                                  \
+          "New byte at 0x00100000 = 0xde"                                  \
+          "New byte at 0x00100001 = 0xad"                                  \
+          "New byte at 0x00100002 = 0xbe"                                  \
+          "New byte at 0x00100003 = 0xef"                                  \
+          "New byte at 0x00100004 = 0xca"                                  \
+          "New byte at 0x00100005 = 0xfe"                                  \
+          "New byte at 0x00100006 = 0xba"                                  \
+          "New byte at 0x00100007 = 0xbe"                                  \
+          "New byte at 0x00100008 = 0xba"                                  \
+          "New byte at 0x00100009 = 0xad"                                  \
+          "New byte at 0x0010000a = 0xf0"                                  \
+          "New byte at 0x0010000b = 0x0d"                                  \
+          "Execution step completed OK."                                   \
+          "Test completed successfully."]                                  \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "c"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabebaadf00d"
+
+# Test of access for CPU0. Much simpler, since access type, alignment and
+# length are more prescribed. Make use of loop-report, which monitors MACLO
+# (0x2801) and MACHI (0x2802). These are 32 bit values and presented in target
+# endianess (which is big-endian for the OpenRISC, so the MS byte is as the
+# highest address.
+
+# GO_COMMAND writing 1 word for CPU0 aligned at byte 0.
+run_libsim "JTAG GO_COMMAND (write) CPU0 1 word, aligned byte 0" \
+    [list "Initalization succeeded."                             \
+          "Execution step completed OK."                         \
+          "Resetting JTAG."                                      \
+          "Execution step completed OK."                         \
+          "Shifting instruction."                                \
+          "  shifting in:  0x01"                                 \
+          "  shifted out:  0x01"                                 \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Selecting module."                                    \
+          "  shifting in:  0x00000000000aff51d871"               \
+          "  shifted out:  0x0164841bc60000000000"               \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing WRITE_COMMAND."                            \
+          "  shifting in:  0x0000000001933eb7e580010028000088"   \
+          "  shifted out:  0x164841bc600000000000000000000000"   \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing GO_COMMAND_WRITE."                         \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"       \
+          "  shifted out:  0x0164841bc6000000000000000000"       \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "New MACLO 0xefbeadde" \
+          "Execution step completed OK."                         \
+          "Test completed successfully."]                        \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"          \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# Check address advances after GO (1 per word for CPU, 4 per word for
+# WB). Test WB with writing and reading all sizes and lengths 1 through
+# 0x10000. Test CPU0 with writing and reading words with a range of lengths,
+# all of which should return length 4.
+
+# - for WB byte access try lengths 1, 2, 3, 4, 5, 8 and 9
+# - for WB half word access try lengths 2, 4, 6, 8 and 10
+# - for WB full word access try lengths 4, 8 and 12
+# - for SPR try length 4
+
+# Advance address after writing 1 byte for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 1 byte address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000319cf96400000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0164841bc6000000000000"           \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0e460cbc200001000010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100001"                           \
+          "  length:       0x1"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "1" \
+         "GO_COMMAND_WRITE" "de" "READ_COMMAND"
+
+# Advance address after writing 2 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 2 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001eaedff2500000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000000e463a0ad6af60"         \
+          "  shifted out:  0x0164841bc600000000000000"         \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0ebe2296e10000800010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100002"                           \
+          "  length:       0x2"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "2" \
+         "GO_COMMAND_WRITE" "dead" "READ_COMMAND"
+
+# Advance address after writing 3 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 3 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000dc247a4480000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001599d9120fb6af60"       \
+          "  shifted out:  0x0164841bc60000000000000000"       \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0e4a8124808001800010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100003"                           \
+          "  length:       0x3"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "3" \
+         "GO_COMMAND_WRITE" "deadbe" "READ_COMMAND"
+
+# Advance address after writing 4 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 4 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000107557c0580000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0ec23583818000400010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100004"                           \
+          "  length:       0x4"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "4" \
+         "GO_COMMAND_WRITE" "deadbeef" "READ_COMMAND"
+
+# Advance address after writing 5 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 5 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000004740b8f440000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000009ac236c4a7eefb6af60"   \
+          "  shifted out:  0x0164841bc600000000000000000000"   \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x13f75a14604001400010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100005"                           \
+          "  length:       0x5"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "5" \
+         "GO_COMMAND_WRITE" "deadbeefca" "READ_COMMAND"
+
+# Advance address after writing 8 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 8 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000171893d95c0000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000014db90944fabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc600000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x134b2e6d21c000200010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100008"                           \
+          "  length:       0x8"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "8" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabe" "READ_COMMAND"
+
+# Advance address after writing 9 bytes for WishBone (access type 0)
+run_libsim "JTAG GO_COMMAND (write) WB write 9 bytes address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000000af2d9ac20000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x009ea7e8002001200010000000000000" \
+          "  access_type:  0x0"                                \
+          "  address:      0x100009"                           \
+          "  length:       0x9"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "9" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba" "READ_COMMAND"
+
+# Advance address after writing 1 half word (2 bytes) for WishBone (access
+# type 1)
+run_libsim "JTAG GO_COMMAND (write) WB write 1 half word address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000fac02ac100000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000000e463a0ad6af60"         \
+          "  shifted out:  0x0164841bc600000000000000"         \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x08c3cb5a010000800010010000000000" \
+          "  access_type:  0x1"                                \
+          "  address:      0x100002"                           \
+          "  length:       0x2"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "2" \
+         "GO_COMMAND_WRITE" "dead" "READ_COMMAND"
+
+# Advance address after writing 2 half words (4 bytes) for WishBone (access
+# type 1)
+run_libsim "JTAG GO_COMMAND (write) WB write 2 half words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000001778a9e180000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x08bfdc4f618000400010010000000000" \
+          "  access_type:  0x1"                                \
+          "  address:      0x100004"                           \
+          "  length:       0x4"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "4" \
+         "GO_COMMAND_WRITE" "deadbeef" "READ_COMMAND"
+
+# Advance address after writing 3 half words (6 bytes) for WishBone (access
+# type 1)
+run_libsim "JTAG GO_COMMAND (write) WB write 3 half words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000008c1c6b5140000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000000c6961b84fea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x15729df2414000c00010010000000000" \
+          "  access_type:  0x1"                                \
+          "  address:      0x100006"                           \
+          "  length:       0x6"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "6" \
+         "GO_COMMAND_WRITE" "deadbeefcafe" "READ_COMMAND"
+
+# Advance address after writing 4 half words (8 bytes) for WishBone (access
+# type 1)
+run_libsim "JTAG GO_COMMAND (write) WB write 4 half words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000061a4e871c0000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000014db90944fabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc600000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x1536c7a1c1c000200010010000000000" \
+          "  access_type:  0x1"                                \
+          "  address:      0x100008"                           \
+          "  length:       0x8"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "8" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabe" "READ_COMMAND"
+
+# Advance address after writing 5 half words (10 bytes) for WishBone (access
+# type 1)
+run_libsim "JTAG GO_COMMAND (write) WB write 5 half words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000c1ae0a0920000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x0000000000185f4b7296abafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc6000000000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x061b600e212000a00010010000000000" \
+          "  access_type:  0x1"                                \
+          "  address:      0x10000a"                           \
+          "  length:       0xa"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "a" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabebaad" "READ_COMMAND"
+
+# Advance address after writing 1 word (4 bytes) for WishBone (access type 2)
+run_libsim "JTAG GO_COMMAND (write) WB write 1 word address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x104bd101e18000400010008000000000" \
+          "  access_type:  0x2"                                \
+          "  address:      0x100004"                           \
+          "  length:       0x4"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4" \
+         "GO_COMMAND_WRITE" "deadbeef" "READ_COMMAND"
+
+# Advance address after writing 2 words (8 bytes) for WishBone (access type 2)
+run_libsim "JTAG GO_COMMAND (write) WB write 2 words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001f99fd767c0000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000014db90944fabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc600000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0dc2caef41c000200010008000000000" \
+          "  access_type:  0x2"                                \
+          "  address:      0x100008"                           \
+          "  length:       0x8"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "8" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabe" "READ_COMMAND"
+
+# Advance address after writing 3 words (12 bytes) for WishBone (access type
+# 2)
+run_libsim "JTAG GO_COMMAND (write) WB write 3 words address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001b42db63fa0000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000014adb55b7601f6abafabafea7eefb6af60" \
+          "  shifted out:  0x0164841bc60000000000000000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x1e937a55c1a000600010008000000000" \
+          "  access_type:  0x2"                                \
+          "  address:      0x10000c"                           \
+          "  length:       0xc"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "c" \
+         "GO_COMMAND_WRITE" "deadbeefcafebabebaadf00d" "READ_COMMAND"
+
+# Advance address after writing 1 word for CPU0 (access type 2). The address
+# should advance by 1 (word, since SPRs are word addressed).
+run_libsim "JTAG GO_COMMAND (write) CPU0 write 1 word address advance" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0164841bc6000000000000000000"     \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_COMMAND."                           \
+          "  shifting in:  0x00000000000000000000000b2420de30" \
+          "  shifted out:  0x0f059be9218000802800008000000000" \
+          "  access_type:  0x2"                                \
+          "  address:      0x2802"                             \
+          "  length:       0x4"                                \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"   \
+         "GO_COMMAND_WRITE" "deadbeef" "READ_COMMAND"
+
+# Tests of overrun and underrun. For Wishbone check both on different access
+# sizes.
+
+# GO_COMMAND_WRITE for WishBone underrun for byte access
+run_libsim "JTAG GO_COMMAND (write) WB byte access underrun"     \
+    [list "Initalization succeeded."                             \
+          "Execution step completed OK."                         \
+          "Resetting JTAG."                                      \
+          "Execution step completed OK."                         \
+          "Shifting instruction."                                \
+          "  shifting in:  0x01"                                 \
+          "  shifted out:  0x01"                                 \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Selecting module."                                    \
+          "  shifting in:  0x0000000000174841bc61"               \
+          "  shifted out:  0x0164841bc60000000000"               \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing WRITE_COMMAND."                            \
+          "  shifting in:  0x000000000171893d95c0000000100008"   \
+          "  shifted out:  0x164841bc600000000000000000000000"   \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing GO_COMMAND_WRITE."                         \
+          "  shifting in:  0x00000000000c1a78bb0bafea7eefb6af60" \
+          "  shifted out:  0x015fea3b0e200000000000000000000000" \
+          "  status:       0x8"                                  \
+          "  time taken:"                                        \
+          "New byte at 0x00100000 = 0xde"                        \
+          "New byte at 0x00100001 = 0xad"                        \
+          "New byte at 0x00100002 = 0xbe"                        \
+          "New byte at 0x00100003 = 0xef"                        \
+          "New byte at 0x00100004 = 0xca"                        \
+          "New byte at 0x00100005 = 0xfe"                        \
+          "New byte at 0x00100006 = 0xba"                        \
+          "Execution step completed OK."                         \
+          "Test completed successfully."]                        \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafeba"
+
+# GO_COMMAND_WRITE for WishBone overrun for byte access
+run_libsim "JTAG GO_COMMAND (write) WB byte access overrun"          \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x000000000171893d95c0000000100008"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x015fea3b0e2000000000000000000000000000" \
+          "  status:       0x8"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100000 = 0xde"                            \
+          "New byte at 0x00100001 = 0xad"                            \
+          "New byte at 0x00100002 = 0xbe"                            \
+          "New byte at 0x00100003 = 0xef"                            \
+          "New byte at 0x00100004 = 0xca"                            \
+          "New byte at 0x00100005 = 0xfe"                            \
+          "New byte at 0x00100006 = 0xba"                            \
+          "New byte at 0x00100007 = 0xbe"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND_WRITE for WishBone underrun for half word access
+run_libsim "JTAG GO_COMMAND (write) WB half word access underrun" \
+    [list "Initalization succeeded."                              \
+          "Execution step completed OK."                          \
+          "Resetting JTAG."                                       \
+          "Execution step completed OK."                          \
+          "Shifting instruction."                                 \
+          "  shifting in:  0x01"                                  \
+          "  shifted out:  0x01"                                  \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Selecting module."                                     \
+          "  shifting in:  0x0000000000174841bc61"                \
+          "  shifted out:  0x0164841bc60000000000"                \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Processing WRITE_COMMAND."                             \
+          "  shifting in:  0x000000000061a4e871c0000000100108"    \
+          "  shifted out:  0x164841bc600000000000000000000000"    \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Processing GO_COMMAND_WRITE."                          \
+          "  shifting in:  0x00000000000c1a78bb0bafea7eefb6af60"  \
+          "  shifted out:  0x015fea3b0e200000000000000000000000"  \
+          "  status:       0x8"                                   \
+          "  time taken:"                                         \
+          "New byte at 0x00100000 = 0xde"                         \
+          "New byte at 0x00100001 = 0xad"                         \
+          "New byte at 0x00100002 = 0xbe"                         \
+          "New byte at 0x00100003 = 0xef"                         \
+          "New byte at 0x00100004 = 0xca"                         \
+          "New byte at 0x00100005 = 0xfe"                         \
+          "New byte at 0x00100006 = 0xba"                         \
+          "Execution step completed OK."                          \
+          "Test completed successfully."]                         \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafeba"
+
+# GO_COMMAND_WRITE for WishBone overrun for half word access
+run_libsim "JTAG GO_COMMAND (write) WB half word access overrun"     \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x000000000061a4e871c0000000100108"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x015fea3b0e2000000000000000000000000000" \
+          "  status:       0x8"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100000 = 0xde"                            \
+          "New byte at 0x00100001 = 0xad"                            \
+          "New byte at 0x00100002 = 0xbe"                            \
+          "New byte at 0x00100003 = 0xef"                            \
+          "New byte at 0x00100004 = 0xca"                            \
+          "New byte at 0x00100005 = 0xfe"                            \
+          "New byte at 0x00100006 = 0xba"                            \
+          "New byte at 0x00100007 = 0xbe"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# GO_COMMAND_WRITE for WishBone underrun for word access
+run_libsim "JTAG GO_COMMAND (write) WB word access underrun"     \
+    [list "Initalization succeeded."                             \
+          "Execution step completed OK."                         \
+          "Resetting JTAG."                                      \
+          "Execution step completed OK."                         \
+          "Shifting instruction."                                \
+          "  shifting in:  0x01"                                 \
+          "  shifted out:  0x01"                                 \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Selecting module."                                    \
+          "  shifting in:  0x0000000000174841bc61"               \
+          "  shifted out:  0x0164841bc60000000000"               \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing WRITE_COMMAND."                            \
+          "  shifting in:  0x0000000001f99fd767c0000000100088"   \
+          "  shifted out:  0x164841bc600000000000000000000000"   \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing GO_COMMAND_WRITE."                         \
+          "  shifting in:  0x00000000000c1a78bb0bafea7eefb6af60" \
+          "  shifted out:  0x015fea3b0e200000000000000000000000" \
+          "  status:       0x8"                                  \
+          "  time taken:"                                        \
+          "New byte at 0x00100000 = 0xde"                        \
+          "New byte at 0x00100001 = 0xad"                        \
+          "New byte at 0x00100002 = 0xbe"                        \
+          "New byte at 0x00100003 = 0xef"                        \
+          "New byte at 0x00100004 = 0xca"                        \
+          "New byte at 0x00100005 = 0xfe"                        \
+          "New byte at 0x00100006 = 0xba"                        \
+          "Execution step completed OK."                         \
+          "Test completed successfully."]                        \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafeba"
+
+# GO_COMMAND_WRITE for WishBone overrun for word access
+run_libsim "JTAG GO_COMMAND (write) WB word access overrun"          \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x0000000001f99fd767c0000000100088"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000005b486612bafabafea7eefb6af60" \
+          "  shifted out:  0x015fea3b0e2000000000000000000000000000" \
+          "  status:       0x8"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x00100000 = 0xde"                            \
+          "New byte at 0x00100001 = 0xad"                            \
+          "New byte at 0x00100002 = 0xbe"                            \
+          "New byte at 0x00100003 = 0xef"                            \
+          "New byte at 0x00100004 = 0xca"                            \
+          "New byte at 0x00100005 = 0xfe"                            \
+          "New byte at 0x00100006 = 0xba"                            \
+          "New byte at 0x00100007 = 0xbe"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafebabeba"
+
+# CPU0 underrun and overrun tests should remember that this is a 32-bit access
+# with a big-endian organization.
+
+# GO_COMMAND_WRITE for CPU0 underrun for word access
+run_libsim "JTAG GO_COMMAND (write) CPU0 word access underrun" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001599d9120fb6af60"       \
+          "  shifted out:  0x015fea3b0e2000000000000000"       \
+          "  status:       0x8"                                \
+          "  time taken:"                                      \
+          "New MACLO 0x00beadde"                               \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"          \
+         "GO_COMMAND_WRITE" "deadbe"
+
+# GO_COMMAND_WRITE for CPU0 overrun for word access
+run_libsim "JTAG GO_COMMAND (write) CPU0 word access overrun"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000009ac236c4a7eefb6af60"   \
+          "  shifted out:  0x015fea3b0e20000000000000000000"   \
+          "  status:       0x8"                                \
+          "  time taken:"                                      \
+          "New MACLO 0xefbeadde"                               \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"          \
+         "GO_COMMAND_WRITE" "deadbeefca"
+
+# Test access to invalid areas. We can only do this for Wishbone, since all
+# SPRs are validly accessible (non-writeable ones just return undefined
+# results).
+
+# Test each access type with one unit and test blocks spanning start and end
+# of writeable blocks.
+
+# GO_COMMAND_WRITE for 1 byte write to invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 1 byte invalid write"   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001ba7d236600000000080008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x000000000006d6fa6e6f60"           \
+          "  shifted out:  0x0112585a56400000000000"           \
+          "  status:       0x4"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "200000" "1"        \
+         "GO_COMMAND_WRITE" "de"
+
+# GO_COMMAND_WRITE for 2 byte write ending in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 byte ending invalid write" \
+    [list "Initalization succeeded."                                \
+          "Execution step completed OK."                            \
+          "Resetting JTAG."                                         \
+          "Execution step completed OK."                            \
+          "Shifting instruction."                                   \
+          "  shifting in:  0x01"                                    \
+          "  shifted out:  0x01"                                    \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Selecting module."                                       \
+          "  shifting in:  0x0000000000174841bc61"                  \
+          "  shifted out:  0x0164841bc60000000000"                  \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing WRITE_COMMAND."                               \
+          "  shifting in:  0x0000000001bbbf3ba70001fffff00008"      \
+          "  shifted out:  0x164841bc600000000000000000000000"      \
+          "  status:       0x0"                                     \
+          "  time taken:"                                           \
+          "Execution step completed OK."                            \
+          "Processing GO_COMMAND_WRITE."                            \
+          "  shifting in:  0x00000000000e463a0ad6af60"              \
+          "  shifted out:  0x0112585a5640000000000000"              \
+          "  status:       0x4"                                     \
+          "  time taken:"                                           \
+          "New byte at 0x001fffff = 0xde"                           \
+          "Execution step completed OK."                            \
+          "Test completed successfully."]                           \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "1fffff" "2"        \
+         "GO_COMMAND_WRITE" "dead"
+
+# GO_COMMAND_WRITE for 2 byte write starting in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 byte starting invalid write" \
+    [list "Initalization succeeded."                                  \
+          "Execution step completed OK."                              \
+          "Resetting JTAG."                                           \
+          "Execution step completed OK."                              \
+          "Shifting instruction."                                     \
+          "  shifting in:  0x01"                                      \
+          "  shifted out:  0x01"                                      \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Selecting module."                                         \
+          "  shifting in:  0x0000000000174841bc61"                    \
+          "  shifted out:  0x0164841bc60000000000"                    \
+          "  status:       0x0"                                       \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Processing WRITE_COMMAND."                                 \
+          "  shifting in:  0x0000000000fd76999f0001fffff7fe08"        \
+          "  shifted out:  0x164841bc600000000000000000000000"        \
+          "  status:       0x0"                                       \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Processing GO_COMMAND_WRITE."                              \
+          "  shifting in:  0x00000000000e463a0ad6af60"                \
+          "  shifted out:  0x0112585a5640000000000000"                \
+          "  status:       0x4"                                       \
+          "  time taken:"                                             \
+          "New byte at 0xffe00000 = 0xad"                             \
+          "Execution step completed OK."                              \
+          "Test completed successfully."]                             \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "ffdfffff" "2"      \
+         "GO_COMMAND_WRITE" "dead"
+
+# GO_COMMAND_WRITE for 1 half word write to invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 1 half word invalid write" \
+    [list "Initalization succeeded."                              \
+          "Execution step completed OK."                          \
+          "Resetting JTAG."                                       \
+          "Execution step completed OK."                          \
+          "Shifting instruction."                                 \
+          "  shifting in:  0x01"                                  \
+          "  shifted out:  0x01"                                  \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Selecting module."                                     \
+          "  shifting in:  0x0000000000174841bc61"                \
+          "  shifted out:  0x0164841bc60000000000"                \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Processing WRITE_COMMAND."                             \
+          "  shifting in:  0x00000000017121f0c300000000080108"    \
+          "  shifted out:  0x164841bc600000000000000000000000"    \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Processing GO_COMMAND_WRITE."                          \
+          "  shifting in:  0x00000000000e463a0ad6af60"            \
+          "  shifted out:  0x0112585a5640000000000000"            \
+          "  status:       0x4"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Test completed successfully."]                         \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "200000" "2"        \
+         "GO_COMMAND_WRITE" "dead"
+
+# GO_COMMAND_WRITE for 2 half word write ending in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 half word ending invalid write" \
+    [list "Initalization succeeded."                                     \
+          "Execution step completed OK."                                 \
+          "Resetting JTAG."                                              \
+          "Execution step completed OK."                                 \
+          "Shifting instruction."                                        \
+          "  shifting in:  0x01"                                         \
+          "  shifted out:  0x01"                                         \
+          "  time taken:"                                                \
+          "Execution step completed OK."                                 \
+          "Selecting module."                                            \
+          "  shifting in:  0x0000000000174841bc61"                       \
+          "  shifted out:  0x0164841bc60000000000"                       \
+          "  status:       0x0"                                          \
+          "  time taken:"                                                \
+          "Execution step completed OK."                                 \
+          "Processing WRITE_COMMAND."                                    \
+          "  shifting in:  0x000000000184405a638000fffff00108"           \
+          "  shifted out:  0x164841bc600000000000000000000000"           \
+          "  status:       0x0"                                          \
+          "  time taken:"                                                \
+          "Execution step completed OK."                                 \
+          "Processing GO_COMMAND_WRITE."                                 \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"               \
+          "  shifted out:  0x0112585a56400000000000000000"               \
+          "  status:       0x4"                                          \
+          "  time taken:"                                                \
+          "New byte at 0x001ffffe = 0xde"                                \
+          "New byte at 0x001fffff = 0xad"                                \
+          "Execution step completed OK."                                 \
+          "Test completed successfully."]                                \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "1ffffe" "4"        \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND_WRITE for 2 half word write starting in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 half word starting invalid write" \
+    [list "Initalization succeeded."                                       \
+          "Execution step completed OK."                                   \
+          "Resetting JTAG."                                                \
+          "Execution step completed OK."                                   \
+          "Shifting instruction."                                          \
+          "  shifting in:  0x01"                                           \
+          "  shifted out:  0x01"                                           \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Selecting module."                                              \
+          "  shifting in:  0x0000000000174841bc61"                         \
+          "  shifted out:  0x0164841bc60000000000"                         \
+          "  status:       0x0"                                            \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Processing WRITE_COMMAND."                                      \
+          "  shifting in:  0x0000000000c289f85b8000fffff7ff08"             \
+          "  shifted out:  0x164841bc600000000000000000000000"             \
+          "  status:       0x0"                                            \
+          "  time taken:"                                                  \
+          "Execution step completed OK."                                   \
+          "Processing GO_COMMAND_WRITE."                                   \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"                 \
+          "  shifted out:  0x0112585a56400000000000000000"                 \
+          "  status:       0x4"                                            \
+          "  time taken:"                                                  \
+          "New byte at 0xffe00000 = 0xbe"                                  \
+          "New byte at 0xffe00001 = 0xef"                                  \
+          "Execution step completed OK."                                   \
+          "Test completed successfully."]                                  \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION"   \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "ffdffffe" "4"        \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND_WRITE for 1 word write to invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 1 word invalid write"   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000004a24cf580000000080088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing GO_COMMAND_WRITE."                       \
+          "  shifting in:  0x00000000001a6f47467eefb6af60"     \
+          "  shifted out:  0x0112585a56400000000000000000"     \
+          "  status:       0x4"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "200000" "4"        \
+         "GO_COMMAND_WRITE" "deadbeef"
+
+# GO_COMMAND_WRITE for 2 word write ending in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 word ending invalid write"  \
+    [list "Initalization succeeded."                                 \
+          "Execution step completed OK."                             \
+          "Resetting JTAG."                                          \
+          "Execution step completed OK."                             \
+          "Shifting instruction."                                    \
+          "  shifting in:  0x01"                                     \
+          "  shifted out:  0x01"                                     \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Selecting module."                                        \
+          "  shifting in:  0x0000000000174841bc61"                   \
+          "  shifted out:  0x0164841bc60000000000"                   \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing WRITE_COMMAND."                                \
+          "  shifting in:  0x00000000008b923f65c0007ffff00088"       \
+          "  shifted out:  0x164841bc600000000000000000000000"       \
+          "  status:       0x0"                                      \
+          "  time taken:"                                            \
+          "Execution step completed OK."                             \
+          "Processing GO_COMMAND_WRITE."                             \
+          "  shifting in:  0x000000000014db90944fabafea7eefb6af60"   \
+          "  shifted out:  0x0112585a5640000000000000000000000000"   \
+          "  status:       0x4"                                      \
+          "  time taken:"                                            \
+          "New byte at 0x001ffffc = 0xde"                            \
+          "New byte at 0x001ffffd = 0xad"                            \
+          "New byte at 0x001ffffe = 0xbe"                            \
+          "New byte at 0x001fffff = 0xef"                            \
+          "Execution step completed OK."                             \
+          "Test completed successfully."]                            \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "1ffffc" "8"        \
+         "GO_COMMAND_WRITE" "deadbeefcafebabe"
+
+# GO_COMMAND_WRITE for 2 word write starting in invalid memory.
+run_libsim "JTAG GO_COMMAND (write) WB 2 word starting invalid write" \
+    [list "Initalization succeeded."                                  \
+          "Execution step completed OK."                              \
+          "Resetting JTAG."                                           \
+          "Execution step completed OK."                              \
+          "Shifting instruction."                                     \
+          "  shifting in:  0x01"                                      \
+          "  shifted out:  0x01"                                      \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Selecting module."                                         \
+          "  shifting in:  0x0000000000174841bc61"                    \
+          "  shifted out:  0x0164841bc60000000000"                    \
+          "  status:       0x0"                                       \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Processing WRITE_COMMAND."                                 \
+          "  shifting in:  0x0000000001cd5b9d5dc0007ffff7fe88"        \
+          "  shifted out:  0x164841bc600000000000000000000000"        \
+          "  status:       0x0"                                       \
+          "  time taken:"                                             \
+          "Execution step completed OK."                              \
+          "Processing GO_COMMAND_WRITE."                              \
+          "  shifting in:  0x000000000014db90944fabafea7eefb6af60"    \
+          "  shifted out:  0x0112585a5640000000000000000000000000"    \
+          "  status:       0x4"                                       \
+          "  time taken:"                                             \
+          "New byte at 0xffe00000 = 0xca"                             \
+          "New byte at 0xffe00001 = 0xfe"                             \
+          "New byte at 0xffe00002 = 0xba"                             \
+          "New byte at 0xffe00003 = 0xbe"                             \
+          "Execution step completed OK."                              \
+          "Test completed successfully."]                             \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-report" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "ffdffffc" "8"      \
+         "GO_COMMAND_WRITE" "deadbeefcafebabe"

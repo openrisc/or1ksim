@@ -1,0 +1,135 @@
+# ext.exp. l.ext{b,h}{s,z} instruction test using DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the l.ext test
+run_or1ksim "ext"               \
+    [list "report(0x0000007f);" \
+          "report(0x0000007f);" \
+          "report(0x00000053);" \
+          "report(0x00000053);" \
+          "report(0x0000ff53);" \
+          "report(0x00000053);" \
+          "report(0x00001234);" \
+          "report(0x00000034);" \
+          "report(0x000000ff);" \
+          "report(0xffffffff);" \
+          "report(0x00000080);" \
+          "report(0xffffff80);" \
+          "report(0x0000ff80);" \
+          "report(0xffffff80);" \
+          "report(0x00007f80);" \
+          "report(0xffffff80);" \
+          "report(0x00007fff);" \
+          "report(0xffffffff);" \
+          "report(0x0000007f);" \
+          "report(0x0000007f);" \
+          "report(0x00000053);" \
+          "report(0x00000053);" \
+          "report(0x0000ff53);" \
+          "report(0x00000053);" \
+          "report(0x00001234);" \
+          "report(0x00000034);" \
+          "report(0x000000ff);" \
+          "report(0x000000ff);" \
+          "report(0x00000080);" \
+          "report(0x00000080);" \
+          "report(0x0000ff80);" \
+          "report(0x00000080);" \
+          "report(0x00007f80);" \
+          "report(0x00000080);" \
+          "report(0x00007fff);" \
+          "report(0x000000ff);" \
+          "report(0x00007fff);" \
+          "report(0x00007fff);" \
+          "report(0x00005233);" \
+          "report(0x00005233);" \
+          "report(0xffff2f53);" \
+          "report(0x00002f53);" \
+          "report(0x12345678);" \
+          "report(0x00005678);" \
+          "report(0x0000ffff);" \
+          "report(0xffffffff);" \
+          "report(0x00008000);" \
+          "report(0xffff8000);" \
+          "report(0x0000ff80);" \
+          "report(0xffffff80);" \
+          "report(0x80008000);" \
+          "report(0xffff8000);" \
+          "report(0x7fffffff);" \
+          "report(0xffffffff);" \
+          "report(0x00007fff);" \
+          "report(0x00007fff);" \
+          "report(0x00005233);" \
+          "report(0x00005233);" \
+          "report(0xffff2f53);" \
+          "report(0x00002f53);" \
+          "report(0x12345678);" \
+          "report(0x00005678);" \
+          "report(0x0000ffff);" \
+          "report(0x0000ffff);" \
+          "report(0x00008000);" \
+          "report(0x00008000);" \
+          "report(0x0000ff80);" \
+          "report(0x0000ff80);" \
+          "report(0x80008000);" \
+          "report(0x00008000);" \
+          "report(0x7fffffff);" \
+          "report(0x0000ffff);" \
+          "report(0xffffffff);" \
+          "report(0xffffffff);" \
+          "report(0x7fffffff);" \
+          "report(0x7fffffff);" \
+          "report(0x7fff7fff);" \
+          "report(0x7fff7fff);" \
+          "report(0xffff7f7f);" \
+          "report(0xffff7f7f);" \
+          "report(0xffffff7f);" \
+          "report(0xffffff7f);" \
+          "report(0xffff7fff);" \
+          "report(0xffff7fff);" \
+          "report(0x7fff7f7f);" \
+          "report(0x7fff7f7f);" \
+          "report(0x12345678);" \
+          "report(0x12345678);" \
+          "report(0xffffffff);" \
+          "report(0xffffffff);" \
+          "report(0x7fffffff);" \
+          "report(0x7fffffff);" \
+          "report(0x7fff7fff);" \
+          "report(0x7fff7fff);" \
+          "report(0xffff7f7f);" \
+          "report(0xffff7f7f);" \
+          "report(0xffffff7f);" \
+          "report(0xffffff7f);" \
+          "report(0xffff7fff);" \
+          "report(0xffff7fff);" \
+          "report(0x7fff7f7f);" \
+          "report(0x7fff7f7f);" \
+          "report(0x12345678);" \
+          "report(0x12345678);" \
+	  "!report(0xdeaddead);" \
+	  "!exit(0)"]            \
+    "" "ext/ext"

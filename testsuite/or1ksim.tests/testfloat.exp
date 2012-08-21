@@ -1,0 +1,66 @@
+# testfloat.exp - Run and check the testfloat test
+
+# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) 2010 ORSoC AB
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+# Contributor Julius Baxter <julius.baxter@orsoc.se>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Can take up to 5 minutes to run this test
+set old_timeout $timeout
+set timeout 300
+
+# Run testfloat
+run_or1ksim "testfloat"                       \
+    [list "No errors found in int32_to_float32, rounding nearest_even." \
+	 "No errors found in int32_to_float32, rounding to_zero." \
+	 "No errors found in int32_to_float32, rounding down." \
+	 "No errors found in int32_to_float32, rounding up." \
+	 "No errors found in float32_to_int32, rounding nearest_even." \
+	 "No errors found in float32_to_int32, rounding to_zero." \
+	 "No errors found in float32_to_int32, rounding down." \
+	 "No errors found in float32_to_int32, rounding up." \
+	 "No errors found in float32_to_int32_round_to_zero." \
+	 "No errors found in float32_add, rounding nearest_even." \
+	 "No errors found in float32_add, rounding to_zero." \
+	 "No errors found in float32_add, rounding down." \
+	 "No errors found in float32_add, rounding up." \
+	 "No errors found in float32_sub, rounding nearest_even." \
+	 "No errors found in float32_sub, rounding to_zero." \
+	 "No errors found in float32_sub, rounding down." \
+	 "No errors found in float32_sub, rounding up." \
+	 "No errors found in float32_mul, rounding nearest_even." \
+	 "No errors found in float32_mul, rounding to_zero." \
+	 "No errors found in float32_mul, rounding down." \
+	 "No errors found in float32_mul, rounding up." \
+	 "No errors found in float32_div, rounding nearest_even." \
+	 "No errors found in float32_div, rounding to_zero." \
+	 "No errors found in float32_div, rounding down." \
+	 "No errors found in float32_div, rounding up." \
+	 "No errors found in float32_eq." \
+	 "No errors found in float32_le." \
+	 "No errors found in float32_lt" \
+	 "!exit(0)"]                    \
+    "fp.cfg" "testfloat/testfloat"
+
+set timeout $old_timeout

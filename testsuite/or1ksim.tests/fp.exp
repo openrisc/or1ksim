@@ -1,0 +1,380 @@
+# fp.exp. Floating point tests using DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+# Copyright (C) 2010 ORSoC AB
+
+# Contributor Julius Baxter <julius.baxter@orsoc.se>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the floating point test
+run_or1ksim "fp"                  \
+    [list "!lf.add.s" \
+	 "   1.0 +  0.0  =  1.0:  OK" \
+	 "   1.0 + -0.0  =  1.0:  OK" \
+	 "   1.0 +  1.0  =  2.0:  OK" \
+	 "   2.0 +  1.0  =  3.0:  OK" \
+	 "   1.5 +  1.5  =  3.0:  OK" \
+	 "   2.0 + -1.0  =  1.0:  OK" \
+	 "   1.0 + -2.0  = -1.0:  OK" \
+	 "   1.0 + -1.0  = +0.0:  OK" \
+	 "   1.0 + +inf  = +inf:  OK" \
+	 "   1.0 + -inf  = -inf:  OK" \
+	 "  +inf + +inf  = +inf:  OK" \
+	 "  +inf + -inf  = -NaN:  OK" \
+	 "  -inf + -inf  = -inf:  OK" \
+	 "   1.0 + +NaN  = +NaN:  OK" \
+	 "   1.0 + -NaN  = -NaN:  OK" \
+	 "  +NaN + +NaN  = +NaN:  OK" \
+	 "  +NaN + -NaN  = +NaN:  OK" \
+	 "  -NaN + -NaN  = -NaN:  OK" \
+	 "   1.0 + +sNaN = +qNaN: OK" \
+	 "   1.0 + -sNaN = -qNaN: OK" \
+	 "   1.0 * 2^127 +  1.0 * 2^127  = +inf:  OK" \
+	 "  -1.0 * 2^127 + -1.0 * 2^127  = -inf:  OK" \
+	 "lf.cust1.s" \
+	 "  l.cust1: OK" \
+	 "lf.div.s" \
+	 "   1.0 /  1.0 =  1.0: OK" \
+	 "   2.0 /  1.0 =  2.0: OK" \
+	 "   3.0 /  2.0 =  1.5: OK" \
+	 "  +0.0 /  1.0 = +0.0: OK" \
+	 "  -0.0 /  1.0 = -0.0: OK" \
+	 "  -3.0 /  2.0 = -1.5: OK" \
+	 "   3.0 / -2.0 = -1.5: OK" \
+	 "  -3.0 / -2.0 = -1.5: OK" \
+	 "   1.0 / +0.0 = +inf: OK" \
+	 "   1.0 / -0.0 = +inf: OK" \
+	 "  -1.0 / +0.0 = -inf: OK" \
+	 "  -1.0 / -0.0 = -inf: OK" \
+	 "   1.0 / +inf = +0.0: OK" \
+	 "   1.0 / -inf = -0.0: OK" \
+	 "  -1.0 / +inf = -0.0: OK" \
+	 "  -1.0 / -inf = +0.0: OK" \
+	 "  +inf /  1.0 = +inf: OK" \
+	 "  -inf /  1.0 = -inf: OK" \
+	 "  +inf / -1.0 = -inf: OK" \
+	 "  -inf / -1.0 = +inf: OK" \
+	 "  +inf / +inf = -NaN: OK" \
+	 "  +inf / -inf = -NaN: OK" \
+	 "  -inf / +inf = -NaN: OK" \
+	 "  -inf / -inf = -NaN: OK" \
+	 "   1.0 / +NaN = +NaN: OK" \
+	 "   1.0 / -NaN = -NaN: OK" \
+	 "  -1.0 / +NaN = +NaN: OK" \
+	 "  -1.0 / -NaN = 1NaN: OK" \
+	 "  +NaN /  1.0 = +NaN: OK" \
+	 "  -NaN /  1.0 = -NaN: OK" \
+	 "  +NaN / -1.0 = +NaN: OK" \
+	 "  -NaN / -1.0 = -NaN: OK" \
+	 "  +NaN / +NaN = +NaN: OK" \
+	 "  +NaN / -NaN = +NaN: OK" \
+	 "  -NaN / +NaN = -NaN: OK" \
+	 "  -NaN / -NaN = -NaN: OK" \
+	 "   1.0 * 2^127  /  1.0 * 2^-129 = +inf: OK" \
+	 "  -1.0 * 2^127  /  1.0 * 2^-129 = -inf: OK" \
+	 "   1.0 * 2^127  / -1.0 * 2^-129 = -inf: OK" \
+	 "  -1.0 * 2^127  / -1.0 * 2^-129 = +inf: OK" \
+	 "   1.0 * 2^-129 /  1.0 * 2^127  = +0.0: OK" \
+	 "  -1.0 * 2^-129 /  1.0 * 2^127  = -0.0: OK" \
+	 "   1.0 * 2^-129 / -1.0 * 2^127  = -0.0: OK" \
+	 "  -1.0 * 2^-129 / -1.0 * 2^127  = +0.0: OK" \
+	 "lf.ftoi.s" \
+	 "  (int)  1.0          =  1:    OK" \
+	 "  (int) -1.0          = -1:    OK" \
+	 "  (int) +0.0          =  0:    OK" \
+	 "  (int) -0.0          =  0:    OK" \
+	 "  (int)  1.5          =  1:    OK" \
+	 "  (int) -1.5          = -1:    OK" \
+	 "  (int)  1.0 * 2^126  = 2^31: OK" \
+	 "  (int) -1.0 * 2^126  = -2^31: OK" \
+	 "  (int)  1.0 * 2^-129 =  0:    OK" \
+	 "  (int) -1.0 * 2^-129 =  0:    OK" \
+	 "  (int) +inf          = 2^31: OK" \
+	 "  (int) -inf          = -2^31: OK" \
+	 "  (int) +NaN          = 2^31: OK" \
+	 "  (int) -NaN          = 2^31: OK" \
+	 "lf.itof.s" \
+	 "  (float)  1.0 =  1: OK" \
+	 "  (float) -1.0 = -1: OK" \
+	 "  (float) +0.0 =  0: OK" \
+	 "  (float) -0.0 =  0: OK" \
+	 "lf.madd.s" \
+	 "   1.0 +  1.0 *  1.0 =  2.0: OK" \
+	 "   0.5 +  1.0 *  1.0 =  1.5: OK" \
+	 "   1.0 +  0.5 *  2.0 =  2.0: OK" \
+	 "   1.0 + -1.0 *  2.0 = -1.0: OK" \
+	 "  -2.0 +  2.0 *  0.5 = -1.0: OK" \
+	 "  -0.5 + -0.5 *  3.0 = -2.0: OK" \
+	 "  +0.0 + +0.0 * +0.0 = +0.0: OK" \
+	 "  -0.0 + +0.0 * -0.0 = +0.0: OK" \
+	 "  -0.0 + -0.0 * -0.0 = +0.0: OK" \
+	 "  -1.0 +  1.0 *  1.0 = +0.0: OK" \
+	 "  +inf +  1.0 *  1.0 = +inf: OK" \
+	 "   1.0 +  1.0 * +inf = +inf: OK" \
+	 "  +inf +  1.0 * +inf = +inf: OK" \
+	 "  -inf +  1.0 *  1.0 = -inf: OK" \
+	 "  +NaN +  1.0 *  1.0 = +NaN: OK" \
+	 "   1.0 +  1.0 * +NaN = +NaN: OK" \
+	 "  +NaN +  1.0 * +NaN = +NaN: OK" \
+	 "  -NaN +  1.0 *  1.0 = -NaN: OK" \
+	 "   1.0 * 2^127  +  1.0 * 2^127  *  1.0 = +inf: OK" \
+	 "   1.0 * 2^127  +  1.0 * 2^127  *  1.0 * 2^-129 = +inf: OK" \
+	 "lf.mul.s" \
+	 "   1.0 *  1.0 =  1.0: OK" \
+	 "   3.0 *  1.0 =  3.0: OK" \
+	 "   1.5 *  2.0 =  3.0: OK" \
+	 "  -1.0 *  2.0 = -2.0: OK" \
+	 "  -1.0 * -2.0 = +2.0: OK" \
+	 "  +0.0 *  2.0 = +0.0: OK" \
+	 "  +0.0 *  2.0 = +0.0: OK" \
+	 "  +inf * -2.0 = -inf: OK" \
+	 "  +NaN *  2.0 = +NaN: OK" \
+	 "   1.0 * 2^127 *  1.0 * 2^127 = +inf: OK" \
+	 "  -1.0 * 2^127 * -1.0 * 2^127 = +inf: OK" \
+	 "  -1.0 * 2^127 *  1.0 * 2^127 = -inf: OK" \
+	 "   1.0 * 2^127 * -1.0 * 2^127 = -inf: OK" \
+	 "lf.rem.s" \
+	 "   1.0 %  1.0 = +0.0: OK" \
+	 "   1.0 %  2.0 =  1.0: OK" \
+	 "   2.0 %  1.5 =  0.5: OK" \
+	 "   3.0 %  1.5 = +0.0: OK" \
+	 "  +0.0 %  2.0 = +0.0: OK" \
+	 "  -0.0 %  2.0 = -0.0: OK" \
+	 "   2.0 % +0.0 = -NaN: OK" \
+	 "  -2.0 % +0.0 = -NaN: OK" \
+	 "   2.0 % -0.0 = -NaN: OK" \
+	 "   2.0 % +inf =  2.0: OK" \
+	 "  +inf %  2.0 = -NaN: OK" \
+	 "   2.0 % +NaN = +NaN: OK" \
+	 "  +NaN %  2.0 = +NaN: OK" \
+	 "   1.0 * 2^127  % 1.0 * 2^-129 = +0.0: OK" \
+	 "   1.0 * 2^-129 % 1.0 * 2^127  = +0.0: OK" \
+	 "lf.sfeq.s" \
+	 "   1.0 ==  1.0: TRUE" \
+	 "   1.0 ==  2.0: FALSE" \
+	 "   1.5 ==  1.5: TRUE" \
+	 "   1.5 ==  0.5: FALSE" \
+	 "  -1.5 == -1.5: TRUE" \
+	 "   1.5 == -1.5: FALSE" \
+	 "  +0.0 == +0.0: TRUE" \
+	 "  -0.0 == -0.0: TRUE" \
+	 "  +0.0 == -0.0: TRUE" \
+	 "   1.0 == +inf: FALSE" \
+	 "  +inf == +inf: TRUE" \
+	 "  -inf == -inf: TRUE" \
+	 "  +inf == -inf: FALSE" \
+	 "   1.0 == +NaN: FALSE" \
+	 "  +NaN == +NaN: FALSE" \
+	 "  -NaN == -NaN: FALSE" \
+	 "  +NaN == -NaN: FALSE" \
+	 "   1.0 * 2^-129 == 1.0 * 2^-129: TRUE" \
+	 "   1.0 * 2^-129 == 1.0 * 2^-128: FALSE" \
+	 "   1.0 * 2^126  == 1.0 * 2^-128: FALSE" \
+	 "lf.sfge.s" \
+	 "   1.0 >=  1.0: TRUE" \
+	 "   2.0 >=  1.0: TRUE" \
+	 "   1.0 >=  2.0: FALSE" \
+	 "   1.5 >=  1.5: TRUE" \
+	 "   1.5 >=  0.5: TRUE" \
+	 "   0.5 >=  1.5: FALSE" \
+	 "  -1.5 >= -1.5: TRUE" \
+	 "  -1.5 >= -0.5: FALSE" \
+	 "  -0.5 >= -1.5: TRUE" \
+	 "   1.5 >= -1.5: TRUE" \
+	 "  -1.5 >=  1.5: FALSE" \
+	 "  +0.0 >= +0.0: TRUE" \
+	 "  -0.0 >= -0.0: TRUE" \
+	 "  +0.0 >= -0.0: TRUE" \
+	 "  -0.0 >= +0.0: TRUE" \
+	 "   1.0 >= +inf: FALSE" \
+	 "  +inf >=  1.0: TRUE" \
+	 "   1.0 >= -inf: TRUE" \
+	 "  -inf >=  1.0: FALSE" \
+	 "  +inf >= +inf: TRUE" \
+	 "  -inf >= -inf: TRUE" \
+	 "  +inf >= -inf: TRUE" \
+	 "  -inf >= +inf: FALSE" \
+	 "   1.0 >= +NaN: FALSE" \
+	 "  +NaN >= +NaN: FALSE" \
+	 "  -NaN >= -NaN: FALSE" \
+	 "  +NaN >= -NaN: FALSE" \
+	 "  -NaN >= +NaN: FALSE" \
+	 "   1.0 * 2^-129 >= 1.0 * 2^-129: TRUE" \
+	 "   1.0 * 2^-129 >= 1.0 * 2^-128: FALSE" \
+	 "   1.0 * 2^-128 >= 1.0 * 2^-129: TRUE" \
+	 "   1.0 * 2^126  >= 1.0 * 2^-128: TRUE" \
+	 "   1.0 * 2^-128 >= 1.0 * 2^126:  FALSE" \
+	 "lf.sfgt.s" \
+	 "   1.0 >  1.0: FALSE" \
+	 "   2.0 >  1.0: TRUE" \
+	 "   1.0 >  2.0: FALSE" \
+	 "   1.5 >  1.5: FALSE" \
+	 "   1.5 >  0.5: TRUE" \
+	 "   0.5 >  1.5: FALSE" \
+	 "  -1.5 > -1.5: FALSE" \
+	 "  -1.5 > -0.5: FALSE" \
+	 "  -0.5 > -1.5: TRUE" \
+	 "   1.5 > -1.5: TRUE" \
+	 "  -1.5 >  1.5: FALSE" \
+	 "  +0.0 > +0.0: FALSE" \
+	 "  -0.0 > -0.0: FALSE" \
+	 "  +0.0 > -0.0: FALSE" \
+	 "  -0.0 > +0.0: FALSE" \
+	 "   1.0 > +inf: FALSE" \
+	 "  +inf >  1.0: TRUE" \
+	 "   1.0 > -inf: TRUE" \
+	 "  -inf >  1.0: FALSE" \
+	 "  +inf > +inf: FALSE" \
+	 "  -inf > -inf: FALSE" \
+	 "  +inf > -inf: TRUE" \
+	 "  -inf > +inf: FALSE" \
+	 "   1.0 > +NaN: FALSE" \
+	 "  +NaN > +NaN: FALSE" \
+	 "  -NaN > -NaN: FALSE" \
+	 "  +NaN > -NaN: FALSE" \
+	 "  -NaN > +NaN: FALSE" \
+	 "   1.0 * 2^-129 > 1.0 * 2^-129: FALSE" \
+	 "   1.0 * 2^-129 > 1.0 * 2^-128: FALSE" \
+	 "   1.0 * 2^-128 > 1.0 * 2^-129: TRUE" \
+	 "   1.0 * 2^126  > 1.0 * 2^-128: TRUE" \
+	 "   1.0 * 2^-128 > 1.0 * 2^126:  FALSE" \
+	 "lf.sfle.s" \
+	 "   1.0 <=  1.0: TRUE" \
+	 "   2.0 <=  1.0: FALSE" \
+	 "   1.0 <=  2.0: TRUE" \
+	 "   1.5 <=  1.5: TRUE" \
+	 "   1.5 <=  0.5: FALSE" \
+	 "   0.5 <=  1.5: TRUE" \
+	 "  -1.5 <= -1.5: TRUE" \
+	 "  -1.5 <= -0.5: TRUE" \
+	 "  -0.5 <= -1.5: FALSE" \
+	 "   1.5 <= -1.5: FALSE" \
+	 "  -1.5 <=  1.5: TRUE" \
+	 "  +0.0 <= +0.0: TRUE" \
+	 "  -0.0 <= -0.0: TRUE" \
+	 "  +0.0 <= -0.0: TRUE" \
+	 "  -0.0 <= +0.0: TRUE" \
+	 "   1.0 <= +inf: TRUE" \
+	 "  +inf <=  1.0: FALSE" \
+	 "   1.0 <= -inf: FALSE" \
+	 "  -inf <=  1.0: TRUE" \
+	 "  +inf <= +inf: TRUE" \
+	 "  -inf <= -inf: TRUE" \
+	 "  +inf <= -inf: FALSE" \
+	 "  -inf <= +inf: TRUE" \
+	 "   1.0 <= +NaN: FALSE" \
+	 "  +NaN <= +NaN: FALSE" \
+	 "  -NaN <= -NaN: FALSE" \
+	 "  +NaN <= -NaN: FALSE" \
+	 "  -NaN <= +NaN: FALSE" \
+	 "   1.0 * 2^-129 <= 1.0 * 2^-129: TRUE" \
+	 "   1.0 * 2^-129 <= 1.0 * 2^-128: TRUE" \
+	 "   1.0 * 2^-128 <= 1.0 * 2^-129: FALSE" \
+	 "   1.0 * 2^126  <= 1.0 * 2^-128: FALSE" \
+	 "   1.0 * 2^-128 <= 1.0 * 2^126:  TRUE" \
+	 "lf.sflt.s" \
+	 "   1.0 <  1.0: FALSE" \
+	 "   2.0 <  1.0: FALSE" \
+	 "   1.0 <  2.0: TRUE" \
+	 "   1.5 <  1.5: FALSE" \
+	 "   1.5 <  0.5: FALSE" \
+	 "   0.5 <  1.5: TRUE" \
+	 "  -1.5 < -1.5: FALSE" \
+	 "  -1.5 < -0.5: TRUE" \
+	 "  -0.5 < -1.5: FALSE" \
+	 "   1.5 < -1.5: FALSE" \
+	 "  -1.5 <  1.5: TRUE" \
+	 "  +0.0 < +0.0: FALSE" \
+	 "  -0.0 < -0.0: FALSE" \
+	 "  +0.0 < -0.0: FALSE" \
+	 "  -0.0 < +0.0: FALSE" \
+	 "   1.0 < +inf: TRUE" \
+	 "  +inf <  1.0: FALSE" \
+	 "   1.0 < -inf: FALSE" \
+	 "  -inf <  1.0: TRUE" \
+	 "  +inf < +inf: FALSE" \
+	 "  -inf < -inf: FALSE" \
+	 "  +inf < -inf: FALSE" \
+	 "  -inf < +inf: TRUE" \
+	 "   1.0 < +NaN: FALSE" \
+	 "  +NaN < +NaN: FALSE" \
+	 "  -NaN < -NaN: FALSE" \
+	 "  +NaN < -NaN: FALSE" \
+	 "  -NaN < +NaN: FALSE" \
+	 "   1.0 * 2^-129 < 1.0 * 2^-129: FALSE" \
+	 "   1.0 * 2^-129 < 1.0 * 2^-128: TRUE" \
+	 "   1.0 * 2^-128 < 1.0 * 2^-129: FALSE" \
+	 "   1.0 * 2^126  < 1.0 * 2^-128: FALSE" \
+	 "   1.0 * 2^-128 < 1.0 * 2^126:  TRUE" \
+	 "lf.sfne.s" \
+	 "   1.0 !=  1.0: FALSE" \
+	 "   1.0 !=  2.0: TRUE" \
+	 "   1.5 !=  1.5: FALSE" \
+	 "   1.5 !=  0.5: TRUE" \
+	 "  -1.5 != -1.5: FALSE" \
+	 "   1.5 != -1.5: TRUE" \
+	 "  +0.0 != +0.0: FALSE" \
+	 "  -0.0 != -0.0: FALSE" \
+	 "  +0.0 != -0.0: FALSE" \
+	 "   1.0 != +inf: TRUE" \
+	 "  +inf != +inf: FALSE" \
+	 "  -inf != -inf: FALSE" \
+	 "  +inf != -inf: TRUE" \
+	 "   1.0 != +NaN: TRUE" \
+	 "  +NaN != +NaN: TRUE" \
+	 "  -NaN != -NaN: TRUE" \
+	 "  +NaN != -NaN: TRUE" \
+	 "   1.0 * 2^-129 != 1.0 * 2^-129: FALSE" \
+	 "   1.0 * 2^-129 != 1.0 * 2^-128: TRUE" \
+	 "   1.0 * 2^126  != 1.0 * 2^-128: TRUE" \
+	 "lf.sub.s" \
+	 "   1.0 -  0.0  =  1.0:  OK" \
+	 "   1.0 - -0.0  =  1.0:  OK" \
+	 "   1.0 -  1.0  = +0.0:  OK" \
+	 "   2.0 -  1.0  =  1.0:  OK" \
+	 "   1.5 -  1.5  = +0.0:  OK" \
+	 "   1.5 -  0.5  =  1.0:  OK" \
+	 "   1.5 -  1.5  =  0.5:  OK" \
+	 "   2.0 - -1.0  =  3.0:  OK" \
+	 "   1.0 - -2.0  =  3.0:  OK" \
+	 "   1.0 - -1.0  =  2.0:  OK" \
+	 "  -1.0 -  2.0  = -3.0:  OK" \
+	 "   1.0 -  2.0  = -1.0:  OK" \
+	 "  -1.0 - -1.0  =  0.0:  OK" \
+	 "   1.0 - +inf  = -inf:  OK" \
+	 "   1.0 - -inf  = +inf:  OK" \
+	 "  +inf - +inf  = -NaN:  OK" \
+	 "  +inf - -inf  = +inf:  OK" \
+	 "  -inf - -inf  = -NaN:  OK" \
+	 "   1.0 - +NaN  = +NaN:  OK" \
+	 "   1.0 - -NaN  = -NaN:  OK" \
+	 "  +NaN - +NaN  = +NaN:  OK" \
+	 "  +NaN - -NaN  = +NaN:  OK" \
+	 "  -NaN - -NaN  = -NaN:  OK" \
+	 "   1.0 - +sNaN = +qNaN: OK" \
+	 "   1.0 - -sNaN = -qNaN: OK" \
+	 "  -1.0 * 2^127 -  1.0 * 2^127  = +inf:  OK" \
+	 "   1.0 * 2^127 - -1.0 * 2^127  = -inf:  OK" \
+	 "Test completed" \
+	 "report(0xdeaddead);" \
+	 "exit(0)"]               \
+    "fp.cfg" "fp/fp"

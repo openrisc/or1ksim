@@ -1,0 +1,47 @@
+	TestFloat software tests for floating point operations
+
+From http://www.jhauser.us/arithmetic/TestFloat.html
+
+     TestFloat is a program for testing whether a computer's floating-point 
+     conforms to the IEC/IEEE Standard for Binary Floating-point Arithmetic. 
+     TestFloat works by comparing the behavior of the machine's floating-point 
+     with that of the SoftFloat software implementation of floating-point.
+
+At present only the single precision floating point capability of the software
+is used to test the OpenRISC's FPU.
+
+The main loop of the applications in TestFloat have been modified so they do
+not rely on input when executed, rather are hard-coded to run all the tests
+they possibly can.
+
+All of the output functions (fputs, putc, fprintf) have been replaced with 
+versions available in the OR1K support C library.
+
+The software included here also includes the SoftFloat library, which is
+is required to test the hardware FPU. 
+
+See http://www.jhauser.us/arithmetic/SoftFloat.html for more information on 
+SoftFloat.
+
+The or1ksim simulator actually implements its single precision floating point
+using functions from SoftFloat (see the softfloat/ path in the or1ksim project)
+so potentially any non-standard behavior of the floating point unit in or1ksim 
+will not be picked up by this test (as TestFloat uses SoftFloat itself to check
+against the hardware/system results.) However, TestFloat comes with a different
+implementation of the IEEE 754 compliant conversion and arithmetic functions to
+test SoftFloat against, hopefully picking up any inconsistencies that exist.
+
+Note that the bits64 version of SoftFloat's library is included here. It is 
+not a problem for all of the current OR1K GCC implementations to handle 64-bit
+data types.
+
+The file layout of SoftFloat and TestFloat, in their distributions, has been
+discarded and all the required files have been included in this path.
+
+testfloat is run during the standard check that can be run after compilation. 
+By default only the testfloat program will be run (not testsoftfloat). 
+testsoftfloat will, actually, be compiled and be under 
+testsuite/test-code-or1k/testfloat and can be run from where if desired.
+
+
+Julius Baxter, August 3 2010

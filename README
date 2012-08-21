@@ -1,0 +1,80 @@
+	      Or1ksim: The OpenRISC 1000 Architectural Simulator
+	      ==================================================
+
+
+What is this stuff?
+===================
+
+This is OpenRISC 1000 architectural simulator. See the file COPYING
+for copying permission. To contact the authors, see the AUTHORS file.
+
+This simulator loads an assembly file for one of the both architectures
+and it simulates the operation of instructions. 
+
+
+Pre-requisites
+==============
+
+The GNU toolchain for OpenRISC 1000 is required to compile programs for use
+with Or1ksim. Instructions how to build these GNU tools can be found on
+www.opencores.org
+
+Both the tool chain and DejaGnu are need to run the test suite.
+
+
+Installation
+============
+
+See the file INSTALL for generic installation instructions. Full details are
+in the user guide, which can be found in the 'doc' subdirectory.
+
+
+GNU Tools
+=========
+
+Instructions how to build GNU tools can be found on www.opencores.org, or in
+the Embecosm Application Note EAN2: "The OpenCores OpenRISC 1000 Simulator and
+Tool Chain: Installation Guide" <www.embecosm.com/download/ean2.html>.
+
+
+Simulator test
+==============
+
+Or1ksim can be tested with "make check", but this requires the GNU tool chain
+to be installed (using the same target specification) and DejaGNU to be
+installed. Full details of the tests can be found in the 'testsuite'
+sub-directory.
+
+
+Help
+====
+
+Run sim with --help option for list of command line options and help in
+interactive mode, to list the commands.
+
+A user guide may be found in the 'doc' sub-directory.
+
+If doxygen and dot are installed, structured documentation of the code base
+may be obtained by running the command:
+
+  doxygen doxygen.config
+
+from the top level directory.
+
+
+OpenRISC and OpenCores
+======================
+
+This project is licensed under the GNU Public License version 3. See the file
+COPYING for details.
+
+About the same idea as with GNU project except we want free and open source
+IP (intellectual property) cores. We design open source, synthesizable
+cores. OpenRISC is one such core. It is a 32-bit RISC microprocessor that
+will run GNU/Linux.
+
+For more information visit us at http://www.opencores.org.
+
+
+Upated by Jeremy Bennett (jeremy.bennett@embecosm.com)
+22 June 2010

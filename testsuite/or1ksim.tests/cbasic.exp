@@ -1,0 +1,50 @@
+# cbasic.exp. Test of C program functionality using DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the basic C functionality test.
+run_or1ksim "cbasic"              \
+    [list "report(0xffffffda);" \
+          "report(0xffffffc5);" \
+          "report(0x00006805);" \
+          "report(0xffff97f9);" \
+          "report(0xffff97f9);" \
+          "report(0x7a55957c);" \
+          "report(0x81e5e000);" \
+          "report(0x00000074);" \
+          "report(0x00000074);" \
+          "report(0x00000074);" \
+          "report(0x00000001);" \
+          "report(0x00000d7c);" \
+          "report(0x00000074);" \
+          "report(0x00000074);" \
+          "report(0x00000074);" \
+          "report(0xffffffff);" \
+          "report(0x00000d7a);" \
+          "report(0x00000d7a);" \
+          "RESULT: 0xdeaddead"  \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"]            \
+    "" "cbasic/cbasic"

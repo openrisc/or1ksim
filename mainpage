@@ -1,0 +1,42 @@
+/*! @file
+ *
+ *  @mainpage Or1ksim: the OpenRISC 1000 Architectural Simulator
+ *
+ *  @section intro_sec About
+ *
+ *  This is the entire code base for Or1ksim. It is described in more detail
+ *  in its user guide, which can be found in the @c doc directory.
+ *
+ *  Or1ksim uses the ArgTable 2 library to parse its arguments. This
+ *  documentation excludes that code base.
+ *
+ *  @section install_sec Installation
+ *
+ *  See the INSTALL file in the main directory for information on building and
+ *  installing these programs
+ *
+ *  @section documentation_sec Documentation
+ *
+ *  The user guide can be found as a texinfo file in the doc subdirectory.
+ *
+ *  This document may be converted to HTML, PDF, info files or PostScript by
+ *  the commands "make html", "make pdf", "make info" and "make ps"
+ *  respectively.
+ *
+ *  @section copying_sec Copying
+ *
+ *  This file is part of OpenRISC Architectural Simulator.
+ *
+ *  This program is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the Free
+ *  Software Foundation; either version 3 of the License, or (at your option)
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ *  more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */

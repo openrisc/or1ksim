@@ -1,0 +1,6 @@
+This is the AUTHORS file for the Or1ksim testsuite OR1K code. This directory
+has its own configuration script, and for GNU consistency, this means it must
+have its own AUTHORS file. However for all the authors see the file in the
+parent directory.
+
+../../AUTHORS

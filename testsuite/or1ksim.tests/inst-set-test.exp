@@ -1,0 +1,1645 @@
+# inst-set-test.exp. Tests of ORBIS32 instruction set
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the l.add, l.addc, l.addi and l.addic tests
+run_or1ksim "add-test"                                     \
+    [list "!  ** OVE flag cleared **"                      \
+          "!l.add"                                         \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000001 + 0x00000002 + c = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x40000000 + 0x3fffffff     = 0x7fffffff: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0xc0000000 + 0xc0000000     = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  RANGE exception"                              \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "!  ** OVE flag cleared **"                      \
+          "l.addc"                                         \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x40000000 + 0x3fffffff     = 0x7fffffff: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x40000000 + 0x3fffffff + c = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0x00000000 + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xc0000000 + 0xc0000000     = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xc0000000 + 0xbfffffff + c = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  0x40000000 + 0x40000000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  RANGE exception"                              \
+          "  0x40000000 + 0x3fffffff + c = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  0xffffffff + 0xfffffffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000000 + 0xffffffff + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  RANGE exception"                              \
+          "  0xbfffffff + 0xbfffffff     = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "!  ** OVE flag cleared **"                      \
+          "l.addi"                                         \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000001 + 0x00000002 + c = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0x0000fffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x7fff8000 + 0x00007fff     = 0x7fffffff: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0x80008000 + 0x00008000     = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  0xffffffff + 0x0000fffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  RANGE exception"                              \
+          "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "!  ** OVE flag cleared **"                      \
+          "l.addic"                                        \
+          "  0x00000001 + 0x00000002     = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0x0000fffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x7fff8000 + 0x00007fff     = 0x7fffffff: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x7fff8000 + 0x00007fff + c = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "  0xffffffff + 0x00000000 + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000000 + 0x0000ffff + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x80008000 + 0x00008000     = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x80007fff + 0x00008000 + c = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: FALSE"                 \
+          "!  ** OVE flag set **"                          \
+          "  RANGE exception"                              \
+          "  0x7fffc000 + 0x00004000     = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  RANGE exception"                              \
+          "  0x7fffc000 + 0x00003fff + c = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                 \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "  0xffffffff + 0x0000fffe     = 0xfffffffd: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  0x00000000 + 0x0000ffff + c = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   FALSE"                 \
+          "  - exception triggered: FALSE"                 \
+          "  RANGE exception"                              \
+          "  0x80007fff + 0x00008000     = 0x7fffffff: OK" \
+          "  - carry flag set:      TRUE"                  \
+          "  - overflow flag set:   TRUE"                  \
+          "  - exception triggered: TRUE"                  \
+          "!  ** OVE flag cleared **"                      \
+          "!Test completed"                                \
+          "!report(0xdeaddead);"                           \
+	  "!exit(0)"]                                      \
+    "inst-set-test.cfg" "inst-set-test/is-add-test"
+
+# Run the l.and, and l.andi tests
+run_or1ksim "and-test"                                 \
+    [list "!  ** OVE flag set **"                      \
+          "!l.and"                                     \
+          "  0x00000000 & 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff & 0xffffffff = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0xaaaaaaaa = 0xaaaaaaaa: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 & 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 & 0x55555555 = 0x55555555: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0x55555555 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c & 0xb38f0f83 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c & 0xc4c70f07 = 0x44400004: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 & 0x38f0f83b = 0x30800803: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!l.andi"                                    \
+          "  0x00000000 & 0x0000 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff & 0xffff = 0x0000ffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0x0000 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0xaaaa = 0x0000aaaa: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 & 0x0000 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 & 0x5555 = 0x00005555: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa & 0x5555 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c & 0x0f83 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c & 0x0f07 = 0x00000004: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 & 0xf83b = 0x00000803: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+	  "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-and-test"
+
+# Run the l.div and l.divu test
+run_or1ksim "div-test"                                 \
+    [list "!l.div"                                     \
+          "  0x0000000c / 0x00000003 = 0x00000004: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000b / 0x00000003 = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0xfffffffd = 0x00000004: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff5 / 0xfffffffd = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0x00000003 = 0xfffffffc: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff5 / 0x00000003 = 0xfffffffd: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000c / 0xfffffffd = 0xfffffffc: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000b / 0xfffffffd = 0xfffffffd: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000c / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  RANGE exception"                          \
+          "  0x0000000c / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: TRUE"              \
+          "  RANGE exception"                          \
+          "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: TRUE"              \
+          "!  ** OVE flag cleared **"                  \
+          "l.divu"                                     \
+          "  0x0000000c / 0x00000003 = 0x00000004: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000b / 0x00000003 = 0x00000003: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0xfffffffd = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff5 / 0xfffffffd = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0x00000003 = 0x55555551: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff5 / 0x00000003 = 0x55555551: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000c / 0xfffffffd = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000b / 0xfffffffd = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x0000000c / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  RANGE exception"                          \
+          "  0x0000000c / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: TRUE"              \
+          "  RANGE exception"                          \
+          "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: TRUE"              \
+          "!  ** OVE flag cleared **"                  \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+	  "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-div-test"
+
+# Run the l.ff1 and l.fl1 test
+run_or1ksim "find-test"                 \
+    [list "!l.ff1"                      \
+          "  ff1 (0x00000001) = 0x01: OK" \
+          "  ff1 (0x80000000) = 0x20: OK" \
+          "  ff1 (0x55555555) = 0x01: OK" \
+          "  ff1 (0xaaaaaaaa) = 0x02: OK" \
+          "  ff1 (0x00018000) = 0x10: OK" \
+          "  ff1 (0xc0000000) = 0x1f: OK" \
+          "  ff1 (0x00000000) = 0x00: OK" \
+          "!l.fl1"                      \
+          "  fl1 (0x00000001) = 0x01: OK" \
+          "  fl1 (0x80000000) = 0x20: OK" \
+          "  fl1 (0x55555555) = 0x1f: OK" \
+          "  fl1 (0xaaaaaaaa) = 0x20: OK" \
+          "  fl1 (0x00018000) = 0x11: OK" \
+          "  fl1 (0xc0000000) = 0x20: OK" \
+          "  fl1 (0x00000000) = 0x00: OK" \
+          "!Test completed"             \
+          "!report(0xdeaddead);"        \
+	  "!exit(0)"]                   \
+    "inst-set-test.cfg" "inst-set-test/is-find-test"
+
+# Run the l.jalf and l.jr test
+run_or1ksim "jump-test"                                     \
+    [list "!l.jalr"                                         \
+          "  Jump to 0x000010dc using register 0x05 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x000012b9 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001496 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001673 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ILLEGAL INSTRUCTION exception"                 \
+          "  Jump to 0x0000184c using register 0x09 failed" \
+          "  - exception triggered: TRUE"                   \
+          "!l.jr"                                           \
+          "  Jump to 0x00001a38 using register 0x05 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001c15 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001df2 using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  ALIGNMENT exception"                           \
+          "  Jump to 0x00001fcf using register 0x05 failed" \
+          "  - exception triggered: TRUE"                   \
+          "  Jump to 0x000021a8 using register 0x09 OK"     \
+          "  - exception triggered: FALSE"                  \
+          "!Test completed"                                 \
+          "!report(0xdeaddead);"                            \
+	  "!exit(0)"]                                       \
+    "inst-set-test.cfg" "inst-set-test/is-jump-test"
+
+# Run the l.lws test
+run_or1ksim "lws-test"                            \
+    [list "!l.lws"                                \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "   l.lws r4,0(r5): r4=0xffffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0xdeadbeef:  OK" \
+          "   l.lws r4,0(r5): r4=0x00000000:  OK" \
+          "   l.lws r4,0(r5): r4=0x7fffffff:  OK" \
+          "   l.lws r4,0(r5): r4=0x80000000:  OK" \
+          "!Test completed"                       \
+          "!report(0xdeaddead);"                  \
+	  "!exit(0)"]                             \
+    "inst-set-test.cfg" "inst-set-test/is-lws-test"
+
+# Run the l.mac test
+run_or1ksim "mac-test"                            \
+    [list "!l.mac"                                \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x00000000 0000000c: OK" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000001 00000000: OK" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x40000000 00000000: OK" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000 00000000: OK" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0xffffffff 00000006: OK" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008001 * 0x0000fffe = 0x00000000 7ffffffe: OK" \
+  "  0x00000000 00000002 + 0x00008001 * 0x0000fffe = 0x00000000 80000000: OK" \
+  "  0x00000000 80000002 + 0x00008001 * 0x0000fffe = 0x00000001 00000000: OK" \
+  "  0x7fffffff 80000001 + 0x00008001 * 0x0000fffe = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff + 0x00008001 * 0x0000fffe = 0x00000000 7ffffffd: OK" \
+  "  0xffffffff 80000002 + 0x00008001 * 0x0000fffe = 0x00000000 00000000: OK" \
+  "  0xfffffffe 80000002 + 0x00008001 * 0x0000fffe = 0xffffffff 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0xfffffffe * 0xfffffffd = 0x00000000 0000000c: OK" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0xfffffffd = 0x00000000 00000005: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0xfffffffd = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c + 0x00000002 * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000001 00000005 + 0x00000002 * 0xfffffffd = 0x00000000 ffffffff: OK" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0xfffffffd = 0x7fffffff fffffff9: OK" \
+  "  0xffffffff ffffffff + 0x00000002 * 0xfffffffd = 0xffffffff fffffff9: OK" \
+  "  0xffffffff 00000005 + 0x00000002 * 0xfffffffd = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 + 0x00000002 * 0xfffffffd = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008000 * 0xffff0000 = 0xffffffff 80000000: OK" \
+  "  0x00000000 00000006 + 0x00008000 * 0xffff0000 = 0xffffffff 80000006: OK" \
+  "  0x00000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000 00000000: OK" \
+  "  0x7fffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff 7fffffff: OK" \
+  "  0xffffffff ffffffff + 0x00008000 * 0xffff0000 = 0xffffffff 7fffffff: OK" \
+  "  0xffffffff 7fffffff + 0x00008000 * 0xffff0000 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 80000000 + 0x00008000 * 0xffff0000 = 0x80000000 00000000: OK" \
+  "!" \
+  "l.maci" \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x00000000 0000000c: OK" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000001 00000000: OK" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x40000000 00000000: OK" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000 00000000: OK" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0xffffffff 00000006: OK" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00010002 * 0x00007fff = 0x00000000 7ffffffe: OK" \
+  "  0x00000000 00000002 + 0x00010002 * 0x00007fff = 0x00000000 80000000: OK" \
+  "  0x00000000 80000002 + 0x00010002 * 0x00007fff = 0x00000001 00000000: OK" \
+  "  0x7fffffff 80000001 + 0x00010002 * 0x00007fff = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff + 0x00010002 * 0x00007fff = 0x00000000 7ffffffd: OK" \
+  "  0xffffffff 80000002 + 0x00010002 * 0x00007fff = 0x00000000 00000000: OK" \
+  "  0xfffffffe 80000002 + 0x00010002 * 0x00007fff = 0xffffffff 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0x0000fffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 + 0xfffffffe * 0x0000fffd = 0x00000000 0000000c: OK" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0x0000fffd = 0x00000000 00000005: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0x0000fffd = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c + 0x00000002 * 0x0000fffd = 0x00000000 00000006: OK" \
+  "  0x00000001 00000005 + 0x00000002 * 0x0000fffd = 0x00000000 ffffffff: OK" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0x0000fffd = 0x7fffffff fffffff9: OK" \
+  "  0xffffffff ffffffff + 0x00000002 * 0x0000fffd = 0xffffffff fffffff9: OK" \
+  "  0xffffffff 00000005 + 0x00000002 * 0x0000fffd = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 + 0x00000002 * 0x0000fffd = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 + 0x00010000 * 0x00008000 = 0xffffffff 80000000: OK" \
+  "  0x00000000 00000006 + 0x00010000 * 0x00008000 = 0xffffffff 80000006: OK" \
+  "  0x00000000 80000000 + 0x00010000 * 0x00008000 = 0x00000000 00000000: OK" \
+  "  0x7fffffff ffffffff + 0x00010000 * 0x00008000 = 0x7fffffff 7fffffff: OK" \
+  "  0xffffffff ffffffff + 0x00010000 * 0x00008000 = 0xffffffff 7fffffff: OK" \
+  "  0xffffffff 7fffffff + 0x00010000 * 0x00008000 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 80000000 + 0x00010000 * 0x00008000 = 0x80000000 00000000: OK" \
+  "!" \
+  "l.macrc" \
+  "  0x00000000 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0x00000002 * 0x00000003 = 0x0000000c:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x3fffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff fffffffa + 0x00000002 * 0x00000003 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 00000000 + 0x00000002 * 0x00000003 = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008001 * 0x0000fffe = 0x7ffffffe:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000002 + 0x00008001 * 0x0000fffe = 0x80000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff 80000001 + 0x00008001 * 0x0000fffe = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00008001 * 0x0000fffe = 0x7ffffffd:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xfffffffe 80000002 + 0x00008001 * 0x0000fffe = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0xfffffffe * 0xfffffffd = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0xfffffffe * 0xfffffffd = 0x0000000c:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0xfffffffe * 0xfffffffd = 0x00000005:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00000002 * 0xfffffffd = 0xfffffffa:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 0000000c + 0x00000002 * 0xfffffffd = 0x00000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000001 00000005 + 0x00000002 * 0xfffffffd = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff ffffffff + 0x00000002 * 0xfffffffd = 0xfffffff9:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00000002 * 0xfffffffd = 0xfffffff9:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 00000005 + 0x00000002 * 0xfffffffd = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 00000006 + 0x00000002 * 0xfffffffd = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "  0x00000000 00000000 + 0x00008000 * 0xffff0000 = 0x80000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 00000006 + 0x00008000 * 0xffff0000 = 0x80000006:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x00000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x7fffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff ffffffff + 0x00008000 * 0xffff0000 = 0x7fffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0xffffffff 7fffffff + 0x00008000 * 0xffff0000 = 0xffffffff:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "  0x80000000 80000000 + 0x00008000 * 0xffff0000 = 0x00000000:   OK" \
+  "  - MACHI cleared" \
+  "  - MACLO cleared" \
+  "!" \
+  "l.msb" \
+  "  0x00000000 00000000 - 0x00000002 * 0x00000003 = 0xffffffff fffffffa: OK" \
+  "  0x00000000 0000000c - 0x00000002 * 0x00000003 = 0x00000000 00000006: OK" \
+  "  0x00000001 00000000 - 0x00000002 * 0x00000003 = 0x00000000 fffffffa: OK" \
+  "  0x40000000 00000000 - 0x00000002 * 0x00000003 = 0x3fffffff fffffffa: OK" \
+  "  0xffffffff fffffffa - 0x00000002 * 0x00000003 = 0xffffffff fffffff4: OK" \
+  "  0xffffffff 00000005 - 0x00000002 * 0x00000003 = 0xfffffffe ffffffff: OK" \
+  "  0x80000000 00000006 - 0x00000002 * 0x00000003 = 0x80000000 00000000: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00008001 * 0x0000fffe = 0xffffffff 80000002: OK" \
+  "  0x00000000 00000002 - 0x00008001 * 0x0000fffe = 0xffffffff 80000004: OK" \
+  "  0x00000000 80000002 - 0x00008001 * 0x0000fffe = 0x00000000 00000004: OK" \
+  "  0x7fffffff 7ffffffd - 0x00008001 * 0x0000fffe = 0x7ffffffe ffffffff: OK" \
+  "  0xffffffff ffffffff - 0x00008001 * 0x0000fffe = 0xffffffff 80000001: OK" \
+  "  0xffffffff 80000002 - 0x00008001 * 0x0000fffe = 0xffffffff 00000004: OK" \
+  "  0xfffffffe 80000002 - 0x00008001 * 0x0000fffe = 0xfffffffe 00000004: OK" \
+  "!" \
+  "  0x00000000 00000006 - 0xfffffffe * 0xfffffffd = 0x00000000 00000000: OK" \
+  "  0x00000000 0000000c - 0xfffffffe * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0xffffffff ffffffff - 0xfffffffe * 0xfffffffd = 0xffffffff fffffff9: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00000002 * 0xfffffffd = 0x00000000 00000006: OK" \
+  "  0x00000000 00000006 - 0x00000002 * 0xfffffffd = 0x00000000 0000000c: OK" \
+  "  0x00000000 ffffffff - 0x00000002 * 0xfffffffd = 0x00000001 00000005: OK" \
+  "  0x7fffffff fffffff9 - 0x00000002 * 0xfffffffd = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff fffffff9 - 0x00000002 * 0xfffffffd = 0xffffffff ffffffff: OK" \
+  "  0xfffffffe ffffffff - 0x00000002 * 0xfffffffd = 0xffffffff 00000005: OK" \
+  "  0x80000000 00000000 - 0x00000002 * 0xfffffffd = 0x80000000 00000006: OK" \
+  "!" \
+  "  0x00000000 00000000 - 0x00008000 * 0xffff0000 = 0x00000000 80000000: OK" \
+  "  0x00000000 00000006 - 0x00008000 * 0xffff0000 = 0x00000000 80000006: OK" \
+  "  0x00000000 80000000 - 0x00008000 * 0xffff0000 = 0x00000001 00000000: OK" \
+  "  0x7fffffff 7fffffff - 0x00008000 * 0xffff0000 = 0x7fffffff ffffffff: OK" \
+  "  0xffffffff ffffffff - 0x00008000 * 0xffff0000 = 0x00000000 7fffffff: OK" \
+  "  0xfffffffe ffffffff - 0x00008000 * 0xffff0000 = 0xffffffff 7fffffff: OK" \
+  "  0x80000000 00000000 - 0x00008000 * 0xffff0000 = 0x80000000 80000000: OK" \
+  "!" \
+  "!Test completed"                       \
+  "!report(0xdeaddead);"                  \
+  "!exit(0)"]                             \
+    "inst-set-test.cfg" "inst-set-test/is-mac-test"
+
+# Run the l.mul test
+run_or1ksim "mul-test"                                 \
+    [list "!  ** OVE flag cleared **"                  \
+          "!l.mul"                                     \
+          "  0x00000002 * 0x00000003 = 0x00000006: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00008001 * 0x0000fffe = 0x7ffffffe: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00008000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x00010000 * 0x00010000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffffe * 0xfffffffd = 0x00000006: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0xffff0002 = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0xffff0000 = 0x80010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0xffff0000 * 0xfffeffff = 0x00010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x00000002 * 0xfffffffd = 0xfffffffa: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff8000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0x00010000 = 0x7fff0000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x80000000 * 0x00000001 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  RANGE exception"                          \
+          "  0x00008000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "  0x00000002 * 0xfffffffd = 0xfffffffa: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  RANGE exception"                          \
+          "  0xffff7fff * 0xffff0000 = 0x80010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "!  ** OVE flag cleared **"                  \
+          "l.muli"                                     \
+          "  0x00000002 * 0x0003 = 0x00000006: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00010002 * 0x7fff = 0x7ffffffe: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00020000 * 0x4000 = 0x80000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x00040000 * 0x4000 = 0x00000000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffffe * 0xfffd = 0x00000006: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffefffe * 0x8001 = 0x7ffffffe: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffe0000 * 0xbfff = 0x80020000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0xfffdfffe * 0x8000 = 0x00010000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x00000002 * 0xfffd = 0xfffffffa: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00010000 * 0x8000 = 0x80000000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffdfffc * 0x4000 = 0x7fff0000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x80000000 * 0x0001 = 0x80000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  RANGE exception"                          \
+          "  0x00020000 * 0x4000 = 0x80000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "  0xfffffffe * 0xfffd = 0x00000006: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  RANGE exception"                          \
+          "  0xfffdfffe * 0x8000 = 0x00010000: OK"     \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "!  ** OVE flag cleared **"                  \
+          "l.mulu"                                     \
+          "  0x00000002 * 0x00000003 = 0x00000006: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00008001 * 0x0000fffe = 0x7ffffffe: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00008000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00010000 * 0x00010000 = 0x00000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffffe * 0xfffffffd = 0x00000006: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0xffff0002 = 0x7ffffffe: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0xffff0000 = 0x80010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff0000 * 0xfffeffff = 0x00010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00000002 * 0xfffffffd = 0xfffffffa: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff8000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0x00010000 = 0x7fff0000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x80000000 * 0x00000001 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  0x00008000 * 0x00010000 = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00000002 * 0xfffffffd = 0xfffffffa: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffff7fff * 0xffff0000 = 0x80010000: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag cleared **"                  \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+          "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-mul-test"
+
+# Run the l.or, and l.ori tests
+run_or1ksim "or-test"                                  \
+    [list "!  ** OVE flag set **"                      \
+          "!l.or"                                      \
+          "  0x00000000 | 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff | 0xffffffff = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0x00000000 = 0xaaaaaaaa: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0xaaaaaaaa = 0xaaaaaaaa: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 | 0x00000000 = 0x55555555: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 | 0x55555555 = 0x55555555: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0x55555555 = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c | 0xb38f0f83 = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c | 0xc4c70f07 = 0xccf7ff7f: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 | 0x38f0f83b = 0xbbffffbb: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!l.ori"                                     \
+          "  0x00000000 | 0x0000 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff | 0xffff = 0xffffffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0x0000 = 0xaaaaaaaa: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0xaaaa = 0xaaaaaaaa: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 | 0x0000 = 0x55555555: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 | 0x5555 = 0x55555555: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa | 0x5555 = 0xaaaaffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c | 0x0f83 = 0x4c70ffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c | 0x0f07 = 0x4c70ff7f: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 | 0xf83b = 0xb38fffbb: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+	  "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-or-test"
+
+# Run the l.ror test
+run_or1ksim "ror-test"                                   \
+    [list "!l.ror"                                       \
+          "  0xb38f0f83 ROR 0x00000000 = 0xb38f0f83: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000001 = 0xd9c787c1: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000004 = 0x3b38f0f8: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000010 = 0x0f83b38f: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x0000001f = 0x671e1f07: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00000021 = 0xd9c787c1: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00002224 = 0x3b38f0f8: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0x00f789f0 = 0x0f83b38f: OK" \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 ROR 0xffffffff = 0x671e1f07: OK" \
+          "  - exception triggered: FALSE"               \
+          "!l.rori"                                      \
+          "  0xb38f0f83 RORI 0x00 = 0xb38f0f83: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x01 = 0xd9c787c1: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x04 = 0x3b38f0f8: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x10 = 0x0f83b38f: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x1f = 0x671e1f07: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x21 = 0xd9c787c1: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x24 = 0x3b38f0f8: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x30 = 0x0f83b38f: OK"      \
+          "  - exception triggered: FALSE"               \
+          "  0xb38f0f83 RORI 0x3f = 0x671e1f07: OK"      \
+          "  - exception triggered: FALSE"               \
+          "!Test completed"                              \
+          "!report(0xdeaddead);"                         \
+          "!exit(0)"]                                    \
+    "inst-set-test.cfg" "inst-set-test/is-ror-test"
+
+# Run the l.mfspr and l.mtspr test
+run_or1ksim "spr-test"                         \
+    [list "!l.mfspr"                           \
+          "  l.mfspr  0x00000000 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x0000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00000801 | 0x2000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002000 | 0x0801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00002801 | 0x0001: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mfspr  0x00000800 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "!l.mtspr"                           \
+          "  l.mtspr  0x00000000 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x0000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00000801 | 0x2000: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002000 | 0x0801: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00002801 | 0x0001: OK" \
+          "  - exception triggered: FALSE"     \
+          "  l.mtspr  0x00000800 | 0x2801: OK" \
+          "  - exception triggered: FALSE"     \
+          "!Test completed"                    \
+          "!report(0xdeaddead);"               \
+          "!exit(0)"]                          \
+    "inst-set-test.cfg" "inst-set-test/is-spr-test"
+
+# Run the shift tests
+run_or1ksim "shift-test"                                        \
+    [list "!  ** OVE flag set **"                               \
+          "!l.sll"                                              \
+          "  0xb38f0f83 shifted by 0x00000000 = 0xb38f0f83: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000001 = 0x671e1f06: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000004 = 0x38f0f830: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000010 = 0x0f830000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0000001f = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000021 = 0x671e1f06: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00002224 = 0x38f0f830: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00f789f0 = 0x0f830000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0xffffffff = 0x80000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!l.slli"                                             \
+          "  0xb38f0f83 shifted by 0x0000 = 0xb38f0f83: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0001 = 0x671e1f06: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0004 = 0x38f0f830: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0010 = 0x0f830000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x001f = 0x80000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0021 = 0x671e1f06: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0024 = 0x38f0f830: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0030 = 0x0f830000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x003f = 0x80000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!l.sra"                                              \
+          "  0xb38f0f83 shifted by 0x00000000 = 0xb38f0f83: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000001 = 0xd9c787c1: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000004 = 0xfb38f0f8: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000010 = 0xffffb38f: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0000001f = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000001 = 0x2638783e: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000004 = 0x04c70f07: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000010 = 0x00004c70: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0000001f = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000021 = 0xd9c787c1: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00002224 = 0xfb38f0f8: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00f789f0 = 0xffffb38f: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0xffffffff = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000021 = 0x2638783e: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00002224 = 0x04c70f07: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00f789f0 = 0x00004c70: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0xffffffff = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!l.srai"                                             \
+          "  0xb38f0f83 shifted by 0x0000 = 0xb38f0f83: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0001 = 0xd9c787c1: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0004 = 0xfb38f0f8: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0010 = 0xffffb38f: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x001f = 0xffffffff: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0001 = 0x2638783e: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0004 = 0x04c70f07: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0010 = 0x00004c70: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x001f = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0021 = 0xd9c787c1: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0024 = 0xfb38f0f8: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0030 = 0xffffb38f: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x003f = 0xffffffff: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0021 = 0x2638783e: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0024 = 0x04c70f07: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0030 = 0x00004c70: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x003f = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!l.srl"                                              \
+          "  0xb38f0f83 shifted by 0x00000000 = 0xb38f0f83: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000001 = 0x59c787c1: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000004 = 0x0b38f0f8: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000010 = 0x0000b38f: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0000001f = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000001 = 0x2638783e: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000004 = 0x04c70f07: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000010 = 0x00004c70: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0000001f = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00000021 = 0x59c787c1: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00002224 = 0x0b38f0f8: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x00f789f0 = 0x0000b38f: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0xffffffff = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00000021 = 0x2638783e: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00002224 = 0x04c70f07: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x00f789f0 = 0x00004c70: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0xffffffff = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!l.srli"                                             \
+          "  0xb38f0f83 shifted by 0x0000 = 0xb38f0f83: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0001 = 0x59c787c1: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0004 = 0x0b38f0f8: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0010 = 0x0000b38f: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x001f = 0x00000001: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0001 = 0x2638783e: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0004 = 0x04c70f07: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0010 = 0x00004c70: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x001f = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0021 = 0x59c787c1: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0024 = 0x0b38f0f8: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x0030 = 0x0000b38f: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0xb38f0f83 shifted by 0x003f = 0x00000001: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0021 = 0x2638783e: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0024 = 0x04c70f07: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x0030 = 0x00004c70: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "  0x4c70f07c shifted by 0x003f = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"                      \
+          "  - overflow flag set:   FALSE"                      \
+          "  - exception triggered: FALSE"                      \
+          "!Test completed"                                     \
+          "!report(0xdeaddead);"                                \
+          "!exit(0)"]                                           \
+    "inst-set-test.cfg" "inst-set-test/is-shift-test"
+
+# Run the l.sub test
+run_or1ksim "sub-test"                         \
+    [list "!  ** OVE flag cleared **" \
+          "!l.sub" \
+          "  0x00000003 - 0x00000002 = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00000001 - 0x00000002 = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x00000003 - 0x00000002 = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xfffffffd - 0xfffffffe = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff - 0xfffffffe = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x7fffffff - 0x3fffffff = 0x40000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x40000000 - 0x40000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x3fffffff - 0x40000000 = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x40000000 - 0x3fffffff = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x80000000 - 0x7fffffff = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "  0x7fffffff - 0x80000000 = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
+          "!  ** OVE flag set **"                      \
+          "  RANGE exception"                          \
+          "  0x80000000 - 0x7fffffff = 0x00000001: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "  0x3fffffff - 0x40000000 = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  RANGE exception"                          \
+          "  0x7fffffff - 0x80000000 = 0xffffffff: OK" \
+          "  - carry flag set:      TRUE"              \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "!  ** OVE flag cleared **"                  \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+          "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-sub-test"
+
+# Run the l.xor test
+run_or1ksim "xor-test"                                 \
+    [list "!  ** OVE flag set **"                      \
+          "!l.xor"                                     \
+          "  0x00000000 ^ 0x00000000 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff ^ 0xffffffff = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0x00000000 = 0xaaaaaaaa: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0xaaaaaaaa = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 ^ 0x00000000 = 0x55555555: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 ^ 0x55555555 = 0x00000000: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0x55555555 = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c ^ 0xb38f0f83 = 0xffffffff: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c ^ 0xc4c70f07 = 0x88b7ff7b: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 ^ 0x38f0f83b = 0x8b7ff7b8: OK" \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!l.xori"                                    \
+          "  0x00000000 ^ 0x0000 = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xffffffff ^ 0xffff = 0x00000000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0x0000 = 0xaaaaaaaa: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0xaaaa = 0x55550000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 ^ 0x0000 = 0x55555555: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x55555555 ^ 0x5555 = 0x55550000: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xaaaaaaaa ^ 0x5555 = 0xaaaaffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c ^ 0x0f83 = 0x4c70ffff: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0x4c70f07c ^ 0x0f07 = 0x4c70ff7b: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "  0xb38f0f83 ^ 0xf83b = 0x4c70f7b8: OK"     \
+          "  - carry flag set:      FALSE"             \
+          "  - overflow flag set:   FALSE"             \
+          "  - exception triggered: FALSE"             \
+          "!Test completed"                            \
+          "!report(0xdeaddead);"                       \
+          "!exit(0)"]                                  \
+    "inst-set-test.cfg" "inst-set-test/is-xor-test"

@@ -1,0 +1,149 @@
+# Or1ksim expect test functiosn for use with DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+#! Run a program on Or1ksim with the supplied config_file
+#
+#! @param[in] testname    The name of the test
+#! @param[in] match_list  A list of expected responses
+#! @param[in] config_file The or1ksim config file to use
+# !@param[in] progname    The program image to use on Or1ksim
+# -----------------------------------------------------------------------------
+proc run_or1ksim { testname match_list config_file progname } {
+    global verbose
+    global srcdir
+    global objdir
+
+    # Construct the filename
+    if {0 == [string length $config_file]} {
+	set config_full_file "$srcdir/or1ksim.tests/default.cfg";
+    } else {
+	set config_full_file "$srcdir/or1ksim.tests/$config_file";
+    }
+
+    set prog_full_name "$objdir/test-code-or1k/$progname"
+    set command_line "$objdir/../sim -f $config_full_file $prog_full_name"
+
+    if { $verbose > 1 } {
+	send_user "starting $command_line\n"
+    }
+
+    # Run the program.
+    eval "spawn $command_line"
+
+    # Try each matchstr in turn, counting the lines for error reporting
+    set match_line 0;
+
+    # The tests for Or1ksim are generally monolithic, with each line of output
+    # matched representing a pass. This is different to the tests for the
+    # library, which are each small and individual.
+    foreach matchstr $match_list {
+
+	set match_line [expr {$match_line + 1}];
+
+	# Each matchstring corresponds to a pass, unless its first character
+	# is '!', indicating a string which must match (without its '!'), but
+	# does not count towards the pass rate.
+	set first_ch [string index $matchstr 0]
+
+	if { $first_ch == "!" } {
+	    # A line to ignore
+	    set matchlen [string length $matchstr]
+	    set last_index [expr {$matchlen - 1}]
+	    set matchstr [string range $matchstr 1 $last_index]
+
+	    if { $verbose > 2 } {
+		send_user "ignorning |$matchstr|\n";
+	    }
+	}
+
+	if { $verbose > 2 } {
+	    send_user "matching |$matchstr|\n";
+	}
+
+	# The matching is slightly tricky. In general we want to find warnings
+	# or errors. However expect will look at the entire buffer, so if we
+	# have the match string *after* an error or warning message, then the
+	# match will still work OK.
+
+	# The trick is to do some post-processing of the matched buffer to see
+	# if there was a preceding Warning or ERROR message.
+
+	expect {
+	    -ex $matchstr {
+		set matchlen [string length $matchstr]
+		set buflen [string length $expect_out(buffer)]
+		set lastch [expr {$buflen - $matchlen}]
+		set prefix [string range $expect_out(buffer) 0 $lastch]
+
+		if { [string match *ERROR* $prefix] } {
+		    # We skipped an error
+		    fail "$testname: ERROR seeking match line $match_line";
+		    return
+		} elseif { [string match *Warning* $prefix] } {
+		    # We skipped a warning
+		    fail "$testname: Warning seeking match line $match_line";
+		    return;
+		} elseif { $first_ch != "!" } {
+		    # If we match we have a pass, unless we were asked to
+		    # ignore.
+		    pass "$testname: $matchstr"
+		}
+		# Everything else skip silently
+	    }
+	    
+	    ERROR {
+		# An error other than the one we seek
+		fail "$testname: ERROR seeking match line $match_line";
+		return
+	    }
+	    
+	    Warning {
+		# Any warning
+		fail "$testname: Warning seeking match line $match_line";
+		return;
+	    }
+	    
+	    eof {
+		fail "$testname: hit EOF seeking match line $match_line";
+		return
+	    }
+	    
+	    timeout {
+		perror "Timeout";
+		unresolved "$testname: timeout";
+                close
+		return
+	    }
+	}
+    }
+
+    # If we get here we've passed the whole test. No need to report anything
+    # else.
+}
+
+# Timeout 3 seconds is plenty as default
+set timeout 3

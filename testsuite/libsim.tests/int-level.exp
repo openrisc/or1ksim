@@ -1,0 +1,62 @@
+# int-level.exp. Test of the library level triggered interrupt functions
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the library level triggered interrupts in a number of ways.
+
+# Sequence of independent interrupts
+run_libsim "int-level simple 1"                     \
+    [list "Initalization succeeded."                \
+          "Starting interrupt handler"              \
+          "Enabling interrupts."                    \
+          "Triggering interrupt 1"                  \
+          "PICSR = 0x00000002"                      \
+          "Clearing interrupt 1"                    \
+          "Test completed successfully."]           \
+    "lib-inttest/lib-inttest" "int-level.cfg"       \
+    "int-logger/int-logger" "-l" "1"
+
+run_libsim "int-level simple 2"                     \
+    [list "Initalization succeeded."                \
+          "Starting interrupt handler"              \
+          "Enabling interrupts."                    \
+          "Triggering interrupt 7"                  \
+          "PICSR = 0x00000080"                      \
+          "Clearing interrupt 7"                    \
+          "Triggering interrupt 17"                 \
+          "PICSR = 0x00020000"                      \
+          "Clearing interrupt 17"                   \
+          "Triggering interrupt 31"                 \
+          "PICSR = 0x80000000"                      \
+          "Clearing interrupt 31"                   \
+          "Test completed successfully."]           \
+    "lib-inttest/lib-inttest" "int-level.cfg"       \
+    "int-logger/int-logger" "-l" "7" "17" "31"
+
+# Check the boundaries of acceptable interrupt numbers
+run_libsim "int-level check boundaries"               \
+    [list "Warning: Invalid interrupt # 0 to raise: Exiting."]  \
+    "lib-inttest/lib-inttest" "int-level.cfg"                   \
+    "int-logger/int-logger" "-l" "0" "1" "31" "32" "31" "1" "0"

@@ -1,0 +1,69 @@
+			     OR1KSIM MAINTAINERS
+			     ===================
+
+This file contains information about people who are permitted to make changes
+to various parts of the compiler and associated libraries.
+
+Please do not contact the people in this file directly to report problems in
+Or1ksim. 
+
+For general information about Or1ksim, post to both OpenRISC mailing lists:
+
+  openrisc@lists.openrisc.net
+  openrisc@lists.opencores.org
+
+(yes we do mean crosspost - they have disjoint sets of readers).
+
+To report problems with Or1ksim, please visit:
+
+  http://bugzilla.opencores.org/
+
+
+Patch submission process
+========================
+
+The following process applies to both the SVN HEAD and release branches.
+
+* Submit the patch to both OpenRISC mailing lists a diff against current SVN
+  HEAD.
+  - make sure you put the patch inline.
+
+* Deal with any review comments.
+ 
+* when the patch is approved (by any maintainer), anyone with
+  write-after-approval permission to the SVN repository may commit the patch.
+
+Note in particular a patch will not be accepted if the resulting code does not
+pass "make distcheck".
+
+Committing to private branches by the owner of that private branch needs no
+approval process. Merge of that private branch into either SVN HEAD or a
+release branch should follow the patch submission process above.
+
+
+MAINTAINER
+==========
+
+The following people may approve patches to Or1ksim
+
+  Julius Baxter                          julius@opencores.org
+  Jeremy Bennett                         jeremybennett@opencores.org
+
+
+WRITE AFTER APPROVAL
+====================
+
+The following people may commit patches after approval by a MAINTAINER
+
+  Julius Baxter                          julius@opencores.org
+  Jeremy Bennett                         jeremybennett@opencores.org
+
+
+OBVIOUS PATCHES
+===============
+
+Anyone with write-after-approval permission may commit "obvious" patches. For
+example trivial typos.
+
+Such patches should be posted after the event to both mailing lists (with the
+tag [OBV] in teh subject line).

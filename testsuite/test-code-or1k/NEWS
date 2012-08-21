@@ -1,0 +1,6 @@
+This is the NEWS file for the Or1ksim testsuite OR1K specific code. This
+directory has its own configuration script, and for GNU consistency, this
+means it must have its own NEWS file. However for all the real news see the
+file in the parent directory.
+
+../../NEWS

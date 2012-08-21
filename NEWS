@@ -1,0 +1,249 @@
+	      Or1ksim: The OpenRISC 1000 Architectural Simulator
+	      ==================================================
+
+
+New in release 0.5.1rc1
+=======================
+
+New features (shouldn't be there during a release cycle, but prompted by debug
+needs elsewhere in the tool chain).
+
+New option --trace provides a one line dump of instruction executed and any
+register or memory location changed after each instruction.
+
+A new configuration option "use_nmi" is added to the programmable interrupt
+controller (PIC). This causes interrupt lines 0 and 1 to be non-maskable, but
+only in the sense that the corresponding bits in PICMR are hard-wired to 1.
+
+New config setting for memory initialization "exitnops" fills memory with
+"l.nop 1", which will cause the simulator to exit. Good for tracking pointer
+corruption.
+
+New l.nop opcodes to turn instruction tracing on and off. Good for debugging
+applications.
+
+New l.nop opcode to return a random number. Good for applications (like the
+Linux kernel) which need access to the host entropy to ensure randomness.
+
+New l.nop opcode to identify that this is an Or1ksim session.  Allows
+applications to determine if they are running on Or1ksim or hardware.
+
+No bugs are fixed.
+
+The following bugs are outstanding
+* Bug 1973: Or1ksim needs PIC tests.
+* But 1931: Or1ksim needs test for l.nop opcodes.
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.5.0rc3
+=======================
+
+No bugs are fixed.
+
+The following bugs are outstanding
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.5.0rc2
+=======================
+
+No new features. This is purely bug fixes post-0.5.0rc1.
+
+The following bugs are fixed.
+* Bug 1847: Build issues with RSP server (duplicate of 1815).
+* Bug 1846: Casting errors.
+* Bug 1824: Memory controller issue (marked as duplicate of Bug 1758).
+* Bug 1816: Error message when target not set is obscure (duplicate of 1813).
+* Bug 1815: Build errors with RSP server.
+* Bug 1813: "make check" fails before installation.
+
+The following bugs are outstanding
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA configuration is broken. Documented in user guide.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.5.0rc1
+=======================
+
+The floating point implementation is now based on John Hauser's "softfloat"
+package, ensuring rigorous compliance with the IEEE 754-2008 standard.
+
+The library interface is extended to allow registers and memory to be written
+directly and processor stalled and unstalled. This is to allow direct
+integration as a simulator in GDB.
+
+Some of the existing library interface functions have different prototypes.
+
+The "include" feature of configuration files (which never worked, but no one
+ever noticed) is dropped.
+
+If the configuration file is not found in the local directory, it is searched
+for in the ${HOME}/.or1ksim directory, then (for backwards compatibility) the
+${HOME}/.or1k directory.
+
+If no simulation file is specified, then sim.cfg is not searched for as a
+default.
+
+New options are added -q|--quiet, -V|--verbose, -m|--memory and
+--report-memory-errors. The semantics of --nosrv and --src otpions are changed.
+
+There is a configuration option to collect statistics on instruction execution
+in binary form.
+
+In previous versions, Bus exceptions were unique in that they produced an
+error message on standard output. The default is now for this exception to be
+handled silently, unless requested by --report-memory-errors.
+
+The following feature requests have been accepted.
+* Feature  393: Integrate Or1ksim in GDB.
+
+The following bugs are fixed.
+* Bug 1821: Reference configuration file has defective debug section.
+* Bug 1817: Reference configuration file missing from distribution.
+* Bug 1795: GDB breakpoints do not work with the instruction cache. 
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+* Bug 1824: Memory controller issue (probably the same as Bug 1758).
+* Bug 1823: Configuration file error line numbers are wrong.
+* Bug 1822: ATA section in configuration file is broken.
+* Bug 1816: Error message when target not set is obscure.
+* Bug 1813: "make check" fails before installation.
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.4.0
+====================
+
+No new features or bugs. This is the full release based on 0.4.0rc2.
+
+
+New in release 0.4.0rc2
+=======================
+
+No new features are provided, pending full release of 0.4.0.
+
+The configuration options --enable-arith-flag and --enable-ov-flag have been
+removed, since they were the source of bugs, notably Bugs 1782, 1783 and 1784.
+
+The configuration option --enable-unsigned-xori has been added to allow a
+conditional solution to Bug 1790.
+
+The following bugs are fixed.
+* Bug 1770: l.div does not set carry or give correct exception.
+* Bug 1771: l.add* do not correctly set the overflow flag.
+* Bug 1772: l.fl1 not implemented.
+* Bug 1773: l.maci not correctly implemented.
+* Bug 1774: l.mulu not implemented.
+* Bug 1775: l.jalr and l.jr don't trigger alignment exceptions.
+* Bug 1776: l.addic is not implemented.
+* Bug 1777: l.macrc not correctly implemented.
+* Bug 1778: l.ror and l.rori are not implemented.
+* Bug 1779: l.mtspr implementation is incorrect.
+* Bug 1782: Or1ksim setting of overflow flag is wrong.
+* Bug 1783: Or1ksim definition of overflow is wrong.
+* Bug 1784: Or1ksim does not trigger overflow exceptions.
+* Bug 1790: l.xori implementation is incorrect.
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.4.0rc1
+=======================
+
+The following new features are provided.
+* testbench now renamed testsuite and fully integrated using DejaGNU.
+  "make check" now works correctly if the OpenRISC toolchain is installed.
+* New configuration flag --enable-all-tests to enable building of incomplete
+  tests with "make check".
+* The library offers an interface via modelled JTAG
+* Single precision floating point is available.
+
+The user guide is updated.
+
+The following feature requests have been accepted.
+* Feature  413: ORFPX32 single precision floating point now supported.
+* Feature  469: Icache tags now intialized as invalid.
+* Feature 1673: Or1ksim now builds on Mac OS X.
+* Feature 1678: download, patch and build dirs removed from SVN.
+
+The following feature requests have been rejected.
+* Feature  399: Writeable SR_LEE bit will not be provided.
+* Feature  409: Separate ELF loader library already exists in binutils.
+* Feature  586: Ignoring HW breakpoints is already possible.
+
+The following bugs are fixed.
+* Bug  534: Test suite fixed (see above).
+* Bug 1710: mprofile now handles mode args correctly.
+* Bug 1723: PS2 keyboard error message clearer if RX file won't open.
+* Bug 1733: Or1ksim now accepts ELF image when working through RSP.
+* Bug 1767: l.lws is not recognized as an opcode.
+
+The following bugs are either cannot be reproduced or will not be fixed.
+
+The following bugs are outstanding
+* Bug 1758: Memory controller issues. Workaround in the user guide.
+
+
+New in release 0.3.0
+====================
+
+* No new features or bugs. This is the full release based on rc3.
+
+New in release 0.3.0rc3
+=======================
+
+* Bug 376 fixed: 32 interrupts now supported
+* Bug 377 fixed: Level triggered interrupts now work correctly
+* Bug 378 fixed: xterm UART now works with RSP
+* Bug 379 fixed: RSP performance improved
+* Bug 380 fixed: GDB 6.8 stepi now works through Or1ksim JTAG interface
+* Bug 398 fixed: Lack of support for LEE bit in SR documented
+* Bug 415 fixed: NPC behavior on writing optionally matches real HW
+* Bug 418 fixed: All library up calls are host-endian
+
+* Feature 395 added: Boot from 0xf0000000 now enabled.
+* Feature 408 added: Image file may be NULL for or1ksim_init.
+* Feature 410 added: RSP now clears sigval on unstalling the processor.
+* Feature 417 added: Or1ksim prints out its version on startup.
+
+New in release 0.3.0rc2
+=======================
+
+* A number of bug fixes
+* Updates to user guide
+
+New in release 0.3.0rc1
+=======================
+
+* Numerous bug fixes (see the OpenRISC tracker and the ChangeLog file)
+* User Guide
+* Consistent coding style and file naming throughout
+* Support for external SystemC models
+
+New in release 1.9 (old style numbering)
+========================================
+
+* support for binary COFF
+* generation of verilog memory models (used when you want to run simulation
+of OpenRISC processor cores)
+
+New in release 1.2 (old style numbering)
+========================================
+
+* support for OR16 ISA
+
+New in release 1.1 (old style numbering)
+========================================
+
+ * First release

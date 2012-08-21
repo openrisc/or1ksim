@@ -1,0 +1,27 @@
+				SoftFloat
+
+This provides a software implementation of functions performing floating point 
+operations according to the IEEE 754 standard.
+
+It is used in or1ksim due to problems arising when using the simulator host 
+machine's floating point unit to perform single precision floating point
+calculations (or even double, in some cases.) Typically the host machine's FPU
+will support extended (80-bit), or higher, precision, resulting in values which
+can differ from those which are calculated on a true single or double precision
+floating point unit (very small differences when in rounding and generating
+status flags.)
+
+Although using a software implementation is slow, it ensures an accurate 
+simulation of a single or double precision floating point unit.
+
+This software was sourced from the author's (John Hauser) site:
+
+http://www.jhauser.us/arithmetic/SoftFloat.html
+
+Note that the code cannot be compiled with -O0 for debugging purpose, because
+of the approach used to code inlining. Additional macros have been added to
+ease this problem. For debugging purposes, Or1ksim should be configured adding
+CFLAGS="-O0 -DINLINE=static -DNO_SOFTFLOAT_UNUSED" to the configure line.
+
+Julius Baxter, August 1, 2010
+Jeremy Bennett, August 4, 2010 (-O0 compilation)

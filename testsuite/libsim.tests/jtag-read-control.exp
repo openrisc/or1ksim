@@ -1,0 +1,294 @@
+# jtag-read-control.exp. Tests of the library JTAG READ_CONTROL command
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# These tests check all the behavior associated with the JTAG READ_CONTROL
+# command.
+
+# NOTE. All these tests return timing information, but we ignore it, since in
+#       general it will not be repeatable.
+
+# Tests of the READ_CONTROL for reading from different modules. This should
+# work fine for CPU0, but provoke a warning for Wishbone and CPU1 and a
+# different warning for all other modules. Test no module, Wishbone, CPU0,
+# CPU1 and module 6.
+
+# READ_CONTROL with no module selected.
+run_libsim "JTAG READ_CONTROL no module"                       \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_CONTROL."                           \
+          "  shifting in:  0x000000000000000000000005ffa8ec38" \
+          "ERROR: JTAG READ_CONTROL with no module selected."  \
+          "  shifted out:  0x0c526410200000000000000000000000" \
+          "  reset:        disabled"                           \
+          "  stall:        unstalled"                          \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "READ_CONTROL"
+
+# READ_CONTROL with only WishBone module selected.
+run_libsim "JTAG READ_CONTROL WB module"                        \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x0000000000174841bc61"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing READ_CONTROL."                            \
+          "  shifting in:  0x000000000000000000000005ffa8ec38"  \
+          "ERROR: JTAG READ_CONTROL of WishBone not supported." \
+          "  shifted out:  0x0c526410200000000000000000000000"  \
+          "  reset:        disabled"                            \
+          "  stall:        unstalled"                           \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "READ_CONTROL"
+
+# READ_CONTROL with only invalid module selected.
+run_libsim "JTAG READ_CONTROL invalid module"              \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000001993c98e69"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing READ_CONTROL."                            \
+          "  shifting in:  0x000000000000000000000005ffa8ec38"  \
+          "ERROR: JTAG READ_CONTROL of CPU1 not supported."     \
+          "  shifted out:  0x0c526410200000000000000000000000"  \
+          "  reset:        disabled"                            \
+          "  stall:        unstalled"                           \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "2" "READ_CONTROL"
+
+# READ_CONTROL with invalid module selected after valid module
+run_libsim "JTAG READ_CONTROL invalid after valid module"  \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000000aff51d871"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000001efe0d976d"              \
+          "  shifted out:  0x01893c98e68000000000"              \
+          "  status:       0x2"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing READ_CONTROL."                            \
+          "  shifting in:  0x000000000000000000000005ffa8ec38"  \
+          "ERROR: JTAG READ_CONTROL with no module selected."   \
+          "  shifted out:  0x0c526410200000000000000000000000"  \
+          "  reset:        disabled"                            \
+          "  stall:        unstalled"                           \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "SELECT_MODULE" "6" "READ_CONTROL"
+
+# READ_CONTROL with valid module selected after invalid module
+run_libsim "JTAG READ_CONTROL valid after invalid module"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001efe0d976d"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_CONTROL."                           \
+          "  shifting in:  0x000000000000000000000005ffa8ec38" \
+          "  shifted out:  0x0c526410200000000000000000000000" \
+          "  reset:        disabled"                           \
+          "  stall:        unstalled"                          \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "6" "SELECT_MODULE" "1" "READ_CONTROL"
+
+# Verify that reading works correctly from the valid module, CPU0.
+
+# READ_CONTROL for CPU0.
+run_libsim "JTAG READ_CONTROL CPU0"                   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_CONTROL."                           \
+          "  shifting in:  0x000000000000000000000005ffa8ec38" \
+          "  shifted out:  0x0c526410200000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "READ_CONTROL"
+
+# The only flag that we can sensible read back is the stall flag. In practice
+# the reset flag is only set during the reset sequence, during which we may
+# not get back any data. All we can test (simply) is that if we set the stall
+# flag it reads back correctly. We leave it to the test of WRITE_CONTROL to
+# determine that the stall actually happens!
+
+# Write the stall bit for CPU and read it back.
+run_libsim "JTAG READ_CONTROL CPU0 read stall bit set"         \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000109a677aa00000000000044" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Processing READ_CONTROL."                           \
+          "  shifting in:  0x000000000000000000000005ffa8ec38" \
+          "  shifted out:  0x1ea18635000000000000004000000000" \
+          "  reset:        disabled"                           \
+          "  stall:        stalled"                            \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "1" "READ_CONTROL"
+
+# Clear the stall bit for CPU and read it back.
+run_libsim "JTAG READ_CONTROL CPU0 read stall bit clear"       \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing READ_CONTROL."                           \
+          "  shifting in:  0x000000000000000000000005ffa8ec38" \
+          "  shifted out:  0x0c526410200000000000000000000000" \
+          "  reset:        disabled"                           \
+          "  stall:        unstalled"                          \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "0" "READ_CONTROL"

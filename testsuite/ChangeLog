@@ -1,0 +1,637 @@
+2012-04-25  Peter Gavin  <pgavin@gmail.com>
+
+	* lib/libsim.exp, lib/or1ksim.exp: kill test processes that timeout
+
+2012-03-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	Patch from R Diez <rdiezmail-openrisc@yahoo.de>
+
+	* Makefile.am: Add AM_RUNTESTFLAGS to trigger correct error
+	behaviour.
+
+2011-08-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1skim.tests/Makefile.am: Added pcu.cfg to EXTRA_DIST.
+
+2011-06-06  Julius Baxter <julius@opencores.rg>
+
+	* test-code-or1k/Makefile.am: Added pcu to SUBDIRS
+	* test-code-or1k/Makefile.in: Regenerated
+	* test-code-or1k/configure.ac: Added pcu/Makefile
+	* test-code-or1k/pcu/pcu.S: Added.
+	* test-code-or1k/pcu/Makefile.am: Added.
+	* or1ksim.tests/Makefile.am: Added pcu.exp to EXTRA_DIST
+	* or1ksim.tests/pcu.cfg: Added, has section enabling PCU
+	* or1ksim.tests/pcu.exp: Added.
+	* or1ksim.tests/mmu.exp: Set timeout to 30 seconds.
+	* or1ksim.tests/Makefile.in: Regenerated.
+	* README: Updated with details of PCU test.
+
+2011-01-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* README: Updated with details of new tests.
+
+2011-01-04  Julius Baxter  <julius@opencores.org>
+
+	* libsim.tests/default.cfg: Remove superfluous sections. Change CPU
+	SR to 0x8001 (unset EPH bit).
+	* libsim.tests/int-edge.cfg: Remove MC section
+	* libsim.tests/int-level.cfg: Ditto
+	* libsim.tests/upcalls.cfg: Ditto, also remove other superfluous
+	section definitions.
+	* test-code-or1k/basic/Makefile.am: Add default linker and exception
+	library to LDADD flags.
+	* test-code-or1k/basic/basic.S: Remove reset section and MC init. Add
+	main section symbol.
+	* test-code-or1k/default.ld: Remove flash section  (all flash boot
+	capability has been removed from software.)
+	Place exception handlers in except section.
+	<_bstart>:Added to indicate start of BSS section
+	<_bend>:Added to indicate end of BSS section
+	* test-code-or1k/except-mc.ld: Added (.rodata.*) to data section.
+	* test-code-or1k/except/except.S: Remove MC init code.
+	Remove code which copied program from flash to RAM on boot.
+	Added all handler sections.
+	Fixed bug with DTLB handler which would -4 off EPCR.
+	Now take care to create exception stack past redzone of 128 bytes.
+	* test-code-or1k/tick/tick.c:
+	(tick_int_spurious): Fix apparent bug with spurious interrupt test
+	which would continue interrupting the program, not allowing it to
+	proceed. Achieve by clearing ttmr when enough interrupts were seen.
+	* test-code-or1k/ext/ext.S: Add labels for linker sections.
+	* test-code-or1k/cache/cache.ld: Similar changes to default.ld
+	* test-code-or1k/cache/cache-asm.S: Remove MC init and relocation code.
+	* test-code-or1k/cache/cache.c: Remove UART code.
+	(init_cache_config): Add function for  automatic detection of cache
+	settings.
+	* test-code-or1k/fp/fp.S: Remove MC init code.
+	(illegal_insn): Added illegal instruction handler to indicate if FPU
+	needs to be enabled.
+	* test-code-or1k/mc-ssram/mc-ssram.c: <gpio_pat>: Init to 0 to stop GCC
+	warning.
+	* test-code-or1k/mul/mul.c:
+	(macrc): Add l.nops before l.macrc. Workaround for bug #1930.
+	* test-code-or1k/mmu/mmu.c: Almost entirely reimplemented, based on
+	version from ORPSoC.
+	* test-code-or1k/mmu/mmu-asm.S: Clobber r3 instead of r11 in lo_immu_en
+	* test-code-or1k/cfg/cfg.S: Change section labels to allow use with new
+	default.ld.
+	* test-code-or1k/except-test/except-test-s.S: Remove MC init code.
+	Add new reset section code.
+	Add .org directives for each vector handler.
+	Change immediate of l.trap to 15 from 1
+	* test-code-or1k/except-test/except-test.c: <FLASH_START>: Removed,
+	substituted with RAM_START where appropriate.
+	<FLASH_SIZE>: Removed.
+	<RAM_SIZE>: Changed to 2MB.
+	<TEST_BASE>: Removed as was not used.
+	Added some printf() output to indicate progress of test.
+	* test-code-or1k/dhry/dhry.c: <DBG>: Removed all #if sections for this
+	define.
+	* test-code-or1k/int-test/int-test.ld: Removed
+	* test-code-or1k/int-test/int-test.S: Remove MC init code.
+	Changed reset section to except section.
+	* test-code-or1k/int-test/Makefile.am: <int_test_LDFLAGS>: Changed to
+	use default.ld.
+	* test-code-or1k/flag/flag.S: Change exceptions to be in .except section
+	* test-code-or1k/mc-sync/Makefile.am: <mc_sync_CPPFLAGS>: Added
+	mc-common as include path.
+	* test-code-or1k/mc-async/Makefile.am: <mc_async_CPPFLAGS>: Ditto.
+	* test-code-or1k/support/support.c:
+	(printf): Added ignoring of '.' in printf format fields.
+	* or1ksim.tests/default.cfg: Removed MC section.
+	* or1ksim.tests/mem-test.exp: Updated expect list.
+	* or1ksim.tests/mmu.cfg: Added CPU section. Removed MC section.
+	* or1ksim.tests/cache.exp: Updated expect list.
+	* or1ksim.tests/eth.cfg: Removed MC section.
+	* or1ksim.tests/mmu.exp: Updated expect list.
+	* or1ksim.tests/kbdtest.cfg: Removed MC section.
+	* or1ksim.tests/int-test.exp: Updated expect list.
+	* or1ksim.tests/fp.cfg: Removed MC section.
+	* test-code/lib-upcalls/lib-upcalls.c: Added explicit handling of
+	OR1KSIM_RC_HALTED return code from library run execute function.
+
+2010-12-27  Julius Baxter  <julius@opencores.org>
+
+	* or1ksim.tests/eth.cfg: Ethernet section, commented out sockif setting,
+	added dummy_crc set to false.
+
+2010-11-26  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/default.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/int-edge.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/int-level.cfg: Updated Ethernet rtx_type parameter.
+	* libsim.tests/upcalls.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/default.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/eth.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/fp.cfg: Updated Ethernet rtx_type parameter.
+	* or1ksim.tests/kbdtest.cfg: Updated Ethernet rtx_type parameter.
+
+2010-11-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/int-edge.exp: Updated for new interrupt interface.
+	* libsim.tests/int-level.exp: Updated for new interrupt interface.
+	* README: Updated to change number of interrupt tests in library.
+
+2010-11-24  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code/lib-inttest/Makefile.am: Updated to use lib-inttest.c
+	to build a single program.
+	* test-code/lib-inttest/Makefile.in: Regenerated.
+	* test-code/lib-inttest/lib-inttest.c: Created.
+	* test-code/lib-inttest/lib-inttest-edge.c: Deleted.
+	* test-code/lib-inttest/lib-inttest-level.c: Deleted.
+
+2010-09-07  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/int-edge.exp <int-edge simple 1>: Increase time
+	between interrupts to 2ms.
+	<int-edge simple 2>: Increase time between interrupts to 2ms.
+	<int-edge duplicated 1>: Increase time between interrupts to 2ms.
+	<int-edge duplicated 2>: Increase time between interrupts to 2ms.
+
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/eth.cfg: Fix section debug to use RSP only.
+	* or1ksim.tests/kbdtest.cfg: Fix section debug to use RSP only.
+
+2010-08-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/testfloat.exp: Modified to use fp.cfg, corrected
+	which tests are counted. Fixed change of timeout.
+	* or1ksim.tests/testfloat.cfg: Deleted.
+	* or1ksim.tests/Makefile.am: Added testfloat.exp to distribution.
+
+2010-08-03  Julius Baxter  <julius.baxter@orsoc.se>
+
+	* or1ksim.tests/fp.exp: Update expected output.
+	* or1ksim.tests/testfloat.exp: Expect file for testfloat sw.
+	* or1ksim.tests/testfloat.cfg: Sim config file for testfloat.
+
+2010-07-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/except-test.exp: Output no longer reports out of
+	memory exceptions.
+	* libsim.tests/jtag-write-control.exp
+	<JTAG WRITE_CONTROL CPU0 reset>: No PIC reset.
+	<JTAG WRITE_CONTROL CPU0 stall and reset>: No PIC reset.
+	<JTAG WRITE_CONTROL CPU0 stall then reset>: No PIC reset.
+	* libsim.tests/upcalls.exp <upcalls - basic, upcalls - misaligned>:
+	No output from exit.
+	* test-code/lib-iftest/lib-iftest.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-inttest/lib-inttest-edge.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-inttest/lib-inttest-level.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-jtag/lib-jtag.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-jtag/lib-jtag-full.c (main): New interface to
+	or1ksim_init.
+	* test-code/lib-upcalls/lib-upcalls.c (main): New interface to
+	or1ksim_init.
+
+2010-06-15  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Added tests for l.mfspr and
+	l.mtspr, l.sub, logical and shift instructions.
+
+2010-06-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Modified output from RANGE
+	exception. Added tests for jump and rotate right instructions.
+
+2010-06-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Added multiplication
+	tests. Extended divistion tests. Changed output to match new
+	format from existing tests.
+	* README: Updated with new tests.
+
+2010-06-11  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Added MAC tests.
+	* or1ksim.tests/mul.exp: Corrected erroneous expected results.
+	* README: Updated with new tests.
+
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Added find tests.
+	* README: Updated with new tests.
+
+2010-06-10  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Extended addition tests.
+	* README: Updated with new tests.
+
+2010-06-09  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.exp: Added division and addition tests.
+	* README: Updated with new tests.
+
+2010-06-06  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/inst-set-test.cfg: Created.
+	* or1ksim.tests/inst-set-test.exp: Created.
+	* or1ksim.tests/Makefile.am: Updated to reflect added and deleted
+	files.
+	* or1ksim.tests/Makefile.in: Regenerated
+	* or1ksim.tests/lws-test.exp: Deleted (incorporated within
+	inst-set-test.ex).
+	* README: Updated to reflect new structure.
+
+2010-06-03  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/fp.exp: Removed timeout change
+	* or1ksim.tests/lws-test.exp: Created.
+	* or1ksim/test/Makefile.am: Added lws-test & config.
+	* or1ksim/test/Makefile.in: Regenerated.
+
+2010-06-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* lib/or1ksim.exp: Use same matching as libsim.exp, treat each
+	match as a pass.
+	* or1ksim/test/basic.exp: Unreported test entries marked.
+	* or1ksim/test/cache.exp: Unreported test entries marked.
+	* or1ksim/test/cbasic.exp: Unreported test entries marked.
+	* or1ksim/test/cfg.exp: Unreported test entries marked.
+	* or1ksim/test/dhry.exp: Unreported test entries marked.
+	* or1ksim/test/dmatest.exp: Unreported test entries marked.
+	* or1ksim/test/eth.exp: Unreported test entries marked.
+	* or1ksim/test/except-test.exp: Unreported test entries marked.
+	* or1ksim/test/exit.exp: Unreported test entries marked.
+	* or1ksim/test/ext.exp: Unreported test entries marked.
+	* or1ksim/test/fbtest.exp: Unreported test entries marked.
+	* or1ksim.tests/fp.cfg: Created.
+	* or1ksim.tests/fp.exp: Created.
+	* or1ksim/test/functest.exp: Unreported test entries marked.
+	* or1ksim/test/flag.exp: Unreported test entries marked.
+	* or1ksim/test/int-test.exp: Unreported test entries marked.
+	* or1ksim/test/kbdtest.exp: Unreported test entries marked.
+	* or1ksim/test/local-global.exp: Unreported test entries marked.
+	* or1ksim/test/Makefile.am: Added floating point test & config.
+	* or1ksim/test/Makefile.in: Regenerated.
+	* or1ksim/test/mem-test.exp: Unreported test entries marked.
+	* or1ksim/test/mmu.exp: Unreported test entries marked.
+	* or1ksim/test/mul.exp: Unreported test entries marked.
+	* or1ksim/test/mycompress.exp: Unreported test entries marked.
+	* or1ksim/test/tick.exp: Unreported test entries marked.
+
+2010-05-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* lib/libsim.exp (run_libsim): Expect clause corrected to detect
+	all unexpected warning/errors.
+	* libsim.tests/jtag-go-command-read.exp
+	<JTAG WRITE_COMMAND module CPU1>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 write half words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 write words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 access type 3>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 read half words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 read words>: Missing error added.
+	<JTAG WRITE_COMMAND CPU0 access type 7>: Missing error added.
+
+2010-05-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/Makefile.am: upcalls.exp added to distribution.
+	* libsim.tests/Makefile.in: Regenerated.
+
+2010-05-18  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/default.cfg: Disabled MC, replaced with memory block
+	and set CPU to take vectors at high address.
+	* test-code/lib-jtag/lib-jtag-full.c: Increase time quanta to 3ms to
+	allow time for messages.
+
+2010-05-16  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/Makefile.am: Added new test files to dist
+	* libsim.tests/Makefile: Regenerated.
+	* libsim.tests/jtag-go-command-read.exp: New file.
+	* libsim.tests/jtag-go-command-write.exp: New file.
+	* libsim.tests/jtag-read-command.exp: Tests updated for new interface.
+	* libsim.tests/jtag-read-control.exp: New file.
+	* libsim.tests/jtag-select-module.exp: Tests updated for new
+	interface. All tests related to subsequent commands moved to their own
+	tests.
+	* libsim.tests/jtag-write-command.exp: Tests updated for new interface.
+	* libsim.tests/jtag-write-control.exp: New file.
+	* test-code/lib-jtag/lib-jtag.c: Interface changed to allow use of new
+	JTAG library interface with bit lengths.
+	* test-code/lib-jtag/lib-jtag-full.c: Use new JTAG library interface
+	with bit lengths.
+
+
+2010-05-14  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/jtag-read-command.exp: Better test naming.
+	* libsim.tests/jtag-select-module.exp: Better test naming.
+	* libsim.tests/jtag-write-command.exp: Better test naming.
+	* libsim.tests/jtag-select-module.exp
+	<SELECT_MODULE READ_COMMAND WB>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND CPU0>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND CPU1>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND module 4>: Check for correct access type.
+	<SELECT_MODULE READ_COMMAND module 14>: Check for correct access
+	type.
+
+2010-05-13  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/default.cfg: Add memory block at top of memory.
+	* libsim.tests/lib-jtag-full.c: Corrected some error messages.
+	* libsim.tests/Makefile.am: Added new JTAG test files.
+	* libsim.tests/Makefile.in: Regenerated.
+	* libsim.tests/jtag-read-command.exp: Break out READ_COMMAND tests.
+	* libsim.tests/jtag-select-module.exp: Break out SELECT_MODULE tests.
+	* libsim.tests/jtag-write-command.exp: Break out WRITE_COMMAND tests.
+	* README: Updated with new tests.
+	* test-code/lib-jtag/lib-jtag-full.c (process_read_command):
+	Corrected printout of access_type.
+
+2010-05-04  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* configure.ac: lib-jtag/Makefile.am added as output
+	* configure: Regenerated
+	* libsim.tests/jtag-basic.exp: Created for low level JTAG tests.
+	* libsim.tests/jtag-full.exp: Created for high level JTAG tests.
+	* libsim.tests/Makefile.am: Added jtag-basic.exp and
+	jtag-full.exp.
+	* libsim.tests/Makefile.in: Regenerated.
+	* test-code/lib-jtag: New directory for JTAG test code
+	* test-code/lib-jtag/lib-jtag.c: Created for low level tests of
+	JTAG functions.
+	* test-code/lib-jtag/lib-jtag-full.c: Created for high level tests
+	of JTAG functions.
+	* test-code/lib-jtag/Makefile.am: Created.
+	* test-code/lib-jtag/Makefile.am: Generated.
+	* test-code/Makefile.am: lib-jtag added as subdir
+	* test-code/Makefile.in: Regenerated.
+
+2010-05-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code/lib-upcalls/lib-upcalls.c (main): Commenting corrected.
+
+2010-05-02  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* global-conf.exp: Renamed from default-global-conf.exp.
+	* lib/or1ksim.exp (run_or1ksim): Use $srcdir instead of
+	environment variable and use $objdir.
+	* lib/or1ksim.exp (run_libsim): Use $srcdir instead of
+	environment variable and use $objdir.
+
+2010-04-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* lib/or1ksim.exp (run_or1ksim): Make timeout return UNRESOLVED
+	rather than FAIL.
+	* lib/libsim.exp (run libsim): Make timeout return UNRESOLVED
+	rather than FAIL.
+	* or1ksim.tests/fbtest.exp: Restore timeout correctly.
+
+2010-04-28  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/upcalls.exp: Created.
+	* libsim.tests/upcalls.cfg: Created.
+	* test-code/lib-upcalls/lib-upcalls.c: Changed to use new upcall
+	interface.
+	* test-code/lib-inttest/lib-inttest-edge.c: Created.
+	* test-code/lib-inttest/lib-inttest-level.c: Changed to use new
+	upcall interface.
+
+2010-04-25  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* libsim.tests/int-level.exp: Created.
+	* test-code/lib-upcalls: Created.
+	* test-code/lib-upcalls/lib-upcalls.c: Created.
+	* test-code/lib-upcalls/Makefile.am: Created.
+	* test-code/lib-upcalls/Makefile.in: Regenerated.
+	function to print chars more clearly.
+	* or1ksim.tests/kbd.exp: Updated for new test output format.
+
+2010-04-23  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code/lib-inttest/lib-inttest-level.c: Created.
+	* Makefile.am: Updated for new tests
+	* Makefile.in: Regenerated.
+	* README: Updated for new library test results.
+
+2010-04-22  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* or1ksim.tests/cbasic.exp: Errors due to buggy printf fixed.
+	* or1ksim.tests/mmu.exp: Errors due to buggy printf fixed.
+	* or1ksim.tests/mul.exp: Errors due to buggy printf fixed.
+
+2010-04-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code-or1k: Renamed from test-code.
+	* configure.ac, configure: Moved to test-code-or1k.
+	* AUTHORS, NEWS, INSTALL, COPYING: Moved to test-code-or1k.
+
+2010-04-20  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* test-code/support/spr-defs.h: NOP_PRINTF definition removed.
+	* test-code/except-test/except-test.c (illegal_insn_test):
+  	  Generate and check a correct sequence for illegal instruction.
+	* test-code/except-test/except-test.c (except_priority_test):
+	  Generate a properly illegal instruction.
+
+2010-04-19  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* AUTHORS: Created to refer to parent file.
+	* config: Directory for board configurations.
+	* config/unix.exp: Created.
+	* configure: Regenerated.
+	* configure.ac: Created as sub-configuration of the main program.
+	* COPYING: Updated to version 3.
+	* default-global-conf.exp: Created.
+	* INSTALL: Updated to refer to parent file.
+	* lib: Directory for expect library code.
+	* lib/or1ksim.ex: Created for library code for Or1ksim tests.
+	* Makefile.am: Updated for DejaGNU compliance.
+	* Makefile.in: Regenerated.
+	* NEWS: Created to refer to parent file.
+	* or1ksim.tests: Directory for expect tests of complete SoC.
+	* or1ksim.tests/acv-gpio.cfg: Updated from old test directory.
+	* or1ksim.tests/acv-uart.cfg: Updated from old test directory.
+	* or1ksim.tests/basic.ex/or1ksim.tests/cache.exp: Created.
+	* or1ksim.tests/basic.exp: Created.
+	* or1ksim.tests/cbasic.exp: Created.
+	* or1ksim.tests/cfg.exp: Created.
+	* or1ksim.tests/default.cfg: Updated from old test directory
+	* or1ksim.tests/dhry.exp: Created.
+	* or1ksim.tests/dmatest.exp: Created.
+	* or1ksim.tests/eth0.rx: Transferred from old test directory.
+	* or1ksim.tests/eth.cfg: Updated from old test directory.
+	* or1ksim.tests/eth.exp: Created.
+	* or1ksim.tests/except-test.exp: Created.
+	* or1ksim.tests/exit.exp: Created.
+	* or1ksim.tests/ext.exp: Created.
+	* or1ksim.tests/fbtest.exp: Created.
+	* or1ksim.tests/flag.exp: Created.
+	* or1ksim.tests/functest.exp: Created.
+	* or1ksim.tests/int-test.exp: Created.
+	* or1ksim.tests/kbdtest.cfg: Updated from old test directory.
+	* or1ksim.tests/kbdtest.exp: Created.
+	* or1ksim.tests/kbdtest.rx: Transferred from old test directory.
+	* or1ksim.tests/local-global.exp: Created.
+	* or1ksim.tests/mem-test.exp: Created.
+	* or1ksim.tests/mmu.cfg: Updated from old test directory.
+	* or1ksim.tests/mmu.exp: Created.
+	* or1ksim.tests/mul.exp: Created.
+	* or1ksim.tests/mycompress.exp: Created.
+	* or1ksim.tests/tick.exp: Created.
+	* README: Updated for new structure.
+	* test-code: New directory for test-programs.
+	* test-code/acv-gpio: New directory.
+	* test-code/acv-gpio/acv-gpio.c: Created.
+	* test-code/acv-gpio/Makefile.am: Created.
+	* test-code/acv-gpio/Makefile.in: Regenerated.
+	* test-code/acv-uart: New directory.
+	* test-code/acv-uart/acv-uart.c: Created.
+	* test-code/acv-uart/Makefile.am: Created.
+	* test-code/acv-uart/Makefile.in: Regenerated.
+	* test-code/basic: New directory.
+	* test-code/basic/basic.S: Created.
+	* test-code/basic/Makefile.am: Created.
+	* test-code/basic/Makefile.in: Regenerated.
+	* test-code/board.h: Created.
+	* test-code/cache: New directory.
+	* test-code/cache/cache-asm.S: Created.
+	* test-code/cache/cache.c: Created.
+	* test-code/cache/cache.ld: Updated from old test directory.
+	* test-code/cache/Makefile.am: Created.
+	* test-code/cache/Makefile.in: Regenerated.
+	* test-code/cbasic: New directory.
+	* test-code/cbasic/cbasic.c: Created.
+	* test-code/cbasic/Makefile.am: Created.
+	* test-code/cbasic/Makefile.in: Regenerated.
+	* test-code/cfg: New directory.
+	* test-code/cfg/cfg.S: Created.
+	* test-code/cfg/Makefile.am: Created.
+	* test-code/cfg/Makefile.in: Regenerated.
+	* test-code/default.ld: Updated from old test directory.
+	* test-code/dhry: New directory.
+	* test-code/dhry/dhry.c: Created.
+	* test-code/dhry/dhry.h: Created.
+	* test-code/dhry/Makefile.am: Created.
+	* test-code/dhry/Makefile.in: Regenerated.
+	* test-code/dmatest: New directory.
+	* test-code/dmatest/dmatest.c: Created.
+	* test-code/dmatest/Makefile.am: Created.
+	* test-code/dmatest/Makefile.in: Regenerated.
+	* test-code/eth: New directory.
+	* test-code/eth/eth.c: Created.
+	* test-code/eth/Makefile.am: Created.
+	* test-code/eth/Makefile.in: Regenerated.
+	* test-code/except: New directory.
+	* test-code/except/except.S: Created.
+	* test-code/except/Makefile.am: Created.
+	* test-code/except/Makefile.in: Regenerated.
+	* test-code/except-mc.ld: Updated from old test directory.
+	* test-code/except-test: New directory.
+	* test-code/except-test/except-test.c: Created.
+	* test-code/except-test/except-test-s.S: Created.
+	* test-code/except-test/Makefile.am: Created.
+	* test-code/except-test/Makefile.in: Regenerated.
+	* test-code/exit: New directory.
+	* test-code/exit/exit.c: Created.
+	* test-code/exit/Makefile.am: Created.
+	* test-code/exit/Makefile.in: Regenerated.
+	* test-code/ext: New directory.
+	* test-code/ext/ext.S: Created.
+	* test-code/ext/Makefile.am: Created.
+	* test-code/ext/Makefile.in: Regenerated.
+	* test-code/fbtest: New directory.
+	* test-code/fbtest/fbtest.c: Created.
+	* test-code/fbtest/Makefile.am: Created.
+	* test-code/fbtest/Makefile.in: Regenerated.
+	* test-code/flag: New directory.
+	* test-code/flag/flag.S: Created.
+	* test-code/flag/Makefile.am: Created.
+	* test-code/flag/Makefile.in: Regenerated.
+	* test-code/functest: New directory.
+	* test-code/functest/functest.c: Created.
+	* test-code/functest/Makefile.am: Created.
+	* test-code/functest/Makefile.in: Regenerated.
+	* test-code/inst-set-test: New directory.
+	* test-code/inst-set-test/inst-set-test.c: Created.
+	* test-code/inst-set-test/Makefile.am: Created.
+	* test-code/inst-set-test/Makefile.in: Regenerated.
+	* test-code/int-test: New directory.
+	* test-code/int-test/int-test.ld: Updated from old test directory.
+	* test-code/int-test/int-test.S: Created.
+	* test-code/int-test/Makefile.am: Created.
+	* test-code/int-test/Makefile.in: Regenerated.
+	* test-code/kbdtest: New directory.
+	* test-code/kbdtest/kbdtest.c: Created.
+	* test-code/kbdtest/Makefile.am: Created.
+	* test-code/kbdtest/Makefile.in: Regenerated.
+	* test-code/local-global: New directory.
+	* test-code/local-global/local-global.c: Created.
+	* test-code/local-global/Makefile.am: Created.
+	* test-code/local-global/Makefile.in: Regenerated.
+	* test-code/Makefile.am: Created.
+	* test-code/Makefile.in: Regenerated.
+	* test-code/mc-async: New directory.
+	* test-code/mc-async/Makefile.am: Created.
+	* test-code/mc-async/Makefile.in: Regenerated.
+	* test-code/mc-async/mc-async.c: Created.
+	* test-code/mc-async/mc-async.h: Created.
+	* test-code/mc-common: New directory.
+	* test-code/mc-common/except-mc.S: Created.
+	* test-code/mc-common/Makefile.am: Created.
+	* test-code/mc-common/Makefile.in: Regenerated.
+	* test-code/mc-common/mc-common.c: Created.
+	* test-code/mc-common/mc-common.h: Created.
+	* test-code/mc-dram: New directory.
+	* test-code/mc-dram/Makefile.am: Created.
+	* test-code/mc-dram/Makefile.in: Regenerated.
+	* test-code/mc-dram/mc-dram.c: Created.
+	* test-code/mc-dram/mc-dram.h: Created.
+	* test-code/mc-ssram: New directory.
+	* test-code/mc-ssram/Makefile.am: Created.
+	* test-code/mc-ssram/Makefile.in: Regenerated.
+	* test-code/mc-ssram/mc-ssram.c: Created.
+	* test-code/mc-ssram/mc-ssram.h: Created.
+	* test-code/mc-sync: New directory.
+	* test-code/mc-sync/Makefile.am: Created.
+	* test-code/mc-sync/Makefile.in: Regenerated.
+	* test-code/mc-sync/mc-sync.c: Created.
+	* test-code/mc-sync/mc-sync.h: Created.
+	* test-code/mem-test: New directory.
+	* test-code/mem-test/Makefile.am: Created.
+	* test-code/mem-test/Makefile.in: Regenerated.
+	* test-code/mem-test/mem-test.c: Created.
+	* test-code/mmu: New directory.
+	* test-code/mmu/Makefile.am: Created.
+	* test-code/mmu/Makefile.in: Regenerated.
+	* test-code/mmu/mmu-asm.S: Created.
+	* test-code/mmu/mmu.c: Created.
+	* test-code/mul: New directory.
+	* test-code/mul/Makefile.am: Created.
+	* test-code/mul/Makefile.in: Regenerated.
+	* test-code/mul/mul.c: Created.
+	* test-code/mycompress: New directory.
+	* test-code/mycompress/Makefile.am: Created.
+	* test-code/mycompress/Makefile.in: Regenerated.
+	* test-code/mycompress/mycompress.c: Created.
+	* test-code/support: New directory.
+	* test-code/support/int.c: Created.
+	* test-code/support/int.h: Created.
+	* test-code/support/Makefile.am: Created.
+	* test-code/support/Makefile.in: Regenerated.
+	* test-code/support/spr-defs.h: Created.
+	* test-code/support/support.c: Created.
+	* test-code/support/support.h: Created.
+	* test-code/tick: New directory.
+	* test-code/tick/Makefile.am: Created.
+	* test-code/tick/Makefile.in: Regenerated.
+	* test-code/tick/tick.c: Created.
+	* test-code/uos: New directory.
+	* test-code/uos/except-or32.S: Created.
+	* test-code/uos/ipc.h: Created.
+	* test-code/uos/Makefile.am: Created.
+	* test-code/uos/Makefile.in: Regenerated.
+	* test-code/uos/README: Created.
+	* test-code/uos/task.c: Created.
+	* test-code/uos/tick.c: Created.
+	* test-code/uos/uos.c: Created.
+	* test-code/uos/uos.h: Created.

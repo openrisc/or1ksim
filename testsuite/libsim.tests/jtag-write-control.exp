@@ -1,0 +1,423 @@
+# jtag-write-control.exp. Tests of the library JTAG WRITE_CONTROL command
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# These tests check all the behavior associated with the JTAG WRITE_CONTROL
+# command.
+
+# NOTE. All these tests return timing information, but we ignore it, since in
+#       general it will not be repeatable.
+
+# Tests of the WRITE_CONTROL for writing from different modules. This should
+# work fine for CPU0, but provoke a warning for Wishbone and CPU1 and a
+# different warning for all other modules. Test no module, Wishbone, CPU0,
+# CPU1 and module 6.
+
+# WRITE_CONTROL with no module selected.
+run_libsim "JTAG WRITE_CONTROL no module"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "ERROR: JTAG WRITE_CONTROL with no module selected." \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "WRITE_CONTROL" "0" "0"
+
+# WRITE_CONTROL with only WishBone module selected.
+run_libsim "JTAG WRITE_CONTROL WB module"                        \
+    [list "Initalization succeeded."                             \
+          "Execution step completed OK."                         \
+          "Resetting JTAG."                                      \
+          "Execution step completed OK."                         \
+          "Shifting instruction."                                \
+          "  shifting in:  0x01"                                 \
+          "  shifted out:  0x01"                                 \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Selecting module."                                    \
+          "  shifting in:  0x0000000000174841bc61"               \
+          "  shifted out:  0x0164841bc60000000000"               \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Processing WRITE_CONTROL."                            \
+          "  shifting in:  0x000000000096dc049200000000000004"   \
+          "ERROR: JTAG WRITE_CONTROL of WishBone not supported." \
+          "  shifted out:  0x164841bc600000000000000000000000"   \
+          "  status:       0x0"                                  \
+          "  time taken:"                                        \
+          "Execution step completed OK."                         \
+          "Test completed successfully."]                        \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_CONTROL" "0" "0"
+
+# WRITE_CONTROL with only invalid module selected.
+run_libsim "JTAG WRITE_CONTROL invalid module"                 \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001993c98e69"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "ERROR: JTAG WRITE_CONTROL of CPU1 not supported."   \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                  \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "2" "WRITE_CONTROL" "0" "0"
+
+# WRITE_CONTROL with invalid module selected after valid module
+run_libsim "JTAG WRITE_CONTROL invalid after valid module"     \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x000000000003491df37d"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "ERROR: JTAG WRITE_CONTROL with no module selected." \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "SELECT_MODULE" "7" "WRITE_CONTROL" "0" "0"
+
+# WRITE_CONTROL with valid module selected after invalid module
+run_libsim "JTAG WRITE_CONTROL valid after invalid module"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x000000000003491df37d"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "7" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "0"
+
+# Verify that writing works correctly from the valid module, CPU0.
+
+# WRITE_CONTROL for CPU0.
+run_libsim "JTAG WRITE_CONTROL CPU0"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "0"
+
+# Test of setting and clearing the stall bit for CPU0. We can only do this via
+# multiple WRITE_COMMANDs. After stalling we should complete execution on a
+# breakpoint and after clearing complete OK.
+
+# Set the stall bit.
+run_libsim "JTAG WRITE_CONTROL CPU0 set stall"                 \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000109a677aa00000000000044" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "1"
+
+# Clear the stall bit.
+run_libsim "JTAG WRITE_CONTROL CPU0 clear stall"               \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "0"
+
+# Set, then clear the stall bit.
+run_libsim "JTAG WRITE_CONTROL CPU0 set then clear stall"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000109a677aa00000000000044" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" "8"   \
+         "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "1" "WRITE_CONTROL" "0" "0"
+
+# Clear, then set the stall bit.
+run_libsim "JTAG WRITE_CONTROL CPU0 clear then set stall"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000096dc049200000000000004" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000109a677aa00000000000044" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" "8"   \
+         "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "0" "WRITE_CONTROL" "0" "1"
+
+# Test the reset bit. We can see this works, becaause the PIC puts out a
+# message on reset.
+
+# Set the reset bit.
+run_libsim "JTAG WRITE_CONTROL CPU0 reset"                     \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000059613d0e00000000000024" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "1" "0"
+
+# Verify that reset overrides any simultaneous stall
+run_libsim "JTAG WRITE_CONTROL CPU0 stall and reset"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x0000000001c61b4e3600000000000064" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "1" "1"
+
+# Verify that reset clears any previous stall
+run_libsim "JTAG WRITE_CONTROL CPU0 stall then reset"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000109a677aa00000000000044" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed with breakpoint."          \
+          "Processing WRITE_CONTROL."                          \
+          "  shifting in:  0x000000000059613d0e00000000000024" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_CONTROL" "0" "1" "WRITE_CONTROL" "1" "0"

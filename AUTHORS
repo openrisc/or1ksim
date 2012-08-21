@@ -1,0 +1,75 @@
+	      Or1ksim: The OpenRISC 1000 Architectural Simulator
+	      ==================================================
+
+
+Authors of Or1ksim
+==================
+
+These are the main contributors known from the source code. Please advise if I
+have omitted anyone.
+
+Jeremy Bennett, <jeremy@jeremybennett.com>
+ 21 Apr 10: Complete rework of the testsuite. Various bugs fixed.
+ 12 Oct 08: Complete tidy-up of the code base, fixing a string of bugs to make
+            version 0.3.0 release candidate 1.
+  9 Jun 08: Added OSCI SystemC TLM 2.0 wrapper and tidied up for GCC 4.3.0 and
+            OpenRISC 1000 GDB 6.8
+
+Jimmy Chen-Min Chen, <jimmy@ee.nctu.edu.tw>
+  Defined and Added support for OR16 ISA(cpu/or16).
+  05/04/2000
+
+Damjan Lampret, <lampret@opencores.org>
+  Original author of the simulator.
+
+Richard Prescott, <rip@step.polymtl.ca>
+  Added channels for peripheral to communicate with host
+
+Johan Rydberg, <johan.rydberg@netinsight.se>
+  Added support for GNU readline aswell as adopted
+  it to GNU autoconf and automake.
+
+
+Feature and Bug reporters and fixers
+====================================
+
+John Alfredo
+  Feature 469: Icache initialization
+
+Julius Baxter
+  Bug 1773: Use of RSP with pre-loaded image.
+
+Mark Jarvin
+  Feature 1673: MAC OS X support
+
+Vijay Karin
+  Bug 534: Report of test bench not working.
+
+Vinay Patil
+  Bug 1710: mprofile argument handling
+
+
+Authors of the argtable2 library
+================================
+
+argtable is Copyright (C) 1998-2001,2003-2008 Stewart Heitmann.  Parts are
+Copyright (C) 1989-1994, 1996-1999,2001,2003 Free Software Foundation, Inc.
+
+argtable was written by Stewart Heitmann <sheitmann@users.sourceforge.net>
+The project homepage can be found at http://argtable.sourceforge.net/
+
+Other contributors:
+Nina Clemson for editing the original argtable-1.0 documentation.
+Livio Bertacco for contributing bug fixes and the argtable-2.x Visual C++
+Makefiles.
+Justin Dearing for contributing bug fixes and Windows DLL support, plus code
+support for the Open Watcom compiler and help with the Mac OS X
+configuration.
+Asa Packer for contributing bug fixes and upgrades to the Visual C++ Makefiles.
+Danilo Cicerone for the Italian translation of "Introduction to Argtable-2x"
+on http://www.digitazero.org.
+Uli Fouquet for configuration patches and documentation related to
+cross-compiling argtable from Unix to Windows, as well as providing the
+arg_print_glossary_gnu function.
+Shachar Shemesh for Debian package integration and kick-starting the migration
+to automake/autoconf.

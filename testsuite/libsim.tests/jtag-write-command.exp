@@ -1,0 +1,1678 @@
+# jtag-command.exp. Tests of the library JTAG WRITE_COMMAND
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# These are the tests of the high level JTAG WRITE_COMMAND interface.
+
+# NOTE. All these tests return timing information, but we ignore it, since in
+#       general it will not be repeatable.
+
+# Test of WRITE_COMMAND for each module (including none). This should raise an
+# error for any module other than WB and CPU0. There are different errors for
+# CPU1 (which can be selected, but for which WRITE_COMMAND is invalid) and all
+# other modules.
+
+# WRITE_COMMAND with no module selection
+run_libsim "JTAG WRITE_COMMAND no module"                      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"
+
+# WRITE_COMMAND for Wishbone
+run_libsim "JTAG WRITE_COMMAND module WB"                      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"
+
+# WRITE_COMMAND for CPU0
+run_libsim "JTAG WRITE_COMMAND module CPU0"                    \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"
+
+# WRITE_COMMAND for CPU1
+run_libsim "JTAG WRITE_COMMAND module CPU1"                    \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001993c98e69"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "ERROR: JTAG WRITE_COMMAND for CPU1 not supported."  \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "2" "WRITE_COMMAND" "2" "100000" "4"
+
+# WRITE_COMMAND for invalid module
+run_libsim "JTAG WRITE_COMMAND invalid module"                 \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000424d9ea79"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "ERROR: JTAG WRITE_COMMAND with no module selected." \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "3" "WRITE_COMMAND" "2" "100000" "4"
+
+# WRITE_COMMAND for valid followed by invalid module
+run_libsim "JTAG WRITE_COMMAND valid then invalid module"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000001993c98e69"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000424d9ea79"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "ERROR: JTAG WRITE_COMMAND with no module selected." \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "2" "SELECT_MODULE" "3" "WRITE_COMMAND" "2"  \
+         "100000" "4"
+
+# WRITE_COMMAND for invalid followed by valid module
+run_libsim "JTAG WRITE_COMMAND invalid then valid module"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken: "                                     \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000424d9ea79"             \
+          "  shifted out:  0x01893c98e68000000000"             \
+          "  status:       0x2"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" "8" \
+         "SELECT_MODULE" "3" "SELECT_MODULE" "0" "WRITE_COMMAND" "2"  \
+         "100000" "4"
+
+# Tests of WRITE_COMMAND access types for WishBone. Check the different access
+# types are accepted/rejected as expected (0, 1, 2, 4, 5 and 6 are OK).
+
+# WRITE_COMMAND to write bytes for WishBone (access type 0)
+run_libsim "JTAG WRITE_COMMAND WB write bytes"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000107557c0580000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "4"
+
+# WRITE_COMMAND to write half words for WishBone (access type 1)
+run_libsim "JTAG WRITE_COMMAND WB write half words"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000001778a9e180000000100108" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "4"
+
+# WRITE_COMMAND to write words for WishBone (access type 2)
+run_libsim "JTAG WRITE_COMMAND WB write words"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018f4396f780000000100088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"
+
+# WRITE_COMMAND to write access type 3 for WishBone. This should fail with an
+# error.
+run_libsim "JTAG WRITE_COMMAND WB write access type 3"   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000009f6e431380000000100188" \
+          "ERROR: JTAG WRITE_COMMAND unknown access type 3."   \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "3" "100000" "4"
+
+# WRITE_COMMAND to read bytes for WishBone (access type 4). All the read
+# accesses use the init version of the loop, so consistent values are set.
+run_libsim "JTAG WRITE_COMMAND WB read bytes"            \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000982f0f3d80000000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100000" "4"
+
+# WRITE_COMMAND to read half words for WishBone (access type 5)
+run_libsim "JTAG WRITE_COMMAND WB read half words"       \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000018802dad980000000100148" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "5" "100000" "4"
+
+# WRITE_COMMAND to read words for WishBone (access type 6)
+run_libsim "JTAG WRITE_COMMAND WB read words"            \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000001039e5cf800000001000c8" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "6" "100000" "4"
+
+# WRITE_COMMAND to read access type 7 for WishBone. This should fail with an
+# error.
+run_libsim "JTAG WRITE_COMMAND WB read access type 7"    \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000010014302b800000001001c8" \
+          "ERROR: JTAG WRITE_COMMAND unknown access type 7."   \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "7" "100000" "4"
+
+# Tests of WRITE_COMMAND addresses for WishBone. Check different addresses are
+# all accepted. For all of these we use the simple loop and a byte write. Test
+# the boundaries (address 0 and address 0xffffffff).
+
+# WRITE_COMMAND for WishBone to address 0
+run_libsim "JTAG WRITE_COMMAND WB write address 0"       \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000517c6ee600000000000008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "0" "1"
+
+# WRITE_COMMAND for WishBone to address ffffffff
+run_libsim "JTAG WRITE_COMMAND WB write address 0xffffffff" \
+    [list "Initalization succeeded."                              \
+          "Execution step completed OK."                          \
+          "Resetting JTAG."                                       \
+          "Execution step completed OK."                          \
+          "Shifting instruction."                                 \
+          "  shifting in:  0x01"                                  \
+          "  shifted out:  0x01"                                  \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Selecting module."                                     \
+          "  shifting in:  0x0000000000174841bc61"                \
+          "  shifted out:  0x0164841bc60000000000"                \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Processing WRITE_COMMAND."                             \
+          "  shifting in:  0x0000000000cd06d25e0001fffffffe08"    \
+          "  shifted out:  0x164841bc600000000000000000000000"    \
+          "  status:       0x0"                                   \
+          "  time taken:"                                         \
+          "Execution step completed OK."                          \
+          "Test completed successfully."]                         \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION"   \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "ffffffff" "1"
+
+# Tests of WRITE_COMMAND lengths for WishBone. Check the different lengths are
+# accepted. For all of these we use the simple loop and write. There is no
+# point testing sizes outside the range, since these fail in the test rather
+# than the progrma under test. We use byte reads from the initialized loop
+
+# Test of WRITE_COMMAND for WishBone 1 byte.
+run_libsim "JTAG WRITE_COMMAND WB read length 1"         \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001aee68a5c00000000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100000" "1"
+
+# Test of WRITE_COMMAND for WishBone 0x10000 bytes. We only match the first
+# few bytes of the shifted strings and data.
+run_libsim "JTAG WRITE_COMMAND WB read length 0x10000"   \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000d2aaafa3fffe0000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100000" "10000"
+
+# Tests of WRITE_COMMAND with different alignments. Byte access should be
+# aligned on any boundary. Half-word on half-word boundaries and word on word
+# boundaries. In each case we use 4 byte transfers.
+
+# Write bytes, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB write bytes, byte 0 aligned" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000107557c0580000000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100000" "4"
+
+# Write bytes, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB write bytes, byte 1 aligned" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000c53f4b0580010000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100001" "4"
+
+# Write bytes, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB write bytes, byte 2 aligned" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001e660678580008000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100002" "4"
+
+# Write bytes, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB write bytes, byte 3 aligned" \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000240a508580018000100008" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "0" "100003" "4"
+
+# Write half words, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB write half words, byte 0 aligned"    \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000001778a9e180000000100108"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100000" "4"
+
+# Write half words, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB write half words, byte 1 aligned"    \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000001d5129ee180010000100108"         \
+          "ERROR: JTAG WishBone 16-bit access must be 2-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100001" "4"
+
+# Write half words, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB write half words, byte 2 aligned"    \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000f64db26180008000100108"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100002" "4"
+
+# Write half words, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB write half words, byte 3 aligned"    \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000013427856180018000100108"         \
+          "ERROR: JTAG WishBone 16-bit access must be 2-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "1" "100003" "4"
+
+# Write words, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB write words, byte 0 aligned"         \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000018f4396f780000000100088"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100000" "4"
+
+# Write words, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB write words, byte 1 aligned"         \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000004d29a1f780010000100088"         \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100001" "4"
+
+# Write words, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB write words, byte 2 aligned"         \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000016e768d7780008000100088"         \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100002" "4"
+
+# Write words, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB write words, byte 3 aligned"         \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000ac1cba7780018000100088"         \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "2" "100003" "4"
+
+# Read bytes, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB read bytes, byte 0 aligned"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000982f0f3d80000000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100000" "4"
+
+# Read bytes, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB read bytes, byte 1 aligned"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000015a45383d80010000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100001" "4"
+
+# Read bytes, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB read bytes, byte 2 aligned"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000000791a14bd80008000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100002" "4"
+
+# Read bytes, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB read bytes, byte 3 aligned"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x0000000000174841bc61"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001bb7023bd80018000100048" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "4" "100003" "4"
+
+# Read half words, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB read half words, byte 0 aligned"     \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000018802dad980000000100148"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "5" "100000" "4"
+
+# Read half words, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB read half words, byte 1 aligned"     \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000004a68edd980010000100148"         \
+          "ERROR: JTAG WishBone 16-bit access must be 2-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "5" "100001" "4"
+
+# Read half words, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB read half words, byte 2 aligned"     \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000016937c15980008000100148"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "5" "100002" "4"
+
+# Read half words, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB read half words, byte 3 aligned"     \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000ab5df65980018000100148"         \
+          "ERROR: JTAG WishBone 16-bit access must be 2-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "5" "100003" "4"
+
+# Read words, aligned on byte 0
+run_libsim "JTAG WRITE_COMMAND WB read words, byte 0 aligned"          \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000001039e5cf800000001000c8"         \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "6" "100000" "4"
+
+# Read words, aligned on byte 1
+run_libsim "JTAG WRITE_COMMAND WB read words, byte 1 aligned"          \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000001d253d2cf800100001000c8" \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "6" "100001" "4"
+
+# Read words, aligned on byte 2
+run_libsim "JTAG WRITE_COMMAND WB read words, byte 2 aligned"          \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x0000000000f10cfe4f800080001000c8"         \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "6" "100002" "4"
+
+# Read words, aligned on byte 3
+run_libsim "JTAG WRITE_COMMAND WB read words, byte 3 aligned"          \
+    [list "Initalization succeeded."                                   \
+          "Execution step completed OK."                               \
+          "Resetting JTAG."                                            \
+          "Execution step completed OK."                               \
+          "Shifting instruction."                                      \
+          "  shifting in:  0x01"                                       \
+          "  shifted out:  0x01"                                       \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Selecting module."                                          \
+          "  shifting in:  0x0000000000174841bc61"                     \
+          "  shifted out:  0x0164841bc60000000000"                     \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Processing WRITE_COMMAND."                                  \
+          "  shifting in:  0x00000000013366c94f800180001000c8"         \
+          "ERROR: JTAG WishBone 32-bit access must be 4-byte aligned." \
+          "  shifted out:  0x164841bc600000000000000000000000"         \
+          "  status:       0x0"                                        \
+          "  time taken:"                                              \
+          "Execution step completed OK."                               \
+          "Test completed successfully."]                              \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "0" "WRITE_COMMAND" "6" "100003" "4"
+
+# Tests of WRITE_COMMAND for CPU0. Check the different access types are
+# accepted/rejected as expected (2 and 6 are OK).
+
+# WRITE_COMMAND to write bytes for CPU0 (access type 0). This should fail
+# with an error message.
+run_libsim "JTAG WRITE_COMMAND CPU0 write bytes"               \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000011b285d1780010028000008" \
+          "ERROR: JTAG 8-bit access for SPR not supported."    \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "0" "2801" "4"
+
+# WRITE_COMMAND to write half words for CPU0 (access type 1). This should fail
+# with an error message.
+run_libsim "JTAG WRITE_COMMAND CPU0 write half words"      \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000000b0588f380010028000108" \
+          "ERROR: JTAG 16-bit access for SPR not supported."   \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "1" "2801" "4"
+
+# WRITE_COMMAND to write words for CPU0 (access type 2).
+run_libsim "JTAG WRITE_COMMAND CPU0 write words"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001933eb7e580010028000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "2801" "4"
+
+# WRITE_COMMAND to write access type 3. This should fail with an error
+# message.
+run_libsim "JTAG WRITE_COMMAND CPU0 access type 3"       \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000008313620180010028000188" \
+          "ERROR: unknown JTAG SPR access type 3."             \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "3" "2801" "4"
+
+# WRITE_COMMAND to read bytes for CPU0 (access type 4). This should fail
+# with an error message.
+run_libsim "JTAG WRITE_COMMAND CPU0 read bytes"                \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x000000000084522e2f80010028000048" \
+          "ERROR: JTAG 8-bit access for SPR not supported."    \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "4" "2801" "4"
+
+# WRITE_COMMAND to read half words for CPU0 (access type 5). This should fail
+# with an error message.
+run_libsim "JTAG WRITE_COMMAND CPU0 read half words"           \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001947ffbcb80010028000148" \
+          "ERROR: JTAG 16-bit access for SPR not supported."   \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "5" "2801" "4"
+
+# WRITE_COMMAND to read words for CPU0 (access type 6)
+run_libsim "JTAG WRITE_COMMAND CPU0 read words"            \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000000c44c4dd800100280000c8" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "6" "2801" "4"
+
+# WRITE_COMMAND to read access type 7. This should fail with an error message.
+run_libsim "JTAG WRITE_COMMAND CPU0 access type 7"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000011c691139800100280001c8" \
+          "ERROR: unknown JTAG SPR access type 7."             \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "7" "2801" "4"
+
+# Tests of WRITE_COMMAND addresses for CPU0. Addresses up to 0xffff are
+# OK. Check different addresses are all accepted. For all of these we use the
+# simple loop and a word write. Test the boundaries (addresses 0, 0xffff and
+# 0x10000). Over-size addresses should be truncated with a warning. Remember
+# these are SPR addresses, which are effectively word addresses.
+
+# WRITE_COMMAND for CPU0 to address 0
+run_libsim "JTAG WRITE_COMMAND CPU0 write address 0"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001efa3017580000000000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "0" "4"
+
+# WRITE_COMMAND for CPU0 to address 0xffff
+run_libsim "JTAG WRITE_COMMAND CPU0 write address 0xffff"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000012e99654d8001fffe000088" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "ffff" "4"
+
+# WRITE_COMMAND for CPU0 to address 0x10000. Should be trucated witha
+# warning.
+run_libsim "JTAG WRITE_COMMAND CPU0 write address 0x10000"  \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000008c6e605180000001000088" \
+          "Warning: truncated JTAG SPR address 0x00010000."    \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "2" "10000" "4"
+
+# Tests of WRITE_COMMAND lengths for CPU0. Check only length 4 is
+# accepted. For all of these we use the simple loop and write. There is no
+# point in testing values outside the permitted range, since these are
+# rejected in the test code, rather than the target code. Test sizes 3, 4, 5
+# and 0x10000 bytes.
+
+# Test of WRITE_COMMAND for CPU0 3 bytes. This should fail with an error
+# message.
+run_libsim "JTAG WRITE_COMMAND CPU0 read length 3"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x0000000001d735c29c800100280000c8" \
+          "ERROR: JTAG SPR access 0x3 bytes not supported."    \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "6" "2801" "3"
+
+# Test of WRITE_COMMAND for CPU0 4 bytes.
+run_libsim "JTAG WRITE_COMMAND CPU0 read length 4"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000000c44c4dd800100280000c8" \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "6" "2801" "4"
+
+# Test of WRITE_COMMAND for CPU0 5 bytes. This should fail with an error
+# message.
+run_libsim "JTAG WRITE_COMMAND CPU0 read length 5"             \
+    [list "Initalization succeeded."                           \
+          "Execution step completed OK."                       \
+          "Resetting JTAG."                                    \
+          "Execution step completed OK."                       \
+          "Shifting instruction."                              \
+          "  shifting in:  0x01"                               \
+          "  shifted out:  0x01"                               \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Selecting module."                                  \
+          "  shifting in:  0x00000000000aff51d871"             \
+          "  shifted out:  0x0164841bc60000000000"             \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Processing WRITE_COMMAND."                          \
+          "  shifting in:  0x00000000014c51002c400100280000c8" \
+          "ERROR: JTAG SPR access 0x5 bytes not supported."    \
+          "  shifted out:  0x164841bc600000000000000000000000" \
+          "  status:       0x0"                                \
+          "  time taken:"                                      \
+          "Execution step completed OK."                       \
+          "Test completed successfully."]                      \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "6" "2801" "5"
+
+# Test of WRITE_COMMAND for CPU0 0x10000 bytes. This should fail with an error
+# message.
+run_libsim "JTAG WRITE_COMMAND CPU0 read length 0x10000"        \
+    [list "Initalization succeeded."                            \
+          "Execution step completed OK."                        \
+          "Resetting JTAG."                                     \
+          "Execution step completed OK."                        \
+          "Shifting instruction."                               \
+          "  shifting in:  0x01"                                \
+          "  shifted out:  0x01"                                \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Selecting module."                                   \
+          "  shifting in:  0x00000000000aff51d871"              \
+          "  shifted out:  0x0164841bc60000000000"              \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Processing WRITE_COMMAND."                           \
+          "  shifting in:  0x000000000046c16443ffff00280000c8"  \
+          "ERROR: JTAG SPR access 0x10000 bytes not supported." \
+          "  shifted out:  0x164841bc600000000000000000000000"  \
+          "  status:       0x0"                                 \
+          "  time taken:"                                       \
+          "Execution step completed OK."                        \
+          "Test completed successfully."]                       \
+    "lib-jtag/lib-jtag-full" "" "loop/loop-init" "RESET" "INSTRUCTION" \
+         "8" "SELECT_MODULE" "1" "WRITE_COMMAND" "6" "2801" "10000"

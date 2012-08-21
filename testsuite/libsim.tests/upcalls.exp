@@ -1,0 +1,76 @@
+# upcalls.exp. Test of the library upcall functions
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the basic upcall test
+run_libsim "upcalls - basic"                                       \
+    [list "Initalization succeeded."                               \
+          "Setting alignment exception handler."                   \
+          "Writing registers."                                     \
+          "Wrote byte at 0x98000000 = 0xde."                       \
+          "Wrote byte at 0x98000001 = 0xad."                       \
+          "Wrote byte at 0x98000002 = 0xbe."                       \
+          "Wrote byte at 0x98000003 = 0xef."                       \
+          "Wrote half word at 0x98000004 = 0xbaad."                \
+          "Wrote half word at 0x98000006 = 0xf00d."                \
+          "Wrote full word at 0x98000008 = 0xcafebabe."            \
+          "Reading registers."                                     \
+          "Read full word at 0x98000000 = 0xdeadbeef."             \
+          "Read byte at 0x98000004 = 0xba."                        \
+          "Read byte at 0x98000005 = 0xad."                        \
+          "Read byte at 0x98000006 = 0xf0."                        \
+          "Read byte at 0x98000007 = 0x0d."                        \
+          "Read half word at 0x98000008 = 0xcafe."                 \
+          "Read half word at 0x9800000a = 0xbabe."                 \
+          "All done."                                              \
+          "report(0xdeaddead);"]                                   \
+    "lib-upcalls/lib-upcalls" "upcalls.cfg" "upcalls/upcall-basic" \
+    "14" "32"
+
+# Run the misalignment upcall test
+run_libsim "upcalls - misaligned"                                       \
+    [list "Initalization succeeded."                                    \
+          "Setting alignment exception handler."                        \
+          "Writing registers."                                          \
+          "Wrote byte at 0x98000000 = 0xde."                            \
+          "Wrote half word at 0x98000002 = 0xdead."                     \
+          "Writing half word at 0x98000005: misalignment exception."    \
+          "Wrote full word at 0x98000008 = 0xdeadbeef."                 \
+          "Writing full word at 0x9800000d: misalignment exception."    \
+          "Writing full word at 0x98000012: misalignment exception."    \
+          "Writing full word at 0x98000017: misalignment exception."    \
+          "Wrote full word at 0x9800001c = 0xbaadbabe."                 \
+          "Reading registers."                                          \
+          "Read byte at 0x98000000 = 0xde."                             \
+          "Read half word at 0x98000002 = 0xdead."                      \
+          "Reading half word at 0x98000005: misalignment exception."    \
+          "Read full word at 0x98000008 = 0xdeadbeef."                  \
+          "Reading full word at 0x9800000d: misalignment exception."    \
+          "Reading full word at 0x98000012: misalignment exception."    \
+          "Reading full word at 0x98000017: misalignment exception."    \
+          "Read full word at 0x9800001c = 0xbaadbabe."                  \
+          "report(0xdeaddead);"]                                        \
+    "lib-upcalls/lib-upcalls" "upcalls.cfg" "upcalls/upcall-misaligned" \
+    "8" "32"

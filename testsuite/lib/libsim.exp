@@ -1,0 +1,131 @@
+# Or1ksim library expect test functions for use with DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+#! Run a libor1ksim program with the supplied config_file and target program.
+#
+#! @param[in] testname    The name of the test
+#! @param[in] match_list  A list of expected responses
+#! @param[in] libprog     The libor1ksim program
+#! @param[in] config      The or1ksim config file to use
+#! @param[in] or1kprog    The program image to use on libprog
+#! @param[in] args        Any other arguments
+# -----------------------------------------------------------------------------
+proc run_libsim { testname match_list libprog config or1kprog args } {
+    global verbose
+    global srcdir
+    global objdir
+
+    # Construct the config filename or use the default
+    if {0 == [string length $config]} {
+	set config "default.cfg";
+    }
+
+    set libprog_name  "$objdir/test-code/$libprog"
+    set config_name   "$srcdir/libsim.tests/$config";
+    set or1kprog_name "$objdir/test-code-or1k/$or1kprog"
+
+    set command_line "$libprog_name $config_name $or1kprog_name $args"
+
+    if { $verbose > 1 } {
+	send_user "starting $command_line\n"
+    }
+
+    # Run the program.
+    eval "spawn $command_line"
+
+    # Try each matchstr in turn, counting the lines for error reporting
+    set match_line 0;
+
+    foreach matchstr $match_list {
+
+	set match_line [expr {$match_line + 1}];
+
+	if { $verbose > 2 } {
+	    send_user "matching |$matchstr|\n";
+	}
+
+	# The matching is slightly tricky. In general we want to find warnings
+	# or errors. However expect will look at the entire buffer, so if we
+	# have the match string *after* an error or warning message, then the
+	# match will still work OK.
+
+	# The trick is to do some post-processing of the matched buffer to see
+	# if there was a preceding Warning or ERROR message.
+
+	expect {
+	    $matchstr {
+		set matchlen [string length $matchstr]
+		set buflen [string length $expect_out(buffer)]
+		set lastch [expr {$buflen - $matchlen}]
+		set prefix [string range $expect_out(buffer) 0 $lastch]
+
+		if { [string match *ERROR* $prefix] } {
+		    # We skipped an error
+		    fail "$testname: ERROR seeking match line $match_line";
+		    return
+		} elseif { [string match *Warning* $prefix] } {
+		    # We skipped a warning
+		    fail "$testname: Warning seeking match line $match_line";
+		    return;
+		}
+
+		# Otherwise silently match
+	    }
+	    
+	    ERROR {
+		# An error other than the one we seek
+		fail "$testname: ERROR seeking match line $match_line";
+		return
+	    }
+	    
+	    Warning {
+		# Any warning
+		fail "$testname: Warning seeking match line $match_line";
+		return;
+	    }
+	    
+	    eof {
+		fail "$testname: hit EOF seeking match line $match_line";
+		return
+	    }
+	    
+	    timeout {
+		perror "Timeout";
+		unresolved "$testname: timeout";
+                close
+		return
+	    }
+	}
+    }
+
+    # If we get here we've passed
+    pass $testname;
+
+}
+
+# Timeout 3 seconds is plenty as default
+set timeout 3

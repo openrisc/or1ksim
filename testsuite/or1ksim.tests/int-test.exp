@@ -1,0 +1,118 @@
+# int-test.exp. Interrupt test using DejaGNU under automake
+
+# Copyright (C) 2010 Embecosm Limited
+
+# Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the Interrupt test. Note this is not a test of the Programmable
+# Interrupt Controller.
+run_or1ksim "int-test"          \
+    [list "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x00002078);" \
+	 "report(0x00000000);" \
+	 "report(0x0000207c);" \
+	 "report(0x00000004);" \
+	 "report(0x0000207c);" \
+	 "report(0x00000004);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002080);" \
+	 "report(0x00000008);" \
+	 "report(0x00002084);" \
+	 "report(0x0000000c);" \
+	 "report(0x00002084);" \
+	 "report(0x0000000c);" \
+	 "report(0x00002088);" \
+	 "report(0x00000010);" \
+	 "report(0x00002088);" \
+	 "report(0x00000010);" \
+	 "report(0x00002088);" \
+	 "report(0x00000010);" \
+	 "report(0x00002088);" \
+	 "report(0x00000010);" \
+	 "report(0x0000208c);" \
+	 "report(0x00000014);" \
+	 "report(0x0000208c);" \
+	 "report(0x00000014);" \
+	 "report(0x00002090);" \
+	 "report(0x00000018);" \
+	 "report(0x00002090);" \
+	 "report(0x00000018);" \
+	 "report(0x00002090);" \
+	 "report(0x00000018);" \
+	 "report(0x00002090);" \
+	 "report(0x00000018);" \
+	 "report(0x0000209c);" \
+	 "report(0x00000024);" \
+	 "report(0x00008203);" \
+	 "report(0x0000209c);" \
+	 "report(0x00000024);" \
+	 "report(0x00008203);" \
+	 "report(0x0000209c);" \
+	 "report(0x00000024);" \
+	 "report(0x00008203);" \
+	 "report(0x0000209c);" \
+	 "report(0x00000024);" \
+	 "report(0x00008203);" \
+	 "report(0x000020a0);" \
+	 "report(0x00000028);" \
+	 "report(0x00008003);" \
+	 "report(0x000020a0);" \
+	 "report(0x00000028);" \
+	 "report(0x00008003);" \
+	 "report(0x000020a0);" \
+	 "report(0x00000028);" \
+	 "report(0x00008003);" \
+	 "report(0x000020a0);" \
+	 "report(0x00000028);" \
+	 "report(0x00008003);" \
+	 "report(0x000020a8);" \
+	 "report(0x00000030);" \
+	 "report(0x000020a8);" \
+	 "report(0x00000030);" \
+	 "report(0x000020ac);" \
+	 "report(0x00000034);" \
+	 "report(0x000020ac);" \
+	 "report(0x00000034);" \
+	 "report(0x000020b0);" \
+	 "report(0x00000038);" \
+	 "report(0xdeaddead);" \
+	 "exit(0)"]            \
+    "" "int-test/int-test"
