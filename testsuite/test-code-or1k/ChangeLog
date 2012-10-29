@@ -1,3 +1,9 @@
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	* pcu/pcu.c: clear PCCR register *after* changing mode, because
+	the previous test might have counted a common event like instruction
+	cache misses, which would mess up the counter
+
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
 	* configure.ac: s,or32,or1k,

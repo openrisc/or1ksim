@@ -118,10 +118,10 @@ pcr_if_sm:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	l.mtspr	r1,r5,SPR_PCMR(0)
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* This next instruction should be counted */
 	l.nop
 	/* Pull PCCR out and check it's != 0 */
@@ -162,10 +162,10 @@ pcr_if_um:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	l.mtspr	r1,r5,SPR_PCMR(0)
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Switch to user mode */
 	l.sys 0
 	/* SM = 0 */
@@ -236,10 +236,10 @@ pcr_itlbm:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	l.mtspr	r1,r5,SPR_PCMR(0)
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 	
 	/* Switch on IMMU - cause tlb miss*/
 	l.mfspr	r4,r0,SPR_SR
@@ -296,10 +296,10 @@ pcr_dtlbm:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	l.mtspr	r1,r5,SPR_PCMR(0)
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 	
 	/* Switch on DMMU - cause tlb miss*/
 	l.mfspr	r4,r0,SPR_SR
@@ -343,12 +343,12 @@ pcr_icmiss:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	/* use r5 to hold pcmr value */
 	l.ori	r5,r0,(SPR_PCMR_CISM | SPR_PCMR_ICM | SPR_PCMR_UMRA)
 	l.mtspr	r1,r5,SPR_PCMR(0)
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 
 	/* Disable IC */
 	l.mfspr r6,r0,SPR_SR
@@ -431,12 +431,12 @@ pcr_dcmiss:
 	/* report which counter we're using */
 	l.or	r3,r1,r1
 	l.nop	NOP_REPORT
-	/* clear (0) pccr */
-	l.mtspr	r1,r0,SPR_PCCR(0)
 	/* Load pcmr with appropriate mode */
 	/* use r5 to hold pcmr value */
 	l.ori	r5,r0,(SPR_PCMR_CISM | SPR_PCMR_DCM | SPR_PCMR_UMRA)
 	l.mtspr	r1,r5,SPR_PCMR(0)	
+	/* clear (0) pccr */
+	l.mtspr	r1,r0,SPR_PCCR(0)
 
 	        /* Disable DC */
         l.mfspr r6,r0,SPR_SR
