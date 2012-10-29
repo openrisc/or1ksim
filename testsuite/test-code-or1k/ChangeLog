@@ -1,5 +1,12 @@
 2012-10-28  Peter Gavin  <pgavin@gmail.com>
 
+	autoreconf
+	* aclocal.m4: regenerated
+	* configure: regenerated
+	* */Makefile.in: regenerated
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
 	add nodelay target
 	* configure.ac: add or1knd target
 	* support/spr-defs.h:

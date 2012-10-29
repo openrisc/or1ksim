@@ -1,5 +1,10 @@
 2012-10-28  Peter Gavin  <pgavin@gmail.com>
 
+	autoreconf
+	* */Makefile.in: regenerated
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
 	add nodelay target
 	* lib/libsim.exp: check target, and choose or1k or or1knd config
 	files as appropriate
