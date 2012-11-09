@@ -1,6 +1,13 @@
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
 
-	* doc/or1ksim.texi: add docs for or1knd (no delay slot mode)
+	* config.h.in: regenerated
+	* configure: ditto
+	* doc/or1ksim.info: ditto
+	* doc/version.texi: ditto
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
+	* doc/or1ksim.info: add docs for or1knd (no delay slot mode)
 
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
 

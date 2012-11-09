@@ -11768,7 +11768,17 @@ ac_config_headers="$ac_config_headers config.h"
 
 # yuck.
 case "$target_cpu" in
-or1k*|or1knd*)
+or1knd*)
+	CPU_ARCH=or32;
+	ARCH_ISA=OR32;
+
+$as_echo "#define OR32_NODELAY 0" >>confdefs.h
+
+
+$as_echo "#define OR32_TYPES 1" >>confdefs.h
+;;
+
+or1k*)
 	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 
