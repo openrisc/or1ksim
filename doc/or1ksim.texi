@@ -105,6 +105,17 @@ default to OpenRISC 1000 32-bit with a warning
 ../or1ksim-@value{VERSION}/configure --target=or1k-elf ...
 @end example
 
+To build the simulator so that no-delay-slot mode is the default, use
+the command
+
+@example
+../or1ksim-2012-04-27/configure --target=or1knd-elf ...
+@end example
+
+Either target can execute code with or without the delay slot, but
+choosing one of these targets at configure time will determine which
+is the default.
+
 There are several other options available, many of which are standard
 to GNU @command{configure} scripts.  Use @kbd{configure --help} to see
 all the options.  The most useful is @code{--prefix} to specify a
@@ -1815,9 +1826,13 @@ configuration sections.
 @item cfgr = @var{value}
 @cindex @code{cfgr} (CPU configuration)
 Sets the CPU configuration register (Special Purpose Register 2) to
-@var{value}.  Default value is 0x00000020, i.e.  support for the ORBIS32
-instruction set.  Attempts to set any other value are accepted, but
-issue a warning that there is no support for the instruction set.
+@var{value}.  When or1ksim is configured with @code{--target=or1k-*},
+the default value is 0x00000020, i.e.  support for the ORBIS32
+instruction set.  When or1ksim is configured with
+@code{--target=or1knd-*}, the default is 0x00000420, i.e. support for
+the ORBIS32 instruction set without a delay slot.  Attempts to set any
+other value are accepted, but issue a warning that there is no support
+for the instruction set.
 
 @item sr = @var{value}
 @cindex @code{sr} (CPU configuration)

@@ -1,5 +1,9 @@
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
 
+	* doc/or1ksim.texi: add docs for or1knd (no delay slot mode)
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
 	* doc/or1ksim.texi: s/or32/or1k/
 
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
