@@ -1,5 +1,9 @@
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
 
+	* doc/or1ksim.texi: s/or32/or1k/
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
 	* configure.ac: check for target=or1knd-* and define OR32_NODELAY
 	* sim-config.c:
 	(init_defconfig) if OR32_NODELAY is defined, use 0x420 as default
