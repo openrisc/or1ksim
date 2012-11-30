@@ -1,3 +1,8 @@
+2012-11-29  Peter Gavin  <pgavin@gmail.com>
+
+	* configure, configure.ac: clear LDFLAGS so the value from the
+	environment doesn't get used
+
 2012-10-28  Peter Gavin  <pgavin@gmail.com>
 
 	autoreconf

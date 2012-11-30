@@ -84,6 +84,7 @@ AC_PROG_INSTALL
 # Specify our baseline CFLAGS
 CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
+LDFLAGS=""
 
 # Flag to specify whether we want optimization when checking
 AC_MSG_CHECKING(whether to enable optimizations when checking)
