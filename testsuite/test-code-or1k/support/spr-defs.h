@@ -636,5 +636,6 @@
 #define NOP_TRACE_OFF    0x0009      /* Turn off tracing */
 #define NOP_RANDOM       0x000a      /* Return 4 random bytes */
 #define NOP_OR1KSIM      0x000b      /* Return non-zero if this is Or1ksim */
+#define NOP_EXIT_SILENT  0x000c      /* End of simulation, quiet version */
 
 #endif	/* SPR_DEFS__H */
