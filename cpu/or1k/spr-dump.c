@@ -109,6 +109,7 @@ static const struct spr_bit_def spr_cpucfgr[] = {
  { "CPUCFGR_OF32S", SPR_CPUCFGR_OF32S },
  { "CPUCFGR_OF64S", SPR_CPUCFGR_OF64S },
  { "CPUCFGR_OV64S", SPR_CPUCFGR_OV64S },
+ { "CPUCFGR_ND",    SPR_CPUCFGR_ND    },
  { NULL,            0                 } };
 
 /* dmmucfgr register */

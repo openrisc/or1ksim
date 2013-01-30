@@ -27,6 +27,7 @@
 
 	/* This file is part of test microkernel for OpenRISC 1000. */
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -238,8 +239,7 @@ reset_vector:
   l.ori   r5,r5,0x0411
   l.sw    0(r4),r5
  
-  l.jr    r9
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
   /* Copy data section */
   l.movhi r3,hi(_src_beg)
@@ -257,8 +257,7 @@ reset_vector:
   l.addi  r4,r4,4
   l.addi  r5,r5,-4
   l.sfgtsi r5,0
-  l.bf    1b
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    1b))
 
   l.movhi r4,hi(_dst_beg)
   l.ori   r4,r4,lo(_dst_beg)
@@ -266,8 +265,7 @@ reset_vector:
   l.ori   r5,r5,lo(_dst_end)
   l.sub   r5,r5,r4
   l.sfeqi r5,0
-  l.bf    2f
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf    2f))
 1:
   l.lwz   r6,0(r3)
   l.sw    0(r4),r6
@@ -275,16 +273,14 @@ reset_vector:
   l.addi  r4,r4,4
   l.addi  r5,r5,-4
   l.sfgtsi r5,0
-  l.bf   	1b
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.bf   	1b))
 
 2:
 
 
   l.movhi r2,hi(reset)
   l.ori   r2,r2,lo(reset)
-  l.jr    r2
-  l.nop
+  OR1K_DELAYED_NOP(OR1K_INST(l.jr    r2))
 
 /*
  * Switch to a new context pointed by task_context
@@ -308,8 +304,7 @@ buserr:
 	l.sw	0(r0),r3	/* Save r3 */
 	PRINTF(r3, buserr_str)
 hang:
-	l.j	hang
-	l.nop
+	OR1K_DELAYED_NOP(OR1K_INST(l.j	hang))
 
 buserr_str:
         .ascii  "Bus error exception.\n\000"
@@ -342,8 +337,7 @@ extint:
 	
 	l.movhi	r3,hi(int_main)
 	l.addi	r3,r0,lo(int_main)
-	l.jr    r3
-	l.nop
+	OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
 extint_str:
         .ascii  "External interrupt exception.\n\000"

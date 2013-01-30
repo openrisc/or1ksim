@@ -1,3 +1,67 @@
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
+	* config.h.in: regenerated
+	* configure: ditto
+	* doc/or1ksim.info: ditto
+	* doc/version.texi: ditto
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
+	* doc/or1ksim.info: add docs for or1knd (no delay slot mode)
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
+	* doc/or1ksim.texi: s/or32/or1k/
+
+2012-11-08  Peter Gavin  <pgavin@gmail.com>
+
+	* configure.ac: check for target=or1knd-* and define OR32_NODELAY
+	* sim-config.c:
+	(init_defconfig) if OR32_NODELAY is defined, use 0x420 as default
+	CPUCFGR value
+
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	autoreconf, update docs
+	* */Makefile.in: regenerated
+	* aclocal.m4: ditto
+	* configure: ditto
+	* doc/or1ksim.info: ditto
+	* doc/version.m4: ditto
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	add or1knd (no-delay slot) target
+	* sim-nd.cfg: new file: configuration for no-delay target.
+	essentially a copy of sim.cfg.
+	* Makefile.am:
+	(DISTCHECK_CONFIGURE_FLAGS) use $(target_alias) instead of or1k-elf
+	(EXTRA_DIST) add sim-nd.cfg
+	* config.sub: add or1knd target
+	* config.guess: ditto
+	* configure.ac: ditto
+	* cpu/or1k/spr-defs.h:
+	(SPR_CPUCFGR_ND) no-delay slot flag
+	* cpu-config.c:
+	(cpu_cfgr) allow SPR_CPUCFGR_ND bit to be set in the argument
+	* cpu/or32/insnset.c:
+	(l_j) check if ND bit is set; if so, don't use delay slot. this is
+	done by setting pcnext directly, and *not* setting next_delay_insn
+	or cpu_state.pc_delay, which are ignored altogether in nodelay mode.
+	(l_jal) ditto
+	(l_jr) ditto
+	(l_jalr) ditto
+	(l_bf) ditto
+	(l_bnf) ditto
+
+2012-04-27  Peter Gavin  <pgavin@gmail.com>
+
+	* Makefile.am: s,or32,or1k,
+	* config.guess: ditto
+	* config.sub: ditto
+	* configure.ac: ditto
+
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
 	* configure: Regenerated.

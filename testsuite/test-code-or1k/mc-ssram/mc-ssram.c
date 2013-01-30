@@ -76,6 +76,7 @@ unsigned long get_config()
   for (ch=0; ch<8; ch++) {
     mc_csc = (unsigned long*)(MC_BASE + MC_CSC(ch));
     mc_tms = (unsigned long*)(MC_BASE + MC_TMS(ch));
+    (void) mc_tms;
     if ( (GET_FIELD(*mc_csc, MC_CSC, MEMTYPE) == 1) && 
          (TEST_FLAG(*mc_csc, MC_CSC, EN) == 1     ) ) {
       mc_ssram_cs[ch].M  = GET_FIELD(*mc_csc, MC_CSC, SEL);

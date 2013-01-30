@@ -25,6 +25,7 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -115,8 +116,7 @@ reset_vector:
 
         l.movhi r3,hi(start)
         l.ori   r3,r3,lo(start)
-        l.jr    r3
-	l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
 
 	.org 0x200
@@ -389,14 +389,15 @@ bss_clear:
 bss_clear_loop:
 	l.sw	0(r3),	r0
 	l.sfgtu	r3, r4
-	l.bnf	bss_clear_loop
-	l.addi	r3, r3, 4
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r3, r3, 4),
+	OR1K_INST(l.bnf	bss_clear_loop)
+        )
 	
 	
         l.movhi r3,hi(reset)
         l.ori   r3,r3,lo(reset)
-        l.jr    r3
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r3)
 
 store_regs:
         l.sw    0x00(r1),r2
@@ -442,8 +443,7 @@ store_regs:
         l.ori   r9,r9,lo(end_except)
 
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
 end_except:
         l.lwz   r2,0x00(r1)
@@ -499,27 +499,22 @@ sys2:
         l.mfspr r4,r0,SPR_SR  /* Check SR */
         l.andi  r4,r4,(SPR_SR_IEE|SPR_SR_TEE|SPR_SR_SM)
         l.sfeqi r4,(SPR_SR_IEE|SPR_SR_TEE|SPR_SR_SM)
-        l.bf    1f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    1f))
         l.addi  r11,r11,1
 1:
         l.sfeqi r3,4          /* Check if l.sys or l.rfe has delay slot */
-        l.bf    1f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    1f))
         l.addi  r11,r11,2
 1:
         l.sfeqi r5,0x1c       /* Check the EPCR */
-        l.bf    1f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    1f))
         l.addi  r11,r11,4
 1:
         l.sfeqi r6,SPR_SR_SM  /* Check the SR when exception is taken */
-        l.bf    1f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    1f))
         l.addi  r11,r11,8
 1:
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 lo_dmmu_en:
         l.mfspr r3,r0,SPR_SR
@@ -539,8 +534,7 @@ lo_immu_en:
  
 call:
         l.addi  r11,r0,0
-        l.jr    r3
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r3))
 
 call_with_int:
         l.mfspr r8,r0,SPR_SR
@@ -553,49 +547,51 @@ load_acc_32:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
         l.lwz   r11,0(r4)
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 load_acc_16:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
         l.lhz   r11,0(r4)
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 store_acc_32:
         l.movhi r3,hi(0x12345678)
         l.ori   r3,r3,lo(0x12345678)
         l.sw    0(r4),r3
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 store_acc_16:
         l.movhi r3,hi(0x12345678)
         l.ori   r3,r3,lo(0x12345678)
         l.sh    0(r4),r3
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 load_b_acc_32:
         l.movhi r11,hi(0x12345678)
         l.ori   r11,r11,lo(0x12345678)
-        l.jr    r9
-        l.lwz   r11,0(r4)
+        OR1K_DELAYED(
+        OR1K_INST(l.lwz   r11,0(r4)),
+        OR1K_INST(l.jr    r9)
+        )
 
 b_trap:
+#ifdef __OR1K_NODELAY__
+        l.trap  15
+#endif
         l.jr    r9
 trap: 
         l.trap  15
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 b_range:
+#ifdef __OR1K_NODELAY__
+        l.addi  r3,r0,-1
+#endif
         l.jr    r9
 range: 
         l.addi  r3,r0,-1
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r9)
 
 int_trigger:
         l.addi  r11,r0,0
@@ -605,10 +601,14 @@ int_trigger:
         l.addi  r11,r11,1
 
 int_loop:
-        l.j     int_loop
-        l.lwz   r5,0(r4);
+        OR1K_DELAYED(
+        OR1K_INST(l.lwz   r5,0(r4)),
+        OR1K_INST(l.j     int_loop)
+        )
 
 jump_back:
         l.addi  r11,r0,0
-        l.jr    r9
-        l.addi  r11,r11,1
+        OR1K_DELAYED(
+        OR1K_INST(l.addi  r11,r11,1),
+        OR1K_INST(l.jr    r9)
+        )

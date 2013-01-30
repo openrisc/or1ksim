@@ -27,6 +27,7 @@
 
 /* Basic SR flag test */
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 
 #define SET_ARITH_FLAG   0  /* If this is not set this test has no meaning */
@@ -50,8 +51,7 @@ _reset:
 	l.addi  r15,r0,0xdead
 	l.movhi r3,hi(start)
         l.ori   r3,r3,lo(start)
-        l.jr    r3
-	l.nop
+        OR1K_DELAYED_NOP(l.jr    r3)
 
 
 	.section .text

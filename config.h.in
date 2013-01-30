@@ -216,6 +216,9 @@
 /* "The OR32 is little endian" */
 #undef OR32_LITTLE_ENDIAN
 
+/* "The OR32 has no delay slot by default" */
+#undef OR32_NODELAY
+
 /* "The compiler uses the OR32 ELF types" */
 #undef OR32_TYPES
 

@@ -37,14 +37,14 @@ AC_PREREQ(2.59)
 
 # This is not nice, but it gets round the problem of the target not being
 # specified. We don't need to warn again - the main configure did that for us.
-case "$target_cpu" in
-or32*)
+case "$target_alias" in
+or1k*|or1knd*)
 	;;
 
 dlx*)
 	;;
 
-*)      target_alias=or32-elf;
+*)      target_alias=or1k-elf;
 	;;
 esac
 
@@ -84,6 +84,7 @@ AC_PROG_INSTALL
 # Specify our baseline CFLAGS
 CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
+LDFLAGS=""
 
 # Flag to specify whether we want optimization when checking
 AC_MSG_CHECKING(whether to enable optimizations when checking)

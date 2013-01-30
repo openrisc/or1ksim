@@ -306,7 +306,11 @@ init_defconfig ()
   cpu_state.sprs[SPR_VR]      = 0;
   cpu_state.sprs[SPR_UPR]     = SPR_UPR_UP | SPR_UPR_TTP;
   cpu_state.sprs[SPR_SR]      = SPR_SR_FO  | SPR_SR_SM;
+#ifndef OR32_NODELAY
   cpu_state.sprs[SPR_CPUCFGR] = SPR_CPUCFGR_OB32S;
+#else
+  cpu_state.sprs[SPR_CPUCFGR] = SPR_CPUCFGR_OB32S | SPR_CPUCFGR_ND;
+#endif
   config.cpu.superscalar      = 0;
   config.cpu.hazards          = 0;
   config.cpu.dependstats      = 0;

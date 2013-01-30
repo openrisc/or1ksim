@@ -57,7 +57,7 @@ main( int argc, char **argv )
   //    char *argPtr; // Unused variable
     flag functionArgument;
     uint8 functionCode;
-    int8 operands, roundingPrecision, roundingMode;
+    int8 /*operands,*/ roundingPrecision, roundingMode;
 
     fail_programName = "testfloat";
     //if ( argc <= 1 ) goto writeHelpMessage;
@@ -72,13 +72,13 @@ main( int argc, char **argv )
     tininessModeName = 0;
     functionArgument = FALSE;
     functionCode = 0;
-    operands = 0;
+    //operands = 0;
     roundingPrecision = 0;
     roundingMode = 0;
     // "all" setting:
     functionArgument = TRUE;
     functionCode = 0;
-    operands = 0;
+    //operands = 0;
     /*
     --argc;
     ++argv;

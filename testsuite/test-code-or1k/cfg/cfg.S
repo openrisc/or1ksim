@@ -25,6 +25,7 @@
    This code is commented throughout for use with Doxygen.
    --------------------------------------------------------------------------*/
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
  
 	.section .except,"ax"
@@ -37,8 +38,7 @@ _reset:
         l.addi  r1,r0,0x7f00
         l.movhi r2,hi(_main)
         l.ori   r2,r2,lo(_main)
-        l.jr    r2
-        l.nop
+        OR1K_DELAYED_NOP(l.jr    r2)
 
 	.section .text
 _main:
