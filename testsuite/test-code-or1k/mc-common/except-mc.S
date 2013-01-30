@@ -26,6 +26,7 @@
    --------------------------------------------------------------------------*/
 
 /* Support file for c based tests */
+#include "or1k-asm.h"
 #include "spr-defs.h"
 
 #define reset reset
@@ -89,8 +90,7 @@ reset_vector:
         l.addi  r30,r0,0x0
         l.addi  r31,r0,0x0
 
-        l.j     init_mc
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.j     init_mc))
 
 start:  l.movhi r1,hi(stack)
         l.ori   r1,r1,lo(stack)
@@ -98,8 +98,7 @@ start:  l.movhi r1,hi(stack)
         /* Check if this is RTL version */
         l.lbz   r3,0(r0)
         l.sfeqi r3,0xff
-        l.bf    2f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    2f))
         l.movhi r3,hi(_src_beg)
         l.ori   r3,r3,lo(_src_beg)
         l.movhi r4,hi(_dst_beg)
@@ -108,43 +107,37 @@ start:  l.movhi r1,hi(stack)
         l.ori   r5,r5,lo(_dst_end)
         l.sub   r5,r5,r4
         l.sfeqi r5,0
-        l.bf    2f
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf    2f))
 1:      l.lwz   r6,0(r3)
         l.sw    0(r4),r6
         l.addi  r3,r3,4
         l.addi  r4,r4,4
         l.addi  r5,r5,-4
         l.sfgtsi r5,0
-        l.bf   	1b
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.bf   	1b))
 
 2:
         l.movhi r2,hi(reset)
         l.ori   r2,r2,lo(reset)
-        l.jr    r2
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r2))
 
         .org    0x200
 buserr_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_buserr)
         l.ori   r10,r10,lo(excpt_buserr)
         l.lwz   r10,0x0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x300
 dpfault_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
  
         l.mfspr r3,r0,SPR_EPCR_BASE
         l.addi  r3,r3,-4
@@ -155,85 +148,73 @@ dpfault_vector:
         l.movhi r10,hi(excpt_dpfault)
         l.ori   r10,r10,lo(excpt_dpfault)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x400
 ipfault_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_ipfault)
         l.ori   r10,r10,lo(excpt_ipfault)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x500
 lpint_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_tick)
         l.ori   r10,r10,lo(excpt_tick)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x600
 align_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_align)
         l.ori   r10,r10,lo(excpt_align)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x700
 illinsn_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_illinsn)
         l.ori   r10,r10,lo(excpt_illinsn)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x800
 hpint_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_int)
         l.ori   r10,r10,lo(excpt_int)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x900
 dtlbmiss_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
 
         l.mfspr r3,r0,SPR_EPCR_BASE
         l.addi  r3,r3,-4
@@ -244,78 +225,67 @@ dtlbmiss_vector:
         l.movhi r10,hi(excpt_dtlbmiss)
         l.ori   r10,r10,lo(excpt_dtlbmiss)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xa00
 itlbmiss_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_itlbmiss)
         l.ori   r10,r10,lo(excpt_itlbmiss)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xb00
 range_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_range)
         l.ori   r10,r10,lo(excpt_range)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xc00
 syscall_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_syscall)
         l.ori   r10,r10,lo(excpt_syscall)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xd00
 break_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_break)
         l.ori   r10,r10,lo(excpt_break)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xe00
 trap_vector:
         l.addi  r1,r1,-116
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_trap)
         l.ori   r10,r10,lo(excpt_trap)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
 store_regs:
         l.sw    0x00(r1),r3
@@ -346,8 +316,7 @@ store_regs:
         l.sw    0x68(r1),r29
         l.sw    0x6c(r1),r30
         l.sw    0x70(r1),r31
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 end_except:
         l.lwz   r3,0x00(r1)
@@ -381,7 +350,6 @@ end_except:
         l.lwz   r31,0x70(r1)
         l.addi  r1,r1,116
         l.rfe
-        l.nop 
 
 init_mc:
         l.movhi r0, 0x0
@@ -424,5 +392,4 @@ init_mc:
         l.xor   r2,r2,r2
         l.xor   r3,r3,r3
 
-        l.j     start
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.j     start))

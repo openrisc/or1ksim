@@ -39,7 +39,7 @@
 
 /*! Convenience macro to check that a test has passed, but only print a
     message on failure. */
-#define SILENT_ASSERT(x, msg) ((x) ?  : fail (msg))
+#define SILENT_ASSERT(x, msg) ((x) ? 1 : fail (msg))
 
 /*! Convenience macros for accessing SPRs */
 #define GET_TTMR() (mfspr (SPR_TTMR))
@@ -283,6 +283,7 @@ waste_time (void)
     {
       x = i;
     }
+  (void) x;
 }	/* waste_time () */
 
 /* --------------------------------------------------------------------------*/

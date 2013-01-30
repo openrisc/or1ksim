@@ -88,12 +88,10 @@
 	LOAD_CONST (r4, SPR_SR_CY)					;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	l.bnf	51f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bnf	51f)					;\
 									;\
 	PUTS (" + c")			/* CY set to add in? */		;\
-	l.j	52f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	52f)					;\
 									;\
 51:	PUTS ("    ")			/* CY clear to add in? */	;\
 									;\
@@ -123,8 +121,7 @@
 	l.bnf	53f							;\
 									;\
 	PUTS ("  - exception triggered: TRUE\n")			;\
-	l.j	54f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	54f)					;\
 									;\
 53:	PUTS ("  - exception triggered: FALSE\n")			;\
 54:	
@@ -169,12 +166,10 @@
 	LOAD_CONST (r4, SPR_SR_CY)					;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	l.bnf	56f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bnf	56f)					;\
 									;\
 	PUTS (" + c")			/* CY set to add in? */		;\
-	l.j	57f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	57f)					;\
 									;\
 56:	PUTS ("    ")			/* CY clear to add in? */	;\
 									;\
@@ -201,11 +196,10 @@
 	LOAD_CONST (r4, 55b)		/* The opcode of interest */	;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	l.bnf	58f							;\
+	OR1K_DELAYED_NOP(l.bnf	58f)					;\
 									;\
 	PUTS ("  - exception triggered: TRUE\n")			;\
-	l.j	59f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	59f)					;\
 									;\
 58:	PUTS ("  - exception triggered: FALSE\n")			;\
 59:	
@@ -223,16 +217,14 @@ _start:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 /* ----------------------------------------------------------------------------
  * Test of add signed, l.add
  * ------------------------------------------------------------------------- */
 _add:
 	LOAD_STR (r3, "l.add\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Add two small positive numbers */
 	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
@@ -281,8 +273,7 @@ _add:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Check that an overflow alone causes a RANGE Exception. */
 	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
@@ -306,16 +297,14 @@ _add:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 /* ----------------------------------------------------------------------------
  * Test of add signed and carry, l.addc
  * ------------------------------------------------------------------------- */
 _addc:
 	LOAD_STR (r3, "l.addc\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Add two small positive numbers */
 	TEST_ADD (0, SPR_SR_CY | SPR_SR_OV,
@@ -383,8 +372,7 @@ _addc:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Check that an overflow alone causes a RANGE Exception, even when it
 	   is the carry that causes the overflow. */
@@ -418,16 +406,14 @@ _addc:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 /* ----------------------------------------------------------------------------
  * Test of add signed immediate, l.addi
  * ------------------------------------------------------------------------- */
 _addi:
 	LOAD_STR (r3, "l.addi\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Add two small positive numbers */
 	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
@@ -476,8 +462,7 @@ _addi:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Check that an overflow alone causes a RANGE Exception. */
 	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
@@ -501,16 +486,14 @@ _addi:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 /* ----------------------------------------------------------------------------
  * Test of add signed and carry, l.addic
  * ------------------------------------------------------------------------- */
 _addic:
 	LOAD_STR (r3, "l.addic\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Add two small positive numbers */
 	TEST_ADDI (0, SPR_SR_CY | SPR_SR_OV,
@@ -578,8 +561,7 @@ _addic:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Check that an overflow alone causes a RANGE Exception, even when it
 	   is the carry that causes the overflow. */
@@ -613,15 +595,13 @@ _addic:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 /* ----------------------------------------------------------------------------
  * All done
  * ------------------------------------------------------------------------- */
 _exit:
 	LOAD_STR (r3, "Test completed\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	TEST_EXIT

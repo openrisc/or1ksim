@@ -26,6 +26,7 @@
    --------------------------------------------------------------------------*/
 
 /* Support file for c based tests */
+#include "or1k-asm.h"
 #include "spr-defs.h"
 
 #define reset reset
@@ -91,113 +92,100 @@ reset_vector:
         l.addi  r29,r0,0x0
         l.addi  r30,r0,0x0
         l.addi  r31,r0,0x0
-        l.j     start
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.j     start))
 	
         .org    0x200
 buserr_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_buserr)
         l.ori   r10,r10,lo(excpt_buserr)
         l.lwz   r10,0x0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x300
 dpfault_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
 
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_dpfault)
         l.ori   r10,r10,lo(excpt_dpfault)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x400
 ipfault_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_ipfault)
         l.ori   r10,r10,lo(excpt_ipfault)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x500
 lpint_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_tick)
         l.ori   r10,r10,lo(excpt_tick)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x600
 align_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_align)
         l.ori   r10,r10,lo(excpt_align)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x700
 illinsn_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_illinsn)
         l.ori   r10,r10,lo(excpt_illinsn)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x800
 hpint_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_int)
         l.ori   r10,r10,lo(excpt_int)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0x900
 dtlbmiss_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
 
         l.movhi r9,hi(end_except)
@@ -205,78 +193,72 @@ dtlbmiss_vector:
         l.movhi r10,hi(excpt_dtlbmiss)
         l.ori   r10,r10,lo(excpt_dtlbmiss)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xa00
 itlbmiss_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_itlbmiss)
         l.ori   r10,r10,lo(excpt_itlbmiss)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xb00
 range_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_range)
         l.ori   r10,r10,lo(excpt_range)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xc00
 syscall_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_syscall)
         l.ori   r10,r10,lo(excpt_syscall)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xd00
 break_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_break)
         l.ori   r10,r10,lo(excpt_break)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xe00
 trap_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
-        l.jal   store_regs
+        OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
         l.movhi r10,hi(excpt_trap)
         l.ori   r10,r10,lo(excpt_trap)
         l.lwz   r10,0(r10)
-        l.jr    r10
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
 	.section .text
 	
@@ -287,8 +269,7 @@ start:  l.movhi r1,hi(stack)
 	/* Call reset() function, in support library, which calls main() */
         l.movhi r4,hi(reset)
         l.ori   r4,r4,lo(reset)
-        l.jr    r4
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r4))
 
 	
 store_regs:
@@ -320,8 +301,7 @@ store_regs:
         l.sw    0x68(r1),r29
         l.sw    0x6c(r1),r30
         l.sw    0x70(r1),r31
-        l.jr    r9
-        l.nop
+        OR1K_DELAYED_NOP(OR1K_INST(l.jr    r9))
 
 end_except:
         l.lwz   r3,0x00(r1)
@@ -355,5 +335,4 @@ end_except:
         l.lwz   r31,0x70(r1)
         l.addi  r1,r1,EXCEPT_STACK_SIZE
         l.rfe
-        l.nop 
 

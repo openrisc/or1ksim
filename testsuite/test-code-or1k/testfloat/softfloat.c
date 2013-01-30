@@ -3020,6 +3020,7 @@ float32 float32_rem( float32 a, float32 b )
     bSig = extractFloat32Frac( b );
     bExp = extractFloat32Exp( b );
     bSign = extractFloat32Sign( b );
+    (void) bSign;
     if ( aExp == 0xFF ) {
         if ( aSig || ( ( bExp == 0xFF ) && bSig ) ) {
             return propagateFloat32NaN( a, b );
@@ -3955,6 +3956,7 @@ float64 float64_rem( float64 a, float64 b )
     bSig = extractFloat64Frac( b );
     bExp = extractFloat64Exp( b );
     bSign = extractFloat64Sign( b );
+    (void) bSign;
     if ( aExp == 0x7FF ) {
         if ( aSig || ( ( bExp == 0x7FF ) && bSig ) ) {
             return propagateFloat64NaN( a, b );

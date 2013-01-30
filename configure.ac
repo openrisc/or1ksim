@@ -54,7 +54,14 @@ AC_PREREQ(2.59)
 
 # yuck.
 case "$target_cpu" in
-or32*)	CPU_ARCH=or32;
+or1knd*)
+	CPU_ARCH=or32;
+	ARCH_ISA=OR32;
+	AC_DEFINE(OR32_NODELAY, 0, "The OR32 has no delay slot by default")
+	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
+
+or1k*)
+	CPU_ARCH=or32;
 	ARCH_ISA=OR32;
 	AC_DEFINE(OR32_TYPES, 1, "The compiler uses the OR32 ELF types");;
 

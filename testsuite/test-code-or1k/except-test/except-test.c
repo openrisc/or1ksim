@@ -493,8 +493,13 @@ int itlb_test (void)
   ret = call (ea, 0);
   ASSERT(except_count == 1);
   ASSERT(except_mask == (1 << V_ITLB_MISS));
+#ifndef __OR1K_NODELAY__
   ASSERT(except_pc == ea + 4);
   ASSERT(ret == 0);
+#else
+  ASSERT(except_pc == ea + 8);
+  ASSERT(ret == 1);
+#endif
 
   /* Set dtlb no permisions */
   itlb_val = SPR_ITLBTR_CI | SPR_ITLBTR_SXE; 
@@ -509,8 +514,13 @@ int itlb_test (void)
   ret = call (ea, 0);
   ASSERT(except_count == 1);
   ASSERT(except_mask == (1 << V_IPF));
+#ifndef __OR1K_NODELAY__
   ASSERT(except_pc == ea + 4);
   ASSERT(ret == 0);
+#else
+  ASSERT(except_pc == ea + 8);
+  ASSERT(ret == 1);
+#endif
 
   /* Reset except counter */
   except_count = 0;
@@ -758,13 +768,20 @@ int illegal_insn_test (void)
 
      Fixed by a) jumping to the correct location and b) really using an
      illegal instruction (opcode 0x3a. */
+#ifndef __OR1K_NODELAY__
   REG32(RAM_START + (RAM_SIZE/2)) = REG32((unsigned long)jump_back + 4);
   REG32(RAM_START + (RAM_SIZE/2) + 4) = 0xe8000000;
 
   /* Check if there was illegal insn exception. Note that if an illegal
      instruction occurs in a delay slot (like this one), then the exception
      PC is the address of the jump instruction. */
+#else
+  REG32(RAM_START + (RAM_SIZE/2)) = 0xe8000000;
+  REG32(RAM_START + (RAM_SIZE/2) + 4) = REG32((unsigned long)jump_back + 8);
+#endif
+
   ret = call (RAM_START + (RAM_SIZE/2), 0 );	/* JPB */
+  (void) ret; /* suppress unused variable warning */
 
   ASSERT(except_count == 1);
   ASSERT(except_mask == (1 << V_ILLINSN));

@@ -79,8 +79,7 @@ _reset:
 	l.movhi	r1,hi(_stack)		/* Set up the stack */
 	l.ori	r1,r1,lo(_stack)
 
-	l.j	_start			/* Jump to the start of code */
-	l.nop
+	OR1K_DELAYED_NOP(l.j	_start)			/* Jump to the start of code */
 
 /* ----------------------------------------------------------------------------
  * Alignment exception
@@ -103,8 +102,7 @@ _reset:
 _align:
 	/* Report exception */
 	LOAD_CONST (r3, 50b)
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Patch with l.nop */
 	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
@@ -136,8 +134,7 @@ _align_end:
 _illegal:
 	/* Report exception */
 	LOAD_CONST (r3, 51b)
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Patch with l.nop */
 	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
@@ -169,8 +166,7 @@ _illegal_end:
 _range:
 	/* Report exception */
 	LOAD_CONST (r3, 52b)
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Patch with l.nop */
 	l.mfspr	r2,r0,SPR_EPCR_BASE	/* Addr of problem instr */
@@ -210,15 +206,17 @@ _puts:
 	/* Loop getting and printing each char until end of string */
 60:	l.lbz	r3,0(r2)
 	l.sfeq	r3,r0			/* NULL termination? */
-	l.bf	61f
-
-	l.addi	r2,r2,1			/* Delay slot, move to next char */
-	l.j	60b			/* Repeat */
-	l.nop	NOP_PUTC		/* Delay slot */
+        OR1K_DELAYED(
+	OR1K_INST(l.addi	r2,r2,1),	/* move to next char */
+	OR1K_INST(l.bf	61f)
+        )
+        OR1K_DELAYED(
+	OR1K_INST(l.nop	NOP_PUTC),
+	OR1K_INST(l.j	60b)			/* Repeat */
+        )
 
 61:	POP (r3)
-	l.jr	r9			/* Return */
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)			/* Return */
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out a register in hex
@@ -286,8 +284,7 @@ _puth:
 
 	POP (r4)			/* Return */
 	POP (r3)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out the lower half of a register in hex
@@ -332,8 +329,7 @@ _puthh:
 
 	POP (r4)			/* Return */
 	POP (r3)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out the lowest byte of a register in hex
@@ -366,8 +362,7 @@ _puthq:
 
 	POP (r4)			/* Return */
 	POP (r3)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out a test name prompt
@@ -383,16 +378,13 @@ _ptest:
 	PUSH (r3)			/* Save the test name for later */
 
 	LOAD_STR (r3, "  ")		/* Prefix */
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP(r3)				/* Test name */
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 	
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out "OK"
@@ -405,13 +397,11 @@ _pok:
 	PUSH (r3)
 
 	LOAD_STR (r3, "OK\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r3)
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out "Failed"
@@ -424,13 +414,11 @@ _pfail:
 	PUSH (r3)
 
 	LOAD_STR (r3, "Failed: ")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r3)
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out "TRUE"
@@ -441,13 +429,11 @@ _ptrue:
 	PUSH (r3)
 
 	LOAD_STR (r3, "TRUE")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r3)
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out "FALSE"
@@ -458,13 +444,11 @@ _pfalse:
 	PUSH (r3)
 
 	LOAD_STR (r3, "FALSE")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r3)
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out "unexpected"
@@ -477,10 +461,8 @@ _punexpected:
 	PUSH (r3)
 
 	LOAD_STR (r3, " unexpected\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r3)
 	POP (r9)
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)

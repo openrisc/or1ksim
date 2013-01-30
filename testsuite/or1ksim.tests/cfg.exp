@@ -25,6 +25,7 @@
 
 
 # Run the CPU configuration test
+if { [istarget "or1k-*-*"] } {
 run_or1ksim "cfg" \
     [list "report(0x12000001);" \
 	  "report(0x0000041f);" \
@@ -41,3 +42,21 @@ run_or1ksim "cfg" \
           "!report(0xdeaddead);" \
 	  "!exit(0)"] \
     "" "cfg/cfg"
+} {
+run_or1ksim "cfg" \
+    [list "report(0x12000001);" \
+	  "report(0x0000041f);" \
+	  "report(0x00000000);" \
+	  "report(0x00000005);" \
+	  "report(0x00000420);" \
+	  "report(0x00000018);" \
+	  "report(0x00000018);" \
+	  "report(0x00000040);" \
+	  "report(0x00000040);" \
+	  "report(0x0000000f);" \
+	  "report(0x00000000);" \
+	  "report(0xf0acfed0);" \
+          "!report(0xdeaddead);" \
+	  "!exit(0)"] \
+    "" "cfg/cfg"
+}

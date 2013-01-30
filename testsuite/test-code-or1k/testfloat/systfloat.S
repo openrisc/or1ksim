@@ -25,6 +25,7 @@ Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 	
 ============================================================================= */
 
+#include "or1k-asm.h"
 	.text
 
 /*
@@ -35,8 +36,7 @@ Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 	.global syst_int32_to_float32
 syst_int32_to_float32:
 	lf.itof.s r11, r3
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 
 
@@ -49,8 +49,7 @@ syst_int32_to_float32:
 	.global syst_float32_to_int32_round_to_zero
 syst_float32_to_int32_round_to_zero:
 	lf.ftoi.s r11, r3
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -60,8 +59,7 @@ syst_float32_to_int32_round_to_zero:
 	.global syst_float32_to_int32
 syst_float32_to_int32:
 	lf.ftoi.s r11, r3
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -71,8 +69,7 @@ syst_float32_to_int32:
 	.global syst_float32_round_to_int
 syst_float32_round_to_int:
 	lf.ftoi.s r11, r3
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 	
 /*
 -------------------------------------------------------------------------------
@@ -82,8 +79,7 @@ syst_float32_round_to_int:
 	.global syst_float32_add
 syst_float32_add:
 	lf.add.s r11, r3, r4
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -93,8 +89,7 @@ syst_float32_add:
 	.global syst_float32_sub
 syst_float32_sub:
 	lf.sub.s r11, r3, r4
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -104,8 +99,7 @@ syst_float32_sub:
 	.global syst_float32_mul
 syst_float32_mul:
 	lf.mul.s r11, r3, r4
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -115,8 +109,7 @@ syst_float32_mul:
 	.global syst_float32_div
 syst_float32_div:
 	lf.div.s r11, r3, r4
-	l.jr	r9
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -129,8 +122,7 @@ syst_float32_eq:
 	l.bnf	1f
 	l.addi	r11, r0, 0
 	l.addi	r11, r0, 1
-1:	l.jr	r9
-	l.nop
+1:	OR1K_DELAYED_NOP(l.jr	r9)
 
 /*
 -------------------------------------------------------------------------------
@@ -143,8 +135,7 @@ syst_float32_le:
 	l.bnf	1f
 	l.addi	r11, r0, 0
 	l.addi	r11, r0, 1
-1:	l.jr	r9
-	l.nop
+1:	OR1K_DELAYED_NOP(l.jr	r9)
 
 	/*
 -------------------------------------------------------------------------------
@@ -157,5 +148,4 @@ syst_float32_lt:
 	l.bnf	1f
 	l.addi	r11, r0, 0
 	l.addi	r11, r0, 1
-1:	l.jr	r9
-	l.nop
+1:	OR1K_DELAYED_NOP(l.jr	r9)

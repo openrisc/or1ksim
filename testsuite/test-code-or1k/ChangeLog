@@ -1,3 +1,60 @@
+2012-11-29  Peter Gavin  <pgavin@gmail.com>
+
+	* configure, configure.ac: clear LDFLAGS so the value from the
+	environment doesn't get used
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	autoreconf
+	* aclocal.m4: regenerated
+	* configure: regenerated
+	* */Makefile.in: regenerated
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	add nodelay target
+	* configure.ac: add or1knd target
+	* support/spr-defs.h:
+	(SPR_CPUCFGR_ND) new flag for nodelay mode
+	* basic/basic.S: include or1k-src.h from newlib; use OR1K_DELAYED
+	macro on jumps/branches
+	* cache/cache.S: ditto
+	* cfg/cfg.S: ditto
+	* except-test/except-test-s.S: ditto
+	* except/except.S: ditto
+	* flag/flag.S: ditto
+	* fp/fp.S: ditto
+	* inst-set-test/inst-set-test.S: ditto
+	* inst-set-test/inst-set-test.h: ditto
+	* inst-set-test/is-add-test.S: ditto
+	* mc-common/except-mc.S: ditto
+	* mmu/mmu-asm.S: ditto
+	* pcu/pcu.S: ditto
+	* uos/except-or32.S: ditto
+	* int-test/int-test.S: ditto; also handle some spots that required
+	different code in nodelay mode
+	* inst-set-test/is-jump-test.S: ditto; also use only offsets in
+	output from test, so that it is position independent, and will
+	work whether nodelay is on or off
+	* cache/cache.c:
+	(jump_and_link) don't emit l.nop after l.jr when in nodelay mode
+	(jump) ditto
+	(call) ditto
+	* except-test/except-test.c:
+	(itlb_test) take into account different position of l.jr
+	instruction in jump_back when in nodelay mode
+	(illegal_insn_test) ditto
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	* pcu/pcu.c: clear PCCR register *after* changing mode, because
+	the previous test might have counted a common event like instruction
+	cache misses, which would mess up the counter
+
+2012-04-27  Peter Gavin  <pgavin@gmail.com>
+
+	* configure.ac: s,or32,or1k,
+
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
 	* configure: Regenerated.

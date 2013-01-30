@@ -40,6 +40,7 @@
  * ------------------------------------------------------------------------- */
 
 
+#include "or1k-asm.h"
 #include "spr-defs.h"
 #include "board.h"
 
@@ -236,19 +237,19 @@ v * A simple rising stack is provided to starting at _stack and pointed to by
 	POP (reg)			/* The register to test */	;\
 	PUSH (reg)			/* May need again later */	;\
 	l.sfeq	r2,reg			/* Does the result match? */	;\
-	l.bf	3f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.bf	3f)					;\
 									;\
-	l.jal	_pfail			/* Test failed */		;\
+	OR1K_DELAYED_NOP(l.jal _pfail)	/* Test failed */		;\
 	l.nop								;\
 	POP (reg)			/* Report the register */	;\
 	l.add	r3,r0,reg						;\
-	l.j	4f							;\
-	l.nop	NOP_REPORT						;\
+        OR1K_DELAYED(           					;\
+	OR1K_INST(l.nop	NOP_REPORT),					;\
+	OR1K_INST(l.j	4f)						;\
+        )                       					;\
 3:									;\
 	POP (reg)			/* Discard the register */	;\
-	l.jal	_pok			/* Test succeeded */		;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal _pok)	/* Test succeeded */		;\
 4:
 	
 /* ----------------------------------------------------------------------------
@@ -268,56 +269,45 @@ v * A simple rising stack is provided to starting at _stack and pointed to by
 	.string	str							;\
 									;\
 	.section .text							;\
-	l.bnf	7f			/* Branch if result FALSE */	;\
+	OR1K_DELAYED_NOP(l.bnf	7f)	/* Branch if result FALSE */	;\
 									;\
 	/* Branch for TRUE result */					;\
 	LOAD_CONST (r3,5b)		/* The string to print */	;\
-	l.jal	_ptest							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptest)					;\
 									;\
 	l.addi	r2,r0,TRUE		/* Was it expected? */		;\
 	l.addi	r3,r0,res						;\
 	l.sfeq	r2,r3							;\
-	l.bnf	6f			/* Branch if not expected */	;\
+	OR1K_DELAYED_NOP(l.bnf	6f)	/* Branch if not expected */	;\
 									;\
 	/* Sub-branch for TRUE found and expected */			;\
-	l.jal	_ptrue							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptrue)					;\
 	PUTC ('\n')							;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 6:									;\
 	/* Sub-branch for TRUE found and not expected */		;\
-	l.jal	_ptrue							;\
-	l.nop								;\
-	l.jal	_punexpected						;\
-	l.nop								;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptrue)					;\
+	OR1K_DELAYED_NOP(l.jal	_punexpected)				;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 									;\
 7:									;\
 	/* Branch for FALSE result */					;\
 	LOAD_CONST (r3,5b)		/* The string to print */	;\
-	l.jal	_ptest							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_ptest)					;\
 									;\
 	l.addi	r2,r0,FALSE		/* Was it expected? */		;\
 	l.addi	r3,r0,res						;\
 	l.sfeq	r2,r3							;\
-	l.bnf	8f			/* Branch if not expected */	;\
+	OR1K_DELAYED_NOP(l.bnf	8f)	/* Branch if not expected */	;\
 									;\
 	/* Sub-branch for FALSE found and expected */			;\
-	l.jal	_pfalse							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfalse)				;\
 	PUTC ('\n')							;\
-	l.j	9f							;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.j	9f)					;\
 8:									;\
 	/* Sub-branch for FALSE found and not expected */		;\
-	l.jal	_pfalse							;\
-	l.nop								;\
-	l.jal	_punexpected						;\
-	l.nop								;\
+	OR1K_DELAYED_NOP(l.jal	_pfalse)				;\
+	OR1K_DELAYED_NOP(l.jal	_punexpected)				;\
 9:
 	
 /* ----------------------------------------------------------------------------
@@ -362,8 +352,7 @@ _reset:
 		
 	l.movhi r3,hi(start)		/* Jump to test start */
 	l.ori	r3,r3,lo(start)
-	l.jr	r3
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r3)
 
 	.org 0x700
 illegal_insn:
@@ -375,8 +364,7 @@ illegal_insn:
 	.section .except,"ax"							;\
 	l.movhi	r3,hi(1b)						;\
 	l.ori	r3,r3,lo(1b)
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	.section .rodata						;\
 1:									;\
@@ -385,8 +373,7 @@ illegal_insn:
 	.section .except,"ax"							;\
 	l.movhi	r3,hi(1b)						;\
 	l.ori	r3,r3,lo(1b)
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	l.addi	r3,r0,1
 	l.nop	NOP_EXIT
@@ -408,15 +395,18 @@ _puts:
 10:	
 	l.lbz	r3,0(r2)
 	l.sfeq	r3,r0			/* NULL termination? */
-	l.bf	11f
+	OR1K_DELAYED(
+	OR1K_INST(l.addi r2,r2,1),	/* move to next character */
+        OR1K_INST(l.bf 11f)
+        )
 
-	l.addi	r2,r2,1			/* Delay slot, move to next char */
-	l.j	10b			/* Repeat */
-	l.nop	NOP_PUTC		/* Delay slot */
+        OR1K_DELAYED(
+	OR1K_INST(l.nop	NOP_PUTC),
+	OR1K_INST(l.j	10b)			/* Repeat */
+        )
 
 11:
-	l.jr	r9			/* Return */
-	l.nop
+	OR1K_DELAYED_NOP(l.jr	r9)		/* Return */
 
 /* ----------------------------------------------------------------------------
  * Subroutine to print out a test name prompt
@@ -431,12 +421,10 @@ _ptest:
 	PUSH(r3)			/* Save the test name for later */
 
 	LOAD_STR(r3, "  ")		/* Prefix */
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP(r3)				/* Test name */
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 	
 	POP (r9)
 	l.jr	r9
@@ -451,8 +439,7 @@ _pok:
 	PUSH(r9)			/* Save the return address */
 
 	LOAD_STR(r3, "OK\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r9)
 	l.jr	r9
@@ -467,8 +454,7 @@ _pfail:
 	PUSH(r9)			/* Save the return address */
 
 	LOAD_STR(r3, "Failed: ")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r9)
 	l.jr	r9
@@ -480,8 +466,7 @@ _ptrue:
 	PUSH(r9)			/* Save the return address */
 
 	LOAD_STR(r3, "TRUE")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r9)
 	l.jr	r9
@@ -494,8 +479,7 @@ _pfalse:
 	PUSH(r9)			/* Save the return address */
 
 	LOAD_STR(r3, "FALSE")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r9)
 	l.jr	r9
@@ -509,8 +493,7 @@ _punexpected:
 	PUSH(r9)			/* Save the return address */
 
 	LOAD_STR(r3, " unexpected\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	POP (r9)
 	l.jr	r9
@@ -527,8 +510,7 @@ start:
 
 _add_s:
 	LOAD_STR (r3, "lf.add.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Simple integer addition */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -651,8 +633,7 @@ _add_s:
  * ------------------------------------------------------------------------- */
 _cust1_s:
 	LOAD_STR (r3, "lf.cust1.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Just test that the instruction does nothing */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -665,8 +646,7 @@ _cust1_s:
  * ------------------------------------------------------------------------- */
 _div_s:
 	LOAD_STR (r3, "lf.div.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer division */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -904,8 +884,7 @@ _div_s:
  * ------------------------------------------------------------------------- */
 v_ftoi_s:
 	LOAD_STR (r3, "lf.ftoi.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Integer conversion */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -974,8 +953,7 @@ v_ftoi_s:
  * ------------------------------------------------------------------------- */
 _itof_s:
 	LOAD_STR (r3, "lf.itof.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Integer conversion */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -999,8 +977,7 @@ _itof_s:
  * ------------------------------------------------------------------------- */
 _madd_s:
 	LOAD_STR (r3, "lf.madd.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Test of integer multiply and add */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -1138,8 +1115,7 @@ _madd_s:
  * ------------------------------------------------------------------------- */
 _mul_s:
 	LOAD_STR (r3, "lf.mul.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer multiplication */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -1222,8 +1198,7 @@ _mul_s:
  * ------------------------------------------------------------------------- */
 _rem_s:
 	LOAD_STR (r3, "lf.rem.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer remainder */
 	LOAD_CONST (r5,FP_S_ONE)
@@ -1344,8 +1319,7 @@ _rem_s:
  * ------------------------------------------------------------------------- */
 _sfeq_s:
 	LOAD_STR (r3, "lf.sfeq.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer equality */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -1460,8 +1434,7 @@ _sfeq_s:
  * ------------------------------------------------------------------------- */
 _sfge_s:
 	LOAD_STR (r3, "lf.sfge.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer greater than or equality */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -1641,8 +1614,7 @@ _sfge_s:
  * ------------------------------------------------------------------------- */
 _sfgt_s:
 	LOAD_STR (r3, "lf.sfgt.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer greater than */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -1821,8 +1793,7 @@ _sfgt_s:
  * ------------------------------------------------------------------------- */
 _sfle_s:
 	LOAD_STR (r3, "lf.sfle.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer less than or equality */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -2002,8 +1973,7 @@ _sfle_s:
  * ------------------------------------------------------------------------- */
 _sflt_s:
 	LOAD_STR (r3, "lf.sflt.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer less than */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -2182,8 +2152,7 @@ _sflt_s:
  * ------------------------------------------------------------------------- */
 _sfne_s:
 	LOAD_STR (r3, "lf.sfne.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	/* Tests of integer inequality */
 	LOAD_CONST (r4,FP_S_ONE)
@@ -2298,8 +2267,7 @@ _sfne_s:
 	.section .text
 _sub_s:
 	LOAD_STR (r3, "lf.sub.s\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	SET_RM	(FPCSR_RM_RIP)
 	
@@ -2453,8 +2421,7 @@ _sub_s:
  * ------------------------------------------------------------------------- */
 _exit:
 	LOAD_STR (r3, "Test completed\n")
-	l.jal	_puts
-	l.nop
+	OR1K_DELAYED_NOP(l.jal	_puts)
 
 	l.movhi	r3,hi(ALL_DONE)
 	l.ori   r3,r3,lo(ALL_DONE)

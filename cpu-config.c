@@ -132,7 +132,7 @@ static void
 cpu_cfgr (union param_val  val,
 	  void            *dat)
 {
-  if (SPR_CPUCFGR_OB32S != val.int_val)
+  if (SPR_CPUCFGR_OB32S != (val.int_val & ~SPR_CPUCFGR_ND))
     {
       WARNING ("CPU configuration: only OB32S currently supported\n");
     }

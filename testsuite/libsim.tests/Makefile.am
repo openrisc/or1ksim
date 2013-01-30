@@ -28,19 +28,23 @@
 
 
 # Just distribute this stuff
-EXTRA_DIST = default.cfg               \
-	     int-edge.cfg              \
-	     int-edge.exp              \
-	     int-level.cfg             \
-	     int-level.exp             \
-	     jtag-basic.exp            \
-	     jtag-go-command-read.exp  \
-	     jtag-go-command-write.exp \
-	     jtag-read-command.exp     \
-	     jtag-read-control.exp     \
-	     jtag-select-module.exp    \
-	     jtag-write-control.exp    \
-	     jtag-write-command.exp    \
-	     lib-iftest.exp            \
-	     upcalls.exp               \
-	     upcalls.cfg
+EXTRA_DIST = cfg/or1k/default.cfg       \
+	     cfg/or1knd/default.cfg     \
+	     cfg/or1k/int-edge.cfg      \
+	     cfg/or1knd/int-edge.cfg    \
+	     int-edge.exp		\
+	     cfg/or1k/int-level.cfg     \
+	     cfg/or1knd/int-level.cfg   \
+	     int-level.exp		\
+	     jtag-basic.exp		\
+	     jtag-go-command-read.exp	\
+	     jtag-go-command-write.exp	\
+	     jtag-read-command.exp	\
+	     jtag-read-control.exp	\
+	     jtag-select-module.exp	\
+	     jtag-write-control.exp	\
+	     jtag-write-command.exp	\
+	     lib-iftest.exp		\
+	     upcalls.exp		\
+	     cfg/or1k/upcalls.cfg       \
+	     cfg/or1knd/upcalls.cfg

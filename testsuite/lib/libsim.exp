@@ -45,7 +45,11 @@ proc run_libsim { testname match_list libprog config or1kprog args } {
     }
 
     set libprog_name  "$objdir/test-code/$libprog"
-    set config_name   "$srcdir/libsim.tests/$config";
+    if { [istarget "or1knd-*-*"] } {
+        set config_name   "$srcdir/libsim.tests/cfg/or1knd/$config"
+    } else {
+        set config_name   "$srcdir/libsim.tests/cfg/or1k/$config"
+    }
     set or1kprog_name "$objdir/test-code-or1k/$or1kprog"
 
     set command_line "$libprog_name $config_name $or1kprog_name $args"
