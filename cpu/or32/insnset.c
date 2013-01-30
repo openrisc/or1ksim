@@ -559,6 +559,7 @@ INSTRUCTION (l_nop) {
       PRINTFQ(" diff  : cycles %lld, insn #%lld\n",
               runtime.sim.cycles - runtime.sim.reset_cycles,
               runtime.cpu.instructions - runtime.cpu.reset_instructions);
+    case NOP_EXIT_SILENT:
       if (config.sim.is_library)
 	{
 	  runtime.cpu.halted = 1;
