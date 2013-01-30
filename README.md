@@ -7,6 +7,10 @@ of a range of peripherals, allowing complete systems to be modelled.
 
 For full details see http://opencores.org/or1k/Or1ksim
 
+*This is a variant of the standard Or1ksim, which uses or1k as the
+architecture name, rather than or32. At some stage in the future this will be
+merged in, so that either architecture name is supported.*
+
 Installation
 ------------
 

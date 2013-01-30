@@ -1,3 +1,7 @@
+2013-01-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* README.md: Updated to explain about the or1k variant.
+
 2012-11-08  Peter Gavin  <pgavin@gmail.com>
 
 	* config.h.in: regenerated
