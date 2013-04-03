@@ -84,6 +84,8 @@ AC_PROG_INSTALL
 # Specify our baseline CFLAGS
 CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
+CCASFLAGS="-g"
+LDFLAGS=""
 
 # Flag to specify whether we want optimization when checking
 AC_MSG_CHECKING(whether to enable optimizations when checking)
@@ -103,6 +105,7 @@ AC_MSG_RESULT(${enable_check_opt-default})
 
 AC_SUBST(CPPFLAGS)
 AC_SUBST(CFLAGS)
+AC_SUBST(CCASFLAGS)
 
 # This is GNU compliant source and uses GNU libraries
 AC_DEFINE(_GNU_SOURCE, 1, "The source code uses the GNU libraries)

@@ -1,3 +1,8 @@
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
+	* configure, configure.ac: force CCASFLAGS=-g so the value from
+	the environment doesn't get used
+
 2013-07-28  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
 
 	* tick.c: Add test for continous mode timer start when timer
