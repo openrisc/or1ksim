@@ -1,3 +1,8 @@
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or1k/spr-defs.h, cpu/or1k/spr-dump.c: add some new SPRs from
+	newest version of architecture manual (v1.0-rev0)
+
 2013-07-28  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
 
 	* tick/tick.c (spr_write_ttmr): Do not disable counter when in
