@@ -11944,6 +11944,7 @@ fi
 # Specify our baseline CFLAGS
 CPPFLAGS="-I\${top_srcdir}/support -I\${top_srcdir}/except"
 CFLAGS="-Wall -Werror -g -nostdlib -mhard-div -mhard-mul"
+CCASFLAGS="-g"
 LDFLAGS=""
 
 # Flag to specify whether we want optimization when checking
@@ -11965,6 +11966,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${enable_check_opt-default}" >&5
 $as_echo "${enable_check_opt-default}" >&6; }
+
 
 
 
