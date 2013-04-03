@@ -1,5 +1,12 @@
 2013-04-03  Peter Gavin  <pgavin@gmail.com>
 
+	* cpu-config.c: (cpu_cfgr) improve checks on configuration, ensure
+	that OB32S is always set, and that unsupported features are
+	unset. Print a warning whenever configuration is changed from
+	whatever was specified in the file
+
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
 	* cpu/or1k/spr-defs.h, cpu/or1k/spr-dump.c: add some new SPRs from
 	newest version of architecture manual (v1.0-rev0)
 
