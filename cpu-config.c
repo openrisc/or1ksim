@@ -132,12 +132,45 @@ static void
 cpu_cfgr (union param_val  val,
 	  void            *dat)
 {
-  if (SPR_CPUCFGR_OB32S != val.int_val)
+  uorreg_t cfgr = val.int_val;
+
+  if (0 != (cfgr & SPR_CPUCFGR_NSGF))
     {
-      WARNING ("CPU configuration: only OB32S currently supported\n");
+      WARNING ("CPU configuration: shadow GPR files are not supported, will be disabled\n");
+      cfgr &= ~SPR_CPUCFGR_NSGF;
+    }
+  if (SPR_CPUCFGR_CGF == (cfgr & SPR_CPUCFGR_CGF))
+    {
+      WARNING ("CPU configuration: custom GPR file is not supported, will be disabled\n");
+      cfgr &= ~SPR_CPUCFGR_CGF;
+    }
+  if (SPR_CPUCFGR_OB32S != (cfgr & SPR_CPUCFGR_OB32S))
+    {
+      WARNING ("CPU configuration: OB32S support cannot be disabled, will be enabled\n");
+      cfgr |= SPR_CPUCFGR_OB32S;
+    }
+  if (SPR_CPUCFGR_OB64S == (cfgr & SPR_CPUCFGR_OB64S))
+    {
+      WARNING ("CPU configuration: OB64S is not supported, will be disabled\n");
+      cfgr &= ~SPR_CPUCFGR_OB64S;
+    }
+  if (SPR_CPUCFGR_OF64S == (cfgr & SPR_CPUCFGR_OF64S))
+    {
+      WARNING ("CPU configuration: OF64S is not supported, will be disabled\n");
+      cfgr &= ~SPR_CPUCFGR_OF64S;
+    }
+  if (SPR_CPUCFGR_EVBARP == (cfgr & SPR_CPUCFGR_EVBARP))
+    {
+      WARNING ("CPU configuration: exception vector base address register not supported, will be disabled");
+      cfgr &= ~SPR_CPUCFGR_EVBARP;
+    }
+  if (SPR_CPUCFGR_ISRP == (cfgr & SPR_CPUCFGR_ISRP))
+    {
+      WARNING ("CPU configuration: implementation specific registers not supported, will be disabled");
+      cfgr &= ~SPR_CPUCFGR_ISRP;
     }
 
-  cpu_state.sprs[SPR_CPUCFGR] = val.int_val;
+  cpu_state.sprs[SPR_CPUCFGR] = cfgr;
 
 }	/* cpu_cfgr() */
 
