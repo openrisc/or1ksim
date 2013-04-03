@@ -86,10 +86,17 @@
 #define SPR_ICCFGR	(SPRGROUP_SYS + 6)
 #define SPR_DCFGR	(SPRGROUP_SYS + 7)
 #define SPR_PCCFGR	(SPRGROUP_SYS + 8)
+#define SPR_VR2		(SPRGROUP_SYS + 9)
+#define SPR_AVR		(SPRGROUP_SYS + 10)
+#define SPR_EVBAR	(SPRGROUP_SYS + 11)
+#define SPR_AECR	(SPRGROUP_SYS + 12)
+#define SPR_AESR	(SPRGROUP_SYS + 13)
 #define SPR_NPC         (SPRGROUP_SYS + 16)  /* CZ 21/06/01 */
 #define SPR_SR		(SPRGROUP_SYS + 17)  /* CZ 21/06/01 */
 #define SPR_PPC         (SPRGROUP_SYS + 18)  /* CZ 21/06/01 */
 #define SPR_FPCSR       (SPRGROUP_SYS + 20)  /* CZ 21/06/01 */
+#define SPR_ISR_BASE	(SPRGROUP_SYS + 21)
+#define SPR_ISR_LAST	(SRPGROUP_SYS + 28)
 #define SPR_EPCR_BASE	(SPRGROUP_SYS + 32)  /* CZ 21/06/01 */
 #define SPR_EPCR_LAST	(SPRGROUP_SYS + 47)  /* CZ 21/06/01 */
 #define SPR_EEAR_BASE	(SPRGROUP_SYS + 48)
@@ -100,6 +107,7 @@
 
 /* Data MMU group */
 #define SPR_DMMUCR	(SPRGROUP_DMMU + 0)
+#define SPR_DMMUPR	(SPRGROUP_DMMU + 1)
 #define SPR_DTLBEIR     (SPRGROUP_DMMU + 2)
 #define SPR_DTLBMR_BASE(WAY)	(SPRGROUP_DMMU + 0x200 + (WAY) * 0x100)
 #define SPR_DTLBMR_LAST(WAY)	(SPRGROUP_DMMU + 0x27f + (WAY) * 0x100)
@@ -108,6 +116,7 @@
 
 /* Instruction MMU group */
 #define SPR_IMMUCR	(SPRGROUP_IMMU + 0)
+#define SPR_IMMUPR	(SPRGROUP_IMMU + 1)
 #define SPR_ITLBEIR     (SPRGROUP_IMMU + 2)
 #define SPR_ITLBMR_BASE(WAY)	(SPRGROUP_IMMU + 0x200 + (WAY) * 0x100)
 #define SPR_ITLBMR_LAST(WAY)	(SPRGROUP_IMMU + 0x27f + (WAY) * 0x100)
@@ -204,7 +213,12 @@
 #define SPR_CPUCFGR_OF32S  0x00000080  /* ORFPX32 supported */
 #define SPR_CPUCFGR_OF64S  0x00000100  /* ORFPX64 supported */
 #define SPR_CPUCFGR_OV64S  0x00000200  /* ORVDX64 supported */
-#define SPR_CPUCFGR_RES	   0xfffffc00  /* Reserved */
+#define SPR_CPUCFGR_ND     0x00000400  /* No delay slots */
+#define SPR_CPUCFGR_AVRP   0x00000800  /* Architecture Version Register (AVR) Present */
+#define SPR_CPUCFGR_EVBARP 0x00001000  /* Exception Vector Base Address Register Present */
+#define SPR_CPUCFGR_ISRP   0x00002000  /* Implementation-Specific Registers (ISR0-7) Present */
+#define SPR_CPUCFGR_AECSRP 0x00004000  /* Arithmetic Exception Control/Status Registers (ARCR/AESR) Present */
+#define SPR_CPUCFGR_RES	   0xffff8000  /* Reserved */
 
 /*
  * JPB: Bit definitions for the Debug configuration register and other
@@ -232,6 +246,45 @@
                                7 == n ? SPR_DCFGR_NDP7 : SPR_DCFGR_NDP8)
 #define MAX_MATCHPOINTS  8
 #define MAX_WATCHPOINTS  (MAX_MATCHPOINTS + 2)
+
+/*
+ * Bit definitions for Version Register 2
+ *
+ */
+
+#define SPR_VR2_CPUID      0xff000000  /* CPU Identification number */
+#define SPR_VR2_VER        0x00ffffff  /* Version */
+
+/*
+ * Bit definitions for Architecture Version Register
+ *
+ */
+
+#define SPR_AVR_RES        0x000000ff  /* Reserved */
+#define SPR_AVR_REV        0x0000ff00  /* Architecture Revision Number */
+#define SPR_AVR_MIN        0x00ff0000  /* Minor Architecture Version Number */
+#define SPR_AVR_MAJ        0xff000000  /* Major Architecture Version Number */
+
+/*
+ * Bit definitions for Exception Vector Base Address Register
+ *
+ */
+
+#define SPR_EVBAR_RES      0x00001fff  /* Reserved */
+#define SPR_EVBAR_EVBA     0xffffe000  /* Exception Vector Base Address */
+
+/*
+ * Bit definitions for Arithmetic Exception Control Register
+ *
+ */
+
+#define SPR_AECR_CYADDE    0x00000001  /* Carry on Add Exception */
+#define SPR_AECR_OVADDE    0x00000002  /* Overflow on Add Exception */
+#define SPR_AECR_CYMULE    0x00000004  /* Carry on Multiply Exception */
+#define SPR_AECR_OVMULE    0x00000008  /* Overflow on Multiply Exception */
+#define SPR_AECR_DBZE      0x00000010  /* Divide by Zero Exception */
+#define SPR_AECR_CYMACADDE 0x00000020  /* Carry on MAC Addition Exception */
+#define SPR_AECR_OVMACADDE 0x00000040  /* Overflow on MAC Addition Exception */
 
 /*
  * Bit definitions for the Supervision Register
@@ -619,6 +672,30 @@
 #define FPCSR_RM_RZ (1<<1)
 #define FPCSR_RM_RIP (2<<1)
 #define FPCSR_RM_RIN (3<<1)
+
+/*
+ * Bit definitions for the Arithmetic Exception Control Register
+ *
+ */
+#define SPR_AECR_CYADDE    0x00000001 /* unsigned overflow in add */
+#define SPR_AECR_OVADDE    0x00000002 /* signed overflow in add */
+#define SPR_AECR_CYMULE    0x00000004 /* unsigned overflow in mul */
+#define SPR_AECR_OVMULE    0x00000008 /* signed overflow in mul */
+#define SPR_AECR_DBZE      0x00000010 /* divide by zero */
+#define SPR_AECR_CYMACADDE 0x00000020 /* unsigned overflow in mac add */
+#define SPR_AECR_OVMACADDE 0x00000040 /* signed overflow in mac add */
+
+/*
+ * Bit definitions for the Arithmetic Exception Status Register
+ *
+ */
+#define SPR_AESR_CYADDE    0x00000001 /* unsigned overflow in add */
+#define SPR_AESR_OVADDE    0x00000002 /* signed overflow in add */
+#define SPR_AESR_CYMULE    0x00000004 /* unsigned overflow in mul */
+#define SPR_AESR_OVMULE    0x00000008 /* signed overflow in mul */
+#define SPR_AESR_DBZE      0x00000010 /* divide by zero */
+#define SPR_AESR_CYMACADDE 0x00000020 /* unsigned overflow in mac add */
+#define SPR_AESR_OVMACADDE 0x00000040 /* signed overflow in mac add */
 
 /*
  * l.nop constants

@@ -109,6 +109,11 @@ static const struct spr_bit_def spr_cpucfgr[] = {
  { "CPUCFGR_OF32S", SPR_CPUCFGR_OF32S },
  { "CPUCFGR_OF64S", SPR_CPUCFGR_OF64S },
  { "CPUCFGR_OV64S", SPR_CPUCFGR_OV64S },
+ { "CPUCFGR_ND",    SPR_CPUCFGR_ND    },
+ { "CPUCFGR_AVRP",  SPR_CPUCFGR_AVRP  },
+ { "CPUCFGR_EVBARP", SPR_CPUCFGR_EVBARP },
+ { "CPUCFGR_ISRP",  SPR_CPUCFGR_ISRP  },
+ { "CPUCFGR_AECSRP", SPR_CPUCFGR_AECSRP },
  { NULL,            0                 } };
 
 /* dmmucfgr register */
@@ -164,6 +169,46 @@ static const struct spr_bit_def spr_dcfgr[] = {
  { "DCFGR_WPCI", SPR_DCFGR_WPCI },
  { NULL,         0              } };
 
+/* VR2 register */
+static const struct spr_bit_def spr_vr2[] = {
+ { "VR2_CPUID", SPR_VR2_CPUID },
+ { "VR2_VER",   SPR_VR2_VER },
+ { NULL, 0 } };
+
+/* AVR register */
+static const struct spr_bit_def spr_avr[] = {
+ { "AVR_REV", SPR_AVR_REV },
+ { "AVR_MIN", SPR_AVR_MIN },
+ { "AVR_MAJ", SPR_AVR_MAJ },
+ { NULL, 0 } };
+
+/* EVBAR register */
+static const struct spr_bit_def spr_evbar[] = {
+ { "EVBAR_EVBA", SPR_EVBAR_EVBA },
+ { NULL, 0 } };
+
+/* AECR register */
+static const struct spr_bit_def spr_aecr[] = {
+ { "AECR_CYADDE", SPR_AECR_CYADDE },
+ { "AECR_OVADDE", SPR_AECR_OVADDE },
+ { "AECR_CYMULE", SPR_AECR_CYMULE },
+ { "AECR_OVMULE", SPR_AECR_OVMULE },
+ { "AECR_DBZE", SPR_AECR_DBZE },
+ { "AECR_CYMACADDE", SPR_AECR_CYMACADDE },
+ { "AECR_OVMACADDE", SPR_AECR_OVMACADDE },
+ { NULL, 0 } };
+
+/* AESR register */
+static const struct spr_bit_def spr_aesr[] = {
+ { "AESR_CYADDE", SPR_AESR_CYADDE },
+ { "AESR_OVADDE", SPR_AESR_OVADDE },
+ { "AESR_CYMULE", SPR_AESR_CYMULE },
+ { "AESR_OVMULE", SPR_AESR_OVMULE },
+ { "AESR_DBZE", SPR_AESR_DBZE },
+ { "AESR_CYMACADDE", SPR_AESR_CYMACADDE },
+ { "AESR_OVMACADDE", SPR_AESR_OVMACADDE },
+ { NULL, 0 } };
+
 /* System group */
 static const struct spr_def spr_sys_group[] = {
  /* 000-000 */ { 0x000, 0x000, "SPR_VR",       spr_vr       },
@@ -174,6 +219,11 @@ static const struct spr_def spr_sys_group[] = {
  /* 005-005 */ { 0x005, 0x005, "SPR_DCCFGR",   spr_dccfgr   },
  /* 006-006 */ { 0x006, 0x006, "SPR_ICCFGR",   spr_iccfgr   },
  /* 007-007 */ { 0x007, 0x007, "SPR_DCFGR",    spr_dcfgr    },	/* JPB */
+ /* 009-009 */ { 0x009, 0x009, "SPR_VR2",      spr_vr2      },
+ /* 00a-00a */ { 0x00a, 0x00a, "SPR_AVR",      spr_avr      },
+ /* 00b-00b */ { 0x00b, 0x00b, "SPR_EVBAR",    spr_evbar    },
+ /* 00c-00c */ { 0x00c, 0x00c, "SPR_AECR",     spr_aecr     },
+ /* 00d-00d */ { 0x00d, 0x00d, "SPR_AESR",     spr_aesr     },
  /* 010-010 */ { 0x010, 0x010, "SPR_NPC",      spr_one_val  },
  /* 011-011 */ { 0x011, 0x011, "SPR_SR",       spr_sr       },
  /* 012-012 */ { 0x012, 0x012, "SPR_PPC",      spr_one_val  },

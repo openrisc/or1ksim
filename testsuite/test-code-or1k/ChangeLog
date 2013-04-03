@@ -1,5 +1,10 @@
 2013-04-03  Peter Gavin  <pgavin@gmail.com>
 
+	* support/spr-defs.h: add some new SPRs from newest version of
+	architecture manual (v1.0-rev0)
+
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
 	* configure, configure.ac: force CCASFLAGS=-g so the value from
 	the environment doesn't get used
 
