@@ -1,3 +1,45 @@
+2013-04-04  Peter Gavin  <pgavin@gmail.com>
+
+	* or1ksim.tests/inst-set-test.exp: update test to match changes in
+	new architecture manual (1.0-rev0), such as AESR/AECR support
+	* or1ksim.tests/cfg/or1k/inst-set-test-aecsr.cfg: config for
+	inst-set-test.exp, with AECSRP bit in CPUCFGR set (new file)
+	* or1ksim.tests/cfg/or1knd/inst-set-test-aecsr.cfg: ditto
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	autoreconf
+	* */Makefile.in: regenerated
+
+2012-10-28  Peter Gavin  <pgavin@gmail.com>
+
+	add nodelay target
+	* lib/libsim.exp: check target, and choose or1k or or1knd config
+	files as appropriate
+	* lib/or1ksim.exp: ditto
+	* libsim.tests/cfg/*: moved to libsim.tests/cfg/or1k/
+	* libsim.tests/cfg/or1knd/default.cfg: new file, copied from or1k
+	version and cfgr bit for nodelay turned on
+	* libsim.tests/cfg/or1knd/int-edge.cfg: ditto
+	* libsim.tests/cfg/or1knd/int-level.cfg: ditto
+	* libsim.tests/cfg/or1knd/upcalls.cfg: ditto
+	* or1ksim.tests/cfg/*: moved to or1ksim.tests/cfg/or1k/
+	* or1ksim.tests/cfg.exp: add nodelay testcase
+	* or1ksim.tests/cfg/or1knd/default.cfg: new file, copied from or1k
+	version and cfgr bit for nodelay turned on
+	* or1ksim.tests/cfg/or1knd/acv-gpio.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/acv-uart.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/eth.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/fp.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/inst-set-test.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/kbdtest.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/mmu.cfg: ditto
+	* or1ksim.tests/cfg/or1knd/pcu.cfg: ditto
+	* or1ksim.tests/inst-set-test.exp: change addresses in testcases
+	to offsets so that the output is position independent; this way
+	the output identical in nodelay mode
+	* or1ksim.tests/int-test.exp: add nodelay test case
+
 2012-04-25  Peter Gavin  <pgavin@gmail.com>
 
 	* lib/libsim.exp, lib/or1ksim.exp: kill test processes that timeout

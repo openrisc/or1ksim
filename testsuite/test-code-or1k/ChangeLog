@@ -1,3 +1,12 @@
+2013-04-04  Peter Gavin  <pgavin@gmail.com>
+
+	* inst-set-test/is-add-test.S: update test to match changes in new
+	architecture manual (1.0-rev0), such as AESR/AECR support
+	* inst-set-test/is-div-test.S: ditto
+	* inst-set-test/is-mac-test.S: ditto
+	* inst-set-test/is-mul-test.S: ditto
+	* inst-set-test/is-sub-test.S: ditto
+
 2013-04-03  Peter Gavin  <pgavin@gmail.com>
 
 	* support/spr-defs.h: add some new SPRs from newest version of

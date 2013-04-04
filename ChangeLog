@@ -1,3 +1,16 @@
+2013-04-04  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/insnset.c: change implementations of l_add, l_addc,
+	l_sub, l_mul, l_mulu, l_div, and l_divu to match current
+	architecture manual revision (1.0-rev0):
+	- add AECR/AESR support.  Only used when AECSRP bit in CPUCFGR is
+	set, otherwise exception is raised when OVE and OV are both set
+	- l_mac and l_msb use full 32x32-bit to 64-bit multiply
+	- l_mac and l_msb set OV bit if add stage overflows, which may
+	cause exception
+	- l_mul does not touch CY flag
+	- l_div, l_divu now set OV bit for DBZ
+
 2013-04-03  Peter Gavin  <pgavin@gmail.com>
 
 	* cpu-config.c: (cpu_cfgr) improve checks on configuration, ensure
