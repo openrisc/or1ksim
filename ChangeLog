@@ -1,3 +1,11 @@
+2013-04-10  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/or32.c: (insn_extract) make sure the new extracted bit
+	is unsigned, otherwise the result may become negative and will be
+	sign-extended when cast to a 64-bit integer.  This fixes the bug
+	on 64-bit systems where "<invalid>" would be printed in traces for
+	valid instructions
+
 2013-04-04  Peter Gavin  <pgavin@gmail.com>
 
 	* cpu/or32/insnset.c: change implementations of l_add, l_addc,

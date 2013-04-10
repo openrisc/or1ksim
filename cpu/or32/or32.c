@@ -669,7 +669,7 @@ insn_extract (param_ch, enc_initial)
 	  {
 	    opc_pos--;
 	    if (param_ch == *enc)
-	      ret |= 1 << opc_pos;
+	      ret |= 1U << opc_pos;
 	  }
 	enc++;
       }
