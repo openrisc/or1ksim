@@ -1,3 +1,8 @@
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
+	* inst-set-test/is-div-test.S: remove wrong code introduced in
+	previous patch
+
 2013-04-04  Peter Gavin  <pgavin@gmail.com>
 
 	* inst-set-test/is-add-test.S: update test to match changes in new
