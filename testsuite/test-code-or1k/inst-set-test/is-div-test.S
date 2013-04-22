@@ -273,23 +273,6 @@ _div_aecsr:
 	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
 
-	/* Finished checking range exceptions */
-	l.mfspr	r3,r0,SPR_SR
-	LOAD_CONST (r2, ~SPR_SR_OVE)	/* Clear OVE */
-	l.and	r3,r3,r2
-	l.mtspr	r0,r3,SPR_SR
-	
-        /* set AECR to DBZE */
-        LOAD_CONST(r2, SPR_AECR_DBZE)
-        l.mtspr r0,r2,SPR_AECR
-
-	/* Divide by zero. Should set the overflow flag and trigger an
-	   exception. */
-	TEST_DIV (l.div, 0x0000000c, 0x00000000,
-	          0x00000000, TRUE)
-	
-	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
-	          0x00000000, TRUE)
 
 _div_except_done:
 	/* Finished checking range exceptions */
