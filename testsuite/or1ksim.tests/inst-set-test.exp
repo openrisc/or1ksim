@@ -885,6 +885,10 @@ run_or1ksim "div-test"                                 \
           "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
           "  - overflow flag set:   TRUE"              \
           "  - exception triggered: TRUE"              \
+          "  RANGE exception"                          \
+          "  0x80000000 / 0xffffffff = 0x00000000: OK" \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
           "!  ** OVE flag cleared **"                  \
           "l.divu"                                     \
           "  0x0000000c / 0x00000003 = 0x00000004: OK" \
@@ -972,6 +976,9 @@ run_or1ksim "div-aecsr-test"                           \
           "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
           "  - overflow flag set:   TRUE"              \
           "  - exception triggered: FALSE"             \
+          "  0x80000000 / 0xffffffff = 0x00000000: OK" \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: FALSE"             \
           "  ** AECR set to DBZE **"                   \
           "  RANGE exception"                          \
           "  0x0000000c / 0x00000000 = 0x00000000: OK" \
@@ -980,6 +987,11 @@ run_or1ksim "div-aecsr-test"                           \
           "  - AESR 00000010:       OK"                \
           "  RANGE exception"                          \
           "  0xfffffff4 / 0x00000000 = 0x00000000: OK" \
+          "  - overflow flag set:   TRUE"              \
+          "  - exception triggered: TRUE"              \
+          "  - AESR 00000010:       OK"                \
+          "  RANGE exception"                          \
+          "  0x80000000 / 0xffffffff = 0x00000000: OK" \
           "  - overflow flag set:   TRUE"              \
           "  - exception triggered: TRUE"              \
           "  - AESR 00000010:       OK"                \
