@@ -1,5 +1,12 @@
 2013-04-22  Peter Gavin  <pgavin@gmail.com>
 
+	* inst-set-test/is-div-test.S: add test case for l.div with
+	dividend 0x80000000 and divisor 0xffffffff.  The behavior should
+	be the same as for divide by zero (set OV flag, don't write
+	result).
+
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
 	* inst-set-test/is-div-test.S: remove wrong code introduced in
 	previous patch
 

@@ -473,8 +473,10 @@ INSTRUCTION (l_div) {
   temp3 = (orreg_t) PARAM2;
   temp2 = (orreg_t) PARAM1;
  
- /* Check for divide by zero (sets carry) */
-  if (0 == temp3)
+  /* Check for divide by zero (sets carry) */
+  /* INT32_MIN / -1 should will also overflow */
+  if ((0 == temp3) ||
+      (0x80000000 == temp2 && 0xffffffff == temp3))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }

@@ -1,3 +1,10 @@
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
+	* or1ksim.test/inst-set-test.exp: add test case for l.div with
+	dividend 0x80000000 and divisor 0xffffffff.  The behavior should
+	be the same as for divide by zero (set OV flag, don't write
+	result).
+
 2013-04-04  Peter Gavin  <pgavin@gmail.com>
 
 	* or1ksim.tests/inst-set-test.exp: update test to match changes in

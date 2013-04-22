@@ -1,3 +1,12 @@
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/insnset.c: (l_div) check for 0x80000000 / 0xffffffff,
+	and treat it like division by zero (set OV flag, do not write to
+	destination register).  The C standard specifies that this
+	operation is undefined, and will typically raise an exception,
+	aborting the simulator, just like divide by zero.  So this change
+	not only changes the ISA, but fixes a bug in the simulator.
+
 2013-04-10  Peter Gavin  <pgavin@gmail.com>
 
 	* cpu/or32/or32.c: (insn_extract) make sure the new extracted bit

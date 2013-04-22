@@ -195,6 +195,10 @@ _div:
 	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
 
+        /* INT32_MIN / -1 should set the overflow flag. */
+        TEST_DIV (l.div, 0x80000000, 0xffffffff,
+                  0x00000000, TRUE)
+
         /* check if AECSRP is set */
         l.mfspr r3,r0,SPR_CPUCFGR
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
@@ -219,6 +223,10 @@ _div_no_aecsr:
 	
 	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
+
+        /* INT32_MIN / -1 should set the overflow flag and trigger an exception */
+        TEST_DIV (l.div, 0x80000000, 0xffffffff,
+                  0x00000000, TRUE)
 
         OR1K_DELAYED_NOP(l.j _div_except_done)
 
@@ -246,6 +254,11 @@ _div_aecsr:
 	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
 
+        /* INT32_MIN / -1 should set the overflow flag and not trigger
+	   an exception */
+        TEST_DIV (l.div, 0x80000000, 0xffffffff,
+                  0x00000000, TRUE)
+
         /* Clear OVE so following printout won't raise an exception */
         l.mfspr r3,r0,SPR_SR
         LOAD_CONST (r2, ~SPR_SR_OVE)
@@ -272,6 +285,11 @@ _div_aecsr:
 	
 	TEST_DIV (l.div, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
+
+        /* INT32_MIN / -1 should set the overflow flag and trigger an
+	   exception */
+        TEST_DIV (l.div, 0x80000000, 0xffffffff,
+                  0x00000000, TRUE)
 
 
 _div_except_done:
