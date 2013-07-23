@@ -1,3 +1,8 @@
+2013-07-28  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
+
+	* tick/tick.c (spr_write_ttmr): Do not disable counter when in
+	continous mode and timer value mathes the timer period.
+
 2013-01-30  Jeremy Bennett  <jeremy.bennett@embecosm.com>
 
 	* README.md: Updated to explain about the or1k variant.
