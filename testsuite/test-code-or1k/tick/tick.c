@@ -367,6 +367,23 @@ main()
      it. */
   ASSERT (ttcr < GET_TTCR (), "Tick timer continued counting after restart");
 
+  /* Clear the mode register flags, zero the period and set disabled
+     mode. Also clear the counter value. */
+  ttmr = clear_ttmr ();
+  ttcr = clear_ttcr ();
+
+  /* Start the timer in continous run mode and the counter will keep
+     going. There should be no interrupts, since we haven't enabled
+     them. Waste some time to allow the counter to advance. */
+  ttmr = set_mode (ttmr, SPR_TTMR_CR);
+  SET_TTMR (ttmr);
+  waste_time ();
+
+  /* The timer should have carried on from what was SPR_TTCR when we started
+     it. */
+  ASSERT (ttcr < GET_TTCR (), "Tick timer started counting in continous mode "
+	  "when time period matches counter value");
+
   /* Disable the timer and waste some time to check that the count does not
      advance */
   ttmr = clear_ttmr ();

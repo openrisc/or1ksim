@@ -1,3 +1,8 @@
+2013-07-28  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
+
+	* tick.c: Add test for continous mode timer start when timer
+	period matches timer counter.
+
 2012-04-27  Peter Gavin  <pgavin@gmail.com>
 
 	* configure: Regenerated.

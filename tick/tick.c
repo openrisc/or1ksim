@@ -201,14 +201,6 @@ spr_write_ttmr (uorreg_t prev_val)
 
   tick_counting = value & SPR_TTMR_M;
 
-  /* If TTCR==TTMR_TP when setting MR, we disable counting?? 
-     I think this should be looked at - Julius */
-  if ((tick_counting == SPR_TTMR_CR) &&
-      (cpu_state.sprs[SPR_TTCR] == (value & SPR_TTMR_TP)))
-    {
-      tick_counting = 0;
-    }
-
   sched_timer_job (prev_val);
 }
 
