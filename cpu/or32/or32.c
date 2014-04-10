@@ -302,6 +302,8 @@ CONST struct or32_opcode or1ksim_or32_opcodes[] = {
    EF (l_jalr), OR32_IF_DELAY, it_jump},
   {"l.maci", "rA,I", "01 0x3  ----- AAAAA IIII IIII IIII IIII",
    EF (l_mac), 0, it_mac},
+  {"l.lwa", "rD,I(rA)", "01 0xB  DDDDD AAAAA IIII IIII IIII IIII",
+   EF (l_lwa), 0, it_load},
   {"l.cust1", "", "01 0xC  ----- ----- ---- ---- ---- ----",
    EF (l_cust1), 0, it_unknown},
   {"l.cust2", "", "01 0xD  ----- ----- ---- ---- ---- ----",
@@ -444,6 +446,8 @@ CONST struct or32_opcode or1ksim_or32_opcodes[] = {
   {"lf.cust1.d", "rA,rB", "11 0x2  ----- AAAAA BBBB B--- 0xE ----", EFI, 0,
    it_float},
 
+  {"l.swa", "I(rA),rB", "11 0x3  IIIII AAAAA BBBB BIII IIII IIII",
+   EF (l_swa), 0, it_store},
   {"l.sd", "I(rA),rB", "11 0x4  IIIII AAAAA BBBB BIII IIII IIII", EFI,
    0, it_store},
   {"l.sw", "I(rA),rB", "11 0x5  IIIII AAAAA BBBB BIII IIII IIII",

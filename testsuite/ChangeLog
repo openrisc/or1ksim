@@ -1,3 +1,8 @@
+2014-05-04  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
+
+	* or1ksim.tests/atomic.exp: New file. Test for atomic (l.lwa/l.swa)
+	instructions.
+
 2014-05-04  Peter Gavin  <pgavin@gmail.com>
 
 	* test-code-or1k/inst-set-test/is-add-test.S: remove

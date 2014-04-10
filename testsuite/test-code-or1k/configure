@@ -12014,7 +12014,7 @@ $as_echo "#define SIZEOF_INT 4" >>confdefs.h
 $as_echo "#define SIZEOF_LONG 4" >>confdefs.h
 
 
-ac_config_files="$ac_config_files Makefile acv-gpio/Makefile acv-uart/Makefile basic/Makefile cache/Makefile cbasic/Makefile cfg/Makefile dhry/Makefile dmatest/Makefile eth/Makefile except/Makefile except-test/Makefile exit/Makefile ext/Makefile fbtest/Makefile fp/Makefile testfloat/Makefile functest/Makefile flag/Makefile int-test/Makefile int-logger/Makefile inst-set-test/Makefile kbdtest/Makefile local-global/Makefile loop/Makefile mc-async/Makefile mc-dram/Makefile mc-ssram/Makefile mc-sync/Makefile mc-common/Makefile mem-test/Makefile mmu/Makefile mul/Makefile mycompress/Makefile support/Makefile tick/Makefile uos/Makefile upcalls/Makefile pcu/Makefile"
+ac_config_files="$ac_config_files Makefile acv-gpio/Makefile acv-uart/Makefile atomic/Makefile basic/Makefile cache/Makefile cbasic/Makefile cfg/Makefile dhry/Makefile dmatest/Makefile eth/Makefile except/Makefile except-test/Makefile exit/Makefile ext/Makefile fbtest/Makefile fp/Makefile testfloat/Makefile functest/Makefile flag/Makefile int-test/Makefile int-logger/Makefile inst-set-test/Makefile kbdtest/Makefile local-global/Makefile loop/Makefile mc-async/Makefile mc-dram/Makefile mc-ssram/Makefile mc-sync/Makefile mc-common/Makefile mem-test/Makefile mmu/Makefile mul/Makefile mycompress/Makefile support/Makefile tick/Makefile uos/Makefile upcalls/Makefile pcu/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -13037,6 +13037,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "acv-gpio/Makefile") CONFIG_FILES="$CONFIG_FILES acv-gpio/Makefile" ;;
     "acv-uart/Makefile") CONFIG_FILES="$CONFIG_FILES acv-uart/Makefile" ;;
+    "atomic/Makefile") CONFIG_FILES="$CONFIG_FILES atomic/Makefile" ;;
     "basic/Makefile") CONFIG_FILES="$CONFIG_FILES basic/Makefile" ;;
     "cache/Makefile") CONFIG_FILES="$CONFIG_FILES cache/Makefile" ;;
     "cbasic/Makefile") CONFIG_FILES="$CONFIG_FILES cbasic/Makefile" ;;
