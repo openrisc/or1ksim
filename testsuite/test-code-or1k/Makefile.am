@@ -42,6 +42,7 @@ SUBDIRS = support       \
 	  mc-common     \
 	  acv-gpio      \
 	  acv-uart      \
+	  atomic        \
 	  basic         \
 	  cache         \
 	  cbasic        \

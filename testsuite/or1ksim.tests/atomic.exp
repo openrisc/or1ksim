@@ -1,0 +1,46 @@
+# Test for atomic (l.lwa/l.swa) instructions using DejaGNU under automake
+
+# Copyright (C) 2014, Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+
+# This file is part of OpenRISC 1000 Architectural Simulator.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http:#www.gnu.org/licenses/>.  */
+
+# -----------------------------------------------------------------------------
+# This code is commented throughout for use with Doxygen.
+# -----------------------------------------------------------------------------
+
+
+# Run the atomic test
+run_or1ksim "atomic" \
+    [list "report(0x00000001);" \
+          "report(0x600d0001);" \
+          "report(0x00000002);" \
+          "report(0x600d0002);" \
+          "report(0x00000003);" \
+          "report(0x600d0003);" \
+          "report(0x00000004);" \
+          "report(0x600d0004);" \
+          "report(0x00000005);" \
+          "report(0x600d0005);" \
+          "report(0x00000006);" \
+          "report(0x600d0006);" \
+          "report(0x00000007);" \
+          "report(0x600d0007);" \
+          "report(0x00000008);" \
+          "report(0x600d0008);" \
+          "report(0x00000009);" \
+          "report(0x600d0009);" \
+          "!exit(0)"] \
+    "" "atomic/atomic"
