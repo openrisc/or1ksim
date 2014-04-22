@@ -66,11 +66,34 @@ INSTRUCTION (l_add) {
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for either CY or OV, and set
+         appropriate AESR bit, then raise exception */
+      if ((((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_CYADDE) == SPR_AECR_CYADDE)) ||
+          (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVADDE) == SPR_AECR_OVADDE))
+          )
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVADDE;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_CYADDE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
 
   temp4 = temp1;
   if (temp4 == temp1)
@@ -127,11 +150,34 @@ INSTRUCTION (l_addc) {
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for either CY or OV, and set
+         appropriate AESR bit, then raise exception */
+      if ((((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_CYADDE) == SPR_AECR_CYADDE)) ||
+          (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVADDE) == SPR_AECR_OVADDE))
+          )
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVADDE;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_CYADDE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
 
   temp4 = temp1;
   if (temp4 == temp1)
@@ -280,17 +326,39 @@ INSTRUCTION (l_sub) {
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for either CY or OV, and set
+         appropriate AESR bit, then raise exception */
+      if ((((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_CYADDE) == SPR_AECR_CYADDE)) ||
+          (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVADDE) == SPR_AECR_OVADDE))
+          )
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVADDE;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_CYADDE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
 }
 /*int mcount = 0;*/
 INSTRUCTION (l_mul) {
   orreg_t   temp0, temp1, temp2;
   LONGEST   ltemp0, ltemp1, ltemp2;
-  ULONGEST  ultemp0, ultemp1, ultemp2;
 
   /* Args in 32-bit */
   temp2 = (orreg_t) PARAM2;
@@ -316,29 +384,35 @@ INSTRUCTION (l_mul) {
       cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
     }
 
-  /* We have 1's complement overflow, if, as an unsigned operation, the result
-     is greater than the largest possible 32-bit unsigned number. This is
-     probably quicker than unpicking the bits of the signed result. */
-  ultemp1 = (ULONGEST) temp1 & 0xffffffffULL;
-  ultemp2 = (ULONGEST) temp2 & 0xffffffffULL;
-  ultemp0 = ultemp1 * ultemp2;
-
-  if (ultemp0 > (ULONGEST) UINT32_MAX)
-    {
-      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
-    }
-  else
-    {
-      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
-    }
+  /* CY flag is not touched */
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for OV, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVMULE) == SPR_AECR_OVMULE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVMULE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
+
 }
 INSTRUCTION (l_mulu) {
   uorreg_t   temp0, temp1, temp2;
@@ -356,8 +430,7 @@ INSTRUCTION (l_mulu) {
   temp0  = (uorreg_t) (ultemp0  & 0xffffffffULL);
   SET_PARAM0 (temp0);
 
-  /* We never have 2's complement overflow */
-  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+  /* OV flag is not touched */
 
   /* We have 1's complement overflow, if the result is greater than the
      largest possible 32-bit unsigned number. */
@@ -369,6 +442,30 @@ INSTRUCTION (l_mulu) {
     {
       cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
     }
+
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for CY, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_CY) == SPR_SR_CY) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_CYMULE) == SPR_AECR_CYMULE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_CYMULE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    }
+
+    /* mulu does not raise an exception when AECR/AESR isn't in use */
+    
+  }
+
 }
 INSTRUCTION (l_div) {
   orreg_t  temp3, temp2, temp1;
@@ -376,27 +473,47 @@ INSTRUCTION (l_div) {
   temp3 = (orreg_t) PARAM2;
   temp2 = (orreg_t) PARAM1;
  
- /* Check for divide by zero (sets carry) */
-  if (0 == temp3)
+  /* Check for divide by zero (sets carry) */
+  /* INT32_MIN / -1 should will also overflow */
+  if ((0 == temp3) ||
+      (0x80000000 == temp2 && 0xffffffff == temp3))
     {
-      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
   else
     {
       temp1 = temp2 / temp3;
       SET_PARAM0(temp1);
-      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
     }
-
-  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;	/* Never set */
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_CY)  == SPR_SR_CY))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for either CY or OV, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_DBZE) == SPR_AECR_DBZE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_DBZE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
+
 }
 INSTRUCTION (l_divu) {
   uorreg_t temp3, temp2, temp1;
@@ -407,24 +524,42 @@ INSTRUCTION (l_divu) {
  /* Check for divide by zero (sets carry) */
   if (0 == temp3)
     {
-      cpu_state.sprs[SPR_SR] |= SPR_SR_CY;
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
   else
     {
       temp1 = temp2 / temp3;
       SET_PARAM0(temp1);
-      cpu_state.sprs[SPR_SR] &= ~SPR_SR_CY;
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
     }
-
-  cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;	/* Never set */
 
   /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
      is set. */
-  if (((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) &&
-      ((cpu_state.sprs[SPR_SR] & SPR_SR_CY)  == SPR_SR_CY))
-    {
-      except_handle (EXCEPT_RANGE, cpu_state.pc);
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+        
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for either CY or OV, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_DBZE) == SPR_AECR_DBZE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_DBZE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
     }
+    
+  }
+
 }
 INSTRUCTION (l_sll) {
   uorreg_t temp1;
@@ -778,50 +913,139 @@ INSTRUCTION (l_trap) {
   except_handle(EXCEPT_TRAP, cpu_state.sprs[SPR_EEAR_BASE]);
 }
 INSTRUCTION (l_mac) {
-  uorreg_t lo, hi;
-  LONGEST l;
-  orreg_t x, y, t;
+  orreg_t lo, hi;
+  LONGEST acc, prod, tmp;
+  LONGEST x, y;
 
-  lo = cpu_state.sprs[SPR_MACLO];
-  hi = cpu_state.sprs[SPR_MACHI];
-  x = PARAM0;
-  y = PARAM1;
-/*   PRINTF ("[%"PRIxREG",%"PRIxREG"]\t", x, y); */
+  lo = (orreg_t) cpu_state.sprs[SPR_MACLO];
+  hi = (orreg_t) cpu_state.sprs[SPR_MACHI];
+  x = (orreg_t) PARAM0;
+  y = (orreg_t) PARAM1;
 
-  /* Compute the temporary as (signed) 32-bits, then sign-extend to 64 when
-     adding in. */
-  l = (ULONGEST)lo | ((LONGEST)hi << 32);
-  t = x * y;
-  l += (LONGEST) t;
-
+  /* current accumulator value as 64-bit signed int */
+  acc = ((LONGEST)lo & 0xFFFFFFFFULL) | ((LONGEST)hi << 32);
+  /* compute 32x32-bit to 64-bit product */
+  prod = x * y;
+  /* 64-bit addition */
+  tmp = acc + prod;
+  
   /* This implementation is very fast - it needs only one cycle for mac.  */
-  lo = ((ULONGEST)l) & 0xFFFFFFFF;
-  hi = ((LONGEST)l) >> 32;
+  lo = tmp & 0xFFFFFFFFULL;
+  hi = (tmp >> 32) & 0xFFFFFFFFULL;
   cpu_state.sprs[SPR_MACLO] = lo;
   cpu_state.sprs[SPR_MACHI] = hi;
-/*   PRINTF ("(%"PRIxREG",%"PRIxREG"\n", hi, lo); */
+
+  /* Set overflow if two negative values gave a positive sum, or if two
+     positive values gave a negative sum. Otherwise clear it */
+  if (((acc <  0) && 
+       (prod <  0) &&
+       (tmp >= 0)) ||
+      ((acc >= 0) && 
+       (prod >= 0) &&
+       (tmp <  0)))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+    }
+  
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+    
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for OV, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVMACADDE) == SPR_AECR_OVMACADDE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVMACADDE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
+    }
+    
+  }
+
 }
 INSTRUCTION (l_msb) {
-  uorreg_t lo, hi;  
-  LONGEST l;
-  orreg_t x, y;
+  orreg_t lo, hi;
+  LONGEST acc, prod, tmp;
+  LONGEST x, y;
 
-  lo = cpu_state.sprs[SPR_MACLO];
-  hi = cpu_state.sprs[SPR_MACHI];
-  x = PARAM0;
-  y = PARAM1;
+  lo = (orreg_t) cpu_state.sprs[SPR_MACLO];
+  hi = (orreg_t) cpu_state.sprs[SPR_MACHI];
+  x = (orreg_t) PARAM0;
+  y = (orreg_t) PARAM1;
 
-/*   PRINTF ("[%"PRIxREG",%"PRIxREG"]\t", x, y); */
-
-  l = (ULONGEST)lo | ((LONGEST)hi << 32);
-  l -= x * y;
-
-  /* This implementation is very fast - it needs only one cycle for msb.  */
-  lo = ((ULONGEST)l) & 0xFFFFFFFF;
-  hi = ((LONGEST)l) >> 32;
+  /* current accumulator value as 64-bit signed int */
+  acc = ((LONGEST)lo & 0xFFFFFFFFULL) | ((LONGEST)hi << 32);
+  /* compute 32x32-bit to 64-bit product */
+  prod = x * y;
+  /* 64-bit subtraction */
+  tmp = acc - prod;
+  
+  /* This implementation is very fast - it needs only one cycle for mac.  */
+  lo = tmp & 0xFFFFFFFFULL;
+  hi = (tmp >> 32) & 0xFFFFFFFFULL;
   cpu_state.sprs[SPR_MACLO] = lo;
   cpu_state.sprs[SPR_MACHI] = hi;
-/*   PRINTF ("(%"PRIxREG",%"PRIxREG")\n", hi, lo); */
+
+  /* Set overflow if a negative value minus a positive value gave a positive
+     sum, or if a positive value minus a negative value gave a negative
+     sum. Otherwise clear it */
+  if (((acc <  0) && 
+       (prod >= 0) &&
+       (tmp >= 0)) ||
+      ((acc >= 0) && 
+       (prod <  0) &&
+       (tmp <  0)))
+    {
+      cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
+    }
+  else
+    {
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_OV;
+    }
+  
+  /* Trigger a range exception if the overflow flag is set and the SR[OVE] bit
+     is set. */
+  if ((cpu_state.sprs[SPR_SR] & SPR_SR_OVE) == SPR_SR_OVE) {
+    
+    /* Check if using precise arithmetic exceptions */
+    if ((cpu_state.sprs[SPR_CPUCFGR] & SPR_CPUCFGR_AECSRP) == SPR_CPUCFGR_AECSRP) {
+    
+      /* If using AECR/AESR, check for OV, and set
+         appropriate AESR bit, then raise exception */
+      if (((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV) && ((cpu_state.sprs[SPR_AECR] & SPR_AECR_OVMACADDE) == SPR_AECR_OVMACADDE))
+        {
+          cpu_state.sprs[SPR_AESR] = 0;
+          if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV) == SPR_SR_OV)
+            cpu_state.sprs[SPR_AESR] |= SPR_AESR_OVMACADDE;
+          except_handle (EXCEPT_RANGE, cpu_state.pc);
+        }
+
+    } else {
+      
+      /* No AECR/AESR, only raise exception if OV is set */
+      if ((cpu_state.sprs[SPR_SR] & SPR_SR_OV)  == SPR_SR_OV)
+        except_handle (EXCEPT_RANGE, cpu_state.pc);
+
+    }
+    
+  }
+
 }
 INSTRUCTION (l_macrc) {
   orreg_t lo;

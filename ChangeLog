@@ -1,3 +1,45 @@
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/insnset.c: (l_div) check for 0x80000000 / 0xffffffff,
+	and treat it like division by zero (set OV flag, do not write to
+	destination register).  The C standard specifies that this
+	operation is undefined, and will typically raise an exception,
+	aborting the simulator, just like divide by zero.  So this change
+	not only changes the ISA, but fixes a bug in the simulator.
+
+2013-04-10  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/or32.c: (insn_extract) make sure the new extracted bit
+	is unsigned, otherwise the result may become negative and will be
+	sign-extended when cast to a 64-bit integer.  This fixes the bug
+	on 64-bit systems where "<invalid>" would be printed in traces for
+	valid instructions
+
+2013-04-04  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or32/insnset.c: change implementations of l_add, l_addc,
+	l_sub, l_mul, l_mulu, l_div, and l_divu to match current
+	architecture manual revision (1.0-rev0):
+	- add AECR/AESR support.  Only used when AECSRP bit in CPUCFGR is
+	set, otherwise exception is raised when OVE and OV are both set
+	- l_mac and l_msb use full 32x32-bit to 64-bit multiply
+	- l_mac and l_msb set OV bit if add stage overflows, which may
+	cause exception
+	- l_mul does not touch CY flag
+	- l_div, l_divu now set OV bit for DBZ
+
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu-config.c: (cpu_cfgr) improve checks on configuration, ensure
+	that OB32S is always set, and that unsupported features are
+	unset. Print a warning whenever configuration is changed from
+	whatever was specified in the file
+
+2013-04-03  Peter Gavin  <pgavin@gmail.com>
+
+	* cpu/or1k/spr-defs.h, cpu/or1k/spr-dump.c: add some new SPRs from
+	newest version of architecture manual (v1.0-rev0)
+
 2013-07-28  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
 
 	* tick/tick.c (spr_write_ttmr): Do not disable counter when in

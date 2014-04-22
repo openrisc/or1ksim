@@ -1,3 +1,18 @@
+2013-04-22  Peter Gavin  <pgavin@gmail.com>
+
+	* or1ksim.test/inst-set-test.exp: add test case for l.div with
+	dividend 0x80000000 and divisor 0xffffffff.  The behavior should
+	be the same as for divide by zero (set OV flag, don't write
+	result).
+
+2013-04-04  Peter Gavin  <pgavin@gmail.com>
+
+	* or1ksim.tests/inst-set-test.exp: update test to match changes in
+	new architecture manual (1.0-rev0), such as AESR/AECR support
+	* or1ksim.tests/cfg/or1k/inst-set-test-aecsr.cfg: config for
+	inst-set-test.exp, with AECSRP bit in CPUCFGR set (new file)
+	* or1ksim.tests/cfg/or1knd/inst-set-test-aecsr.cfg: ditto
+
 2012-10-28  Peter Gavin  <pgavin@gmail.com>
 
 	autoreconf
