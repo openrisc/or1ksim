@@ -1,3 +1,8 @@
+2014-05-04  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
+
+	* or1ksim.tests/atomic.exp: New file. Test for atomic (l.lwa/l.swa)
+	instructions.
+
 2013-04-22  Peter Gavin  <pgavin@gmail.com>
 
 	* or1ksim.test/inst-set-test.exp: add test case for l.div with

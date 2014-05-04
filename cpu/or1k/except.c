@@ -50,6 +50,9 @@ except_handle (oraddr_t except, oraddr_t ea)
 {
   oraddr_t except_vector;
 
+  /* context switches abort load link / store conditional sequences */
+  cpu_state.loadlock_active = 0;
+
   if (debug_ignore_exception (except))
     return;
 

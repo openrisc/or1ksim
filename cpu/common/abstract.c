@@ -830,6 +830,10 @@ set_mem32 (oraddr_t memaddr, uint32_t value, int *breakpoint)
     }
 
   phys_memaddr = dmmu_translate (memaddr, 1);;
+
+  if ((phys_memaddr & ~3) == cpu_state.loadlock_addr)
+    cpu_state.loadlock_active = 0;
+
   /* If we produced exception don't set anything */
   if (except_pending)
     return;
@@ -914,6 +918,10 @@ set_mem16 (oraddr_t memaddr, uint16_t value, int *breakpoint)
     }
 
   phys_memaddr = dmmu_translate (memaddr, 1);;
+
+  if ((phys_memaddr & ~3) == cpu_state.loadlock_addr)
+    cpu_state.loadlock_active = 0;
+
   /* If we produced exception don't set anything */
   if (except_pending)
     return;
@@ -989,9 +997,11 @@ set_mem8 (oraddr_t memaddr, uint8_t value, int *breakpoint)
   if (config.sim.mprofile)
     mprofile (memaddr, MPROF_8 | MPROF_WRITE);
 
-  phys_memaddr = memaddr;
-
   phys_memaddr = dmmu_translate (memaddr, 1);;
+
+  if ((phys_memaddr & ~3) == cpu_state.loadlock_addr)
+    cpu_state.loadlock_active = 0;
+
   /* If we produced exception don't set anything */
   if (except_pending)
     return;

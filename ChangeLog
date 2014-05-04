@@ -1,3 +1,21 @@
+2014-05-04  Stefan Kristiansson  <stefan.kristiansson@saunalahti.fi>
+
+	* cpu/common/abstract.c:
+	(set_mem32) Clear atomic reserve on write to atomic address.
+	(set_mem16) Likewise.
+	(set_mem8) Likewise.
+	* cpu/common/execute.h <cpu_state>: Add loadlock_active and
+	loadlock_address members.
+	* cpu/or1k/except.c (except_handle): Clear atomic reserve on
+	exceptions.
+	* cpu/or32/insnset.c:
+	(l_swa): New function.
+	(l_lwa): Likewise.
+	* cpu/or32/or32.c <or1ksim_or32_opcodes>: Add l.lwa and l.swa
+	instructions.
+	* cpu/or32/simpl32-defs.h: Add l_swa and l_lwa declarations.
+	* cuc/load.c <conv>: Add l.lwa and l.swa instructions.
+
 2013-04-22  Peter Gavin  <pgavin@gmail.com>
 
 	* cpu/or32/insnset.c: (l_div) check for 0x80000000 / 0xffffffff,

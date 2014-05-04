@@ -183,6 +183,31 @@ INSTRUCTION (l_addc) {
   if (temp4 == temp1)
     or1k_mstats.byteadd++;
 }
+INSTRUCTION (l_swa) {
+  int old_cyc = 0;
+  uint32_t swa_success = 0;
+
+  if (config.cpu.sbuf_len)
+    old_cyc = runtime.sim.mem_cycles;
+
+  if (cpu_state.loadlock_addr == dmmu_translate (PARAM0, 0)
+      && cpu_state.loadlock_active) {
+    swa_success = 1;
+    set_mem32(PARAM0, PARAM1, &breakpoint);
+    if (config.cpu.sbuf_len) {
+      int t = runtime.sim.mem_cycles;
+      runtime.sim.mem_cycles = old_cyc;
+      sbuf_store (t - old_cyc);
+    }
+  }
+
+  if (swa_success)
+      cpu_state.sprs[SPR_SR] |= SPR_SR_F;
+  else
+      cpu_state.sprs[SPR_SR] &= ~SPR_SR_F;
+
+  cpu_state.loadlock_active = 0;
+}
 INSTRUCTION (l_sw) {
   int old_cyc = 0;
   if (config.cpu.sbuf_len) old_cyc = runtime.sim.mem_cycles;
@@ -212,6 +237,18 @@ INSTRUCTION (l_sh) {
     runtime.sim.mem_cycles = old_cyc;
     sbuf_store (t - old_cyc);
   }
+}
+INSTRUCTION (l_lwa) {
+  uint32_t val;
+  if (config.cpu.sbuf_len)
+    sbuf_load ();
+  val = eval_mem32(PARAM1, &breakpoint);
+  cpu_state.loadlock_active = 1;
+  cpu_state.loadlock_addr = dmmu_translate (PARAM1, 0);
+  /* If eval operand produced exception don't set anything. JPB changed to
+     trigger on breakpoint, as well as except_pending (seemed to be a bug). */
+  if (!(except_pending || breakpoint))
+    SET_PARAM0(val);
 }
 INSTRUCTION (l_lws) {
   uint32_t val;

@@ -134,6 +134,7 @@ AC_DEFINE([SIZEOF_LONG],  [4], [Result of sizeof (long)])
 AC_CONFIG_FILES([Makefile               \
 		 acv-gpio/Makefile      \
 		 acv-uart/Makefile      \
+		 atomic/Makefile      \
 		 basic/Makefile         \
 		 cache/Makefile         \
 		 cbasic/Makefile        \

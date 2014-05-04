@@ -54,7 +54,8 @@ struct cpu_state {
   oraddr_t             pc_delay;	/*!< Delay instr EA register */
   struct iqueue_entry  iqueue;		/*!< Decode of just executed instr */
   struct iqueue_entry  icomplet;        /*!< Decode of instr before this */
-
+  int                  loadlock_active; /*!< A load lock is active */
+  oraddr_t             loadlock_addr;   /*!< Address of the load lock */
 };
 
 /*! History of execution */
