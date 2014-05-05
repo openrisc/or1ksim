@@ -112,7 +112,8 @@
 	LOAD_CONST (r4, 50b)		/* The opcode of interest */	;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	OR1K_DELAYED_NOP(l.bnf	53f)					;\
+	l.bnf	53f					;\
+	l.nop					;\
 									;\
 	PUTS ("  - exception triggered: TRUE\n")			;\
 									;\
@@ -122,7 +123,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	54f)					;\
+	l.bnf	54f					;\
+	l.nop					;\
 									;\
         PUTS ("  - AESR ")						;\
         PUTH (aesr)							;\
@@ -231,11 +233,13 @@ _sub:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _sub_aecsr)
+        l.bf _sub_aecsr
+	l.nop
 
 _sub_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -258,14 +262,17 @@ _sub_no_aecsr:
 	          0x7fffffff, 0x80000000, 0xffffffff,
 	          TRUE, TRUE, 0)
 
-        OR1K_DELAYED_NOP(l.j _sub_except_done)
+        l.j _sub_except_done
+	l.nop
 
 _sub_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -298,7 +305,8 @@ _sub_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to OVADDE only **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -332,7 +340,8 @@ _sub_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to CYADDE only **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -366,7 +375,8 @@ _sub_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to OVADDE | CYADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -401,7 +411,8 @@ _sub_except_done:
 	l.mtspr	r0,r3,SPR_SR
 	
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 /* ----------------------------------------------------------------------------
  * All done

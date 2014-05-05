@@ -102,7 +102,8 @@
 	LOAD_CONST (r4, 50b)		/* The opcode of interest */	;\
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
-	OR1K_DELAYED_NOP(l.bnf	51f)					;\
+	l.bnf	51f					;\
+	l.nop					;\
 									;\
 	PUTS ("  - exception triggered: TRUE\n")			;\
 									;\
@@ -112,7 +113,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if divide ever sets an exception in, DBZE will be the */	;\
 	/* only bit set */						;\
@@ -122,7 +124,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_DBZE)					;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -204,11 +207,13 @@ _div:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _div_aecsr)
+        l.bf _div_aecsr
+	l.nop
 
 _div_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -228,14 +233,17 @@ _div_no_aecsr:
         TEST_DIV (l.div, 0x80000000, 0xffffffff,
                   0x00000000, TRUE)
 
-        OR1K_DELAYED_NOP(l.j _div_except_done)
+        l.j _div_except_done
+	l.nop
 
 _div_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -266,7 +274,8 @@ _div_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to DBZE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -300,7 +309,8 @@ _div_except_done:
 	l.mtspr	r0,r3,SPR_SR
 
 	LOAD_STR (r3, "  ** OVE flag cleared **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 /* ----------------------------------------------------------------------------
  * Test of divide unsigned, l.divu
@@ -356,11 +366,13 @@ _divu:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _divu_aecsr)
+        l.bf _divu_aecsr
+	l.nop
 
 _divu_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -376,14 +388,17 @@ _divu_no_aecsr:
 	TEST_DIV (l.divu, 0xfffffff4, 0x00000000,
 	          0x00000000, TRUE)
 
-        OR1K_DELAYED_NOP(l.j _divu_except_done)
+        l.j _divu_except_done
+	l.nop
 
 _divu_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -409,7 +424,8 @@ _divu_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to DBZE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR

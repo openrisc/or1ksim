@@ -180,7 +180,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if l.mul ever sets an exception in, OVMACADDE will be the */	;\
 	/* only bit set */						;\
@@ -190,7 +191,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_OVMACADDE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -285,7 +287,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if l.mul ever sets an exception in, OVMACADDE will be the */	;\
 	/* only bit set */						;\
@@ -295,7 +298,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_OVMACADDE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -389,7 +393,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if l.mul ever sets an exception in, OVMACADDE will be the */	;\
 	/* only bit set */						;\
@@ -399,7 +404,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_OVMACADDE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -660,11 +666,13 @@ _mac:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _mac_aecsr)
+        l.bf _mac_aecsr
+	l.nop
 
 _mac_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -691,14 +699,17 @@ _mac_no_aecsr:
 	          0x80002000, 0x00007fff,
                   TRUE)
 
-        OR1K_DELAYED_NOP(l.j _mac_except_done)
+        l.j _mac_except_done
+	l.nop
 
 _mac_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -737,7 +748,8 @@ _mac_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to OVMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 	
         /* set AECR to OVMACADDE */
         LOAD_CONST(r2, SPR_AECR_OVMACADDE)
@@ -782,7 +794,8 @@ _mac_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to CYMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* set AECR to CYMACADDE */
         LOAD_CONST(r2, SPR_AECR_CYMACADDE)
@@ -1076,11 +1089,13 @@ tmp:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _maci_aecsr)
+        l.bf _maci_aecsr
+	l.nop
 
 _maci_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -1107,14 +1122,17 @@ _maci_no_aecsr:
 	          0x80002000, 0x00007fff,
                   TRUE)
 
-        OR1K_DELAYED_NOP(l.j _maci_except_done)
+        l.j _maci_except_done
+	l.nop
 
 _maci_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -1153,7 +1171,8 @@ _maci_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to OVMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 	
         /* set AECR to OVMACADDE */
         LOAD_CONST(r2, SPR_AECR_OVMACADDE)
@@ -1198,7 +1217,8 @@ _maci_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to CYMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* set AECR to CYMACADDE */
         LOAD_CONST(r2, SPR_AECR_CYMACADDE)
@@ -1679,11 +1699,13 @@ _msb:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _msb_aecsr)
+        l.bf _msb_aecsr
+	l.nop
 
 _msb_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -1710,14 +1732,17 @@ _msb_no_aecsr:
 	          0xffffffff, 0xffffffff,
                   FALSE)
 
-        OR1K_DELAYED_NOP(l.j _msb_except_done)
+        l.j _msb_except_done
+	l.nop
 
 _msb_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -1756,7 +1781,8 @@ _msb_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to OVMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 	
         /* set AECR to OVMACADDE */
         LOAD_CONST(r2, SPR_AECR_OVMACADDE)
@@ -1801,7 +1827,8 @@ _msb_aecsr:
 	PUTC ('\n')
         
 	LOAD_STR (r3, "  ** AECR set to CYMACADDE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* set AECR to CYMACADDE */
         LOAD_CONST(r2, SPR_AECR_CYMACADDE)

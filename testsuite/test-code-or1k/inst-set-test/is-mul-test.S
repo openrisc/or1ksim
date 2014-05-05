@@ -110,7 +110,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if l.mul ever sets an exception in, OVMULE will be the */	;\
 	/* only bit set */						;\
@@ -120,7 +121,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_OVMULE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -199,7 +201,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	52f)					;\
+	l.bnf	52f					;\
+	l.nop					;\
 									;\
 	/* if l.mulu ever sets an exception in, CYMULE will be the */	;\
 	/* only bit set */						;\
@@ -209,7 +212,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_CYMULE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	53f)					;\
+	l.j	53f					;\
+	l.nop					;\
 									;\
 51:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -285,7 +289,8 @@
 	l.and	r2,r2,r4						;\
 	l.sfeq	r2,r4							;\
 	/* If AECSRP is not set skip to where AESR is popped at end */	;\
-	OR1K_DELAYED_NOP(l.bnf	55f)					;\
+	l.bnf	55f					;\
+	l.nop					;\
 									;\
         PUTS ("  - AESR ")						;\
         PUTH (SPR_AESR_OVMULE)						;\
@@ -293,7 +298,8 @@
 	POP (r2)			/* Retrieve AESR */		;\
         CHECK_RES1 (r2, SPR_AESR_OVMULE)				;\
 									;\
-	OR1K_DELAYED_NOP(l.j	56f)					;\
+	l.j	56f					;\
+	l.nop					;\
 									;\
 54:	PUTS ("  - exception triggered: FALSE\n")			;\
 	/* If exception wasn't triggered we still need to pop AESR */	;\
@@ -387,11 +393,13 @@ _mul:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _mul_aecsr)
+        l.bf _mul_aecsr
+	l.nop
 
 _mul_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -413,14 +421,17 @@ _mul_no_aecsr:
 	TEST_MUL (0xffff7fff, 0xffff0000,
 	          0x80010000, TRUE)
 
-        OR1K_DELAYED_NOP(l.j _mul_except_done)
+        l.j _mul_except_done
+	l.nop
 
 _mul_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -452,7 +463,8 @@ _mul_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to OVMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -485,7 +497,8 @@ _mul_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to CYMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -589,11 +602,13 @@ _muli:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _muli_aecsr)
+        l.bf _muli_aecsr
+	l.nop
 
 _muli_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -615,14 +630,17 @@ _muli_no_aecsr:
 	TEST_MULI (0xfffdfffe, 0x8000,
 	          0x00010000, TRUE)
 
-        OR1K_DELAYED_NOP(l.j _muli_except_done)
+        l.j _muli_except_done
+	l.nop
 
 _muli_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -654,7 +672,8 @@ _muli_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to OVMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -687,7 +706,8 @@ _muli_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to CYMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -791,11 +811,13 @@ _mulu:
         LOAD_CONST(r2, SPR_CPUCFGR_AECSRP)
         l.and r3,r3,r2
         l.sfeq r3,r2
-        OR1K_DELAYED_NOP(l.bf _mulu_aecsr)
+        l.bf _mulu_aecsr
+	l.nop
 
 _mulu_no_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -817,14 +839,17 @@ _mulu_no_aecsr:
 	TEST_MULU (0xffff7fff, 0xffff0000,
 	           0x80010000, TRUE)
 
-        OR1K_DELAYED_NOP(l.j _mulu_except_done)
+        l.j _mulu_except_done
+	l.nop
 
 _mulu_aecsr:
 	LOAD_STR (r3, "  ** OVE flag set **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
 
 	LOAD_STR (r3, "  ** AECR set to 0 **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
 	/* Check that range exceptions are triggered */
 	l.mfspr	r3,r0,SPR_SR
@@ -856,7 +881,8 @@ _mulu_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to OVMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
@@ -889,7 +915,8 @@ _mulu_aecsr:
         l.mtspr r0,r3,SPR_SR
         
 	LOAD_STR (r3, "  ** AECR set to CYMULE **\n")
-	OR1K_DELAYED_NOP(l.jal	_puts)
+	l.jal	_puts
+	l.nop
         
         /* Set OVE again */
 	l.mfspr	r3,r0,SPR_SR
