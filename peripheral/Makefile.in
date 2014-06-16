@@ -91,7 +91,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libperipheral_la_LIBADD =
 am_libperipheral_la_OBJECTS = generic.lo 16450.lo dma.lo mc.lo eth.lo \
 	crc32.lo gpio.lo vga.lo fb.lo ps2kbd.lo atahost.lo \
-	atadevice.lo atadevice-cmdi.lo memory.lo
+	atadevice.lo atadevice-cmdi.lo memory.lo cfi_flash.lo
 libperipheral_la_OBJECTS = $(am_libperipheral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -331,6 +331,7 @@ libperipheral_la_SOURCES = generic.c        \
                            atadevice.c      \
                            atadevice-cmdi.c \
                            memory.c         \
+                           cfi_flash.c      \
                            16450.h          \
                            atacmd.h         \
                            generic.h        \
@@ -347,7 +348,8 @@ libperipheral_la_SOURCES = generic.c        \
                            mc.h             \
 			   memory.h         \
                            ps2kbd.h         \
-                           vga.h
+                           vga.h            \
+                           cfi_flash.h
 
 all: all-recursive
 
@@ -417,6 +419,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ps2kbd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vga.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfi_flash.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
