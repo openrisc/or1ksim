@@ -146,6 +146,9 @@ struct eth_device
     /* Buffer descriptors */
     unsigned long int  bd_ram[ETH_BD_SPACE / 4];
   } regs;
+
+  long int						loopbck_len;
+  unsigned char				loopbck_buf[ETH_MAXPL];
 };
 
 
@@ -329,8 +332,11 @@ eth_flush_bd (struct eth_device *eth)
 
   /* Send packet according to interface type and set BD status. If we didn't
      write the whole packet, then we retry. */
-  if (eth_write_packet (eth, buf, packet_length) == packet_length)
+  if (TEST_FLAG (eth->regs.moder, ETH_MODER, LOOPBCK) ||
+      eth_write_packet (eth, buf, packet_length) == packet_length)
     {
+      eth->loopbck_len = packet_length;
+      memcpy(eth->loopbck_buf, buf, packet_length);
       CLEAR_FLAG (bd_info, ETH_TX_BD, READY);
       SET_FLAG (eth->regs.int_source, ETH_INT_SOURCE, TXB);
       ok_to_int_p = TEST_FLAG (eth->regs.int_mask, ETH_INT_MASK, TXB_M);
@@ -618,17 +624,20 @@ eth_fill_bd (struct eth_device *eth)
      @todo We should support this. */
   if (TEST_FLAG (eth->regs.moder, ETH_MODER, LOOPBCK))
     {
-      PRINTF ("Ethernet loopback requested.\n");
-      fprintf (stderr, "ERROR: Loopback not supported. Ignored.\n");
+      packet_length = eth->loopbck_len;
+      memcpy(buf, eth->loopbck_buf, packet_length);
     }
-  
-  packet_length = eth_read_packet (eth, buf);
+  else
+    {
+      packet_length = eth_read_packet (eth, buf);
+    }
+
   if (packet_length <= 0)
     {
       /* Empty packet or error. No more to do here. */
       return;
     }
-  
+
 /* Got a packet successfully. If not promiscuous mode, check the destination
    address is meant for us. */
   if (!TEST_FLAG (eth->regs.moder, ETH_MODER, PRO))
