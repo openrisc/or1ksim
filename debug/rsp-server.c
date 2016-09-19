@@ -2152,7 +2152,7 @@ rsp_vpkt (struct rsp_buf *buf)
     {
       fprintf (stderr, "Warning: Unknown RSP 'v' packet type %s: ignored\n",
 	       buf->data);
-      put_str_packet ("E01");
+      put_str_packet ("");
       return;
     }
 }	/* rsp_vpkt () */
