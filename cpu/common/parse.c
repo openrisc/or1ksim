@@ -503,7 +503,7 @@ readfile_elf (char *filename)
   FILE *inputfs;
   struct elf32_hdr elfhdr;
   struct elf32_phdr *elf_phdata = NULL;
-  struct elf32_shdr *elf_spnt, *elf_shdata;
+  struct elf32_shdr *elf_spstr, *elf_spnt, *elf_shdata;
   struct elf32_sym *sym_tbl = (struct elf32_sym *) 0;
   uint32_t syms = 0;
   char *str_tbl = (char *) 0;
@@ -580,35 +580,8 @@ readfile_elf (char *filename)
        i++, elf_spnt++)
     {
 
-      if (ELF_LONG_H (elf_spnt->sh_type) == SHT_STRTAB)
-	{
-	  if (NULL != str_tbl)
-	    {
-	      free (str_tbl);
-	    }
 
-	  if ((str_tbl =
-	       (char *) malloc (ELF_LONG_H (elf_spnt->sh_size))) == NULL)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-
-	  if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) !=
-	      0)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-
-	  if (fread (str_tbl, ELF_LONG_H (elf_spnt->sh_size), 1, inputfs) !=
-	      1)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-	}
-      else if (ELF_LONG_H (elf_spnt->sh_type) == SHT_SYMTAB)
+      if (ELF_LONG_H (elf_spnt->sh_type) == SHT_SYMTAB)
 	{
 
 	  if (NULL != sym_tbl)
@@ -641,6 +614,36 @@ readfile_elf (char *filename)
 	  syms =
 	    ELF_LONG_H (elf_spnt->sh_size) /
 	    ELF_LONG_H (elf_spnt->sh_entsize);
+
+      if (ELF_LONG_H (elf_spnt->sh_link) <= ELF_SHORT_H (elfhdr.e_shnum))
+		{
+		  if (NULL != str_tbl)
+			{
+			  free (str_tbl);
+			}
+
+		  elf_spstr = &elf_shdata[ELF_LONG_H (elf_spnt->sh_link)];
+		  if ((str_tbl =
+			   (char *) malloc (ELF_LONG_H (elf_spstr->sh_size))) == NULL)
+			{
+			  perror ("readfile_elf");
+			  exit (1);
+			}
+
+		  if (fseek (inputfs, ELF_LONG_H (elf_spstr->sh_offset), SEEK_SET) !=
+			  0)
+			{
+			  perror ("readfile_elf");
+			  exit (1);
+			}
+
+		  if (fread (str_tbl, ELF_LONG_H (elf_spstr->sh_size), 1, inputfs) !=
+			  1)
+			{
+			  perror ("readfile_elf");
+			  exit (1);
+			}
+		}
 	}
     }
 
