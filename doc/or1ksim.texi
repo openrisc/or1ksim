@@ -2519,6 +2519,7 @@ All peripheral components are optional.  If they are specified, then
 * Keyboard Configuration::
 * Disc Interface Configuration::
 * Generic Peripheral Configuration::
+* CFI Flash Configuration::
 @end menu
 
 @node Memory Controller Configuration
@@ -3395,6 +3396,48 @@ external peripheral"}}.
 If 1 (true, the default), these parameters respectively enable the
 device for byte wide, half-word wide and word wide accesses.  If 0,
 accesses of that width will fail.
+
+@end table
+
+@node CFI Flash Configuration
+@subsection CFI Flash Configuration
+@cindex CFI Flash configuration
+@cindex configuration of CFI Flash memory
+@cindex @code{section cfi_flash}
+This peripheral emulates a CFI compatible Flash memory device up to
+128MB.
+
+CFI Flash peripheral configuration is described in @code{@w{section
+cfi_flash}}.  This section may appear multiple times, specifying multiple
+external peripherals.  The following parameters may be specified.
+
+@table @code
+
+@item enabled = 0|1
+@cindex @code{enabled} (CFI Flash configuration)
+If 1 (true, the default), this CFI Flash device is enabled.  If 0,
+it is disabled.
+
+@item baseaddr = @var{value}
+@cindex @code{baseaddr} (CFI Flash configuration)
+Set the base address of the CFI Flash memory to @var{value}.  The
+default is 0, which is probably not a sensible value.
+
+@item size = @var{value}
+@cindex @code{size} (CFI Flash configuration)
+Set the size of the CFI Flash memory.
+
+@item name = "@var{str}"
+@cindex @code{name} (CFI Flash configuration)
+This gives the peripheral the name @code{"@var{str}"}.  This is used to
+identify the peripheral in error messages and warnings, and when
+reporting its status.  The default value is @code{@w{"anonymous
+external peripheral"}}.
+
+@item file = "@var{str}"
+@cindex @code{file} (CFI Flash configuration)
+When file is set, the flash memory is preloaded with the content this
+file.  When not set, the memory is blank (all 0xff).
 
 @end table
 

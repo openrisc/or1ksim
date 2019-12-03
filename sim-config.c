@@ -65,7 +65,7 @@
 #include "jtag.h"
 #include "misc.h"
 #include "argtable2.h"
-
+#include "cfi_flash.h"
 
 /*! A structure used to represent possible parameters in a section. */
 struct config_param
@@ -1600,6 +1600,7 @@ reg_config_secs ()
   reg_cpu_sec ();
   reg_pic_sec ();
   reg_memory_sec ();
+  reg_cfi_memory_sec ();
   reg_mc_sec ();
   reg_uart_sec ();
   reg_dma_sec ();

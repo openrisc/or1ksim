@@ -39,6 +39,7 @@ libperipheral_la_SOURCES = generic.c        \
                            atadevice.c      \
                            atadevice-cmdi.c \
                            memory.c         \
+                           cfi_flash.c      \
                            16450.h          \
                            atacmd.h         \
                            generic.h        \
@@ -55,4 +56,5 @@ libperipheral_la_SOURCES = generic.c        \
                            mc.h             \
 			   memory.h         \
                            ps2kbd.h         \
-                           vga.h
+                           vga.h            \
+                           cfi_flash.h
