@@ -270,7 +270,8 @@ analyse_function (char *module_name, long orig_time,
 #if 0
   csm (func);
 #endif
-  assert (saved = dup_func (func));
+  saved = dup_func (func);
+  assert (saved != NULL);
 
   timings.preroll = timings.unroll = 1;
   timings.nshared = 0;
@@ -409,8 +410,8 @@ analyse_function (char *module_name, long orig_time,
       if (saved->bb[b].ntim)
 	free (saved->bb[b].tim);
       saved->bb[b].ntim = nt;
-      assert (saved->bb[b].tim =
-	      (cuc_timings *) malloc (sizeof (cuc_timings) * nt));
+      saved->bb[b].tim = (cuc_timings *) malloc (sizeof (cuc_timings) * nt);
+      assert (saved->bb[b].tim != NULL);
 
       /* Copy options in reverse order -- smallest first */
       for (i = 0; i < nt; i++)
@@ -433,17 +434,15 @@ analyse_function (char *module_name, long orig_time,
 static const char *option_char =
   "?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-/*static */ char *
+static char *
 gen_option (char *s, int bb_no, int f_opt)
 {
-  if (bb_no >= 0)
-    sprintf (s, "%i", bb_no);
   assert (f_opt <= strlen (option_char));
-  sprintf (s, "%s%c", s, option_char[f_opt]);
+  sprintf (s, "%i%c", bb_no, option_char[f_opt]);
   return s;
 }
 
-/*static */ void
+static void
 print_option (int bb_no, int f_opt)
 {
   char tmp1[10];
@@ -461,8 +460,10 @@ format_func_options (char *s, cuc_func * f)
     if (f->bb[b].selected_tim >= 0)
       {
 	char tmp[10];
-	sprintf (s, "%s%s%s", s, first ? "" : ",",
-		 gen_option (tmp, b, f->bb[b].selected_tim));
+
+	if (!first)
+	  strcat (s, ",");
+	strcat (s, gen_option (tmp, b, f->bb[b].selected_tim));
 	first = 0;
       }
   return s;
@@ -504,7 +505,9 @@ generate_function (cuc_func * rf, char *name, char *cut_filename)
   char tmp[256];
   cuc_timings tt;
   cuc_func *f;
-  assert (f = dup_func (rf));
+
+  f = dup_func (rf);
+  assert (f != NULL);
 
   if (cuc_debug >= 2)
     print_cuc_bb (f, "BEFORE_GENERATE");
@@ -587,7 +590,9 @@ extract_function (char *out_fn, unsigned long start_addr)
   FILE *fo;
   unsigned long a = start_addr;
   int x = 0;
-  assert (fo = fopen (out_fn, "wt+"));
+
+  fo = fopen (out_fn, "wt+");
+  assert (fo != NULL);
 
   do
     {
@@ -713,7 +718,7 @@ main_cuc (char *filename)
 {
   int i, j;
   char tmp1[256];
-  char filename_cut[256];
+  char filename_cut[251];
 #if 0				/* Select prefix, based on binary program name */
   for (i = 0; i < sizeof (filename_cut); i++)
     {
@@ -734,7 +739,9 @@ main_cuc (char *filename)
 	  config.sim.prof_fn, config.sim.mprof_fn);
   sprintf (tmp1, "%s.log", filename_cut);
   PRINTF ("Analyzing. (log file \"%s\").\n", tmp1);
-  assert (flog = fopen (tmp1, "wt+"));
+
+  flog = fopen (tmp1, "wt+");
+  assert (flog != NULL);
 
   /* Loads in the specified timings table */
   PRINTF ("Using timings from \"%s\" at %s\n", config.cuc.timings_fn,

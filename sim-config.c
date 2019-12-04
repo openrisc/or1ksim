@@ -907,7 +907,7 @@ alloc_memory_block (const char *size)
     }
 
   /* Turn the memory size back into a decimal string and allocate it */
-  char str_size[11];
+  char str_size[32];
   sprintf (str_size, "%lu\n", mem_size);
 
   struct config_section *sec = lookup_section ("memory");

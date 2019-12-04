@@ -145,7 +145,7 @@ void remove_dslots ()
 void detect_locals ()
 {
   int stack[CUC_MAX_STACK];
-  int i, can_remove_stack = 1;
+  int i;
   int real_stack_size = 0;
 
   for (i = 0; i < CUC_MAX_STACK; i++) stack[i] = -1;
@@ -163,7 +163,7 @@ void detect_locals ()
         insn[i].op[0] = -1; insn[i].opt[0] = OPT_REGISTER | OPT_DEST; 
         insn[i].op[1] = insn[i].op[2]; insn[i].opt[1] = insn[i].opt[2];
         insn[i].op[2] = 0; insn[i].opt[2] = OPT_CONST;
-      } else can_remove_stack = 0;
+      }
     /* lw rx,off (r1) */
     } else if (insn[i].index == II_LW
       && (insn[i].opt[1] & OPT_CONST)
@@ -174,7 +174,7 @@ void detect_locals ()
         change_insn_type (&insn[i], II_ADD);
         insn[i].op[1] = stack[insn[i].op[1]]; insn[i].opt[1] = OPT_REF;
         insn[i].op[2] = 0; insn[i].opt[2] = OPT_CONST;
-      } else can_remove_stack = 0;
+      }
     /* Check for defined stack size */
     } else if (insn[i].index == II_ADD && !real_stack_size
             && (insn[i].opt[0] & OPT_REGISTER) && insn[i].op[0] == 1
@@ -183,7 +183,6 @@ void detect_locals ()
       real_stack_size = -insn[i].op[2];
     }
   } 
-  //assert (can_remove_stack); /* TODO */  
 }
 
 /* Disassemble one instruction from insn index and generate parameters */

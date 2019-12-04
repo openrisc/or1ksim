@@ -74,7 +74,8 @@ void cpy_bb (cuc_bb *dest, cuc_bb *src)
   dep_list *d;
   assert (dest != src);
   *dest = *src;
-  assert (dest->insn = malloc (sizeof (cuc_insn) * src->ninsn));
+  dest->insn = malloc (sizeof (cuc_insn) * src->ninsn);
+  assert (dest->insn != NULL);
   for (i = 0; i < src->ninsn; i++) {
     d = src->insn[i].dep;
     dest->insn[i] = src->insn[i];
@@ -92,11 +93,13 @@ void cpy_bb (cuc_bb *dest, cuc_bb *src)
     d = d->next;
   }
   if (src->ntim) {
-    assert (dest->tim = malloc (sizeof (cuc_timings) * src->ntim));
+    dest->tim = malloc (sizeof (cuc_timings) * src->ntim);
+    assert (dest->tim != NULL);
     for (i = 0; i < src->ntim; i++) {
       dest->tim[i] = src->tim[i];
       if (src->tim[i].nshared) {
-        assert (dest->tim[i].shared = malloc (sizeof (int) * src->tim[i].nshared));
+        dest->tim[i].shared = malloc (sizeof (int) * src->tim[i].nshared);
+	assert (dest->tim[i].shared != NULL);
         for (j = 0; j < src->tim[i].nshared; j++)
           dest->tim[i].shared[j] = src->tim[i].shared[j];
       }
@@ -111,7 +114,8 @@ cuc_func *dup_func (cuc_func *f)
   int b, i;
   for (b = 0; b < f->num_bb; b++) cpy_bb (&n->bb[b], &f->bb[b]);
   n->num_bb = f->num_bb;
-  assert (n->init_bb_reloc = (int *)malloc (sizeof (int) * f->num_init_bb));
+  n->init_bb_reloc = (int *)malloc (sizeof (int) * f->num_init_bb);
+  assert (n->init_bb_reloc != NULL);
   for (b = 0; b < f->num_init_bb; b++) n->init_bb_reloc[b] = f->init_bb_reloc[b];
   n->num_init_bb = f->num_init_bb;
   for (i = 0; i < MAX_REGS; i++) {
@@ -411,7 +415,7 @@ void build_bb (cuc_func *f)
     else f->bb[i].ninsn = f->bb[i].last - f->bb[i].first + 1 + MAX_REGS - 1;
     assert (f->bb[i].ninsn >= MAX_REGS - 1);
     f->bb[i].insn = (cuc_insn *) malloc (sizeof (cuc_insn) * f->bb[i].ninsn);
-    assert (f->bb[i].insn);
+    assert (f->bb[i].insn != NULL);
     f->bb[i].nmemory = 0;
     f->bb[i].unrolled = 1;
 
@@ -1198,11 +1202,17 @@ void generate_bb_seq (cuc_func *f, char *mp_filename, char *bb_filename)
     fi = runtime.sim.fmprof;
     reopened = 1;
     rewind (fi);
-  } else assert (fi = fopen (mp_filename, "rb"));
-  assert (fo = fopen (bb_filename, "wb+"));
+  } else {
+    fi = fopen (mp_filename, "rb");
+    assert (fi);
+  }
+  fo = fopen (bb_filename, "wb+");
+  assert (fo);
   
-  assert (bb_start = (unsigned long *) malloc (sizeof (unsigned long) * f->num_bb));
-  assert (bb_end = (unsigned long *) malloc (sizeof (unsigned long) * f->num_bb));
+  bb_start = (unsigned long *) malloc (sizeof (unsigned long) * f->num_bb);
+  bb_end = (unsigned long *) malloc (sizeof (unsigned long) * f->num_bb);
+  assert (bb_start != NULL);
+  assert (bb_end != NULL);
   for (b = 0; b < f->num_bb; b++) {
     bb_start[b] = f->start_addr + f->bb[b].first * 4;
     bb_end[b] = f->start_addr + f->bb[b].last * 4;
@@ -1211,7 +1221,7 @@ void generate_bb_seq (cuc_func *f, char *mp_filename, char *bb_filename)
   }
   
   buf = (struct mprofentry_struct *) malloc (sizeof (struct mprofentry_struct) * bufsize);
-  assert (buf);
+  assert (buf != NULL);
 
   //PRINTF ("BBSEQ:\n");
   do {
@@ -1262,7 +1272,8 @@ void generate_bb_seq (cuc_func *f, char *mp_filename, char *bb_filename)
   /* Initialize basic block relocations */
   f->num_init_bb = f->num_bb;
   //PRINTF ("num_init_bb = %i\n", f->num_init_bb);
-  assert (f->init_bb_reloc = (int *)malloc (sizeof (int) * f->num_init_bb));
+  f->init_bb_reloc = (int *) malloc (sizeof (int) * f->num_init_bb);
+  assert (f->init_bb_reloc != NULL);
   for (b = 0; b < f->num_init_bb; b++) f->init_bb_reloc[b] = b;
 }
 
@@ -1276,9 +1287,11 @@ void count_bb_seq (cuc_func *f, int b, char *bb_filename, int *counts, int prero
   int cnt = 0;
   int times = preroll - 1 + unroll;
 
-  assert (fi = fopen (bb_filename, "rb"));
+  fi = fopen (bb_filename, "rb");
+  assert (fi);
   for (i = 0; i < times; i++) counts[i] = 0;
-  assert (buf = (int *) malloc (sizeof (int) * bufsize));
+  buf = (int *) malloc (sizeof (int) * bufsize);
+  assert (buf != NULL);
 
   do {
     r = fread (buf, sizeof (int), bufsize, fi);
@@ -1505,7 +1518,8 @@ cuc_func *preunroll_loop (cuc_func *f, int b, int preroll, int unroll, char *bb_
   }  
  
   /* Assign new counts to functions */
-  assert (counts = (int *)malloc (sizeof (int) * (preroll - 1 + unroll)));
+  counts = (int *) malloc (sizeof (int) * (preroll - 1 + unroll));
+  assert (counts != NULL);
   count_bb_seq (n, b, bb_filename, counts, preroll, unroll);
   for (i = 0; i < preroll - 1 + unroll; i++) {
     if (i == 0) b1 = b;
