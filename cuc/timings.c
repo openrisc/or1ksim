@@ -255,10 +255,11 @@ void load_timing_table (char *filename)
   log ("Loading timings from %s\n", filename);
   log ("Using clock delay %.2fns (frequency %.0fMHz)\n", runtime.cuc.cycle_duration,
                  1000. / runtime.cuc.cycle_duration);
-  assert (fi = fopen (filename, "rt"));
+  fi = fopen (filename, "rt");
+  assert (fi != NULL);
 
   timing_table = (cuc_timing_table *)malloc ((II_LAST + 1) * sizeof (cuc_timing_table));
-  assert (timing_table);
+  assert (timing_table != NULL);
   for (i = 0; i <= II_LAST; i++) {
     timing_table[i].size = -1.;
     timing_table[i].sizei = -1.;

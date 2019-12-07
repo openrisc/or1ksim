@@ -523,7 +523,7 @@ static const struct spr_def *spr_groups[] = {
  /* 0a */ spr_tt_group };
 
 /* Should be long enough for everything */
-static char ret_spr[1000];
+static char ret_spr[1024];
 
 /* Dumps the given spr in nice, human readable form */
 char *dump_spr(uint16_t spr, uorreg_t spr_val)
@@ -532,6 +532,7 @@ char *dump_spr(uint16_t spr, uorreg_t spr_val)
   uint16_t spr_in_group = spr & (MAX_SPRS_PER_GRP - 1);
   uint16_t spr_group = spr >> MAX_SPRS_PER_GRP_BITS;
   const struct spr_bit_def *spr_bit_def;
+  char spr_buf[512];
 
   int first_bit = 1;
   int i;
@@ -553,10 +554,10 @@ char *dump_spr(uint16_t spr, uorreg_t spr_val)
 
   /* Decode the spr bits and show them in a pretty format */
   if(spr_def->from_spr == spr_def->to_spr)
-    sprintf(ret_spr, "%s", spr_def->name);
+    sprintf(spr_buf, "%s", spr_def->name);
   else
-    sprintf(ret_spr, spr_def->name, spr_in_group - spr_def->from_spr);
-  strcat(ret_spr, " = ");
+    sprintf(spr_buf, spr_def->name, spr_in_group - spr_def->from_spr);
+  strcat(spr_buf, " = ");
 
   /* First get all the single-bit bit fields and dump them */
   for(spr_bit_def = spr_def->bits; spr_bit_def->name; spr_bit_def++) {
@@ -567,7 +568,7 @@ char *dump_spr(uint16_t spr, uorreg_t spr_val)
       continue;
 
     if(!first_bit)
-      strcat(ret_spr, " | ");
+      strcat(spr_buf, " | ");
     else
       first_bit = 0;
     strcat(ret_spr, spr_bit_def->name);
@@ -578,13 +579,13 @@ char *dump_spr(uint16_t spr, uorreg_t spr_val)
     if(is_power2(spr_bit_def->mask))
       continue;
     if(!first_bit)
-      strcat(ret_spr, " | ");
+      strcat(spr_buf, " | ");
     else
       first_bit = 0;
     for(tmp = spr_bit_def->mask, i = 0; !(tmp & 1); i++)
       tmp >>= 1;
 
-    sprintf(ret_spr, "%s%s = %" PRIxREG, ret_spr, spr_bit_def->name,
+    sprintf(ret_spr, "%s%s = %" PRIxREG, spr_buf, spr_bit_def->name,
             (spr_val >> i) & tmp);
   }
   return ret_spr;

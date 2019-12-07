@@ -28,7 +28,7 @@
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2012-04-27], [openrisc@opencores.org])
+AC_INIT([or1ksim], [2019-12-04], [openrisc@lists.librecores.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
@@ -82,10 +82,7 @@ AC_SUBST(CPU_ARCH)
 
 # Set the CFLAGS we want. We put the user flags last, so that if the user
 # changes the optimization level, that will take precedence.
-# CFLAGS="-g -Wall -Werror -O2 -D$ARCH_ISA $CFLAGS"
-# 15-Aug-11: Jeremy Bennett. TODO temporarily remove -Werror to get round
-#            GCC 4.6 issues.
-CFLAGS="-g -Wall -O2 -D$ARCH_ISA $CFLAGS"
+CFLAGS="-g -Wall -Werror -O2 -D$ARCH_ISA $CFLAGS"
 
 AM_PROG_AS
 

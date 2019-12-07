@@ -167,15 +167,19 @@ print_insn_v (FILE * fo, cuc_func * f, int b, int i)
   assert (s);
   while (*s)
     {
+      char t[30];
       if (*s <= MAX_OPERANDS)
-	{
-	  char t[30];
-	  sprintf (tmp, "%s%s", tmp, print_op_v (f, t, REF (b, i), *s - 1));
-	}
+	strcat (tmp, print_op_v (f, t, REF (b, i), *s - 1));
       else if (*s == '\b')
-	sprintf (tmp, "%s%i", tmp, b);
+	{
+	  sprintf (t, "%i", b);
+	  strcat (tmp, t);
+	}
       else
-	sprintf (tmp, "%s%c", tmp, *s);
+	{
+	  sprintf (t, "%c", *s);
+	  strcat (tmp, t);
+	}
       s++;
     }
   GEN ("%-40s /* %s */\n", tmp, ii->disasm);

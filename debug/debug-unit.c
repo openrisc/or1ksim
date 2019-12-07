@@ -282,7 +282,7 @@ calculate_watchpoints (enum debug_unit_action  action,
 	  long int sop1 = udata;
 	  long int sop2 = cpu_state.sprs[SPR_DVR (i)];
 
-	  switch (dcr & SPR_DCR_CC)
+	  switch (dcr_cc)
 	    {
 	    case SPR_DCR_CC_MASKED:
 	      mp[i] = sop1 & sop2;

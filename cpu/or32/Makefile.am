@@ -31,6 +31,8 @@ libarch_la_SOURCES = execute.c         \
                      or32.c            \
 		     simpl32-defs.h
 
+libarch_la_CFLAGS  = $(AM_CFLAGS) -Wno-unused-but-set-variable
+
 BUILT_SOURCES      = execgen.c
 
 noinst_PROGRAMS    = generate$(EXEEXT)

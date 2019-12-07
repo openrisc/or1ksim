@@ -1019,7 +1019,7 @@ eth_open_tap_if (struct eth_device *eth)
      at least CAP_NET_ADMIN capabilities. */
   memset (&ifr, 0, sizeof(ifr));
   ifr.ifr_flags = IFF_TAP | IFF_NO_PI; 
-  strncpy (ifr.ifr_name, eth->tap_dev, IFNAMSIZ);
+  strncpy (ifr.ifr_name, eth->tap_dev, IFNAMSIZ - 1);
 
   if (ioctl (eth->rtx_fd, TUNSETIFF, (void *) &ifr) < 0)
     {

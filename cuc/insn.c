@@ -107,7 +107,7 @@ print_insns (int bb, cuc_insn * insn, int ninsn, int verbose)
   int i, j;
   for (i = 0; i < ninsn; i++)
     {
-      char tmp[10];
+      char tmp[32];
       dep_list *l = insn[i].dep;
       sprintf (tmp, "[%x_%x]", bb, i);
       PRINTF ("%-8s%c %-4s ", tmp, insn[i].index >= 0 ? ':' : '?',
@@ -1613,7 +1613,8 @@ csm (cuc_func * f)
   main_list = NULL;
   for (b = 0; b < f->num_bb; b++)
     {
-      assert (iteration = (int *) malloc (sizeof (int) * f->bb[b].ninsn));
+      iteration = (int *) malloc (sizeof (int) * f->bb[b].ninsn);
+      assert (iteration != NULL);
       for (i = 0; i < f->bb[b].ninsn; i++)
 	{
 	  int cnt = 0, cntc = 0;
@@ -1648,8 +1649,8 @@ csm (cuc_func * f)
 	      iteration[j] = -1;
 	  if (cntc > 1)
 	    {
-	      assert (list =
-		      (cuc_shared_list *) malloc (sizeof (cuc_shared_list)));
+	      list = (cuc_shared_list *) malloc (sizeof (cuc_shared_list));
+	      assert (list != NULL);
 	      list->next = main_list;
 	      list->from = NULL;
 	      list->ref = REF (b, i);
@@ -1663,8 +1664,8 @@ csm (cuc_func * f)
 	    }
 	  if (cnt > 1)
 	    {
-	      assert (list =
-		      (cuc_shared_list *) malloc (sizeof (cuc_shared_list)));
+	      list = (cuc_shared_list *) malloc (sizeof (cuc_shared_list));
+	      assert (list != NULL);
 	      list->next = main_list;
 	      list->from = NULL;
 	      list->ref = REF (b, i);
@@ -1803,8 +1804,8 @@ csm (cuc_func * f)
 	  f->bb[b].tim = NULL;
 	  continue;
 	}
-      assert (f->bb[b].tim =
-	      (cuc_timings *) malloc (sizeof (cuc_timings) * cnt));
+      f->bb[b].tim = (cuc_timings *) malloc (sizeof (cuc_timings) * cnt);
+      assert (f->bb[b].tim != NULL);
 
       cnt = 0;
       for (list = main_list; list; list = list->next)
@@ -1814,8 +1815,9 @@ csm (cuc_func * f)
 	    f->bb[b].tim[cnt].b = b;
 	    f->bb[b].tim[cnt].preroll = f->bb[b].tim[cnt].unroll = 1;
 	    f->bb[b].tim[cnt].nshared = list->ninsn;
-	    assert (f->bb[b].tim[cnt].shared = (cuc_shared_item *)
-		    malloc (sizeof (cuc_shared_item) * list->ninsn));
+	    f->bb[b].tim[cnt].shared = (cuc_shared_item *)
+		    malloc (sizeof (cuc_shared_item) * list->ninsn);
+	    assert (f->bb[b].tim[cnt].shared != NULL);
 	    for (i = 0; i < list->ninsn; i++, l = l->from)
 	      {
 		f->bb[b].tim[cnt].shared[i].ref = l->ref;
@@ -1886,8 +1888,8 @@ search_csm (int iter, cuc_func * f, cuc_shared_list * list)
 
 	if (cntc > 1)
 	  {
-	    assert (l =
-		    (cuc_shared_list *) malloc (sizeof (cuc_shared_list)));
+	    l = (cuc_shared_list *) malloc (sizeof (cuc_shared_list));
+	    assert (l != NULL);
 	    l->next = main_list;
 	    main_list = l;
 	    l->from = list;
@@ -1901,8 +1903,8 @@ search_csm (int iter, cuc_func * f, cuc_shared_list * list)
 	  }
 	if (cnt > 1)
 	  {
-	    assert (l =
-		    (cuc_shared_list *) malloc (sizeof (cuc_shared_list)));
+	    l = (cuc_shared_list *) malloc (sizeof (cuc_shared_list));
+	    assert (l != NULL);
 	    l->next = main_list;
 	    main_list = l;
 	    l->from = list;
