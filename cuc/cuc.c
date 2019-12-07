@@ -181,7 +181,6 @@ preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
 	      int i, int j)
 {
   cuc_func *func;
-  cucdebug (2, "BB%i unroll %i times preroll %i times\n", b, j, i);
   log ("BB%i unroll %i times preroll %i times\n", b, j, i);
   func = preunroll_loop (f, b, i, j, bb_filename);
   if (cuc_debug >= 2)
@@ -189,8 +188,6 @@ preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
   cuc_optimize (func);
   analyse_timings (func, timings);
 
-  cucdebug (2, "new_time = %i, old_time = %i, size = %f\n",
-	    timings->new_time, func->orig_time, timings->size);
   log ("new time = %icyc, old_time = %icyc, size = %.0f gates\n",
        timings->new_time, func->orig_time, timings->size);
   //output_verilog (func, argv[1]);
@@ -646,9 +643,6 @@ restart:
 		    {
 		      log ("%s is calling unknown function, address %08lx\n",
 			   prof_func[f].name, ii->op[0]);
-		      debug (1,
-			     "%s is calling unknown function, address %08lx\n",
-			     prof_func[f].name, ii->op[0]);
 		      free_func (func[f]);
 		      func[f] = NULL;
 		      goto restart;
@@ -656,8 +650,6 @@ restart:
 		  else if (f == j)
 		    {
 		      log ("%s is recursive, ignoring\n", prof_func[f].name);
-		      debug (1, "%s is recursive, ignoring\n",
-			     prof_func[f].name);
 		      free_func (func[f]);
 		      func[f] = NULL;
 		      goto restart;
@@ -772,8 +764,6 @@ main_cuc (char *filename)
 
       log ("Testing function %s (%08lx - %08lx)\n", prof_func[i].name,
 	   start_addr, end_addr);
-      PRINTF ("Testing function %s (%08lx - %08lx)\n", prof_func[i].name,
-	      start_addr, end_addr);
       func[i] =
 	analyse_function (prof_func[i].name, orig_time, start_addr, end_addr,
 			  config.cuc.memory_order, prof_func[i].calls);

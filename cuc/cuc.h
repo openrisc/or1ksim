@@ -102,9 +102,10 @@
 # define MAX(x,y)          ((x) > (y) ? (x) : (y))
 #endif
 
-#define log(x...)       {fprintf (flog, x); fflush (flog); }
-
 #define cucdebug(x,s...) {if ((x) <= cuc_debug) PRINTF (s);}
+
+#define log(x...)        {cucdebug (1, x); fprintf (flog, x); fflush (flog);}
+
 
 #define CUC_WIDTH_ITERATIONS  256
 

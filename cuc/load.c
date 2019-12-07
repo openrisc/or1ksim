@@ -476,7 +476,6 @@ cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr)
     /* Ensure the function doesn't jump past its end.  */
     branch_offset = calc_branch_offset (&insn[i]);
     if (start_addr + (i * 4) + branch_offset > end_addr) {
-        cucdebug (1, "Instruction #%i: \"%s\" jumps past function end.\n", i, name);
       log ("Instruction #%i: \"%s\" jumps past function end.\n", i, name);
       return 1;
     }
@@ -494,7 +493,6 @@ cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr)
         change_insn_type (&insn[i], II_NOP);
         continue;
       } else {
-        cucdebug (1, "Instruction #%i: \"%s\" not supported.\n", i, name);
         log ("Instruction #%i: \"%s\" not supported.\n", i, name);
         return 1;
       }
@@ -550,7 +548,6 @@ cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr)
       }
       if ((insn[i].index < 0) ||
 	  ((insn[i].index == II_NOP) && (insn[i].op[0] != 0))) {
-        cucdebug (1, "Instruction #%i: \"%s\" not supported (2).\n", i, name);
         log ("Instruction #%i: \"%s\" not supported (2).\n", i, name);
         return 1;
       }
@@ -559,7 +556,6 @@ cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr)
   num_insn = i;
   fclose (fi);
   if (func_return != 2) {
-    cucdebug (1, "Unsupported function structure.\n");
     log ("Unsupported function structure.\n");
     return 1;
   }
