@@ -226,7 +226,7 @@ extern int reloc[MAX_INSNS];
 extern FILE *flog;
 
 /* Loads from file into global array insn */
-int cuc_load (char *in_fn);
+int cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr);
 
 /* Negates conditional instruction */
 void negate_conditional (cuc_insn * ii);

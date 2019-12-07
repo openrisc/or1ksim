@@ -120,9 +120,20 @@ prof_acquire (const char *fprofname)
       line++;
       if (dir == '+')
 	{
-	  if (fscanf
-	      (fprof, "%08X %08X %08X %s\n", &stack[nstack].cycles,
-	       &stack[nstack].raddr, &stack[nstack].addr,
+	  /* Read in a '+' line indicating function entry, example:
+
+	       +00000027 00002038 000061ac _or1k_cache_init
+
+	     Columns are:
+		- CPU cycles to when the function was called
+		- Return address, to where the function call will return
+		- Address of function entry
+		- Function name
+	   */
+	  if (fscanf (fprof, "%08X %08X %08X %s\n",
+	       &stack[nstack].cycles,
+	       &stack[nstack].raddr,
+	       &stack[nstack].addr,
 	       &stack[nstack].name[0]) != 4)
 	    fprintf (stderr, "Error reading line #%i\n", line);
 	  else
@@ -138,7 +149,17 @@ prof_acquire (const char *fprofname)
       else if (dir == '-')
 	{
 	  struct stack_struct s;
-	  if (fscanf (fprof, "%08X %08X\n", &s.cycles, &s.raddr) != 2)
+	  /* Read in a '-' line indicating function return, example:
+
+	       -00000033 00002038
+
+	     Columns are:
+		- CPU cycles to when the function return happened
+		- Return address, to where the function call is returning
+	   */
+	  if (fscanf (fprof, "%08X %08X\n",
+	      &s.cycles,
+	      &s.raddr) != 2)
 	    fprintf (stderr, "Error reading line #%i\n", line);
 	  else
 	    {

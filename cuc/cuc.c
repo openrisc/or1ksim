@@ -63,7 +63,7 @@ const int caller_saved[MAX_REGS] = {
 };
 
 /* Does all known instruction optimizations */
-void
+static void
 cuc_optimize (cuc_func * func)
 {
   int modified = 0;
@@ -176,7 +176,7 @@ cuc_optimize (cuc_func * func)
 }
 
 /* Pre/unrolls basic block and optimizes it */
-cuc_timings *
+static cuc_timings *
 preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
 	      int i, int j)
 {
@@ -204,7 +204,7 @@ preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
 
 
 /* Simple comparison function */
-int
+static int
 tim_comp (cuc_timings * a, cuc_timings * b)
 {
   if (a->new_time < b->new_time)
@@ -216,7 +216,7 @@ tim_comp (cuc_timings * a, cuc_timings * b)
 }
 
 /* Analyses function; done when cuc command is entered in (sim) prompt */
-cuc_func *
+static cuc_func *
 analyse_function (char *module_name, long orig_time,
 		  unsigned long start_addr, unsigned long end_addr,
 		  int memory_order, int num_runs)
@@ -228,6 +228,7 @@ analyse_function (char *module_name, long orig_time,
   char tmp1[256];
   char tmp2[256];
 
+  memset (func, 0, sizeof (cuc_func));
   func->orig_time = orig_time;
   func->start_addr = start_addr;
   func->end_addr = end_addr;
@@ -236,13 +237,13 @@ analyse_function (char *module_name, long orig_time,
   func->fdeps = NULL;
   func->num_runs = num_runs;
 
+  /* Load the function instruction bin file dumped by extract_function.  */
   sprintf (tmp1, "%s.bin", module_name);
-  cucdebug (2, "Loading %s.bin\n", module_name);
-  if (cuc_load (tmp1))
-    {
-      free (func);
-      return NULL;
-    }
+  cucdebug (2, "Loading %s\n", tmp1);
+  if (cuc_load (tmp1, func->start_addr, func->end_addr)) {
+    free (func);
+    return NULL;
+  }
 
   log ("Detecting basic blocks\n");
   detect_bb (func);
@@ -498,7 +499,7 @@ options_cmd (int func_no, cuc_func * f)
 }
 
 /* Generates a function, based on specified parameters */
-cuc_func *
+static cuc_func *
 generate_function (cuc_func * rf, char *name, char *cut_filename)
 {
   int b;
@@ -569,7 +570,7 @@ calc_cycles (cuc_func * f)
 }
 
 /* Calculates required size, based on selected options */
-double
+static double
 calc_size (cuc_func * f)
 {
   int b;
@@ -584,12 +585,12 @@ calc_size (cuc_func * f)
 }
 
 /* Dumps specified function to file (hex) */
-unsigned long
+static unsigned long
 extract_function (char *out_fn, unsigned long start_addr)
 {
   FILE *fo;
   unsigned long a = start_addr;
-  int x = 0;
+  int return_counter = 0;
 
   fo = fopen (out_fn, "wt+");
   assert (fo != NULL);
@@ -598,15 +599,20 @@ extract_function (char *out_fn, unsigned long start_addr)
     {
       unsigned long d = eval_direct32 (a, 0, 0);
       int index = or1ksim_insn_decode (d);
+
       assert (index >= 0);
-      if (x)
-	x++;
+
+      if (return_counter)
+	return_counter++;
+
+      /* TODO: this is not the best way to find the end of the function.  */
       if (strcmp (or1ksim_insn_name (index), "l.jr") == 0)
-	x = 1;
+	return_counter = 1;
       a += 4;
+
       fprintf (fo, "%08lx\n", d);
     }
-  while (x < 2);
+  while (return_counter < 2);
 
   fclose (fo);
   return a - 4;
@@ -718,21 +724,9 @@ main_cuc (char *filename)
 {
   int i, j;
   char tmp1[256];
-  char filename_cut[251];
-#if 0				/* Select prefix, based on binary program name */
-  for (i = 0; i < sizeof (filename_cut); i++)
-    {
-      if (isalpha (filename[i]))
-	filename_cut[i] = filename[i];
-      else
-	{
-	  filename_cut[i] = '\0';
-	  break;
-	}
-    }
-#else
+  char filename_cut[8];
+
   strcpy (filename_cut, "cu");
-#endif
 
   PRINTF ("Entering OpenRISC Custom Unit Compiler command prompt\n");
   PRINTF ("Using profile file \"%s\" and memory profile file \"%s\".\n",
@@ -757,6 +751,8 @@ main_cuc (char *filename)
 	  MO_STRONG ? "strong" : "exact");
 
   prof_set (1, 0);
+  /* TODO: don't just fail on recoverable failure, return 1 and go
+     back to the (sim) command prompt.  */
   assert (prof_acquire (config.sim.prof_fn) == 0);
 
   if (config.cuc.calling_convention)

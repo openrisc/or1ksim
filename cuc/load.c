@@ -103,7 +103,8 @@ void negate_conditional (cuc_insn *ii)
 }
 
 /* Remove delay slots */
-void remove_dslots ()
+static void
+remove_dslots ()
 {
   int i;
   int in_delay = 0;
@@ -142,7 +143,8 @@ void remove_dslots ()
 }
 
 /* Convert local variables (uses stack frame -- r1) to internal values */
-void detect_locals ()
+static void
+detect_locals ()
 {
   int stack[CUC_MAX_STACK];
   int i;
@@ -186,7 +188,8 @@ void detect_locals ()
 }
 
 /* Disassemble one instruction from insn index and generate parameters */
-const char *build_insn (unsigned long data, cuc_insn *insn)
+static const char *
+decode_insn (unsigned long data, cuc_insn *insn)
 {
   const char *name;
   char *s;
@@ -195,10 +198,9 @@ const char *build_insn (unsigned long data, cuc_insn *insn)
   int i, argc = 0;
 
   insn->insn = data;
-  insn->index = -1;
+  insn->index = index;
   insn->type = 0;
   name = or1ksim_insn_name (index);
-  insn->index = index;
   or1ksim_disassemble_index (data, index);
   strcpy (insn->disasm, or1ksim_disassembled);
   insn->dep = NULL;
@@ -230,12 +232,14 @@ const char *build_insn (unsigned long data, cuc_insn *insn)
   return name;
 }
 
-/* inserts nop before branch */
-void expand_branch ()
+/* inserts nop and cmov before branch */
+static void
+expand_branch ()
 {
   int i, j, num_bra = 0, d;
   for (i = 0; i < num_insn; i++) if (insn[i].type & IT_BRANCH) num_bra++;
 
+  /* Calculate the new expanded size of the insn array.  */
   d = num_insn + 2 * num_bra;
   assert (d < MAX_INSNS);
   
@@ -244,24 +248,37 @@ void expand_branch ()
     insn[--d] = insn[i]; // for delay slot (later)
     if (insn[d].opt[1] & OPT_REGISTER) {
       assert (insn[d].op[1] == FLAG_REG);
-      insn[d].op[1] = i; insn[d].opt[1] = OPT_REF;
+      insn[d].op[1] = i;
+      insn[d].opt[1] = OPT_REF;
     }
     insn[--d] = insn[i]; // for branch
     change_insn_type (&insn[d], II_NOP);
+
     insn[--d] = insn[i]; // save flag & negation of conditional, if required
     change_insn_type (&insn[d], II_CMOV);
-    insn[d].op[0] = -1; insn[d].opt[0] = OPT_REGISTER | OPT_DEST;
-    insn[d].op[1] = insn[d].type & IT_FLAG1 ? 0 : 1; insn[d].opt[1] = OPT_CONST;
-    insn[d].op[2] = insn[d].type & IT_FLAG1 ? 1 : 0; insn[d].opt[2] = OPT_CONST;
-    insn[d].op[3] = FLAG_REG; insn[d].opt[3] = OPT_REGISTER;
+
+    insn[d].op[0] = -1;
+    insn[d].opt[0] = OPT_REGISTER | OPT_DEST;
+
+    insn[d].op[1] = insn[d].type & IT_FLAG1 ? 0 : 1;
+    insn[d].opt[1] = OPT_CONST;
+
+    insn[d].op[2] = insn[d].type & IT_FLAG1 ? 1 : 0;
+    insn[d].opt[2] = OPT_CONST;
+
+    insn[d].op[3] = FLAG_REG;
+    insn[d].opt[3] = OPT_REGISTER;
     insn[d].type = IT_COND;
     if (insn[d].type)
-    reloc[i] = d;
+      reloc[i] = d;
   } else {
     insn[--d] = insn[i];
     reloc[i] = d;
   }
+
   num_insn += 2 * num_bra;
+
+  if (cuc_debug >= 6) print_cuc_insns ("PRE_EXP_BRANCH_RELOC", 0);
   for (i = 0; i < num_insn; i++)
     for (j = 0; j < MAX_OPERANDS; j++)
       if (insn[i].opt[j] & OPT_REF || insn[i].opt[j] & OPT_JUMP)
@@ -269,7 +286,8 @@ void expand_branch ()
 }
 
 /* expands immediate memory instructions to two */
-void expand_memory ()
+static void
+expand_memory ()
 {
   int i, j, num_mem = 0, d;
   for (i = 0; i < num_insn; i++) if (insn[i].type & IT_MEMORY) num_mem++;
@@ -324,7 +342,8 @@ void expand_memory ()
 }
 
 /* expands signed comparisons to three instructions */
-void expand_signed ()
+static void
+expand_signed ()
 {
   int i, j, num_sig = 0, d;
   for (i = 0; i < num_insn; i++)
@@ -371,7 +390,8 @@ void expand_signed ()
 }
 
 /* expands calls to 7 instructions */
-void expand_calls ()
+static void
+expand_calls ()
 {
   int i, j, num_call = 0, d;
   for (i = 0; i < num_insn; i++)
@@ -411,9 +431,25 @@ void expand_calls ()
         insn[i].op[j] = reloc[insn[i].op[j]];
 }
 
-/* Loads function from file into global array insn.
+/* Calculate a branch jump destination offset if any.  Used to find the
+   internal bounds of a function.  */
+static long
+calc_branch_offset (const cuc_insn *insn)
+{
+  struct or32_opcode const *opcode = &or1ksim_or32_opcodes[insn->index];
+
+  if (opcode->flags & OR32_IF_DELAY && opcode->args[0] == 'N') {
+    unsigned long imm = or1ksim_or32_extract ('N', opcode->encoding,
+					      insn->insn);
+    return ((long) or1ksim_extend_imm(imm, 'N')) * 4;
+  }
+  return 0;
+}
+
+/* Loads function from file into global insn array.
    Function returns nonzero if function cannot be converted. */
-int cuc_load (char *in_fn)
+int
+cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr)
 {
   int i, j;
   FILE *fi;
@@ -422,27 +458,37 @@ int cuc_load (char *in_fn)
   
   log ("Loading filename %s\n", in_fn);
   if ((fi = fopen (in_fn, "rt")) == NULL) {
-    fprintf (stderr, "Cannot open '%s'\n", in_fn);
-    exit (1);
+    log ("Cannot open '%s'\n", in_fn);
+    return 1;
   }
   /* Read in the function and decode the instructions */
   for (i = 0;; i++) {
     unsigned long data;
     const char *name;
+    long branch_offset;
 
     if (fscanf (fi, "%08lx\n", &data) != 1) break;
     
-    /* build params */
-    name = build_insn (data, &insn[i]);
+    /* Decode the instruction and parameters.  */
+    name = decode_insn (data, &insn[i]);
     if (func_return) func_return++;
-    //PRINTF ("%s\n", name);
+
+    /* Ensure the function doesn't jump past its end.  */
+    branch_offset = calc_branch_offset (&insn[i]);
+    if (start_addr + (i * 4) + branch_offset > end_addr) {
+        cucdebug (1, "Instruction #%i: \"%s\" jumps past function end.\n", i, name);
+      log ("Instruction #%i: \"%s\" jumps past function end.\n", i, name);
+      return 1;
+    }
 
     if (or1ksim_or32_opcodes[insn[i].index].flags & OR32_IF_DELAY) {
       int f;
-      if (strcmp (name, "l.bnf") == 0) f = 1;
-      else if (strcmp (name, "l.bf") == 0) f = 0;
+      if (strcmp (name, "l.bnf") == 0)
+        f = 1;
+      else if (strcmp (name, "l.bf") == 0)
+        f = 0;
       else if (strcmp (name, "l.j") == 0) {
-	f = -1;
+        f = -1;
       } else if (strcmp (name, "l.jr") == 0 && func_return == 0) {
         func_return = 1;
         change_insn_type (&insn[i], II_NOP);
@@ -452,18 +498,31 @@ int cuc_load (char *in_fn)
         log ("Instruction #%i: \"%s\" not supported.\n", i, name);
         return 1;
       }
+
+      /* Normalize all branches to l.bf.  */
       if (f < 0) { /* l.j */
-	/* repair params */
+        /* repair params */
         change_insn_type (&insn[i], II_BF);
-        insn[i].op[0] = i + insn[i].op[0]; insn[i].opt[0] = OPT_JUMP;
-        insn[i].op[1] = 1; insn[i].opt[1] = OPT_CONST;
+
+        insn[i].op[0] = i + insn[i].op[0];
+        insn[i].opt[0] = OPT_JUMP;
+
+        insn[i].op[1] = 1;
+        insn[i].opt[1] = OPT_CONST;
+
         insn[i].type |= IT_BRANCH | IT_VOLATILE;
       } else {
         change_insn_type (&insn[i], II_BF);
-        insn[i].op[0] = i + insn[i].op[0]; insn[i].opt[0] = OPT_JUMP;
-        insn[i].op[1] = FLAG_REG; insn[i].opt[1] = OPT_REGISTER;
+
+        insn[i].op[0] = i + insn[i].op[0];
+        insn[i].opt[0] = OPT_JUMP;
+
+        insn[i].op[1] = FLAG_REG;
+        insn[i].opt[1] = OPT_REGISTER;
+
         insn[i].type |= IT_BRANCH | IT_VOLATILE;
-        if (f) insn[i].type |= IT_FLAG1;
+        if (f)
+          insn[i].type |= IT_FLAG1;
       }
     } else {
       insn[i].index = -1;
@@ -506,7 +565,7 @@ int cuc_load (char *in_fn)
   }
 
   log ("Number of instructions loaded = %i\n", num_insn);
-  if (cuc_debug >= 3) print_cuc_insns ("INITIAL", 1);
+  if (cuc_debug >= 3) print_cuc_insns ("INITIAL", 0);
 
   log ("Converting.\n");
   expand_branch ();
