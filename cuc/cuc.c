@@ -63,7 +63,7 @@ const int caller_saved[MAX_REGS] = {
 };
 
 /* Does all known instruction optimizations */
-void
+static void
 cuc_optimize (cuc_func * func)
 {
   int modified = 0;
@@ -176,12 +176,11 @@ cuc_optimize (cuc_func * func)
 }
 
 /* Pre/unrolls basic block and optimizes it */
-cuc_timings *
+static cuc_timings *
 preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
 	      int i, int j)
 {
   cuc_func *func;
-  cucdebug (2, "BB%i unroll %i times preroll %i times\n", b, j, i);
   log ("BB%i unroll %i times preroll %i times\n", b, j, i);
   func = preunroll_loop (f, b, i, j, bb_filename);
   if (cuc_debug >= 2)
@@ -189,8 +188,6 @@ preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
   cuc_optimize (func);
   analyse_timings (func, timings);
 
-  cucdebug (2, "new_time = %i, old_time = %i, size = %f\n",
-	    timings->new_time, func->orig_time, timings->size);
   log ("new time = %icyc, old_time = %icyc, size = %.0f gates\n",
        timings->new_time, func->orig_time, timings->size);
   //output_verilog (func, argv[1]);
@@ -204,7 +201,7 @@ preunroll_bb (char *bb_filename, cuc_func * f, cuc_timings * timings, int b,
 
 
 /* Simple comparison function */
-int
+static int
 tim_comp (cuc_timings * a, cuc_timings * b)
 {
   if (a->new_time < b->new_time)
@@ -216,7 +213,7 @@ tim_comp (cuc_timings * a, cuc_timings * b)
 }
 
 /* Analyses function; done when cuc command is entered in (sim) prompt */
-cuc_func *
+static cuc_func *
 analyse_function (char *module_name, long orig_time,
 		  unsigned long start_addr, unsigned long end_addr,
 		  int memory_order, int num_runs)
@@ -228,6 +225,7 @@ analyse_function (char *module_name, long orig_time,
   char tmp1[256];
   char tmp2[256];
 
+  memset (func, 0, sizeof (cuc_func));
   func->orig_time = orig_time;
   func->start_addr = start_addr;
   func->end_addr = end_addr;
@@ -236,20 +234,19 @@ analyse_function (char *module_name, long orig_time,
   func->fdeps = NULL;
   func->num_runs = num_runs;
 
+  /* Load the function instruction bin file dumped by extract_function.  */
   sprintf (tmp1, "%s.bin", module_name);
-  cucdebug (2, "Loading %s.bin\n", module_name);
-  if (cuc_load (tmp1))
-    {
-      free (func);
-      return NULL;
-    }
+  cucdebug (2, "Loading %s\n", tmp1);
+  if (cuc_load (tmp1, func->start_addr, func->end_addr)) {
+    free (func);
+    return NULL;
+  }
 
   log ("Detecting basic blocks\n");
   detect_bb (func);
   if (cuc_debug >= 2)
     print_cuc_insns ("WITH_BB_LIMITS", 0);
 
-  //sprintf (tmp1, "%s.bin.mp", module_name);
   sprintf (tmp2, "%s.bin.bb", module_name);
   generate_bb_seq (func, config.sim.mprof_fn, tmp2);
   log ("Assuming %i clk cycle load (%i cyc burst)\n", runtime.cuc.mdelay[0],
@@ -498,7 +495,7 @@ options_cmd (int func_no, cuc_func * f)
 }
 
 /* Generates a function, based on specified parameters */
-cuc_func *
+static cuc_func *
 generate_function (cuc_func * rf, char *name, char *cut_filename)
 {
   int b;
@@ -548,7 +545,7 @@ generate_function (cuc_func * rf, char *name, char *cut_filename)
     print_cuc_bb (f, "AFTER_LATCHES");
   analyse_timings (f, &tt);
 
-  sprintf (tmp, "%s%s", cut_filename, name);
+  sprintf (tmp, "%s_%s", cut_filename, name);
   output_verilog (f, tmp, name);
   return f;
 }
@@ -569,7 +566,7 @@ calc_cycles (cuc_func * f)
 }
 
 /* Calculates required size, based on selected options */
-double
+static double
 calc_size (cuc_func * f)
 {
   int b;
@@ -584,12 +581,12 @@ calc_size (cuc_func * f)
 }
 
 /* Dumps specified function to file (hex) */
-unsigned long
+static unsigned long
 extract_function (char *out_fn, unsigned long start_addr)
 {
   FILE *fo;
   unsigned long a = start_addr;
-  int x = 0;
+  int return_counter = 0;
 
   fo = fopen (out_fn, "wt+");
   assert (fo != NULL);
@@ -598,15 +595,20 @@ extract_function (char *out_fn, unsigned long start_addr)
     {
       unsigned long d = eval_direct32 (a, 0, 0);
       int index = or1ksim_insn_decode (d);
+
       assert (index >= 0);
-      if (x)
-	x++;
+
+      if (return_counter)
+	return_counter++;
+
+      /* TODO: this is not the best way to find the end of the function.  */
       if (strcmp (or1ksim_insn_name (index), "l.jr") == 0)
-	x = 1;
+	return_counter = 1;
       a += 4;
+
       fprintf (fo, "%08lx\n", d);
     }
-  while (x < 2);
+  while (return_counter < 2);
 
   fclose (fo);
   return a - 4;
@@ -640,9 +642,6 @@ restart:
 		    {
 		      log ("%s is calling unknown function, address %08lx\n",
 			   prof_func[f].name, ii->op[0]);
-		      debug (1,
-			     "%s is calling unknown function, address %08lx\n",
-			     prof_func[f].name, ii->op[0]);
 		      free_func (func[f]);
 		      func[f] = NULL;
 		      goto restart;
@@ -650,8 +649,6 @@ restart:
 		  else if (f == j)
 		    {
 		      log ("%s is recursive, ignoring\n", prof_func[f].name);
-		      debug (1, "%s is recursive, ignoring\n",
-			     prof_func[f].name);
 		      free_func (func[f]);
 		      func[f] = NULL;
 		      goto restart;
@@ -713,26 +710,26 @@ restart:
   }
 }
 
+static int
+have_mprofile (const char *mp_filename)
+{
+  if (runtime.sim.fmprof) {
+    return 1;
+  } else if (access (mp_filename, R_OK) == 0) {
+    return 1;
+  }
+  PRINTF ("Failed to read mprofile file: %s\n", mp_filename);
+  return 0;
+}
+
 void
-main_cuc (char *filename)
+main_cuc (const char *filename)
 {
   int i, j;
   char tmp1[256];
-  char filename_cut[251];
-#if 0				/* Select prefix, based on binary program name */
-  for (i = 0; i < sizeof (filename_cut); i++)
-    {
-      if (isalpha (filename[i]))
-	filename_cut[i] = filename[i];
-      else
-	{
-	  filename_cut[i] = '\0';
-	  break;
-	}
-    }
-#else
+  char filename_cut[8];
+
   strcpy (filename_cut, "cu");
-#endif
 
   PRINTF ("Entering OpenRISC Custom Unit Compiler command prompt\n");
   PRINTF ("Using profile file \"%s\" and memory profile file \"%s\".\n",
@@ -741,12 +738,18 @@ main_cuc (char *filename)
   PRINTF ("Analyzing. (log file \"%s\").\n", tmp1);
 
   flog = fopen (tmp1, "wt+");
-  assert (flog != NULL);
+  if (flog == NULL) {
+    PRINTF ("Failed to open cuc log file \"%s\".\n", tmp1);
+    return;
+  }
 
   /* Loads in the specified timings table */
   PRINTF ("Using timings from \"%s\" at %s\n", config.cuc.timings_fn,
 	  generate_time_pretty (tmp1, config.sim.clkcycle_ps));
-  load_timing_table (config.cuc.timings_fn);
+  if (load_timing_table (config.cuc.timings_fn)) {
+    fclose (flog);
+    return;
+  }
   runtime.cuc.cycle_duration = 1000. * config.sim.clkcycle_ps;
   PRINTF ("Multicycle logic %s, bursts %s, %s memory order.\n",
 	  config.cuc.no_multicycle ? "OFF" : "ON",
@@ -757,7 +760,15 @@ main_cuc (char *filename)
 	  MO_STRONG ? "strong" : "exact");
 
   prof_set (1, 0);
-  assert (prof_acquire (config.sim.prof_fn) == 0);
+  if (prof_acquire (config.sim.prof_fn)) {
+    fclose (flog);
+    return;
+  }
+
+  if (!have_mprofile (config.sim.mprof_fn)) {
+    fclose (flog);
+    return;
+  }
 
   if (config.cuc.calling_convention)
     PRINTF ("Assuming OpenRISC standard calling convention.\n");
@@ -776,8 +787,6 @@ main_cuc (char *filename)
 
       log ("Testing function %s (%08lx - %08lx)\n", prof_func[i].name,
 	   start_addr, end_addr);
-      PRINTF ("Testing function %s (%08lx - %08lx)\n", prof_func[i].name,
-	      start_addr, end_addr);
       func[i] =
 	analyse_function (prof_func[i].name, orig_time, start_addr, end_addr,
 			  config.cuc.memory_order, prof_func[i].calls);

@@ -3680,8 +3680,8 @@ Configuration, , CUC Configuration}).
 
 @quotation Caution
 The CUC must be properly configured, for this to succeed.  In
-particular a timing file must be available and readable.  Otherwise
-@value{OR1KSIM} will crash.
+particular a timing and profile file must be available and readable.
+Otherwise @value{OR1KSIM} will not enter the @value{CUC} prompt.
 @end quotation
 
 @item help

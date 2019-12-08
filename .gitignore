@@ -2,3 +2,5 @@ autom4te.cache/
 config.h.in~
 cscope.out
 doc/stamp-vti
+cu.log
+sim.log

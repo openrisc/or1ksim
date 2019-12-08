@@ -2953,8 +2953,9 @@ available, which may not be abbreviated, are:
      Configuration: CUC Configuration.).
 
           Caution: The CUC must be properly configured, for this to
-          succeed.  In particular a timing file must be available and
-          readable.  Otherwise Or1ksim will crash.
+          succeed.  In particular a timing and profile file must be
+          available and readable.  Otherwise Or1ksim will not enter the
+          {No value for 'CUC'} prompt.
 
 'help'
      Print out brief information about each command available.
@@ -4167,7 +4168,7 @@ Index
 * Custom Unit Compiler (Interactive CLI): Interactive Command Line.
                                                               (line 161)
 * Custom Unit Compiler (Interactive CLI) <1>: Interactive Command Line.
-                                                              (line 169)
+                                                              (line 170)
 * Custom Unit Compiler Configuration:    CUC Configuration.   (line   6)
 * data cache configuration:              Cache Configuration. (line   6)
 * data MMU configuration:                Memory Management Configuration.
@@ -4358,7 +4359,7 @@ Index
 * heads (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 124)
 * help (Interactive CLI):                Interactive Command Line.
-                                                              (line 169)
+                                                              (line 170)
 * hexadecimal memory dump (Interactive CLI): Interactive Command Line.
                                                               (line 132)
 * hide_device_id (verification API configuration): Verification API Configuration.
@@ -4389,7 +4390,7 @@ Index
                                                               (line   6)
 * instruction profiling for Or1ksim:     Profiling Utility.   (line   6)
 * instruction profiling utility (Interactive CLI): Interactive Command Line.
-                                                              (line 177)
+                                                              (line 178)
 * internal debugging:                    Internal Debugging.  (line   6)
 * interrupt controller configuration:    Interrupt Configuration.
                                                               (line   6)
@@ -4459,7 +4460,7 @@ Index
 * memory profiling start address:        Memory Profiling Utility.
                                                               (line  55)
 * memory profiling utility (Interactive CLI): Interactive Command Line.
-                                                              (line 172)
+                                                              (line 173)
 * memory profiling version of Or1ksim:   Memory Profiling Utility.
                                                               (line   6)
 * memory_order (CUC configuration):      CUC Configuration.   (line  15)
@@ -4476,9 +4477,9 @@ Index
 * MMU configuration:                     Memory Management Configuration.
                                                               (line   6)
 * mprofile (Interactive CLI):            Interactive Command Line.
-                                                              (line 172)
+                                                              (line 173)
 * mprofile (Interactive CLI) <1>:        Interactive Command Line.
-                                                              (line 177)
+                                                              (line 178)
 * mprofile (simulator configuration):    Simulator Behavior.  (line  29)
 * mprof_file (simulator configuration):  Simulator Behavior.  (line  34)
 * mprof_fn (simulator configuration - deprecated): Simulator Behavior.
@@ -4597,7 +4598,7 @@ Index
 * profile (simulator configuration):     Simulator Behavior.  (line  19)
 * profiling for Or1ksim:                 Profiling Utility.   (line   6)
 * profiling utility (Interactive CLI):   Interactive Command Line.
-                                                              (line 177)
+                                                              (line 178)
 * prof_file (simulator configuration):   Simulator Behavior.  (line  23)
 * prof_fn (simulator configuration - deprecated): Simulator Behavior.
                                                               (line  23)
@@ -4925,16 +4926,16 @@ Node: Disc Interface Configuration98843
 Node: Generic Peripheral Configuration103948
 Node: CFI Flash Configuration106274
 Node: Interactive Command Line107441
-Node: Verification API114420
-Node: Code Internals118861
-Node: Coding Conventions119444
-Node: Global Data Structures123867
-Node: Concepts126521
-Ref: Output Redirection126666
-Ref: Interrupts Internal127199
-Node: Internal Debugging128350
-Node: Regression Testing128874
-Node: GNU Free Documentation License132659
-Node: Index155047
+Node: Verification API114478
+Node: Code Internals118919
+Node: Coding Conventions119502
+Node: Global Data Structures123925
+Node: Concepts126579
+Ref: Output Redirection126724
+Ref: Interrupts Internal127257
+Node: Internal Debugging128408
+Node: Regression Testing128932
+Node: GNU Free Documentation License132717
+Node: Index155105
 
 End Tag Table

@@ -102,9 +102,10 @@
 # define MAX(x,y)          ((x) > (y) ? (x) : (y))
 #endif
 
-#define log(x...)       {fprintf (flog, x); fflush (flog); }
-
 #define cucdebug(x,s...) {if ((x) <= cuc_debug) PRINTF (s);}
+
+#define log(x...)        {cucdebug (1, x); fprintf (flog, x); fflush (flog);}
+
 
 #define CUC_WIDTH_ITERATIONS  256
 
@@ -226,13 +227,14 @@ extern int reloc[MAX_INSNS];
 extern FILE *flog;
 
 /* Loads from file into global array insn */
-int cuc_load (char *in_fn);
+int cuc_load (char *in_fn, unsigned long start_addr, unsigned long end_addr);
 
 /* Negates conditional instruction */
 void negate_conditional (cuc_insn * ii);
 
 /* Scans sequence of BBs and set bb[].cnt */
-void generate_bb_seq (cuc_func * f, char *mp_filename, char *bb_filename);
+void generate_bb_seq (cuc_func * f, const char *mp_filename,
+		      const char *bb_filename);
 
 /* Prints out instructions */
 void print_insns (int bb, cuc_insn * insn, int size, int verbose);
@@ -341,7 +343,7 @@ void add_dep (dep_list ** list, int dep);
 
 void dispose_list (dep_list ** list);
 
-void main_cuc (char *filename);
+void main_cuc (const char *filename);
 
 void add_data_dep (cuc_func * f);
 

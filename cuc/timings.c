@@ -247,7 +247,8 @@ void analyse_timings (cuc_func *f, cuc_timings *timings)
 }
 
 /* Loads in the specified timings table */
-void load_timing_table (char *filename)
+int
+load_timing_table (char *filename)
 {
   int i;
   FILE *fi;
@@ -256,9 +257,12 @@ void load_timing_table (char *filename)
   log ("Using clock delay %.2fns (frequency %.0fMHz)\n", runtime.cuc.cycle_duration,
                  1000. / runtime.cuc.cycle_duration);
   fi = fopen (filename, "rt");
-  assert (fi != NULL);
+  if (fi == NULL) {
+    PRINTF ("Failed to load timings file: %s\n", filename);
+    return 1;
+  }
 
-  timing_table = (cuc_timing_table *)malloc ((II_LAST + 1) * sizeof (cuc_timing_table));
+  timing_table = (cuc_timing_table *) malloc ((II_LAST + 1) * sizeof (cuc_timing_table));
   assert (timing_table != NULL);
   for (i = 0; i <= II_LAST; i++) {
     timing_table[i].size = -1.;
@@ -297,5 +301,6 @@ void load_timing_table (char *filename)
   }
   
   fclose (fi);
+  return 0;
 }
 
