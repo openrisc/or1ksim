@@ -247,7 +247,6 @@ analyse_function (char *module_name, long orig_time,
   if (cuc_debug >= 2)
     print_cuc_insns ("WITH_BB_LIMITS", 0);
 
-  //sprintf (tmp1, "%s.bin.mp", module_name);
   sprintf (tmp2, "%s.bin.bb", module_name);
   generate_bb_seq (func, config.sim.mprof_fn, tmp2);
   log ("Assuming %i clk cycle load (%i cyc burst)\n", runtime.cuc.mdelay[0],
@@ -546,7 +545,7 @@ generate_function (cuc_func * rf, char *name, char *cut_filename)
     print_cuc_bb (f, "AFTER_LATCHES");
   analyse_timings (f, &tt);
 
-  sprintf (tmp, "%s%s", cut_filename, name);
+  sprintf (tmp, "%s_%s", cut_filename, name);
   output_verilog (f, tmp, name);
   return f;
 }
@@ -711,8 +710,20 @@ restart:
   }
 }
 
+static int
+have_mprofile (const char *mp_filename)
+{
+  if (runtime.sim.fmprof) {
+    return 1;
+  } else if (access (mp_filename, R_OK) == 0) {
+    return 1;
+  }
+  PRINTF ("Failed to read mprofile file: %s\n", mp_filename);
+  return 0;
+}
+
 void
-main_cuc (char *filename)
+main_cuc (const char *filename)
 {
   int i, j;
   char tmp1[256];
@@ -727,12 +738,18 @@ main_cuc (char *filename)
   PRINTF ("Analyzing. (log file \"%s\").\n", tmp1);
 
   flog = fopen (tmp1, "wt+");
-  assert (flog != NULL);
+  if (flog == NULL) {
+    PRINTF ("Failed to open cuc log file \"%s\".\n", tmp1);
+    return;
+  }
 
   /* Loads in the specified timings table */
   PRINTF ("Using timings from \"%s\" at %s\n", config.cuc.timings_fn,
 	  generate_time_pretty (tmp1, config.sim.clkcycle_ps));
-  load_timing_table (config.cuc.timings_fn);
+  if (load_timing_table (config.cuc.timings_fn)) {
+    fclose (flog);
+    return;
+  }
   runtime.cuc.cycle_duration = 1000. * config.sim.clkcycle_ps;
   PRINTF ("Multicycle logic %s, bursts %s, %s memory order.\n",
 	  config.cuc.no_multicycle ? "OFF" : "ON",
@@ -743,9 +760,15 @@ main_cuc (char *filename)
 	  MO_STRONG ? "strong" : "exact");
 
   prof_set (1, 0);
-  /* TODO: don't just fail on recoverable failure, return 1 and go
-     back to the (sim) command prompt.  */
-  assert (prof_acquire (config.sim.prof_fn) == 0);
+  if (prof_acquire (config.sim.prof_fn)) {
+    fclose (flog);
+    return;
+  }
+
+  if (!have_mprofile (config.sim.mprof_fn)) {
+    fclose (flog);
+    return;
+  }
 
   if (config.cuc.calling_convention)
     PRINTF ("Assuming OpenRISC standard calling convention.\n");

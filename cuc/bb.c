@@ -1194,7 +1194,8 @@ void expand_bb (cuc_func *f, int b)
 }
 
 /* Scans sequence of BBs and set bb[].cnt */
-void generate_bb_seq (cuc_func *f, char *mp_filename, char *bb_filename)
+void
+generate_bb_seq (cuc_func *f, const char *mp_filename, const char *bb_filename)
 {
   FILE *fi, *fo;
   struct mprofentry_struct *buf;

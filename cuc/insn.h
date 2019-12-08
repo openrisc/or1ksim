@@ -112,7 +112,7 @@ void change_insn_type (cuc_insn * i, int index);
 const char *cuc_insn_name (cuc_insn * ii);
 
 /* Loads in the specified timings table */
-void load_timing_table (char *filename);
+int load_timing_table (char *filename);
 
 /* Displays shared instructions */
 void print_shared (cuc_func * rf, cuc_shared_item * shared, int nshared);
