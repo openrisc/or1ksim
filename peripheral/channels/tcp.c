@@ -130,6 +130,9 @@ tcp_init (const char *input)
   if (listen (fd, 1) < 0)
     goto error;
 
+  printf ("Or1ksim: Console listening for telnet on port %d\n", port_number);
+  fflush (stdout);
+
   channel->socket_fd = fd;
   channel->port_number = port_number;
   channel->connected = 0;
