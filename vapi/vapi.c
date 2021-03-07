@@ -33,7 +33,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
