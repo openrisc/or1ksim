@@ -90,7 +90,7 @@ simmem_read8 (oraddr_t addr, void *dat)
 #ifdef WORDS_BIGENDIAN
   return *(uint8_t *) (dat + addr);
 #else
-  return *(uint8_t *) (dat + ((addr & ~ADDR_C (3)) | (3 - (addr & 3))));
+  return *(uint8_t *) (dat + (addr ^ 3));
 #endif
 }
 
@@ -116,7 +116,7 @@ simmem_write8 (oraddr_t addr, uint8_t value, void *dat)
 #ifdef WORDS_BIGENDIAN
   *(uint8_t *) (dat + addr) = value;
 #else
-  *(uint8_t *) (dat + ((addr & ~ADDR_C (3)) | (3 - (addr & 3)))) = value;
+  *(uint8_t *) (dat + (addr ^ 3)) = value;
 #endif
 }
 
