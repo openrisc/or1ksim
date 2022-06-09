@@ -177,11 +177,12 @@ vga_read32 (oraddr_t addr, void *dat)
 
 /* This code will only work on little endian machines */
 #ifdef __BIG_ENDIAN__
-#warning Image dump not supported on big endian machines
 
 static int
-vga_dump_image (char *filename, struct vga_start *vga)
+vga_dump_image (char *filename, struct vga_state *vga)
 {
+  fprintf (stderr, "Image dump not supported on big endian machines\n");
+
   return 1;
 }
 

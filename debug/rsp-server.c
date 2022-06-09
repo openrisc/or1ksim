@@ -1190,8 +1190,8 @@ reg2hex (unsigned long int  val,
 
   for (n = 0; n < 8; n++)
     {
-#ifdef WORDSBIGENDIAN
-      int  nyb_shift = n * 4;
+#ifdef WORDS_BIGENDIAN
+      int  nyb_shift = (n ^ 1) * 4;
 #else
       int  nyb_shift = 28 - (n * 4);
 #endif
@@ -1221,8 +1221,8 @@ hex2reg (char *buf)
 
   for (n = 0; n < 8; n++)
     {
-#ifdef WORDSBIGENDIAN
-      int  nyb_shift = n * 4;
+#ifdef WORDS_BIGENDIAN
+      int  nyb_shift = (n ^ 1) * 4;
 #else
       int  nyb_shift = 28 - (n * 4);
 #endif

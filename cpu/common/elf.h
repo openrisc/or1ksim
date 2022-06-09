@@ -6,8 +6,8 @@
 #endif
 
 #ifdef WORDS_BIGENDIAN
-#define ELF_SHORT_H
-#define ELF_LONG_H
+#define ELF_SHORT_H(ps) ((unsigned short)(ps))
+#define ELF_LONG_H(ps)  ((unsigned long)(ps))
 #else
 /* Load a short int from the following tables with big-endian formats */
 #define ELF_SHORT_H(ps) ((((unsigned short)(ps) >> 8) & 0xff) |\
