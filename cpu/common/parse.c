@@ -273,7 +273,7 @@ check_insn (uint32_t insn)
 /*---------------------------------------------------------------------------*/
 /*!Add an instruction to the program
 
-  @note insn must be in big endian format
+  @note insn must be in target endian format
 
   @param[in] address     The address to use
   @param[in] insn        The instruction to add
@@ -290,10 +290,17 @@ addprogram (oraddr_t  address,
 
   /* We can't have set_program32 functions since it is not gauranteed that the
      section we're loading is aligned on a 4-byte boundry */
-  set_program8 (vaddr, (insn >> 24) & 0xff);
+#ifdef TARGET_BIG_ENDIAN
+  set_program8 (vaddr + 0, (insn >> 24) & 0xff);
   set_program8 (vaddr + 1, (insn >> 16) & 0xff);
-  set_program8 (vaddr + 2, (insn >> 8) & 0xff);
-  set_program8 (vaddr + 3, insn & 0xff);
+  set_program8 (vaddr + 2, (insn >>  8) & 0xff);
+  set_program8 (vaddr + 3, (insn >>  0) & 0xff);
+#else
+  set_program8 (vaddr + 3, (insn >> 24) & 0xff);
+  set_program8 (vaddr + 2, (insn >> 16) & 0xff);
+  set_program8 (vaddr + 1, (insn >>  8) & 0xff);
+  set_program8 (vaddr + 0, (insn >>  0) & 0xff);
+#endif
 
 #if IMM_STATS
   check_insn (insn);
