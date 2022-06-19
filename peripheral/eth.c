@@ -41,14 +41,9 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include <sys/poll.h>
+#include <poll.h>
 #include <unistd.h>
 #include <errno.h>
-
-#if HAVE_LINUX_IF_TUN_H==1
-#include <linux/if.h>
-#include <linux/if_tun.h>
-#endif
 
 /* Package includes */
 #include "arch.h"
@@ -65,6 +60,10 @@
 #include "toplevel-support.h"
 #include "sim-cmd.h"
 
+#if HAVE_LINUX_IF_TUN_H==1
+#include <linux/if.h>
+#include <linux/if_tun.h>
+#endif
 
 /* Control debug messages */
 #define ETH_DEBUG 0
