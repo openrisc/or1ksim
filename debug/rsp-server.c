@@ -2150,8 +2150,12 @@ rsp_vpkt (struct rsp_buf *buf)
     }
   else
     {
-      fprintf (stderr, "Warning: Unknown RSP 'v' packet type %s: ignored\n",
-	       buf->data);
+      /* GDB expects an empty response for unknown 'v' packets. */
+      if (0 != strcmp ("vMustReplyEmpty", buf->data))
+	{
+	  fprintf (stderr, "Warning: Unknown RSP 'v' packet type %s: ignored\n",
+		   buf->data);
+	}
       put_str_packet ("");
       return;
     }
