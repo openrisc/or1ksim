@@ -99,6 +99,7 @@ except_handle (oraddr_t except, oraddr_t ea)
 	cpu_state.pc - (cpu_state.delay_insn ? 4 : 0);
       break;
       /* EPCR is loaded with address of next not-yet-executed instruction */
+    case EXCEPT_FPE:
     case EXCEPT_SYSCALL:
       cpu_state.sprs[SPR_EPCR_BASE] =
 	(cpu_state.pc + 4) - (cpu_state.delay_insn ? 4 : 0);
