@@ -244,6 +244,7 @@ static void
 cpu_hardfloat (union param_val val, void *dat)
 {
   config.cpu.hardfloat = val.int_val;
+  cpu_state.sprs[SPR_CPUCFGR] |= SPR_CPUCFGR_OF32S;
 }
 /*---------------------------------------------------------------------------*/
 /*!Register the functions to handle a section cpu

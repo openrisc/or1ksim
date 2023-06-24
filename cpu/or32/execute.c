@@ -1113,12 +1113,10 @@ float_set_flags ()
 	 !!(float_exception_flags & float_flag_underflow),
 	 !!(float_exception_flags & float_flag_inexact));
   */
-  // TODO: Call FP exception is FPEE set and any of the flags were set
-  /*
-     if ((cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_FPEE) &
-     (|(cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_ALLF)))
-     except_handle (EXCEPT_FPE, cpu_state.iqueue.insn_addr);
-  */
+  // Call FP exception if FPEE set and any of the flags were set
+  if ((cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_FPEE) &&
+      (cpu_state.sprs[SPR_FPCSR] & SPR_FPCSR_ALLF))
+     except_handle (EXCEPT_FPE, cpu_state.sprs[SPR_EEAR_BASE]);
   // Now clear softfloat's flags:
   float_exception_flags = 0;
   
