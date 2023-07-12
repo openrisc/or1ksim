@@ -1,4 +1,4 @@
-This is or1ksim.info, produced by makeinfo version 6.6 from
+This is or1ksim.info, produced by makeinfo version 6.8 from
 or1ksim.texi.
 
 This file documents the OpenRISC Architectural Simulator, Or1ksim.
@@ -582,11 +582,11 @@ should be added to the link command.
 The header file 'or1ksim.h' contains appropriate declarations of the
 functions exported by the Or1ksim library.  These are:
 
- -- 'or1ksim.h': int or1ksim_init (int ARGC, char *ARGV, void
-          *CLASS_PTR, int (*UPR)(void *CLASS_PTR, unsigned long int
-          ADDR, unsigned char MASK[], unsigned char RDATA[], int
-          DATA_LEN), int (*UPW)(void *CLASS_PTR, unsigned long int ADDR,
-          unsigned char MASK[], unsigned char WDATA[], int DATA_LEN))
+ -- or1ksim.h: int or1ksim_init (int ARGC, char *ARGV, void *CLASS_PTR,
+          int (*UPR)(void *CLASS_PTR, unsigned long int ADDR, unsigned
+          char MASK[], unsigned char RDATA[], int DATA_LEN), int
+          (*UPW)(void *CLASS_PTR, unsigned long int ADDR, unsigned char
+          MASK[], unsigned char WDATA[], int DATA_LEN))
 
      The initialization function is supplied with a vector of arguments,
      which are interpreted as arguments to the standalone version (see
@@ -625,7 +625,7 @@ functions exported by the Or1ksim library.  These are:
           single words (4 bytes), using masks if smaller values are
           required.  In this it mimcs the behavior of the WishBone bus.
 
- -- 'or1ksim.h': int or1ksim_run (double DURATION)
+ -- or1ksim.h: int or1ksim_run (double DURATION)
 
      Run the simulator for the simulated duration specified (in
      seconds).  A duration of -1 indicates 'run forever'
@@ -636,7 +636,7 @@ functions exported by the Or1ksim library.  These are:
      (terminated early due to hitting a breakpoint) and
      'OR1KSIM_RC_HALTED' (terminated early due to hitting 'l.nop 1').
 
- -- 'or1ksim.h': void or1ksim_reset_duration (double DURATION)
+ -- or1ksim.h: void or1ksim_reset_duration (double DURATION)
 
      Change the duration of a run specified in an earlier call to
      'or1ksim_run'.  Typically this is called from an upcall, which
@@ -647,26 +647,26 @@ functions exported by the Or1ksim library.  These are:
      for (i.e the duration from _now_, not the duration from the
      original call to 'or1ksim_run').
 
- -- 'or1ksim.h': void or1ksim_set_time_point ()
+ -- or1ksim.h: void or1ksim_set_time_point ()
 
      Set a timing point.  For use with 'or1ksim_get_time_period'.
 
- -- 'or1ksim.h': double or1ksim_get_time_period ()
+ -- or1ksim.h: double or1ksim_get_time_period ()
 
      Return the simulated time (in seconds) that has elapsed since the
      last call to 'or1ksim_set_time_point'.
 
- -- 'or1ksim.h': int or1ksim_is_le ()
+ -- or1ksim.h: int or1ksim_is_le ()
 
      Return 1 (logical true) if the Or1ksim simulation is little-endian,
      0 otherwise.
 
- -- 'or1ksim.h': unsigned long int or1ksim_clock_rate ()
+ -- or1ksim.h: unsigned long int or1ksim_clock_rate ()
 
      Return the Or1ksim clock rate (in Hz).  This is the value specified
      in the configuration file.
 
- -- 'or1ksim.h': void or1ksim_interrupt (int I)
+ -- or1ksim.h: void or1ksim_interrupt (int I)
 
      Generate an edge-triggered interrupt on interrupt line I.  The
      interrupt must be cleared separately by clearing the corresponding
@@ -677,7 +677,7 @@ functions exported by the Or1ksim library.  These are:
      programmable interrupt controller (*note Interrupt Configuration:
      Interrupt Configuration.).
 
- -- 'or1ksim.h': void or1ksim_interrupt_set (int I)
+ -- or1ksim.h: void or1ksim_interrupt_set (int I)
 
      Assert a level-triggered interrupt on interrupt line I.  The
      interrupt must be cleared separately by an explicit call to
@@ -688,7 +688,7 @@ functions exported by the Or1ksim library.  These are:
      programmable interrupt controller (*note Interrupt Configuration:
      Interrupt Configuration.).
 
- -- 'or1ksim.h': void or1ksim_interrupt_clear (int I)
+ -- or1ksim.h: void or1ksim_interrupt_clear (int I)
 
      Clear a level-triggered interrupt on interrupt line I, which was
      previously asserted by a call to 'or1ksim_interrupt_set'.  A
@@ -697,7 +697,7 @@ functions exported by the Or1ksim library.  These are:
      programmable interrupt controller (*note Interrupt Configuration:
      Interrupt Configuration.).
 
- -- 'or1ksim.h': double or1ksim_jtag_reset ()
+ -- or1ksim.h: double or1ksim_jtag_reset ()
 
      Drive a reset sequence through the JTAG interface.  Return the
      (model) time taken for this action.  Remember that the JTAG has its
@@ -705,7 +705,7 @@ functions exported by the Or1ksim library.  These are:
      clock, so even a reset (5 JTAG cycles) could take 50 processor
      clock cycles to complete.
 
- -- 'or1ksim.h': double or1ksim_jtag_shift_ir (unsigned char *JREG, int
+ -- or1ksim.h: double or1ksim_jtag_shift_ir (unsigned char *JREG, int
           NUM_BITS)
 
      Shift the supplied register through the JTAG instruction register.
@@ -718,7 +718,7 @@ functions exported by the Or1ksim library.  These are:
      For example a 12-bit register would have bits 0-7 in byte 0 and
      bits 11-8 in the least significant 4 bits of byte 1.
 
- -- 'or1ksim.h': double or1ksim_jtag_shift_dr (unsigned char *JREG, int
+ -- or1ksim.h: double or1ksim_jtag_shift_dr (unsigned char *JREG, int
           NUM_BITS)
 
      Shift the supplied register through the JTAG data register.  Return
@@ -731,7 +731,7 @@ functions exported by the Or1ksim library.  These are:
      For example a 12-bit register would have bits 0-7 in byte 0 and
      bits 11-8 in the least significant 4 bits of byte 1.
 
- -- 'or1ksim.h': int or1ksim_read_mem (unsigned long int ADDR, unsigned
+ -- or1ksim.h: int or1ksim_read_mem (unsigned long int ADDR, unsigned
           char *BUF, int LEN)
 
      Read LEN bytes from ADDR, placing the result in BUF.  Return LEN on
@@ -739,7 +739,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': int or1ksim_write_mem (unsigned long int ADDR, const
+ -- or1ksim.h: int or1ksim_write_mem (unsigned long int ADDR, const
           unsigned char *BUF, int LEN)
 
      Write LEN bytes to ADDR, taking the data from BUF.  Return LEN on
@@ -747,7 +747,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': int or1ksim_read_spr (int SPRNUM, unsigned long int
+ -- or1ksim.h: int or1ksim_read_spr (int SPRNUM, unsigned long int
           *SPRVAL_PTR)
 
      Read the SPR specified by SPRNUM, placing the result in SPRVAL_PTR.
@@ -755,7 +755,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': int or1ksim_write_spr (int SPRNUM, unsigned long int
+ -- or1ksim.h: int or1ksim_write_spr (int SPRNUM, unsigned long int
           SPRVA)
 
      Write SPRVAL to the SPR specified by SPRNUM.  Return non-zero on
@@ -763,7 +763,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': int or1ksim_read_reg (int REGNUM, unsigned long int
+ -- or1ksim.h: int or1ksim_read_reg (int REGNUM, unsigned long int
           *REGVAL_PTR)
 
      Read the general purpose register specified by REGNUM, placing the
@@ -771,7 +771,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': int or1ksim_write_reg (int REGNUM, unsigned long int
+ -- or1ksim.h: int or1ksim_write_reg (int REGNUM, unsigned long int
           REGVA)
 
      Write REGVAL to the general purpose register specified by REGNUM.
@@ -779,7 +779,7 @@ functions exported by the Or1ksim library.  These are:
 
           Note: This function was added in Or1ksim 0.5.0.
 
- -- 'or1ksim.h': void or1ksim_set_stall_state (int STATE)
+ -- or1ksim.h: void or1ksim_set_stall_state (int STATE)
 
      Set the processor's state according to STATE (1 = stalled, 0 = not
      stalled).
@@ -4066,11 +4066,11 @@ Index
 * BusyBox and Ethernet:                  Networking from OpenRISC Linux and BusyBox.
                                                               (line   6)
 * byte_enabled (generic peripheral configuration): Generic Peripheral Configuration.
-                                                              (line  49)
+                                                              (line  48)
 * cache configuration:                   Cache Configuration. (line   6)
 * calling_convention (CUC configuration): CUC Configuration.  (line  36)
 * ce (memory configuration):             Memory Configuration.
-                                                              (line 122)
+                                                              (line 121)
 * cfgr (CPU configuration):              CPU Configuration.   (line  37)
 * CFI Flash configuration:               CFI Flash Configuration.
                                                               (line   6)
@@ -4088,7 +4088,7 @@ Index
 * config:                                Global Data Structures.
                                                               (line   7)
 * config.bpb:                            Global Data Structures.
-                                                              (line  38)
+                                                              (line  37)
 * config.cpu:                            Global Data Structures.
                                                               (line  22)
 * config.cuc:                            Global Data Structures.
@@ -4096,17 +4096,17 @@ Index
 * config.dc:                             Global Data Structures.
                                                               (line  25)
 * config.debug:                          Global Data Structures.
-                                                              (line  41)
+                                                              (line  40)
 * config.pic:                            Global Data Structures.
-                                                              (line  34)
+                                                              (line  33)
 * config.pm:                             Global Data Structures.
-                                                              (line  30)
+                                                              (line  29)
 * config.sim:                            Global Data Structures.
                                                               (line  11)
 * config.vapi:                           Global Data Structures.
                                                               (line  14)
 * configuration dynamic structure:       Global Data Structures.
-                                                              (line  49)
+                                                              (line  48)
 * configuration file structure:          Configuration File Format.
                                                               (line   6)
 * configuration global structure:        Global Data Structures.
@@ -4196,9 +4196,9 @@ Index
 * DejaGNU tests directories:             Regression Testing.  (line  50)
 * DejaGnu tool specific configuration:   Regression Testing.  (line  39)
 * delayr (memory configuration):         Memory Configuration.
-                                                              (line 142)
+                                                              (line 141)
 * delayw (memory configuration):         Memory Configuration.
-                                                              (line 148)
+                                                              (line 147)
 * dependstats (CPU configuration):       CPU Configuration.   (line  83)
 * dev_id (ATA/ATAPI configuration):      Disc Interface Configuration.
                                                               (line  40)
@@ -4256,7 +4256,7 @@ Index
 * enabled (CFI Flash configuration):     CFI Flash Configuration.
                                                               (line  14)
 * enabled (debug interface configuration): Debug Interface Configuration.
-                                                              (line  12)
+                                                              (line  11)
 * enabled (DMA configuration):           DMA Configuration.   (line  20)
 * enabled (Ethernet configuration):      Ethernet Configuration.
                                                               (line  19)
@@ -4327,7 +4327,7 @@ Index
 * file (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 107)
 * file (CFI Flash configuration):        CFI Flash Configuration.
-                                                              (line  32)
+                                                              (line  31)
 * file (keyboard configuration):         Keyboard Configuration.
                                                               (line  51)
 * filename (frame buffer configuration - deprecated): Frame Buffer Configuration.
@@ -4377,7 +4377,7 @@ Index
                                                               (line  51)
 * host test code:                        Regression Testing.  (line  57)
 * hw_enabled (generic peripheral configuration): Generic Peripheral Configuration.
-                                                              (line  50)
+                                                              (line  49)
 * IMMU configuration:                    Memory Management Configuration.
                                                               (line   6)
 * index (memory controller configuration): Memory Controller Configuration.
@@ -4434,13 +4434,13 @@ Index
 * load_missdelay (data cache configuration): Cache Configuration.
                                                               (line  50)
 * log (memory configuration):            Memory Configuration.
-                                                              (line 154)
+                                                              (line 153)
 * log_enabled (verification API configuration): Verification API Configuration.
                                                               (line  28)
 * long:                                  Simulator Library.   (line  92)
 * make file for tests:                   Regression Testing.  (line  27)
 * mc (memory configuration):             Memory Configuration.
-                                                              (line 131)
+                                                              (line 130)
 * memory configuration:                  Memory Configuration.
                                                               (line   6)
 * memory controller configuration:       Memory Controller Configuration.
@@ -4629,7 +4629,7 @@ Index
 * regression testing:                    Regression Testing.  (line   6)
 * reg_sim_reset:                         Concepts.            (line  13)
 * Remote Serial Protocol:                Debug Interface Configuration.
-                                                              (line  21)
+                                                              (line  20)
 * Remote Serial Protocol, --nosrv:       Standalone Simulator.
                                                               (line  65)
 * Remote Serial Protocol, --srv:         Standalone Simulator.
@@ -4644,9 +4644,9 @@ Index
                                                               (line  48)
 * rev (CPU configuration):               CPU Configuration.   (line  13)
 * rsp_enabled (debug interface configuration): Debug Interface Configuration.
-                                                              (line  21)
+                                                              (line  20)
 * rsp_port (debug interface configuration): Debug Interface Configuration.
-                                                              (line  33)
+                                                              (line  32)
 * rtx_type (Ethernet configuration):     Ethernet Configuration.
                                                               (line  47)
 * run (Interactive CLI):                 Interactive Command Line.
@@ -4655,16 +4655,16 @@ Index
                                                               (line  23)
 * running Or1ksim:                       Usage.               (line   6)
 * runtime:                               Global Data Structures.
-                                                              (line  58)
+                                                              (line  57)
 * runtime global structure:              Global Data Structures.
-                                                              (line  58)
+                                                              (line  57)
 * runtime.cpu:                           Global Data Structures.
-                                                              (line  62)
+                                                              (line  61)
 * runtime.cpu.fout:                      Concepts.            (line   7)
 * runtime.cuc:                           Global Data Structures.
-                                                              (line  62)
+                                                              (line  61)
 * runtime.vapi:                          Global Data Structures.
-                                                              (line  62)
+                                                              (line  61)
 * rxfile (Ethernet configuration):       Ethernet Configuration.
                                                               (line  76)
 * rx_channel (Ethernet configuration):   Ethernet Configuration.
@@ -4719,7 +4719,7 @@ Index
 * section vga:                           Display Interface Configuration.
                                                               (line   6)
 * sections:                              Global Data Structures.
-                                                              (line  49)
+                                                              (line  48)
 * sectors (ATA/ATAPI device configuration): Disc Interface Configuration.
                                                               (line 128)
 * server_port (verification API configuration): Verification API Configuration.
@@ -4785,7 +4785,7 @@ Index
 * TCP/IP port range:                     Verification API Configuration.
                                                               (line  23)
 * TCP/IP port range for or1ksim-rsp service: Debug Interface Configuration.
-                                                              (line  38)
+                                                              (line  37)
 * test code for host:                    Regression Testing.  (line  57)
 * test code for target:                  Regression Testing.  (line  63)
 * test make file:                        Regression Testing.  (line  27)
@@ -4851,7 +4851,7 @@ Index
 * VAPI for GPIO:                         Verification API.    (line  87)
 * VAPI for UART:                         Verification API.    (line  41)
 * vapi_id (debug interface configuration): Debug Interface Configuration.
-                                                              (line  44)
+                                                              (line  43)
 * vapi_id (DMA configuration):           DMA Configuration.   (line  38)
 * vapi_id (DMA configuration) <1>:       Ethernet Configuration.
                                                               (line 118)
@@ -4870,7 +4870,7 @@ Index
 * VGA configuration:                     Display Interface Configuration.
                                                               (line   6)
 * word_enabled (generic peripheral configuration): Generic Peripheral Configuration.
-                                                              (line  51)
+                                                              (line  50)
 
 
 
@@ -4887,55 +4887,60 @@ Node: Profiling Utility15124
 Node: Memory Profiling Utility16030
 Node: Trace Generation17395
 Node: Simulator Library19583
-Node: Ethernet TUN/TAP Interface30003
-Node: Setting Up a Persistent TAP device31110
-Node: Establishing a Bridge31785
-Node: Opening the Firewall33471
-Node: Disabling Ethernet Filtering33963
-Node: Networking from OpenRISC Linux and BusyBox34589
-Node: Tearing Down a Bridge36254
-Node: l.nop Support36998
-Node: Configuration39173
-Node: Configuration File Format39785
-Node: Configuration File Preprocessing40170
-Node: Configuration File Syntax40467
-Node: Simulator Configuration43252
-Node: Simulator Behavior43543
-Node: Verification API Configuration48126
-Node: CUC Configuration50062
-Node: Core OpenRISC Configuration52056
-Node: CPU Configuration52597
-Node: Memory Configuration56928
-Node: Memory Management Configuration63647
-Node: Cache Configuration66023
-Node: Interrupt Configuration68406
-Node: Power Management Configuration70241
-Node: Branch Prediction Configuration71515
-Node: Debug Interface Configuration72874
-Node: Performance Counters Configuration75257
-Node: Peripheral Configuration75741
-Node: Memory Controller Configuration76395
-Node: UART Configuration80155
-Node: DMA Configuration83667
-Node: Ethernet Configuration85531
-Node: GPIO Configuration90803
-Node: Display Interface Configuration92433
-Node: Frame Buffer Configuration94742
-Node: Keyboard Configuration96606
-Node: Disc Interface Configuration98843
-Node: Generic Peripheral Configuration103948
-Node: CFI Flash Configuration106274
-Node: Interactive Command Line107441
-Node: Verification API114478
-Node: Code Internals118919
-Node: Coding Conventions119502
-Node: Global Data Structures123925
-Node: Concepts126579
-Ref: Output Redirection126724
-Ref: Interrupts Internal127257
-Node: Internal Debugging128408
-Node: Regression Testing128932
-Node: GNU Free Documentation License132717
-Node: Index155105
+Node: Ethernet TUN/TAP Interface29963
+Node: Setting Up a Persistent TAP device31070
+Node: Establishing a Bridge31745
+Node: Opening the Firewall33431
+Node: Disabling Ethernet Filtering33923
+Node: Networking from OpenRISC Linux and BusyBox34549
+Node: Tearing Down a Bridge36214
+Node: l.nop Support36958
+Node: Configuration39133
+Node: Configuration File Format39745
+Node: Configuration File Preprocessing40130
+Node: Configuration File Syntax40427
+Node: Simulator Configuration43212
+Node: Simulator Behavior43503
+Node: Verification API Configuration48086
+Node: CUC Configuration50022
+Node: Core OpenRISC Configuration52016
+Node: CPU Configuration52557
+Node: Memory Configuration56888
+Node: Memory Management Configuration63607
+Node: Cache Configuration65983
+Node: Interrupt Configuration68366
+Node: Power Management Configuration70201
+Node: Branch Prediction Configuration71475
+Node: Debug Interface Configuration72834
+Node: Performance Counters Configuration75217
+Node: Peripheral Configuration75701
+Node: Memory Controller Configuration76355
+Node: UART Configuration80115
+Node: DMA Configuration83627
+Node: Ethernet Configuration85491
+Node: GPIO Configuration90763
+Node: Display Interface Configuration92393
+Node: Frame Buffer Configuration94702
+Node: Keyboard Configuration96566
+Node: Disc Interface Configuration98803
+Node: Generic Peripheral Configuration103908
+Node: CFI Flash Configuration106234
+Node: Interactive Command Line107401
+Node: Verification API114438
+Node: Code Internals118879
+Node: Coding Conventions119462
+Node: Global Data Structures123885
+Node: Concepts126539
+Ref: Output Redirection126684
+Ref: Interrupts Internal127217
+Node: Internal Debugging128368
+Node: Regression Testing128892
+Node: GNU Free Documentation License132677
+Node: Index155065
 
 End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:
