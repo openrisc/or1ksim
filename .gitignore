@@ -1,6 +1,7 @@
 autom4te.cache/
-config.h.in~
+*~
 cscope.out
 doc/stamp-vti
+doc/version.texi
 cu.log
 sim.log
