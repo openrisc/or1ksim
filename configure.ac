@@ -21,14 +21,14 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Configure script for the OpenRISC 1000 simulator 
+# Configure script for the OpenRISC 1000 simulator
 
 # Process this file with autoconf to produce a configure script.
 
 
 # Use a full version number (x.y.z, possibly with "rcn" as a suffix) when
 # preparing a release, otherwise use a the date version (yyyy-mm-dd).
-AC_INIT([or1ksim], [2019-12-04], [openrisc@lists.librecores.org])
+AC_INIT([or1ksim], m4_esyscmd([date '+%Y-%m-%d']), [linux-openrisc@vger.kernel.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Generically use extensions such as _GNU_SOURCE if available.
