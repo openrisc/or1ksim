@@ -1,0 +1,28 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install -y build-essential autoconf automake autotools-dev xz-utils git libelf-dev texinfo
+
+      - name: build or1ksim
+        run: |
+          ./configure --prefix=/opt/or1k
+          make -j $(nproc)
+          make DESTDIR=$PWD/install install
+
+      - name: tarball build
+        run: tar czvf or1ksim.tar.gz -C ./install/opt/ or1k/
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: or1ksim-nightly
+          path: or1ksim.tar.gz
