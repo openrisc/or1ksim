@@ -1,8 +1,8 @@
-name: Build
+name: Nightly Build
 
-on: push
-#  schedule:
-#    - cron:  '0 1 * * *'
+on:
+  schedule:
+    - cron:  '0 1 * * *'
 
 jobs:
   activity-check:
