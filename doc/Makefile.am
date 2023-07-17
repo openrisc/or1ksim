@@ -25,5 +25,4 @@ info_TEXINFOS = or1ksim.texi
 # Included files in the texinfo source
 
 or1ksim_TEXINFOS = config.texi \
-	           fdl-1.2.texi \
-		   version.texi
+	           fdl-1.2.texi
