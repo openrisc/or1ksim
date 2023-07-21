@@ -102,13 +102,11 @@ strstrip (char       *dst,
    physical address is equal to logical.
 
    @param[in] laddr       Logical address
-   @param[in] breakpoint  Unused
 
    @return  The physical address                                             */
 /*---------------------------------------------------------------------------*/
 static oraddr_t
-translate (oraddr_t  laddr,
-	   int      *breakpoint)
+translate (oraddr_t laddr)
 {
   int i;
 
@@ -276,17 +274,14 @@ check_insn (uint32_t insn)
   @note insn must be in big endian format
 
   @param[in] address     The address to use
-  @param[in] insn        The instruction to add
-  @param[in] breakpoint  Not used (it is passed to the translate() function,
-                         which also does not use it.                         */
+  @param[in] insn        The instruction to add                              */
 /*---------------------------------------------------------------------------*/
 static void
 addprogram (oraddr_t  address,
-	    uint32_t  insn,
-	    int      *breakpoint)
+	    uint32_t  insn)
 {
-  int vaddr = (!runtime.sim.filename) ? translate (address, breakpoint) :
-                                        translate (freemem, breakpoint);
+  int vaddr = (!runtime.sim.filename) ? translate (address) :
+                                        translate (freemem);
 
   /* We can't have set_program32 functions since it is not gauranteed that the
      section we're loading is aligned on a 4-byte boundry */
@@ -324,7 +319,6 @@ readfile_coff (char  *filename,
   struct COFF_scnhdr coffscnhdr;
   int len;
   int firstthree = 0;
-  int breakpoint = 0;
 
   if (!(inputfs = fopen (filename, "r")))
     {
@@ -390,7 +384,7 @@ readfile_coff (char  *filename,
 	      fseek (inputfs, -2, SEEK_CUR);
 	    }
 
-	  addprogram (freemem, insn, &breakpoint);
+	  addprogram (freemem, insn);
 	  sectsize -= len;
 	}
     }
@@ -508,7 +502,6 @@ readfile_elf (char *filename)
   uint32_t syms = 0;
   char *str_tbl = (char *) 0;
   char *s_str = (char *) 0;
-  int breakpoint = 0;
   uint32_t inputbuf;
   uint32_t padd;
   uint32_t insn;
@@ -724,7 +717,7 @@ readfile_elf (char *filename)
 		 && (len = fread (&inputbuf, sizeof (inputbuf), 1, inputfs)))
 	    {
 	      insn = ELF_LONG_H (inputbuf);
-	      addprogram (freemem, insn, &breakpoint);
+	      addprogram (freemem, insn);
 	      sectsize -= 4;
 	    }
 	}
@@ -859,8 +852,6 @@ identifyfile (char *filename)
 uint32_t
 loadcode (char *filename, oraddr_t startaddr, oraddr_t virtphy_transl)
 {
-  int breakpoint = 0;
-
   transl_error = 0;
   transl_table = virtphy_transl;
   freemem      = startaddr;
@@ -886,6 +877,6 @@ loadcode (char *filename, oraddr_t startaddr, oraddr_t virtphy_transl)
   if (transl_error)
     return -1;
   else
-    return translate (freemem, &breakpoint);
+    return translate (freemem);
 
 }
