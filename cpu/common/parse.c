@@ -670,12 +670,11 @@ readfile_elf (char *filename)
 	}
     }
 
-
   for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr.e_shnum);
        i++, elf_spnt++)
     {
 
-      if ((ELF_LONG_H (elf_spnt->sh_type) & SHT_PROGBITS)
+      if ((ELF_LONG_H (elf_spnt->sh_type) == SHT_PROGBITS)
 	  && (ELF_LONG_H (elf_spnt->sh_flags) & SHF_ALLOC))
 	{
 
