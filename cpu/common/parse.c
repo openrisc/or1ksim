@@ -498,10 +498,10 @@ readfile_elf (char *filename)
   struct elf32_hdr elfhdr;
   struct elf32_phdr *elf_phdata = NULL;
   struct elf32_shdr *elf_spstr, *elf_spnt, *elf_shdata;
-  struct elf32_sym *sym_tbl = (struct elf32_sym *) 0;
+  struct elf32_sym *sym_tbl = NULL;
   uint32_t syms = 0;
-  char *str_tbl = (char *) 0;
-  char *s_str = (char *) 0;
+  char *str_tbl = NULL;
+  char *s_str = NULL;
   uint32_t inputbuf;
   uint32_t padd;
   uint32_t insn;
@@ -513,12 +513,14 @@ readfile_elf (char *filename)
       exit (1);
     }
 
+  /* Load elf header */
   if (fread (&elfhdr, sizeof (elfhdr), 1, inputfs) != 1)
     {
       perror ("readfile_elf");
       exit (1);
     }
 
+  /* Read in elf section header */
   if ((elf_shdata =
        (struct elf32_shdr *) malloc (ELF_SHORT_H (elfhdr.e_shentsize) *
 				     ELF_SHORT_H (elfhdr.e_shnum))) == NULL)
@@ -542,6 +544,7 @@ readfile_elf (char *filename)
       exit (1);
     }
 
+  /* Read in elf program headers if available */
   if (ELF_LONG_H (elfhdr.e_phoff))
     {
       if ((elf_phdata =
@@ -569,18 +572,15 @@ readfile_elf (char *filename)
 	}
     }
 
+  /* Look for symbol table section and load string table.  Used
+     for inserting symbol labels.  */
   for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr.e_shnum);
        i++, elf_spnt++)
     {
-
-
       if (ELF_LONG_H (elf_spnt->sh_type) == SHT_SYMTAB)
 	{
-
 	  if (NULL != sym_tbl)
-	    {
-	      free (sym_tbl);
-	    }
+	    free (sym_tbl);
 
 	  if ((sym_tbl =
 	       (struct elf32_sym *) malloc (ELF_LONG_H (elf_spnt->sh_size)))
@@ -608,38 +608,37 @@ readfile_elf (char *filename)
 	    ELF_LONG_H (elf_spnt->sh_size) /
 	    ELF_LONG_H (elf_spnt->sh_entsize);
 
-      if (ELF_LONG_H (elf_spnt->sh_link) <= ELF_SHORT_H (elfhdr.e_shnum))
+	  if (ELF_LONG_H (elf_spnt->sh_link) <= ELF_SHORT_H (elfhdr.e_shnum))
+	    {
+	      if (NULL != str_tbl)
+		free (str_tbl);
+
+	      elf_spstr = &elf_shdata[ELF_LONG_H (elf_spnt->sh_link)];
+	      if ((str_tbl =
+		  (char *) malloc (ELF_LONG_H (elf_spstr->sh_size))) == NULL)
 		{
-		  if (NULL != str_tbl)
-			{
-			  free (str_tbl);
-			}
-
-		  elf_spstr = &elf_shdata[ELF_LONG_H (elf_spnt->sh_link)];
-		  if ((str_tbl =
-			   (char *) malloc (ELF_LONG_H (elf_spstr->sh_size))) == NULL)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
-
-		  if (fseek (inputfs, ELF_LONG_H (elf_spstr->sh_offset), SEEK_SET) !=
-			  0)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
-
-		  if (fread (str_tbl, ELF_LONG_H (elf_spstr->sh_size), 1, inputfs) !=
-			  1)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
+		  perror ("readfile_elf");
+		  exit (1);
 		}
+
+	      if (fseek (inputfs, ELF_LONG_H (elf_spstr->sh_offset), SEEK_SET) !=
+		  0)
+		{
+		  perror ("readfile_elf");
+		  exit (1);
+		}
+
+	      if (fread (str_tbl, ELF_LONG_H (elf_spstr->sh_size), 1, inputfs) !=
+		  1)
+		{
+		  perror ("readfile_elf");
+		  exit (1);
+		}
+	    }
 	}
     }
 
+  /* Load section name string table.  Used for printing section names.  */
   if (ELF_SHORT_H (elfhdr.e_shstrndx) != SHN_UNDEF)
     {
       elf_spnt = &elf_shdata[ELF_SHORT_H (elfhdr.e_shstrndx)];
@@ -663,6 +662,7 @@ readfile_elf (char *filename)
 	}
     }
 
+  /* Iterate over section headers and load program bits.  */
   for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr.e_shnum);
        i++, elf_spnt++)
     {
@@ -672,6 +672,9 @@ readfile_elf (char *filename)
 	{
 
 	  padd = ELF_LONG_H (elf_spnt->sh_addr);
+	  /* Search if section is within program header segment, if
+	     so adjust the paddr to use the physical address of the
+	     segment.  */
 	  for (j = 0; j < ELF_SHORT_H (elfhdr.e_phnum); j++)
 	    {
 	      if (ELF_LONG_H (elf_phdata[j].p_offset) &&
@@ -685,8 +688,6 @@ readfile_elf (char *filename)
 		  ELF_LONG_H (elf_spnt->sh_offset) -
 		  ELF_LONG_H (elf_phdata[j].p_offset);
 	    }
-
-
 
 	  if (ELF_LONG_H (elf_spnt->sh_name) && s_str)
 	    {
@@ -723,6 +724,7 @@ readfile_elf (char *filename)
 	}
     }
 
+  /* Load up sym_tbl symbols and names from str_tbl into symbol to label hash.  */
   if (str_tbl)
     {
       i = 0;
@@ -739,19 +741,18 @@ readfile_elf (char *filename)
     }
 
   if (NULL != str_tbl)
-    {
-      free (str_tbl);
-    }
+    free (str_tbl);
 
   if (NULL != sym_tbl)
-    {
-      free (sym_tbl);
-    }
+    free (sym_tbl);
 
-  free (s_str);
-  free (elf_phdata);
+  if (NULL != s_str)
+    free (s_str);
+
+  if (NULL != elf_phdata)
+    free (elf_phdata);
+
   free (elf_shdata);
-
 }
 
 /* Identify file type and call appropriate readfile_X routine. It only
