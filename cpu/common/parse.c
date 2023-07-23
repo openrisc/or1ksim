@@ -102,13 +102,11 @@ strstrip (char       *dst,
    physical address is equal to logical.
 
    @param[in] laddr       Logical address
-   @param[in] breakpoint  Unused
 
    @return  The physical address                                             */
 /*---------------------------------------------------------------------------*/
 static oraddr_t
-translate (oraddr_t  laddr,
-	   int      *breakpoint)
+translate (oraddr_t laddr)
 {
   int i;
 
@@ -276,17 +274,14 @@ check_insn (uint32_t insn)
   @note insn must be in big endian format
 
   @param[in] address     The address to use
-  @param[in] insn        The instruction to add
-  @param[in] breakpoint  Not used (it is passed to the translate() function,
-                         which also does not use it.                         */
+  @param[in] insn        The instruction to add                              */
 /*---------------------------------------------------------------------------*/
 static void
 addprogram (oraddr_t  address,
-	    uint32_t  insn,
-	    int      *breakpoint)
+	    uint32_t  insn)
 {
-  int vaddr = (!runtime.sim.filename) ? translate (address, breakpoint) :
-                                        translate (freemem, breakpoint);
+  int vaddr = (!runtime.sim.filename) ? translate (address) :
+                                        translate (freemem);
 
   /* We can't have set_program32 functions since it is not gauranteed that the
      section we're loading is aligned on a 4-byte boundry */
@@ -324,7 +319,6 @@ readfile_coff (char  *filename,
   struct COFF_scnhdr coffscnhdr;
   int len;
   int firstthree = 0;
-  int breakpoint = 0;
 
   if (!(inputfs = fopen (filename, "r")))
     {
@@ -390,7 +384,7 @@ readfile_coff (char  *filename,
 	      fseek (inputfs, -2, SEEK_CUR);
 	    }
 
-	  addprogram (freemem, insn, &breakpoint);
+	  addprogram (freemem, insn);
 	  sectsize -= len;
 	}
     }
@@ -496,6 +490,263 @@ readsyms_coff (char *filename, uint32_t symptr, uint32_t syms)
   return;
 }
 
+static int
+load_by_program_headers_elf (FILE *inputfs,
+			     struct elf32_hdr *elfhdr,
+			     struct elf32_phdr *elf_phdata)
+{
+  int segments_loaded = 0;
+  int i, len;
+
+  /* Iterate over prgram headers and load PT_LOAD segments.  */
+  for (i = 0; i < ELF_SHORT_H (elfhdr->e_phnum); i++)
+    {
+      struct elf32_phdr *ph = &elf_phdata[i];
+
+      if (ELF_LONG_H (ph->p_type) == PT_LOAD)
+	{
+	  uint32_t padd = ELF_LONG_H (ph->p_paddr);
+	  uint32_t inputbuf, insn;
+	  int segsize;
+
+	  PRINTFQ ("Program Header: PT_LOAD,");
+	  PRINTFQ (" vaddr: 0x%.8lx,", ELF_LONG_H (ph->p_vaddr));
+	  PRINTFQ (" paddr: 0x%" PRIx32, padd);
+	  PRINTFQ (" offset: 0x%.8lx,", ELF_LONG_H (ph->p_offset));
+	  PRINTFQ (" filesz: 0x%.8lx,", ELF_LONG_H (ph->p_filesz));
+	  PRINTFQ (" memsz: 0x%.8lx\n", ELF_LONG_H (ph->p_memsz));
+
+	  freemem = padd;
+	  segsize = ELF_LONG_H (ph->p_filesz);
+
+	  if (fseek (inputfs, ELF_LONG_H (ph->p_offset), SEEK_SET) !=
+	      0)
+	    {
+	      perror ("laod_by_program_headers_elf");
+	      return -1;
+	    }
+
+	  while (segsize > 0
+		 && (len = fread (&inputbuf, sizeof (inputbuf), 1, inputfs)))
+	    {
+	      insn = ELF_LONG_H (inputbuf);
+	      addprogram (freemem, insn);
+	      segsize -= 4;
+	    }
+
+	  segments_loaded++;
+	}
+    }
+  return segments_loaded;
+}
+
+static int
+load_by_section_headers_elf (FILE *inputfs,
+			     struct elf32_hdr *elfhdr,
+			     struct elf32_phdr *elf_phdata,
+			     struct elf32_shdr *elf_shdata)
+{
+  char *s_str = NULL;
+  struct elf32_shdr *elf_spnt;
+  int sections_loaded = 0;
+  int i, j, len;
+
+  /* Load section name string table.  Used for printing section names.  */
+  if (ELF_SHORT_H (elfhdr->e_shstrndx) != SHN_UNDEF)
+    {
+      elf_spnt = &elf_shdata[ELF_SHORT_H (elfhdr->e_shstrndx)];
+
+      if ((s_str = (char *) malloc (ELF_LONG_H (elf_spnt->sh_size))) == NULL)
+	{
+	  perror ("load_by_section_headers_elf");
+	  exit (1);
+	}
+
+      if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) != 0)
+	{
+	  perror ("load_by_section_headers_elf");
+	  exit (1);
+	}
+
+      if (fread (s_str, ELF_LONG_H (elf_spnt->sh_size), 1, inputfs) != 1)
+	{
+	  perror ("load_by_section_headers_elf");
+	  exit (1);
+	}
+    }
+
+  /* Iterate over section headers and load program bits.  */
+  for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr->e_shnum);
+       i++, elf_spnt++)
+    {
+
+      if ((ELF_LONG_H (elf_spnt->sh_type) == SHT_PROGBITS)
+	  && (ELF_LONG_H (elf_spnt->sh_flags) & SHF_ALLOC))
+	{
+	  uint32_t padd;
+	  uint32_t inputbuf, insn;
+	  int sectsize;
+
+	  padd = ELF_LONG_H (elf_spnt->sh_addr);
+	  /* Search if section is within program header segment, if
+	     so adjust the paddr to use the physical address of the
+	     segment.  */
+	  for (j = 0; j < ELF_SHORT_H (elfhdr->e_phnum); j++)
+	    {
+	      if (ELF_LONG_H (elf_phdata[j].p_offset) &&
+		  ELF_LONG_H (elf_phdata[j].p_offset) <=
+		  ELF_LONG_H (elf_spnt->sh_offset)
+		  && (ELF_LONG_H (elf_phdata[j].p_offset) +
+		      ELF_LONG_H (elf_phdata[j].p_memsz)) >
+		  ELF_LONG_H (elf_spnt->sh_offset))
+		padd =
+		  ELF_LONG_H (elf_phdata[j].p_paddr) +
+		  ELF_LONG_H (elf_spnt->sh_offset) -
+		  ELF_LONG_H (elf_phdata[j].p_offset);
+	    }
+
+	  if (ELF_LONG_H (elf_spnt->sh_name) && s_str)
+	    {
+	      PRINTFQ ("Section: %s,", &s_str[ELF_LONG_H (elf_spnt->sh_name)]);
+	    }
+	  else
+	    {
+	      PRINTFQ ("Section: noname,");
+	    }
+
+	  PRINTFQ (" vaddr: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_addr));
+	  PRINTFQ (" paddr: 0x%" PRIx32, padd);
+	  PRINTFQ (" offset: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_offset));
+	  PRINTFQ (" size: 0x%.8lx\n", ELF_LONG_H (elf_spnt->sh_size));
+
+	  freemem = padd;
+	  sectsize = ELF_LONG_H (elf_spnt->sh_size);
+
+	  if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) !=
+	      0)
+	    {
+	      perror ("load_by_section_headers_elf");
+	      exit (1);
+	    }
+
+	  while (sectsize > 0
+		 && (len = fread (&inputbuf, sizeof (inputbuf), 1, inputfs)))
+	    {
+	      insn = ELF_LONG_H (inputbuf);
+	      addprogram (freemem, insn);
+	      sectsize -= 4;
+	    }
+
+	  sections_loaded++;
+	}
+    }
+
+  if (NULL != s_str)
+    free (s_str);
+
+  return sections_loaded;
+}
+
+static void
+load_labels_elf (FILE *inputfs,
+		 struct elf32_hdr *elfhdr,
+		 struct elf32_shdr *elf_shdata)
+{
+  struct elf32_shdr *elf_spstr, *elf_spnt;
+  struct elf32_sym *sym_tbl = NULL;
+  uint32_t syms = 0;
+  char *str_tbl = NULL;
+  int i;
+
+  /* Look for symbol table section and load string table.  Used
+     for inserting symbol labels.  */
+  for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr->e_shnum);
+       i++, elf_spnt++)
+    {
+      if (ELF_LONG_H (elf_spnt->sh_type) == SHT_SYMTAB)
+	{
+	  if (NULL != sym_tbl)
+	    free (sym_tbl);
+
+	  if ((sym_tbl =
+	       (struct elf32_sym *) malloc (ELF_LONG_H (elf_spnt->sh_size)))
+	      == NULL)
+	    {
+	      perror ("load_labels_elf");
+	      exit (1);
+	    }
+
+	  if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) !=
+	      0)
+	    {
+	      perror ("load_labels_elf");
+	      exit (1);
+	    }
+
+	  if (fread (sym_tbl, ELF_LONG_H (elf_spnt->sh_size), 1, inputfs) !=
+	      1)
+	    {
+	      perror ("load_labels_elf");
+	      exit (1);
+	    }
+
+	  syms =
+	    ELF_LONG_H (elf_spnt->sh_size) /
+	    ELF_LONG_H (elf_spnt->sh_entsize);
+
+	  if (ELF_LONG_H (elf_spnt->sh_link) <= ELF_SHORT_H (elfhdr->e_shnum))
+	    {
+	      if (NULL != str_tbl)
+		free (str_tbl);
+
+	      elf_spstr = &elf_shdata[ELF_LONG_H (elf_spnt->sh_link)];
+	      if ((str_tbl =
+		  (char *) malloc (ELF_LONG_H (elf_spstr->sh_size))) == NULL)
+		{
+		  perror ("load_labels_elf");
+		  exit (1);
+		}
+
+	      if (fseek (inputfs, ELF_LONG_H (elf_spstr->sh_offset), SEEK_SET) !=
+		  0)
+		{
+		  perror ("load_labels_elf");
+		  exit (1);
+		}
+
+	      if (fread (str_tbl, ELF_LONG_H (elf_spstr->sh_size), 1, inputfs) !=
+		  1)
+		{
+		  perror ("load_labels_elf");
+		  exit (1);
+		}
+	    }
+	}
+    }
+
+  /* Load up sym_tbl symbols and names from str_tbl into symbol to label hash.  */
+  if (str_tbl)
+    {
+      i = 0;
+      while (syms--)
+	{
+	  if (sym_tbl[i].st_name && sym_tbl[i].st_info
+	      && ELF_SHORT_H (sym_tbl[i].st_shndx) < 0x8000)
+	    {
+	      add_label (ELF_LONG_H (sym_tbl[i].st_value),
+			 &str_tbl[ELF_LONG_H (sym_tbl[i].st_name)]);
+	    }
+	  i++;
+	}
+    }
+
+  if (NULL != str_tbl)
+    free (str_tbl);
+
+  if (NULL != sym_tbl)
+    free (sym_tbl);
+}
+
 static void
 readfile_elf (char *filename)
 {
@@ -503,16 +754,8 @@ readfile_elf (char *filename)
   FILE *inputfs;
   struct elf32_hdr elfhdr;
   struct elf32_phdr *elf_phdata = NULL;
-  struct elf32_shdr *elf_spstr, *elf_spnt, *elf_shdata;
-  struct elf32_sym *sym_tbl = (struct elf32_sym *) 0;
-  uint32_t syms = 0;
-  char *str_tbl = (char *) 0;
-  char *s_str = (char *) 0;
-  int breakpoint = 0;
-  uint32_t inputbuf;
-  uint32_t padd;
-  uint32_t insn;
-  int i, j, sectsize, len;
+  struct elf32_shdr *elf_shdata;
+  int loaded;
 
   if (!(inputfs = fopen (filename, "r")))
     {
@@ -520,12 +763,14 @@ readfile_elf (char *filename)
       exit (1);
     }
 
+  /* Load elf header */
   if (fread (&elfhdr, sizeof (elfhdr), 1, inputfs) != 1)
     {
       perror ("readfile_elf");
       exit (1);
     }
 
+  /* Read in elf section header */
   if ((elf_shdata =
        (struct elf32_shdr *) malloc (ELF_SHORT_H (elfhdr.e_shentsize) *
 				     ELF_SHORT_H (elfhdr.e_shnum))) == NULL)
@@ -549,6 +794,7 @@ readfile_elf (char *filename)
       exit (1);
     }
 
+  /* Read in elf program headers if available */
   if (ELF_LONG_H (elfhdr.e_phoff))
     {
       if ((elf_phdata =
@@ -576,190 +822,19 @@ readfile_elf (char *filename)
 	}
     }
 
-  for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr.e_shnum);
-       i++, elf_spnt++)
+  loaded = load_by_program_headers_elf(inputfs, &elfhdr, elf_phdata);
+  if (loaded <= 0)
     {
-
-
-      if (ELF_LONG_H (elf_spnt->sh_type) == SHT_SYMTAB)
-	{
-
-	  if (NULL != sym_tbl)
-	    {
-	      free (sym_tbl);
-	    }
-
-	  if ((sym_tbl =
-	       (struct elf32_sym *) malloc (ELF_LONG_H (elf_spnt->sh_size)))
-	      == NULL)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-
-	  if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) !=
-	      0)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-
-	  if (fread (sym_tbl, ELF_LONG_H (elf_spnt->sh_size), 1, inputfs) !=
-	      1)
-	    {
-	      perror ("readfile_elf");
-	      exit (1);
-	    }
-
-	  syms =
-	    ELF_LONG_H (elf_spnt->sh_size) /
-	    ELF_LONG_H (elf_spnt->sh_entsize);
-
-      if (ELF_LONG_H (elf_spnt->sh_link) <= ELF_SHORT_H (elfhdr.e_shnum))
-		{
-		  if (NULL != str_tbl)
-			{
-			  free (str_tbl);
-			}
-
-		  elf_spstr = &elf_shdata[ELF_LONG_H (elf_spnt->sh_link)];
-		  if ((str_tbl =
-			   (char *) malloc (ELF_LONG_H (elf_spstr->sh_size))) == NULL)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
-
-		  if (fseek (inputfs, ELF_LONG_H (elf_spstr->sh_offset), SEEK_SET) !=
-			  0)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
-
-		  if (fread (str_tbl, ELF_LONG_H (elf_spstr->sh_size), 1, inputfs) !=
-			  1)
-			{
-			  perror ("readfile_elf");
-			  exit (1);
-			}
-		}
-	}
+      loaded = load_by_section_headers_elf(inputfs, &elfhdr,
+					   elf_phdata, elf_shdata);
     }
+  if (loaded)
+    load_labels_elf(inputfs, &elfhdr, elf_shdata);
 
-  if (ELF_SHORT_H (elfhdr.e_shstrndx) != SHN_UNDEF)
-    {
-      elf_spnt = &elf_shdata[ELF_SHORT_H (elfhdr.e_shstrndx)];
+  if (NULL != elf_phdata)
+    free (elf_phdata);
 
-      if ((s_str = (char *) malloc (ELF_LONG_H (elf_spnt->sh_size))) == NULL)
-	{
-	  perror ("readfile_elf");
-	  exit (1);
-	}
-
-      if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) != 0)
-	{
-	  perror ("readfile_elf");
-	  exit (1);
-	}
-
-      if (fread (s_str, ELF_LONG_H (elf_spnt->sh_size), 1, inputfs) != 1)
-	{
-	  perror ("readfile_elf");
-	  exit (1);
-	}
-    }
-
-
-  for (i = 0, elf_spnt = elf_shdata; i < ELF_SHORT_H (elfhdr.e_shnum);
-       i++, elf_spnt++)
-    {
-
-      if ((ELF_LONG_H (elf_spnt->sh_type) & SHT_PROGBITS)
-	  && (ELF_LONG_H (elf_spnt->sh_flags) & SHF_ALLOC))
-	{
-
-	  padd = ELF_LONG_H (elf_spnt->sh_addr);
-	  for (j = 0; j < ELF_SHORT_H (elfhdr.e_phnum); j++)
-	    {
-	      if (ELF_LONG_H (elf_phdata[j].p_offset) &&
-		  ELF_LONG_H (elf_phdata[j].p_offset) <=
-		  ELF_LONG_H (elf_spnt->sh_offset)
-		  && (ELF_LONG_H (elf_phdata[j].p_offset) +
-		      ELF_LONG_H (elf_phdata[j].p_memsz)) >
-		  ELF_LONG_H (elf_spnt->sh_offset))
-		padd =
-		  ELF_LONG_H (elf_phdata[j].p_paddr) +
-		  ELF_LONG_H (elf_spnt->sh_offset) -
-		  ELF_LONG_H (elf_phdata[j].p_offset);
-	    }
-
-
-
-	  if (ELF_LONG_H (elf_spnt->sh_name) && s_str)
-	    {
-	      PRINTFQ ("Section: %s,", &s_str[ELF_LONG_H (elf_spnt->sh_name)]);
-	    }
-	  else
-	    {
-	      PRINTFQ ("Section: noname,");
-	    }
-
-	  PRINTFQ (" vaddr: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_addr));
-	  PRINTFQ (" paddr: 0x%" PRIx32, padd);
-	  PRINTFQ (" offset: 0x%.8lx,", ELF_LONG_H (elf_spnt->sh_offset));
-	  PRINTFQ (" size: 0x%.8lx\n", ELF_LONG_H (elf_spnt->sh_size));
-
-	  freemem = padd;
-	  sectsize = ELF_LONG_H (elf_spnt->sh_size);
-
-	  if (fseek (inputfs, ELF_LONG_H (elf_spnt->sh_offset), SEEK_SET) !=
-	      0)
-	    {
-	      perror ("readfile_elf");
-	      free (elf_phdata);
-	      exit (1);
-	    }
-
-	  while (sectsize > 0
-		 && (len = fread (&inputbuf, sizeof (inputbuf), 1, inputfs)))
-	    {
-	      insn = ELF_LONG_H (inputbuf);
-	      addprogram (freemem, insn, &breakpoint);
-	      sectsize -= 4;
-	    }
-	}
-    }
-
-  if (str_tbl)
-    {
-      i = 0;
-      while (syms--)
-	{
-	  if (sym_tbl[i].st_name && sym_tbl[i].st_info
-	      && ELF_SHORT_H (sym_tbl[i].st_shndx) < 0x8000)
-	    {
-	      add_label (ELF_LONG_H (sym_tbl[i].st_value),
-			 &str_tbl[ELF_LONG_H (sym_tbl[i].st_name)]);
-	    }
-	  i++;
-	}
-    }
-
-  if (NULL != str_tbl)
-    {
-      free (str_tbl);
-    }
-
-  if (NULL != sym_tbl)
-    {
-      free (sym_tbl);
-    }
-
-  free (s_str);
-  free (elf_phdata);
   free (elf_shdata);
-
 }
 
 /* Identify file type and call appropriate readfile_X routine. It only
@@ -860,8 +935,6 @@ identifyfile (char *filename)
 uint32_t
 loadcode (char *filename, oraddr_t startaddr, oraddr_t virtphy_transl)
 {
-  int breakpoint = 0;
-
   transl_error = 0;
   transl_table = virtphy_transl;
   freemem      = startaddr;
@@ -887,6 +960,6 @@ loadcode (char *filename, oraddr_t startaddr, oraddr_t virtphy_transl)
   if (transl_error)
     return -1;
   else
-    return translate (freemem, &breakpoint);
+    return translate (freemem);
 
 }
