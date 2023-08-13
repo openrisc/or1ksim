@@ -55,7 +55,7 @@ unsigned long set_config()
     lpoc = *mc_poc;
 
     for (ch=0; ch<8; ch++) {
-        if (MC_SSRAM_CSMASK && (0x01 << ch) ) {
+        if (MC_SSRAM_CSMASK & (0x01 << ch) ) {
 	    mc_csc = (unsigned long*)(MC_BASE + MC_CSC(ch));
 	    SET_FIELD(*mc_csc, MC_CSC, SEL, mc_ssram_cs[ch].M);
 	    SET_FLAG(*mc_csc, MC_CSC, EN);

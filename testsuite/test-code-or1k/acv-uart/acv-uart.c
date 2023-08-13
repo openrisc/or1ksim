@@ -27,6 +27,7 @@
 
 /* UART test using ACV */
 
+#include <unistd.h>
 #include "spr-defs.h"
 #include "support.h"
 
@@ -76,7 +77,7 @@
 #define WAIT() {asm ("l.nop");asm ("l.nop");asm ("l.nop");asm ("l.nop");}
 /* fails if there is an error */
 #define NO_ERROR() { unsigned x = getreg (UART_LSR); if ((x & (LSR_BREAK|LSR_FE|LSR_PE|LSR_OE)) && !(x & LSR_ERR)) \
-printf ("LSR7 (0x%02x) ERR @ %i\n", x, __LINE__); ASSERT(!(x & LSR_ERR) && ((x & 0x60) != 0x40));}
+{ printf ("LSR7 (0x%02x) ERR @ %i\n", x, __LINE__); } ASSERT(!(x & LSR_ERR) && ((x & 0x60) != 0x40));}
 #define MARK() printf ("Passed line %i\n", __LINE__)
 
 #ifndef __LINE__
@@ -93,12 +94,12 @@ void fail (char *func, int line)
   exit (1);
 }
 
-inline void setreg (unsigned long addr, unsigned char value)
+static inline void setreg (unsigned long addr, unsigned char value)
 {
   *((volatile unsigned char *)addr) = value;
 }
 
-inline unsigned long getreg (unsigned long addr)
+static inline unsigned long getreg (unsigned long addr)
 {
   return *((volatile unsigned char *)addr);
 }
@@ -148,7 +149,9 @@ void recv_char (int ch)
   char r;
   report (ch);
   /* Wait for rx fifo to be  */
-  while (!((x = getreg (UART_LSR)) & LSR_DR));
+  while (!((x = getreg (UART_LSR)) & LSR_DR)) {
+    ;
+  }
   if ((x & (LSR_BREAK|LSR_FE|LSR_PE|LSR_OE)) && !(x & LSR_ERR)) printf ("LSR7 (0x%02x) ERR @ recv_char\n", x);
   ASSERT(!(x & LSR_ERR));
 
@@ -167,7 +170,9 @@ void send_char_no_wait (int ch)
 void send_char (int ch)
 {
   report (ch);
-  while (!(getreg (UART_LSR) & LSR_TXFE));
+  while (!(getreg (UART_LSR) & LSR_TXFE)) {
+    ;
+  }
   NO_ERROR();
   setreg (UART_THR, ch); /* send character */
   NO_ERROR();
@@ -348,7 +353,9 @@ void send_recv_test ()
   s = "test_";
   while (*s) {
     /* Wait for tx fifo and tx to be empty */
-    while (!(getreg (UART_LSR) & LSR_TXE));
+    while (!(getreg (UART_LSR) & LSR_TXE)) {
+      ;
+    }
     NO_ERROR();
     setreg (UART_THR, *s); /* send character */
     NO_ERROR();
@@ -373,7 +380,9 @@ void send_recv_test ()
 
   /* Receives and compares the string */
   s = "recv";
-  while (*s) recv_char (*s++);
+  while (*s) {
+    recv_char (*s++);
+  }
   MARK();
   printf ("OK\n");
 }
@@ -401,7 +410,9 @@ void break_test ()
   /* Receive a break */
   send_char ('!');
   MARK();
-  while (!((x = getreg (UART_LSR)) & LSR_DR));
+  while (!((x = getreg (UART_LSR)) & LSR_DR)) {
+    ;
+  }
   /* we should receive zero character with broken frame and break bit should be set */
   printf("[%x]\n", (LSR_DR | LSR_BREAK | LSR_ERR | LSR_TXFE | LSR_TXE));
   ASSERT (x == (LSR_DR | LSR_BREAK | LSR_ERR | LSR_TXFE | LSR_TXE));
@@ -410,7 +421,9 @@ void break_test ()
 
   /* Send a # to release break */
   setreg (UART_THR, '#');
-  while (!(getreg (UART_LSR) & LSR_DR));
+  while (!(getreg (UART_LSR) & LSR_DR)) {
+    ;
+  }
   NO_ERROR(); /* BREAK bit should be cleared now  */
   ASSERT (getreg (UART_RBR) == '$');
   MARK();
@@ -419,7 +432,9 @@ void break_test ()
   s = "ns";
   while (*s) send_char (*s++);
   ASSERT (!(getreg (UART_LSR) & LSR_DR));
-  while (!(getreg (UART_LSR) & LSR_TXE)); /* Wait till we send everything */
+  while (!(getreg (UART_LSR) & LSR_TXE)) {
+    ; /* Wait till we send everything */
+  }
   /* this should break the * char, so it should not be received */
   setreg (UART_THR, '*');
   setreg (UART_LCR, 0x3 | LCR_BREAK);
@@ -433,7 +448,9 @@ void break_test ()
 
   /* Receive a break */
   send_char ('#');
-  while (!((x = getreg (UART_LSR)) & LSR_DR));
+  while (!((x = getreg (UART_LSR)) & LSR_DR)) {
+    ;
+  }
   /* we should receive zero character with broken frame and break bit
      should not be set, because we cleared it */
   printf("[%x:%x]\n", x, (LSR_DR | LSR_BREAK |LSR_ERR | LSR_TXFE | LSR_TXE));
@@ -442,7 +459,9 @@ void break_test ()
   MARK();
   send_char ('?');
   MARK();
-  while (!(getreg (UART_LSR) & LSR_DR));
+  while (!(getreg (UART_LSR) & LSR_DR)) {
+    ;
+  }
   recv_char ('!');
   printf ("OK\n");
 }
@@ -513,18 +532,24 @@ void different_modes_test ()
   
   /* Restore normal mode */
   send_char ('T');
-  while (getreg (UART_LSR) != 0x60); /* Wait for THR to be empty */
+  while (getreg (UART_LSR) != 0x60) {
+    ; /* Wait for THR to be empty */
+  }
   setreg (UART_LCR, LCR_DIVL);
   setreg (UART_DLH, 2 >> 8);
   setreg (UART_DLL, 2 & 0xff);
   setreg (UART_LCR, 0x03);    /* 8N1 @ 2 */
   MARK();
-  while (!(getreg (UART_LSR) & 1));  /* Receive 'x' char */
+  while (!(getreg (UART_LSR) & 1)) {
+    ;  /* Receive 'x' char */
+  }
   getreg (UART_RBR);
   MARK();
   
   send_char ('T');
-  while (getreg (UART_LSR) != 0x60); /* Wait for THR to be empty */
+  while (getreg (UART_LSR) != 0x60) {
+    ; /* Wait for THR to be empty */
+  }
   MARK();
   printf ("OK\n");
 }
@@ -546,7 +571,9 @@ void interrupt_test ()
   setreg (UART_FCR, 0x01); /* Set trigger level = 1 char, fifo should not be reset */
   setreg (UART_IER, 0x07); /* Enable interrupts: line status, THR empty, data ready */
 
-  while (!int_cnt); /* Clear previous THR interrupt */
+  while (!int_cnt) {
+    ; /* Clear previous THR interrupt */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc2);
   ASSERT ((int_lsr & 0xbe) == 0x20);
@@ -554,14 +581,18 @@ void interrupt_test ()
 
   /* I am configured - start interrupt test */
   send_char ('I');
-  while (!int_cnt); /* Wait for THR to be empty */
+  while (!int_cnt) {
+    ; /* Wait for THR to be empty */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc2);
   ASSERT ((int_lsr & 0xbe) == 0x20);
   MARK();
   
   int_rbr = '0';
-  while (!int_cnt); /* Wait for DR */
+  while (!int_cnt) {
+    ; /* Wait for DR */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc4);
   ASSERT (int_lsr == 0x61);
@@ -572,14 +603,18 @@ void interrupt_test ()
 
   /* Everything ok here, send me 4 more */
   send_char ('I');
-  while (!int_cnt); /* Wait for THR to be empty */
+  while (!int_cnt) {
+    ; /* Wait for THR to be empty */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc2);
   ASSERT ((int_lsr & 0xbe) == 0x20);
   MARK();
 
   int_rbr = '1';
-  while (!int_cnt); /* Wait for DR */
+  while (!int_cnt) {
+    ; /* Wait for DR */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc4);
   ASSERT (int_lsr == 0x61);
@@ -589,14 +624,18 @@ void interrupt_test ()
   
   /* Everything ok here, send me 5 more */
   send_char ('I');
-  while (!int_cnt); /* Wait for THR to be empty */
+  while (!int_cnt) {
+    ; /* Wait for THR to be empty */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc2);
   ASSERT ((int_lsr & 0xbe) == 0x20);
   MARK();
   
   int_rbr = '2';
-  while (!int_cnt); /* Wait for DR */
+  while (!int_cnt) {
+    ; /* Wait for DR */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc4);
   ASSERT (int_lsr == 0x61);
@@ -606,7 +645,9 @@ void interrupt_test ()
   
   /* Everything ok here, send me 7 more */
   send_char ('I');
-  while (!int_cnt); /* Wait for THR to be empty */
+  while (!int_cnt) {
+    ; /* Wait for THR to be empty */
+  }
   ASSERT (--int_cnt == 0);
   ASSERT (int_iir == 0xc2);
   ASSERT ((int_lsr & 0xbe) == 0x20);

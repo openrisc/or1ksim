@@ -30,7 +30,7 @@
 
 
 /*!Alignment exception handler defined here. */
-unsigned long excpt_align;
+extern unsigned long excpt_align;
 
 
 /* --------------------------------------------------------------------------*/

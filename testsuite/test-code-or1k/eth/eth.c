@@ -140,7 +140,8 @@ static void transmit_one_packet( void )
 	SET_FLAG(*eth_moder, ETH_MODER, TXEN);
 	
 	/* Now wait till sent */
-	while ( TEST_FLAG( eth_bd_base[tx_bindex], ETH_TX_BD, READY ) );
+	while ( TEST_FLAG( eth_bd_base[tx_bindex], ETH_TX_BD, READY ) )
+		;
 	CLEAR_FLAG(*eth_moder, ETH_MODER, TXEN);
 	*eth_int_source = 0x7f;
 }
@@ -178,7 +179,8 @@ static void receive_one_packet(void)
   SET_FLAG(eth_bd_base[rx_bindex], ETH_RX_BD, READY);
   SET_FLAG(*eth_moder, ETH_MODER, RXEN);
 
-  while ( TEST_FLAG( eth_bd_base[rx_bindex], ETH_RX_BD, READY ) );  
+  while ( TEST_FLAG( eth_bd_base[rx_bindex], ETH_RX_BD, READY ) )
+     ;
   CLEAR_FLAG(*eth_moder, ETH_MODER, RXEN);
   *eth_int_source = 0x7f;
 
@@ -243,7 +245,8 @@ int main()
 	transmit_one_packet_int();
 	tx_bindex += 2;
 	/* printf("waiting for int\n"); */
-	while (!int_happend);
+	while (!int_happend)
+		;
 	CLEAR_FLAG(*eth_int_mask, ETH_INT_MASK, TXB_M);
 	
 	printf("seting mask flag RX\n");
@@ -251,7 +254,8 @@ int main()
 	receive_one_packet_int();
 	rx_bindex += 2;
 	/* printf("waiting for int\n"); */
-	while (!int_happend);
+	while (!int_happend)
+		;
 	CLEAR_FLAG(*eth_int_mask, ETH_INT_MASK, RXB_M);
 	
 	
