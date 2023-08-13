@@ -136,7 +136,7 @@ proc run_or1ksim { testname match_list config_file progname } {
 	    }
 	    
 	    eof {
-		fail "$testname: hit EOF seeking match line $match_line";
+		fail "$testname: hit EOF seeking match line $match_line: $matchstr";
 		return
 	    }
 	    
