@@ -100,7 +100,7 @@ extern void b_trap (void);
 extern void range (void);
 extern void b_range (void);
 extern int except_basic (void);
-extern void (*test)(void);
+extern unsigned long test[2]; /* Number of instructions in test_dummy */
 extern int load_acc_32 (unsigned long add);
 extern int load_acc_16 (unsigned long add);
 extern int store_acc_32 (unsigned long add);
@@ -132,19 +132,19 @@ volatile unsigned long except_ea;
 /* Eception PC */
 volatile unsigned long except_pc;
 
-unsigned long  excpt_buserr;
-unsigned long excpt_dpfault;
-unsigned long excpt_ipfault;
-unsigned long excpt_tick;
-unsigned long excpt_align;
-unsigned long excpt_illinsn;
-unsigned long excpt_int;
-unsigned long excpt_dtlbmiss;
-unsigned long excpt_itlbmiss;
-unsigned long excpt_range;
-unsigned long excpt_syscall;
-unsigned long excpt_break;
-unsigned long excpt_trap;
+extern unsigned long excpt_buserr;
+extern unsigned long excpt_dpfault;
+extern unsigned long excpt_ipfault;
+extern unsigned long excpt_tick;
+extern unsigned long excpt_align;
+extern unsigned long excpt_illinsn;
+extern unsigned long excpt_int;
+extern unsigned long excpt_dtlbmiss;
+extern unsigned long excpt_itlbmiss;
+extern unsigned long excpt_range;
+extern unsigned long excpt_syscall;
+extern unsigned long excpt_break;
+extern unsigned long excpt_trap;
 
 
 void fail (char *func, int line)
@@ -170,7 +170,7 @@ void test_dummy (void)
 
 void copy_test (unsigned long phy_add)
 {
-	memcpy((void *)phy_add, (void *)&test, 8);
+	memcpy((void *)phy_add, test, 8);
 }
 
 /* Bus error handler */

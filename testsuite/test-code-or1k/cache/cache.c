@@ -70,7 +70,8 @@ extern unsigned long ic_inv_test(void);
 extern unsigned long dc_inv_test(unsigned long);
 
 extern void (*jalr)(void);
-extern void (*jr)(void);
+/* Number of instructions in jump */
+extern unsigned long jr[6];
 
 /* Index on jump table */
 unsigned long jump_indx;
@@ -102,14 +103,12 @@ void jump(void)
 	/* Jump to that address */
 	asm("l.jr\t\tr3") ;
 	/* Report that we succeeded */
-#ifndef __OR1K_NODELAY__
 	asm("l.nop\t0");
-#endif
 }
 
 void copy_jr(unsigned long add)
 {
-	memcpy((void *)add, (void *)&jr, 24);
+	memcpy((void *)add, jr, 24);
 }
 
 void call(unsigned long add)
