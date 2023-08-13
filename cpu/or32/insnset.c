@@ -30,7 +30,7 @@
 INSTRUCTION (l_add) {
   orreg_t temp1, temp2, temp3;
   int8_t temp4;
-  
+
   temp2 = (orreg_t)PARAM2;
   temp3 = (orreg_t)PARAM1;
   temp1 = temp2 + temp3;
@@ -38,12 +38,7 @@ INSTRUCTION (l_add) {
 
   /* Set overflow if two negative values gave a positive sum, or if two
      positive values gave a negative sum. Otherwise clear it */
-  if ((((long int) temp2 <  0) && 
-       ((long int) temp3 <  0) &&
-       ((long int) temp1 >= 0)) ||
-      (((long int) temp2 >= 0) && 
-       ((long int) temp3 >= 0) &&
-       ((long int) temp1 <  0)))
+  if (__builtin_add_overflow_p (temp2, temp3, temp1))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
@@ -119,12 +114,8 @@ INSTRUCTION (l_addc) {
      positive values gave a negative sum. Otherwise clear it. There are no
      corner cases with the extra bit carried in (unlike the carry flag - see
      below). */
-  if ((((long int) temp2 <  0) && 
-       ((long int) temp3 <  0) &&
-       ((long int) temp1 >= 0)) ||
-      (((long int) temp2 >= 0) && 
-       ((long int) temp3 >= 0) &&
-       ((long int) temp1 <  0)))
+  if (((temp2 <  0) && (temp3 <  0) && (temp1 >= 0)) ||
+      ((temp2 >= 0) && (temp3 >= 0) && (temp1 <  0)))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
@@ -336,12 +327,7 @@ INSTRUCTION (l_sub) {
   /* Set overflow if a negative value minus a positive value gave a positive
      sum, or if a positive value minus a negative value gave a negative
      sum. Otherwise clear it */
-  if ((((long int) temp2 <  0) && 
-       ((long int) temp3 >= 0) &&
-       ((long int) temp1 >= 0)) ||
-      (((long int) temp2 >= 0) && 
-       ((long int) temp3 <  0) &&
-       ((long int) temp1 <  0)))
+  if (__builtin_sub_overflow_p (temp2, temp3, temp1))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
@@ -974,12 +960,7 @@ INSTRUCTION (l_mac) {
 
   /* Set overflow if two negative values gave a positive sum, or if two
      positive values gave a negative sum. Otherwise clear it */
-  if (((acc <  0) && 
-       (prod <  0) &&
-       (tmp >= 0)) ||
-      ((acc >= 0) && 
-       (prod >= 0) &&
-       (tmp <  0)))
+  if (__builtin_add_overflow_p (acc, prod, tmp))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
@@ -1042,12 +1023,7 @@ INSTRUCTION (l_msb) {
   /* Set overflow if a negative value minus a positive value gave a positive
      sum, or if a positive value minus a negative value gave a negative
      sum. Otherwise clear it */
-  if (((acc <  0) && 
-       (prod >= 0) &&
-       (tmp >= 0)) ||
-      ((acc >= 0) && 
-       (prod <  0) &&
-       (tmp <  0)))
+  if (__builtin_sub_overflow_p (acc, prod, tmp))
     {
       cpu_state.sprs[SPR_SR] |= SPR_SR_OV;
     }
