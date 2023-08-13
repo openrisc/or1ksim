@@ -113,7 +113,7 @@ proc run_libsim { testname match_list libprog config or1kprog args } {
 	    }
 	    
 	    eof {
-		fail "$testname: hit EOF seeking match line $match_line";
+		fail "$testname: hit EOF seeking match line $match_line: $matchstr";
 		return
 	    }
 	    
