@@ -37,7 +37,7 @@ jobs:
 
       - name: build or1ksim
         run: |
-          ./configure --prefix=/opt/or1k
+          ./configure --prefix=/opt/or1k --target=or1k-elf
           make -j $(nproc)
           make DESTDIR=$PWD/install install
 
