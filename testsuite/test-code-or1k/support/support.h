@@ -90,7 +90,7 @@ extern unsigned long int  excpt_dtlbmiss;
 extern unsigned long int  excpt_itlbmiss;
 extern unsigned long int  excpt_range;
 extern unsigned long int  excpt_syscall;
-extern unsigned long int  excpt_break;
+extern unsigned long int  excpt_fpu;
 extern unsigned long int  excpt_trap;
 
 #endif

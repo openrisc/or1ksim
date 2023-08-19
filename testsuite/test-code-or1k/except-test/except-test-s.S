@@ -66,7 +66,7 @@ stack:
         .extern excpt_itlbmiss
         .extern excpt_range
         .extern excpt_syscall
-        .extern excpt_break
+        .extern excpt_fpu
         .extern excpt_trap
 
 	/* Our special text section is used to guarantee this code goes first
@@ -334,14 +334,14 @@ syscall_vector:
         l.addi  r3,r3,8
 
 	.org 0xd00
-break_vector:
+fpu_vector:
         l.addi  r1,r1,-120
         l.sw    0x1c(r1),r9
         l.sw    0x20(r1),r10
         l.movhi r9,hi(store_regs)
         l.ori   r9,r9,lo(store_regs)
-        l.movhi r10,hi(excpt_break)
-        l.ori   r10,r10,lo(excpt_break)
+        l.movhi r10,hi(excpt_fpu)
+        l.ori   r10,r10,lo(excpt_fpu)
         l.jr    r9
         l.nop
         l.nop
