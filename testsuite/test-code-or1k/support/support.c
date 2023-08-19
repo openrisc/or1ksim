@@ -48,7 +48,7 @@ unsigned long excpt_dtlbmiss = (unsigned long) excpt_dummy;
 unsigned long excpt_itlbmiss = (unsigned long) excpt_dummy;
 unsigned long excpt_range    = (unsigned long) excpt_dummy;
 unsigned long excpt_syscall  = (unsigned long) excpt_dummy;
-unsigned long excpt_break    = (unsigned long) excpt_dummy;
+unsigned long excpt_fpu      = (unsigned long) excpt_dummy;
 unsigned long excpt_trap     = (unsigned long) excpt_dummy;
 
 

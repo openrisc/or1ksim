@@ -143,7 +143,7 @@ extern unsigned long excpt_dtlbmiss;
 extern unsigned long excpt_itlbmiss;
 extern unsigned long excpt_range;
 extern unsigned long excpt_syscall;
-extern unsigned long excpt_break;
+extern unsigned long excpt_fpu;
 extern unsigned long excpt_trap;
 
 

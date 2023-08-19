@@ -51,7 +51,7 @@ stack:
         .extern excpt_itlbmiss
         .extern excpt_range
         .extern excpt_syscall
-        .extern excpt_break
+        .extern excpt_fpu
         .extern excpt_trap
 
 	.section .except,"ax"
@@ -235,15 +235,15 @@ syscall_vector:
         OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 
         .org    0xd00
-break_vector:
+fpu_vector:
         l.addi  r1,r1,-EXCEPT_STACK_SIZE
         l.sw    0x18(r1),r9
         OR1K_DELAYED_NOP(OR1K_INST(l.jal   store_regs))
         l.nop
         l.movhi r9,hi(end_except)
         l.ori   r9,r9,lo(end_except)
-        l.movhi r10,hi(excpt_break)
-        l.ori   r10,r10,lo(excpt_break)
+        l.movhi r10,hi(excpt_fpu)
+        l.ori   r10,r10,lo(excpt_fpu)
         l.lwz   r10,0(r10)
         OR1K_DELAYED_NOP(OR1K_INST(l.jr    r10))
 

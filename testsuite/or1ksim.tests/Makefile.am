@@ -52,6 +52,7 @@ EXTRA_DIST = cfg/or1k/acv-gpio.cfg		\
 	     cfg/or1k/fp.cfg			\
 	     cfg/or1knd/fp.cfg			\
 	     fp.exp				\
+	     fpee.exp				\
              functest.exp			\
              int-test.exp			\
 	     cfg/or1k/inst-set-test.cfg		\

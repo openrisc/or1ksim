@@ -55,6 +55,7 @@ SUBDIRS = support       \
 	  ext           \
 	  fbtest        \
 	  fp            \
+	  fpee		\
 	  testfloat	\
 	  functest      \
 	  flag          \

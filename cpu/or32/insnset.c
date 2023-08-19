@@ -904,7 +904,8 @@ INSTRUCTION (l_mtspr) {
   uint16_t regno = PARAM0 | PARAM2;
   uorreg_t value = PARAM1;
 
-  if (cpu_state.sprs[SPR_SR] & SPR_SR_SM)
+  if ((regno == SPR_FPCSR) ||
+      (cpu_state.sprs[SPR_SR] & SPR_SR_SM))
     mtspr(regno, value);
   else {
     PRINTF("WARNING: trying to write SPR while SR[SUPV] is cleared.\n");
@@ -915,10 +916,11 @@ INSTRUCTION (l_mfspr) {
   uint16_t regno = PARAM1 | PARAM2;
   uorreg_t value = mfspr(regno);
 
-  if ((cpu_state.sprs[SPR_SR] & SPR_SR_SM) ||
+  if ((regno == SPR_FPCSR) ||
+      (cpu_state.sprs[SPR_SR] & SPR_SR_SM) ||
       // TODO: Check if this SPR should actually be allowed to be read with
       // SR's SM==0 and SUMRA==1
-      (!(cpu_state.sprs[SPR_SR] & SPR_SR_SM) && 
+      (!(cpu_state.sprs[SPR_SR] & SPR_SR_SM) &&
        (cpu_state.sprs[SPR_SR] & SPR_SR_SUMRA)))
     SET_PARAM0(value);
   else
