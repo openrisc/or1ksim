@@ -86,9 +86,9 @@ static int in_reset = 0;
 /*! Forward declaration of static functions */
 static int calculate_watchpoints (enum debug_unit_action action,
 				  unsigned long          udata);
-static int get_devint_reg (enum development_interface_address_space addr,
+static int get_devint_reg (int addr,
 			   unsigned long *data);
-static int set_devint_reg (enum development_interface_address_space addr,
+static int set_devint_reg (int addr,
 			   unsigned long  data);
 static int debug_set_mem (oraddr_t address, uorreg_t data);
 static int debug_get_mem (oraddr_t address, uorreg_t * data);
@@ -786,8 +786,7 @@ debug_set_chain (enum debug_scan_chain_ids  chain)
    @return  An error code (including ERR_NONE) if there is no error          */
 /*---------------------------------------------------------------------------*/
 static int
-get_devint_reg (enum development_interface_address_space  address,
-		unsigned long                            *data)
+get_devint_reg (int address, unsigned long *data)
 {
   int  err = ERR_NONE;
 
@@ -817,8 +816,7 @@ get_devint_reg (enum development_interface_address_space  address,
    @return  An error code (including ERR_NONE) if there is no error          */
 /*---------------------------------------------------------------------------*/
 static int
-set_devint_reg (enum development_interface_address_space  address,
-		unsigned long                             data)
+set_devint_reg (int address, unsigned long data)
 {
   int err =  ERR_NONE;
 

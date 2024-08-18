@@ -31,15 +31,13 @@
 #ifndef OR32_H_ISA
 #define OR32_H_ISA
 
+#include <stdint.h>
+
 #define NUM_UNSIGNED (0)
 #define NUM_SIGNED (1)
 
 #ifndef PARAMS
 #define PARAMS(x) x
-#endif
-
-#ifndef CONST
-#define CONST const
 #endif
 
 #define MAX_GPRS 32
@@ -85,7 +83,7 @@ enum insn_type {
 /* Main instruction specification array.  */
 struct or32_opcode {
   /* Name of the instruction.  */
-  char *name;
+  const char *name;
 
   /* A string of characters which describe the operands.
      Valid characters are:
@@ -100,14 +98,14 @@ struct or32_opcode {
      M	 An immediate operand, range . (unused)
      N	 An immediate operand, range -33554432 to 33554431.
      O	 An immediate operand, range . (unused) */
-  char *args;
+  const char *args;
 
   /* Opcode and operand encoding. */
-  char *encoding;
+  const char *encoding;
 
 #ifdef HAVE_EXECUTION
 # if COMPLEX_EXECUTION
-  char *function_name;
+  const char *function_name;
 # elif SIMPLE_EXECUTION
   void (*exec)(struct iqueue_entry *);
 # endif
@@ -153,16 +151,16 @@ struct temp_insn_struct
   int in_pass;
 };
 
-  
 extern unsigned long *or1ksim_automata;
 extern struct temp_insn_struct *or1ksim_ti;
 
-extern CONST struct  or32_opcode  or1ksim_or32_opcodes[];
+extern const struct  or32_opcode  or1ksim_or32_opcodes[];
 
 extern char *or1ksim_disassembled;
 
 /* trace data */
 extern int           trace_dest_reg;
+extern int           trace_src_reg;
 extern int           trace_store_addr_reg;
 extern unsigned int  trace_store_imm;
 extern int           trace_store_val_reg;
@@ -173,28 +171,28 @@ extern int           trace_dest_spr;
 extern int or1ksim_insn_len PARAMS((int insn_index));
 
 /* MM: Returns instruction name from index.  */
-extern CONST char *or1ksim_insn_name PARAMS ((int index));
+extern const char *or1ksim_insn_name PARAMS ((int index));
 
-/* MM: Constructs new FSM, based on or1ksim_or32_opcodes.  */ 
-extern void or1ksim_build_automata PARAMS ((int  quiet));
+/* MM: Constructs new FSM, based on or1ksim_or32_opcodes.  */
+extern void or1ksim_build_automata PARAMS ((int quiet));
 
-/* MM: Destructs FSM.  */ 
+/* MM: Destructs FSM.  */
 extern void or1ksim_destruct_automata PARAMS ((void));
 
 /* MM: Decodes instruction using FSM.  Call or1ksim_build_automata first.  */
-extern int or1ksim_insn_decode PARAMS((unsigned int insn));
+extern int or1ksim_insn_decode PARAMS((uint32_t insn));
 
 /* Disassemble one instruction from insn to disassemble.
    Return the size of the instruction.  */
-extern int or1ksim_disassemble_insn (unsigned long insn);
+extern int or1ksim_disassemble_insn (uint32_t insn);
 
 /* Disassemble one instruction from insn index.
    Return the size of the instruction.  */
-int or1ksim_disassemble_index (unsigned long insn, int index);
+int or1ksim_disassemble_index (uint32_t insn, int index);
 
 /* Disassemble one instruction from insn index for tracing. */
-void or1ksim_disassemble_trace_index (unsigned long int  insn,
-				      int                index);
+void or1ksim_disassemble_trace_index (uint32_t insn,
+				      int      index);
 
 /* FOR INTERNAL USE ONLY */
 /* Automatically does zero- or sign- extension and also finds correct
@@ -203,7 +201,6 @@ void or1ksim_disassemble_trace_index (unsigned long int  insn,
 unsigned long or1ksim_extend_imm(unsigned long imm, char l);
 
 /* Extracts value from opcode */
-unsigned long or1ksim_or32_extract(char param_ch, char *enc_initial, unsigned long insn);
+unsigned long or1ksim_or32_extract(char param_ch, const char *enc_initial, uint32_t insn);
 
 #endif
-

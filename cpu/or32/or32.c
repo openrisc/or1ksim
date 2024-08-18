@@ -5,7 +5,7 @@
 
    Contributed by Damjan Lampret (lampret@opencores.org).
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
-   
+
    This file is part of Or1ksim, the OpenRISC 1000 Architectural Simulator.
    This file is also part of gen_or1k_isa, GDB and GAS.
 
@@ -25,21 +25,28 @@
 /* This program is commented throughout in a fashion suitable for processing
    with Doxygen. */
 
-
+#ifdef OR1KSIM_TRACE_STANDALONE
+/* When running in fusesoc just assume we have modern string.h and ctype.h */
+# include <string.h>
+# include <ctype.h>
+# define HAVE_EXECUTION 1
+# define COMPLEX_EXECUTION 1
+# include "or32.h"
+#else
 /* Autoconf and/or portability configuration */
-#include "config.h"
-#include "port.h"
+# include "config.h"
+# include "port.h"
+/* Package includes */
+# include "opcode/or32.h"
+#endif
 
 /* System includes */
 #include <stdlib.h>
 #include <stdio.h>
 
-/* Package includes */
-#include "opcode/or32.h"
-
 /* We treat all letters the same in encode/decode routines so
    we need to assign some characteristics to them like signess etc.*/
-CONST struct or32_letter or32_letters[] = {
+const struct or32_letter or32_letters[] = {
   {'A', NUM_UNSIGNED},
   {'B', NUM_UNSIGNED},
   {'D', NUM_UNSIGNED},
@@ -85,7 +92,7 @@ CONST struct or32_letter or32_letters[] = {
 # define EFI EFN
 #endif /* HAVE_EXECUTION */
 
-CONST struct or32_opcode or1ksim_or32_opcodes[] = {
+const struct or32_opcode or1ksim_or32_opcodes[] = {
 
   {"l.j", "N", "00 0x0  NNNNN NNNNN NNNN NNNN NNNN NNNN",
    EF (l_j), OR32_IF_DELAY, it_jump},
@@ -567,7 +574,7 @@ CONST struct or32_opcode or1ksim_or32_opcodes[] = {
    0, it_unknown},
 #endif
 
-  {"", "", "", EFI, 0, 0}	/* Dummy entry, not included in num_opcodes.  This
+  {"", "", "", EFI, 0, it_unknown} /* Dummy entry, not included in num_opcodes.  This
 				 * lets code examine entry i+1 without checking
 				 * if we've run off the end of the table.  */
 };
@@ -576,7 +583,7 @@ CONST struct or32_opcode or1ksim_or32_opcodes[] = {
 #undef EFN
 #undef EF
 
-static CONST int NUM_OPCODES =
+static const int NUM_OPCODES =
   ((sizeof (or1ksim_or32_opcodes)) / (sizeof (struct or32_opcode))) - 1;
 
 /* Calculates instruction length in bytes. Always 4 for OR32. */
@@ -591,7 +598,7 @@ or1ksim_insn_len (int insn_index)
 static int
 letter_signed (char l)
 {
-  CONST struct or32_letter *pletter;
+  const struct or32_letter *pletter;
 
   for (pletter = or32_letters; pletter->letter != '\0'; pletter++)
     if (pletter->letter == l)
@@ -608,8 +615,9 @@ static int range_cache[256] = { 0 };
 static int
 letter_range (char l)
 {
-  CONST struct or32_opcode *pinsn;
-  char *enc;
+  const struct or32_opcode *pinsn;
+  const char *enc;
+  int i;
   int range = 0;
 
   /* Is value cached? */
@@ -620,10 +628,10 @@ letter_range (char l)
     {
       if (strchr (pinsn->encoding, l))
 	{
-	  for (enc = pinsn->encoding; *enc != '\0'; enc++)
-	    if ((*enc == '0') && (*(enc + 1) == 'x'))
-	      enc += 2;
-	    else if (*enc == l)
+	  for (i = 0, enc = pinsn->encoding; enc[i] != '\0'; i++)
+	    if ((enc[i] == '0') && (enc[i + 1] == 'x'))
+	      i += 2;
+	    else if (enc[i] == l)
 	      range++;
 	  return range_cache[(unsigned char) l] = range;
 	}
@@ -634,7 +642,7 @@ letter_range (char l)
 }
 
 /* Returns name of the specified instruction index */
-CONST char *
+const char *
 or1ksim_insn_name (int index)
 {
   if (index >= 0 && index < NUM_OPCODES)
@@ -647,17 +655,15 @@ or1ksim_insn_name (int index)
 
 /* Find symbols in encoding.  */
 static unsigned long
-insn_extract (param_ch, enc_initial)
-     char param_ch;
-     char *enc_initial;
+insn_extract (char param_ch, const char *enc)
 {
-  char *enc;
+  int i;
   unsigned long ret = 0;
   unsigned opc_pos = 32;
-  for (enc = enc_initial; *enc != '\0';)
-    if ((*enc == '0') && (*(enc + 1) == 'x'))
+  for (i = 0; enc[i] != '\0';)
+    if ((enc[i] == '0') && (enc[i + 1] == 'x'))
       {
-	unsigned long tmp = strtol (enc + 2, NULL, 16);
+	unsigned long tmp = strtol (&enc[i + 2], NULL, 16);
 	opc_pos -= 4;
 	if (param_ch == '0' || param_ch == '1')
 	  {
@@ -665,17 +671,17 @@ insn_extract (param_ch, enc_initial)
 	      tmp = 15 - tmp;
 	    ret |= tmp << opc_pos;
 	  }
-	enc += 3;
+	i += 3;
       }
     else
       {
-	if (*enc == '0' || *enc == '1' || *enc == '-' || isalpha ((int)*enc))
+	if (enc[i] == '0' || enc[i] == '1' || enc[i] == '-' || isalpha (enc[i]))
 	  {
 	    opc_pos--;
-	    if (param_ch == *enc)
+	    if (param_ch == enc[i])
 	      ret |= 1U << opc_pos;
 	  }
-	enc++;
+	i++;
       }
   return ret;
 }
@@ -700,7 +706,7 @@ static struct insn_op_struct *op_data;
 struct insn_op_struct **or1ksim_op_start;
 
 static void
-or32_debug (int level, const char *format, ...)
+or1k_debug (int level, const char *format, ...)
 {
 #if DEBUG
   char *p;
@@ -733,13 +739,13 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	last_match = i;
       }
 
-  or32_debug (8, "%08X %08lX\n", mask, cur_mask);
+  or1k_debug (8, "%08X %08lX\n", mask, cur_mask);
   if (ninstr == 0)
     return 0;
   if (ninstr == 1)
     {
       /* Leaf holds instruction index. */
-      or32_debug (8, "%i>I%i %s\n", cur - or1ksim_automata, last_match,
+      or1k_debug (8, "%i>I%i %s\n", cur - or1ksim_automata, last_match,
 	     or1ksim_or32_opcodes[last_match].name);
       *cur = LEAF_FLAG | last_match;
       cur++;
@@ -754,20 +760,20 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	  for (len = best_len + 1; len < MIN (MAX_LEN, 33 - i); len++)
 	    {
 	      unsigned long m = (1UL << ((unsigned long) len)) - 1;
-	      or32_debug (9, " (%i(%08lX & %08lX>>%i = %08lX, %08lX)", len, m,
+	      or1k_debug (9, " (%i(%08lX & %08lX>>%i = %08lX, %08lX)", len, m,
 		     cur_mask, i, (cur_mask >> (unsigned) i),
 		     (cur_mask >> (unsigned) i) & m);
 	      if ((m & (cur_mask >> (unsigned) i)) == m)
 		{
 		  best_len = len;
 		  best_first = i;
-		  or32_debug (9, "!");
+		  or1k_debug (9, "!");
 		}
 	      else
 		break;
 	    }
 	}
-      or32_debug (9, "\n");
+      or1k_debug (9, "\n");
       if (!best_len)
 	{
 	  fprintf (stderr, "%i instructions match mask 0x%08X:\n", ninstr,
@@ -779,7 +785,7 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 	  fprintf (stderr, "\n");
 	  exit (1);
 	}
-      or32_debug (8, "%i> #### %i << %i (%i) ####\n", cur - or1ksim_automata, best_len,
+      or1k_debug (8, "%i> #### %i << %i (%i) ####\n", cur - or1ksim_automata, best_len,
 	     best_first, ninstr);
       *cur = best_first;
       cur++;
@@ -802,18 +808,18 @@ cover_insn (unsigned long *cur, int pass, unsigned int mask)
 		&& ((or1ksim_ti[j].insn_mask >> best_first) & cur_mask) == cur_mask)
 	      or1ksim_ti[j].in_pass = curpass;
 
-	  or32_debug (9, "%08X %08lX %i\n", mask, cur_mask, best_first);
+	  or1k_debug (9, "%08X %08lX %i\n", mask, cur_mask, best_first);
 	  c = cover_insn (cur, curpass, mask & (~(cur_mask << best_first)));
 	  if (c)
 	    {
-	      or32_debug (8, "%i> #%X -> %u\n", next - or1ksim_automata, i,
+	      or1k_debug (8, "%i> #%X -> %u\n", next - or1ksim_automata, i,
 		     cur - or1ksim_automata);
 	      *next = cur - or1ksim_automata;
 	      cur = c;
 	    }
 	  else
 	    {
-	      or32_debug (8, "%i> N/A\n", next - or1ksim_automata);
+	      or1k_debug (8, "%i> N/A\n", next - or1ksim_automata);
 	      *next = 0;
 	    }
 	  next++;
@@ -836,43 +842,43 @@ num_ones (unsigned long value)
   return c;
 }
 
-/* Utility function, which converts parameters from or32_opcode format to more binary form.  
+/* Utility function, which converts parameters from or32_opcode format to more binary form.
    Parameters are stored in or1ksim_ti struct.  */
 
 static struct insn_op_struct *
-parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
+parse_params (const struct or32_opcode *opcode, struct insn_op_struct *cur)
 {
-  char *args = opcode->args;
+  const char *args = opcode->args;
   int i, type;
   int num_cur_op = 0;;
 
   i = 0;
   type = 0;
   /* In case we don't have any parameters, we add dummy read from r0.  */
-  if (!(*args))
+  if (!(args[i]))
     {
       cur->type = OPTYPE_REG | OPTYPE_OP | OPTYPE_LAST;
       cur->data = 0;
-      or32_debug (9, "#%08lX %08lX\n", cur->type, cur->data);
+      or1k_debug (9, "#%08lX %08lX\n", cur->type, cur->data);
       cur++;
       return cur;
     }
 
-  while (*args != '\0')
+  while (args[i] != '\0')
     {
-      if (*args == 'r')
+      if (args[i] == 'r')
 	{
-	  args++;
+	  i++;
 	  type |= OPTYPE_REG;
-	  if (*args == 'D')
+	  if (args[i] == 'D')
 	    type |= OPTYPE_DST;
 	}
-      else if (isalpha ((int)*args))
+      else if (isalpha (args[i]))
 	{
 	  unsigned long arg;
-	  arg = insn_extract (*args, opcode->encoding);
-	  or32_debug (9, "%s : %08lX ------\n", opcode->name, arg);
-	  if (letter_signed (*args))
+	  arg = insn_extract (args[i], opcode->encoding);
+	  or1k_debug (9, "%s : %08lX ------\n", opcode->name, arg);
+	  if (letter_signed (args[i]))
 	    {
 	      type |= OPTYPE_SIG;
 	      type |= ((num_ones (arg) - 1) << OPTYPE_SBIT_SHR) & OPTYPE_SBIT;
@@ -897,13 +903,13 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
 	      cur->type = type | shr;
 	      cur->data = mask;
 	      arg &= ~(((1 << mask) - 1) << shr);
-	      or32_debug (6, "|%08lX %08lX\n", cur->type, cur->data);
+	      or1k_debug (6, "|%08lX %08lX\n", cur->type, cur->data);
 	      cur++;
 	      num_cur_op++;
 	    }
-	  args++;
+	  i++;
 	}
-      else if (*args == '(')
+      else if (args[i] == '(')
 	{
 	  /* Next param is displacement.  Later we will treat them as one operand.  */
 	  /* Set the OPTYPE_DIS flag on all insn_op_structs that belong to this
@@ -914,33 +920,30 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
 	      num_cur_op--;
 	    }
 	  cur[-1].type |= OPTYPE_OP;
-	  or32_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
+	  or1k_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
 	  type = 0;
 	  i++;
-	  args++;
 	}
-      else if (*args == OPERAND_DELIM)
+      else if (args[i] == OPERAND_DELIM)
 	{
 	  cur--;
 	  cur->type = type | cur->type | OPTYPE_OP;
-	  or32_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
+	  or1k_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
 	  cur++;
 	  type = 0;
 	  i++;
-	  args++;
 	}
-      else if (*args == '0')
+      else if (args[i] == '0')
 	{
 	  cur->type = type;
 	  cur->data = 0;
-	  or32_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
+	  or1k_debug (9, ">%08lX %08lX\n", cur->type, cur->data);
 	  cur++;
 	  type = 0;
 	  i++;
-	  args++;
 	}
-      else if (*args == ')')
-	args++;
+      else if (args[i] == ')')
+	i++;
       else
 	{
 	  fprintf (stderr, "%s : parse error in args.\n", opcode->name);
@@ -949,7 +952,7 @@ parse_params (CONST struct or32_opcode *opcode, struct insn_op_struct *cur)
     }
   cur--;
   cur->type = type | cur->type | OPTYPE_OP | OPTYPE_LAST;
-  or32_debug (9, "#%08lX %08lX\n", cur->type, cur->data);
+  or1k_debug (9, "#%08lX %08lX\n", cur->type, cur->data);
   cur++;
   return cur;
 }
@@ -985,7 +988,7 @@ or1ksim_build_automata (int  quiet)
   for (i = 0; i < NUM_OPCODES; i++)
     {
       unsigned long ones, zeros;
-      char *encoding = or1ksim_or32_opcodes[i].encoding;
+      const char *encoding = or1ksim_or32_opcodes[i].encoding;
       ones = insn_extract ('1', encoding);
       zeros = insn_extract ('0', encoding);
       or1ksim_ti[i].insn_mask = ones | zeros;
@@ -1086,6 +1089,7 @@ char *or1ksim_disassembled = &disassembled_str[0];
 
 /* trace data */
 int           trace_dest_reg;
+int           trace_src_reg;
 int           trace_store_addr_reg;
 unsigned int  trace_store_imm;
 int           trace_store_val_reg;
@@ -1116,21 +1120,18 @@ or1ksim_extend_imm (unsigned long imm, char l)
 }
 
 unsigned long
-or1ksim_or32_extract (param_ch, enc_initial, insn)
-     char param_ch;
-     char *enc_initial;
-     unsigned long insn;
+or1ksim_or32_extract (char param_ch, const char *enc,
+		      uint32_t insn)
 {
-  char *enc;
+  int i;
   unsigned long ret = 0;
   int opc_pos = 0;
   int param_pos = 0;
 
-  for (enc = enc_initial; *enc != '\0'; enc++)
-    if (*enc == param_ch)
+  for (i = 0; enc[i] != '\0'; i++)
+    if (enc[i] == param_ch)
       {
-	if (enc - 2 >= enc_initial && (*(enc - 2) == '0')
-	    && (*(enc - 1) == 'x'))
+	if ((i - 2) >= 0 && (enc[i - 2] == '0') && (enc[i - 1] == 'x'))
 	  continue;
 	else
 	  param_pos++;
@@ -1140,30 +1141,30 @@ or1ksim_or32_extract (param_ch, enc_initial, insn)
   printf ("or1ksim_or32_extract: %x ", param_pos);
 #endif
   opc_pos = 32;
-  for (enc = enc_initial; *enc != '\0';)
-    if ((*enc == '0') && (*(enc + 1) == 'x'))
+  for (i = 0; enc[i] != '\0';)
+    if ((enc[i] == '0') && (enc[i + 1] == 'x'))
       {
 	opc_pos -= 4;
 	if ((param_ch == '0') || (param_ch == '1'))
 	  {
-	    unsigned long tmp = strtol (enc, NULL, 16);
+	    unsigned long tmp = strtol (&enc[i], NULL, 16);
 #if DEBUG
-	    printf (" enc=%s, tmp=%x ", enc, tmp);
+	    printf (" enc=%s, tmp=%x ", &enc[i], tmp);
 #endif
 	    if (param_ch == '0')
 	      tmp = 15 - tmp;
 	    ret |= tmp << opc_pos;
 	  }
-	enc += 3;
+	i += 3;
       }
-    else if ((*enc == '0') || (*enc == '1'))
+    else if ((enc[i] == '0') || (enc[i] == '1'))
       {
 	opc_pos--;
-	if (param_ch == *enc)
+	if (param_ch == enc[i])
 	  ret |= 1 << opc_pos;
-	enc++;
+	i++;
       }
-    else if (*enc == param_ch)
+    else if (enc[i] == param_ch)
       {
 	opc_pos--;
 	param_pos--;
@@ -1175,20 +1176,20 @@ or1ksim_or32_extract (param_ch, enc_initial, insn)
 	  ret -= ((insn >> opc_pos) & 0x1) << param_pos;
 	else
 	  ret += ((insn >> opc_pos) & 0x1) << param_pos;
-	enc++;
+	i++;
       }
-    else if (isalpha ((int)*enc))
+    else if (isalpha (enc[i]))
       {
 	opc_pos--;
-	enc++;
+	i++;
       }
-    else if (*enc == '-')
+    else if (enc[i] == '-')
       {
 	opc_pos--;
-	enc++;
+	i++;
       }
     else
-      enc++;
+      i++;
 
 #if DEBUG
   printf ("ret=%x\n", ret);
@@ -1198,29 +1199,23 @@ or1ksim_or32_extract (param_ch, enc_initial, insn)
 
 /* Print register. Used only by print_insn. */
 
-static char *
-or32_print_register (dest, param_ch, encoding, insn)
-     char *dest;
-     char param_ch;
-     char *encoding;
-     unsigned long insn;
+static int
+or1k_print_register (int dest, char param_ch, const char *encoding,
+		     uint32_t insn)
 {
   int regnum = or1ksim_or32_extract (param_ch, encoding, insn);
 
-  sprintf (dest, "r%d", regnum);
-  while (*dest)
+  sprintf (&or1ksim_disassembled[dest], "r%d", regnum);
+  while (or1ksim_disassembled[dest])
     dest++;
   return dest;
 }
 
 /* Print immediate. Used only by print_insn. */
 
-static char *
-or32_print_immediate (dest, param_ch, encoding, insn)
-     char *dest;
-     char param_ch;
-     char *encoding;
-     unsigned long insn;
+static int
+or1k_print_immediate (int dest, char param_ch, const char *encoding,
+		      uint32_t insn)
 {
   int imm = or1ksim_or32_extract (param_ch, encoding, insn);
 
@@ -1229,13 +1224,13 @@ or32_print_immediate (dest, param_ch, encoding, insn)
   if (letter_signed (param_ch))
     {
       if (imm < 0)
-	sprintf (dest, "%d", imm);
+	sprintf (&or1ksim_disassembled[dest], "%d", imm);
       else
-	sprintf (dest, "0x%x", imm);
+	sprintf (&or1ksim_disassembled[dest], "0x%x", imm);
     }
   else
-    sprintf (dest, "%#x", imm);
-  while (*dest)
+    sprintf (&or1ksim_disassembled[dest], "%#x", imm);
+  while (or1ksim_disassembled[dest])
     dest++;
   return dest;
 }
@@ -1244,8 +1239,7 @@ or32_print_immediate (dest, param_ch, encoding, insn)
    Return the size of the instruction.  */
 
 int
-or1ksim_disassemble_insn (insn)
-     unsigned long insn;
+or1ksim_disassemble_insn (uint32_t insn)
 {
   return or1ksim_disassemble_index (insn, or1ksim_insn_decode (insn));
 }
@@ -1254,41 +1248,41 @@ or1ksim_disassemble_insn (insn)
    Return the size of the instruction.  */
 
 int
-or1ksim_disassemble_index (insn, index)
-     unsigned long insn;
-     int index;
+or1ksim_disassemble_index (uint32_t insn, int index)
 {
-  char *dest = or1ksim_disassembled;
+  int dest = 0;
   if (index >= 0)
     {
       struct or32_opcode const *opcode = &or1ksim_or32_opcodes[index];
-      char *s;
+      const char *args;
+      int i;
 
-      strcpy (dest, opcode->name);
-      while (*dest)
+      strcpy (or1ksim_disassembled, opcode->name);
+      while (or1ksim_disassembled[dest])
 	dest++;
-      *dest++ = ' ';
-      *dest = 0;
+      or1ksim_disassembled[dest++] = ' ';
+      or1ksim_disassembled[dest] = 0;
 
-      for (s = opcode->args; *s != '\0'; ++s)
+      args = opcode->args;
+      for (i = 0; args[i] != '\0'; ++i)
 	{
-	  switch (*s)
+	  switch (args[i])
 	    {
 	    case '\0':
 	      return or1ksim_insn_len (insn);
 
 	    case 'r':
-	      dest = or32_print_register (dest, *++s, opcode->encoding, insn);
+	      dest = or1k_print_register (dest, args[++i], opcode->encoding, insn);
 	      break;
 
 	    default:
-	      if (strchr (opcode->encoding, *s))
+	      if (strchr (opcode->encoding, args[i]))
 		dest =
-		  or32_print_immediate (dest, *s, opcode->encoding, insn);
+		  or1k_print_immediate (dest, args[i], opcode->encoding, insn);
 	      else
 		{
-		  *dest++ = *s;
-		  *dest = 0;
+		  or1ksim_disassembled[dest++] = args[i];
+		  or1ksim_disassembled[dest] = 0;
 		}
 	    }
 	}
@@ -1296,8 +1290,8 @@ or1ksim_disassemble_index (insn, index)
   else
     {
       /* This used to be %8x for binutils.  */
-      sprintf (dest, ".word 0x%08lx", insn);
-      while (*dest)
+      sprintf (&or1ksim_disassembled[dest], ".word 0x%08x", insn);
+      while (or1ksim_disassembled[dest])
 	dest++;
     }
   return or1ksim_insn_len (insn);
@@ -1313,15 +1307,15 @@ or1ksim_disassemble_index (insn, index)
    @param[in] index  Index into the opcode table.                             */
 /* -------------------------------------------------------------------------- */
 void
-or1ksim_disassemble_trace_index (unsigned long int  insn,
-				 int                index)
+or1ksim_disassemble_trace_index (uint32_t insn,
+				 int      index)
 {
-  int                i;
-  char              *dest        = or1ksim_disassembled;
+  int                dest = 0;
 
   /* Set trace result defaults. */
   trace_dest_reg       = -1;
   trace_dest_spr       = -1;
+  trace_src_reg        = -1;
   trace_store_addr_reg = -1;
   trace_store_imm      =  0;
   trace_store_val_reg  = -1;
@@ -1332,7 +1326,8 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
       const int  OPC_WIDTH = 8;
 
       struct or32_opcode const *opcode = &or1ksim_or32_opcodes[index];
-      char                     *s;
+      const char               *args;
+      int                       i;
 
       /* Is it a store opcode? */
       if (0 == strcmp ("l.sb", opcode->name))
@@ -1355,41 +1350,42 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
 	}
 
       /* Copy the opcode and pad */
-      strcpy (dest, opcode->name);
+      strcpy (&or1ksim_disassembled[dest], opcode->name);
 
       for (i = 0; i < OPC_WIDTH; i++)
 	{
-	  if ('\0' == dest[0])
+	  if ('\0' == or1ksim_disassembled[dest])
 	    {
-	      dest[0] = ' ';
-	      dest[1] = '\0';
+	      or1ksim_disassembled[dest] = ' ';
+	      or1ksim_disassembled[dest + 1] = '\0';
 	    }
 
 	  dest++;
 	}
 
-      for (s = opcode->args; *s != '\0'; ++s)
+      args = opcode->args;
+      for (i = 0; args[i] != '\0'; ++i)
 	{
-	  switch (*s)
+	  switch (args[i])
 	    {
 	    case '\0':
 	      break;
 
 	    case 'r':
-	      dest = or32_print_register (dest, *++s, opcode->encoding, insn);
+	      dest = or1k_print_register (dest, args[++i], opcode->encoding, insn);
 
-	      switch (*s)
+	      switch (args[i])
 		{
 		case 'D':
 		  trace_dest_reg =
-		    or1ksim_or32_extract (*s, opcode->encoding, insn);
+		    or1ksim_or32_extract (args[i], opcode->encoding, insn);
 		  break;
 
 		case 'A':
 		  if (0 != trace_store_width)
 		    {
 		      trace_store_addr_reg =
-			or1ksim_or32_extract (*s, opcode->encoding, insn);
+			or1ksim_or32_extract (args[i], opcode->encoding, insn);
 		    }
 		  break;
 
@@ -1397,44 +1393,45 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
 		  if (0 != trace_store_width)
 		    {
 		      trace_store_val_reg =
-			or1ksim_or32_extract (*s, opcode->encoding, insn);
+			or1ksim_or32_extract (args[i], opcode->encoding, insn);
 		    }
 		  break;
-		  
 		}
 
 	      break;
 
 	    default:
-	      if (strchr (opcode->encoding, *s))
+	      if (strchr (opcode->encoding, args[i]))
 		{
-		  dest = or32_print_immediate (dest, *s, opcode->encoding,
+		  dest = or1k_print_immediate (dest, args[i], opcode->encoding,
 					       insn);
 
 		  /* If we have a store instruction, save the immediate. */
 		  if (0 != trace_store_width)
 		    {
-		      trace_store_imm = 
-			or1ksim_or32_extract (*s, opcode->encoding, insn);
 		      trace_store_imm =
-			or1ksim_extend_imm (trace_store_imm, *s);
+			or1ksim_or32_extract (args[i], opcode->encoding, insn);
+		      trace_store_imm =
+			or1ksim_extend_imm (trace_store_imm, args[i]);
 		    }
 
 		  if (1 == trace_dest_spr)
-		  {
-			  trace_dest_spr = 
-				  or1ksim_or32_extract ('K', opcode->encoding, 
+		    {
+			  trace_dest_spr =
+				  or1ksim_or32_extract ('K', opcode->encoding,
 							insn);
 			  trace_dest_reg =
-				  or1ksim_or32_extract ('A', opcode->encoding, 
+				  or1ksim_or32_extract ('A', opcode->encoding,
 							insn);
-		  }
-		  
+			  trace_src_reg =
+				  or1ksim_or32_extract ('B', opcode->encoding,
+							insn);
+		    }
 		}
 	      else
 		{
-		  *dest++ = *s;
-		  *dest = 0;
+		  or1ksim_disassembled[dest++] = args[i];
+		  or1ksim_disassembled[dest] = 0;
 		}
 	    }
 	}
@@ -1442,8 +1439,8 @@ or1ksim_disassemble_trace_index (unsigned long int  insn,
   else
     {
       /* This used to be %8x for binutils.  */
-      sprintf (dest, ".word 0x%08lx", insn);
-      while (*dest)
+      sprintf (&or1ksim_disassembled[dest], ".word 0x%08x", insn);
+      while (or1ksim_disassembled[dest])
 	dest++;
     }
 }	/* or1ksim_disassemble_trace_index () */
