@@ -192,7 +192,7 @@ static const char *
 decode_insn (unsigned long data, cuc_insn *insn)
 {
   const char *name;
-  char *s;
+  const char *s;
   int index = or1ksim_insn_decode (data);
   struct or32_opcode const *opcode;
   int i, argc = 0;
@@ -212,18 +212,18 @@ decode_insn (unsigned long data, cuc_insn *insn)
   }
   opcode = &or1ksim_or32_opcodes[index];
 
-  for (s = opcode->args; *s != '\0'; ++s) {
-    switch (*s) {
+  for (i = 0, s = opcode->args; s[i] != '\0'; ++i) {
+    switch (s[i]) {
     case '\0': return name;
     case 'r':
       insn->opt[argc] = OPT_REGISTER | (argc ? 0 : OPT_DEST);
-      insn->op[argc++] = or1ksim_or32_extract(*++s, opcode->encoding, data);
+      insn->op[argc++] = or1ksim_or32_extract(s[++i], opcode->encoding, data);
       break;
 
     default:
       if (strchr (opcode->encoding, *s)) {
-        unsigned long imm = or1ksim_or32_extract (*s, opcode->encoding, data);
-        imm = or1ksim_extend_imm(imm, *s);
+        unsigned long imm = or1ksim_or32_extract (s[i], opcode->encoding, data);
+        imm = or1ksim_extend_imm(imm, s[i]);
         insn->opt[argc] = OPT_CONST;
         insn->op[argc++] = imm;
       }
