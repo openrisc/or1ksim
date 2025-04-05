@@ -587,7 +587,8 @@ void arg_cat(char **pdest, const char *src, size_t *pndest)
         *dest++ = *src++;
 
     /* null terminate dest string */
-    *dest=0;
+    if (dest<=end)
+        *dest=0;
 
     /* update *pdest and *pndest */
     *pndest = end - dest;
