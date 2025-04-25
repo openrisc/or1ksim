@@ -100,6 +100,6 @@ extern void adddstats (int item1, int item2, int cnt_dynamic, int depend);
 extern void addfstats (enum insn_type item1, enum insn_type item2,
 		       int cnt_dynamic, int depend);
 extern void initstats ();
-extern void printstats ();
+extern void printstats (int which);
 
 #endif	/*  STATS__H */
