@@ -123,8 +123,7 @@ init_randomness ()
    @param[in] signum  The signal which triggered this handler                */
 /*---------------------------------------------------------------------------*/
 void
-ctrl_c (signum)
-     int signum;
+ctrl_c (int signum)
 {
   /* Incase the user pressed ctrl+c twice without the sim reacting kill it.
    * This is incase the sim locks up in a high level routine, without executeing
@@ -150,8 +149,7 @@ ctrl_c (signum)
    @param[in] signum  The signal which triggered this handler                */
 /*---------------------------------------------------------------------------*/
 void
-toggle_trace (signum)
-     int signum;
+toggle_trace (int signum)
 {
 
   runtime.sim.hush = !runtime.sim.hush;
