@@ -551,52 +551,8 @@ int arg_parse(int argc, char **argv, void **argtable)
     return endtable->count;
     }
 
-
-/*
- * Concatenate contents of src[] string onto *pdest[] string.
- * The *pdest pointer is altered to point to the end of the
- * target string and *pndest is decremented by the same number
- * of chars.
- * Does not append more than *pndest chars into *pdest[]
- * so as to prevent buffer overruns.
- * Its something like strncat() but more efficient for repeated
- * calls on the same destination string.
- * Example of use:
- *   char dest[30] = "good"
- *   size_t ndest = sizeof(dest);
- *   char *pdest = dest;
- *   arg_char(&pdest,"bye ",&ndest);
- *   arg_char(&pdest,"cruel ",&ndest);
- *   arg_char(&pdest,"world!",&ndest);
- * Results in:
- *   dest[] == "goodbye cruel world!"
- *   ndest  == 10
- */
 static
-void arg_cat(char **pdest, const char *src, size_t *pndest)
-    {
-    char *dest = *pdest;
-    char *end  = dest + *pndest;
-
-    /*locate null terminator of dest string */
-    while(dest<end && *dest!=0)
-        dest++;
-
-    /* concat src string to dest string */
-    while(dest<end && *src!=0)
-        *dest++ = *src++;
-
-    /* null terminate dest string */
-    *dest=0;
-
-    /* update *pdest and *pndest */
-    *pndest = end - dest;
-    *pdest  = dest;
-    }
-
-
-static
-void arg_cat_option(char *dest, size_t ndest, const char *shortopts, const char *longopts, const char *datatype, int optvalue)
+void arg_cat_option(char *dest, const size_t ndest, const char *shortopts, const char *longopts, const char *datatype, int optvalue)
     {
     if (shortopts)
         {
@@ -608,18 +564,18 @@ void arg_cat_option(char *dest, size_t ndest, const char *shortopts, const char 
         option[1] = shortopts[0];
         option[2] = 0;
 
-        arg_cat(&dest,option,&ndest);
+        strlcat(dest,option,ndest);
         if (datatype)
             {
-            arg_cat(&dest," ",&ndest);
+            strlcat(dest," ",ndest);
             if (optvalue)
                 {
-                arg_cat(&dest,"[",&ndest);
-                arg_cat(&dest,datatype,&ndest);
-                arg_cat(&dest,"]",&ndest);
+                strlcat(dest,"[",ndest);
+                strlcat(dest,datatype,ndest);
+                strlcat(dest,"]",ndest);
                 }
             else
-                arg_cat(&dest,datatype,&ndest);
+                strlcat(dest,datatype,ndest);
             }
         }
     else if (longopts)
@@ -627,7 +583,7 @@ void arg_cat_option(char *dest, size_t ndest, const char *shortopts, const char 
         size_t ncspn;
 
         /* add "--" tag prefix */
-        arg_cat(&dest,"--",&ndest);
+        strlcat(dest,"--",ndest);
 
         /* add comma separated option tag */
         ncspn = strcspn(longopts,",");
@@ -635,32 +591,32 @@ void arg_cat_option(char *dest, size_t ndest, const char *shortopts, const char 
 
         if (datatype)
             {
-            arg_cat(&dest,"=",&ndest);
+            strlcat(dest,"=",ndest);
             if (optvalue)
                 {
-                arg_cat(&dest,"[",&ndest);
-                arg_cat(&dest,datatype,&ndest);
-                arg_cat(&dest,"]",&ndest);
+                strlcat(dest,"[",ndest);
+                strlcat(dest,datatype,ndest);
+                strlcat(dest,"]",ndest);
                 }
             else
-                arg_cat(&dest,datatype,&ndest);
+                strlcat(dest,datatype,ndest);
             }
         }
     else if (datatype)
         {
         if (optvalue)
             {
-            arg_cat(&dest,"[",&ndest);
-            arg_cat(&dest,datatype,&ndest);
-            arg_cat(&dest,"]",&ndest);
+            strlcat(dest,"[",ndest);
+            strlcat(dest,datatype,ndest);
+            strlcat(dest,"]",ndest);
             }
         else
-            arg_cat(&dest,datatype,&ndest);
+            strlcat(dest,datatype,ndest);
         }
     }
 
 static
-void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char *longopts, const char *datatype,  int optvalue, const char *separator)
+void arg_cat_optionv(char *dest, const size_t ndest, const char *shortopts, const char *longopts, const char *datatype,  int optvalue, const char *separator)
     {
     separator = separator ? separator : "";
 
@@ -678,15 +634,15 @@ void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char
             shortopt[1]=*c;
             shortopt[2]=0;
 
-            arg_cat(&dest,shortopt,&ndest);
+            strlcat(dest,shortopt,ndest);
             if (*++c)
-                arg_cat(&dest,separator,&ndest);
+                strlcat(dest,separator,ndest);
             }
         }
 
     /* put separator between long opts and short opts */
     if (shortopts && longopts)
-        arg_cat(&dest,separator,&ndest);
+        strlcat(dest,separator,ndest);
 
     if (longopts)
         {
@@ -696,7 +652,7 @@ void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char
             size_t ncspn;
 
             /* add "--" tag prefix */
-            arg_cat(&dest,"--",&ndest);
+            strlcat(dest,"--",ndest);
 
             /* add comma separated option tag */
             ncspn = strcspn(c,",");
@@ -706,7 +662,7 @@ void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char
             /* add given separator in place of comma */
             if (*c==',')
                  {
-                 arg_cat(&dest,separator,&ndest);
+                 strlcat(dest,separator,ndest);
                  c++;
                  }
             }
@@ -715,18 +671,18 @@ void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char
     if (datatype)
         {
         if (longopts)
-            arg_cat(&dest,"=",&ndest);
+            strlcat(dest,"=",ndest);
         else if (shortopts)
-            arg_cat(&dest," ",&ndest);
+            strlcat(dest," ",ndest);
 
         if (optvalue)
             {
-            arg_cat(&dest,"[",&ndest);
-            arg_cat(&dest,datatype,&ndest);
-            arg_cat(&dest,"]",&ndest);
+            strlcat(dest,"[",ndest);
+            strlcat(dest,datatype,ndest);
+            strlcat(dest,"]",ndest);
             }
         else
-            arg_cat(&dest,datatype,&ndest);
+            strlcat(dest,datatype,ndest);
         }
     }
 
