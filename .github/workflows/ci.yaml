@@ -1,0 +1,20 @@
+name: ci
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install -y build-essential autoconf automake autotools-dev xz-utils git libelf-dev texinfo
+
+      - name: build or1ksim
+        run: |
+          ./configure --prefix=/opt/or1k --target=or1k-elf
+          make -j $(nproc)
+          make DESTDIR=$PWD/install install
