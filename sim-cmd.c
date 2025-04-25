@@ -783,8 +783,8 @@ handle_sim_command (void)
 
 #ifdef HAVE_LIBREADLINE
 
-char *command_generator ();
-char **sim_completion ();
+char *command_generator (const char *text, int stat);
+char **sim_completion (const char *text, int start, int end);
 
 /* Tell the GNU readline library how to complete.  We want to try to complete
    on command names if this is the first word in the line, or on filenames
@@ -807,7 +807,7 @@ initialize_readline (void)
    or NULL if there aren't any. */
 /* FIXME: Handle arguments to the `set' command */
 char **
-sim_completion (char *text, int start, int end)
+sim_completion (const char *text, int start, int end)
 {
   char **matches;
 
@@ -826,7 +826,7 @@ sim_completion (char *text, int start, int end)
    to start from scratch; without any state (i.e. STATE == 0), then we
    start at the top of the list. */
 char *
-command_generator (char *text, int state)
+command_generator (const char *text, int state)
 {
   static int list_index, len;
   const char *name;
