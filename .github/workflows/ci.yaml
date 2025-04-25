@@ -12,6 +12,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y build-essential autoconf automake autotools-dev xz-utils git libelf-dev texinfo
+          uname -a
+          gcc --version
 
       - name: build or1ksim
         run: |
