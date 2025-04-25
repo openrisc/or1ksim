@@ -338,7 +338,7 @@ void arg_parse_tagged(int argc, char **argv, struct arg_hdr **table, struct arg_
                 * getopt_long() found an option with its argument missing.
                 */
                 /*printf(": option %s requires an argument\n",argv[optind-1]); */
-                arg_register_error(endtable,endtable,ARG_EMISSARG,argv[optind-1]); 
+                arg_register_error(endtable,endtable,ARG_EMISSARG,argv[optind-1]);
                 break;
 
             default:
@@ -487,7 +487,7 @@ void arg_reset(void **argtable)
         } while(!(table[tabindex++]->flag&ARG_TERMINATOR));
     }
 
-    
+
 int arg_parse(int argc, char **argv, void **argtable)
     {
     struct arg_hdr **table = (struct arg_hdr **)argtable;
@@ -546,7 +546,7 @@ int arg_parse(int argc, char **argv, void **argtable)
         {
         /* memory alloc failed */
         arg_register_error(endtable,endtable,ARG_EMALLOC,NULL);
-        }        
+        }
 
     return endtable->count;
     }
@@ -601,13 +601,13 @@ void arg_cat_option(char *dest, size_t ndest, const char *shortopts, const char 
     if (shortopts)
         {
         char option[3];
-        
+
         /* note: option array[] is initialiazed dynamically here to satisfy   */
         /* a deficiency in the watcom compiler wrt static array initializers. */
         option[0] = '-';
         option[1] = shortopts[0];
         option[2] = 0;
-        
+
         arg_cat(&dest,option,&ndest);
         if (datatype)
             {
@@ -671,13 +671,13 @@ void arg_cat_optionv(char *dest, size_t ndest, const char *shortopts, const char
             {
             /* "-a|-b|-c" */
             char shortopt[3];
-        
+
             /* note: shortopt array[] is initialiazed dynamically here to satisfy */
             /* a deficiency in the watcom compiler wrt static array initializers. */
             shortopt[0]='-';
             shortopt[1]=*c;
             shortopt[2]=0;
-            
+
             arg_cat(&dest,shortopt,&ndest);
             if (*++c)
                 arg_cat(&dest,separator,&ndest);
@@ -964,7 +964,7 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
     if ( line_end < line_start )
         { fprintf( fp, "%s\n", text ); }
 
-    while (line_end-1 > line_start ) 
+    while (line_end-1 > line_start )
         {
         /* Eat leading whitespaces. This is essential because while
            wrapping lines, there will often be a whitespace at beginning
@@ -973,12 +973,12 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
 	  while (isspace ((int) (*(text+line_start))) )
             { line_start++; }
 
-        if ((line_end - line_start) > colwidth ) 
+        if ((line_end - line_start) > colwidth )
             { line_end = line_start + colwidth; }
 
         /* Find last whitespace, that fits into line */
 	/* JPB patch to cast argument */
-        while ( ( line_end > line_start ) 
+        while ( ( line_end > line_start )
                 && ( line_end - line_start > colwidth )
                 && !isspace ((int) (*(text+line_end))))
             { line_end--; }
@@ -989,7 +989,7 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
         line_end--;
 
         /* Output line of text */
-        while ( line_start < line_end ) 
+        while ( line_start < line_end )
             {
             fputc(*(text+line_start), fp );
             line_start++;
@@ -997,7 +997,7 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
         fputc( '\n', fp );
 
         /* Initialize another line */
-        if ( line_end+1 < textlen ) 
+        if ( line_end+1 < textlen )
             {
             unsigned i;
 
@@ -1014,7 +1014,7 @@ void arg_print_formatted( FILE *fp, const unsigned lmargin, const unsigned rmarg
     }
 
 /**
- * Prints the glossary in strict GNU format. 
+ * Prints the glossary in strict GNU format.
  * Differences to arg_print_glossary() are:
  *  - wraps lines after 80 chars
  *  - indents lines without shortops
@@ -1037,7 +1037,7 @@ void arg_print_glossary_gnu(FILE *fp, void **argtable )
             const char *datatype  = table[tabindex]->datatype;
             const char *glossary  = table[tabindex]->glossary;
 
-            if ( !shortopts && longopts ) 
+            if ( !shortopts && longopts )
                 {
                 /* Indent trailing line by 4 spaces... */
                 memset( syntax, ' ', 4 );
@@ -1047,7 +1047,7 @@ void arg_print_glossary_gnu(FILE *fp, void **argtable )
             arg_cat_optionv(syntax,sizeof(syntax),shortopts,longopts,datatype,table[tabindex]->flag&ARG_HASOPTVALUE,", ");
 
             /* If syntax fits not into column, print glossary in new line... */
-            if ( strlen(syntax) > 25 ) 
+            if ( strlen(syntax) > 25 )
                 {
                 fprintf( fp, "  %-25s %s\n", syntax, "" );
                 *syntax = '\0';
@@ -1114,11 +1114,11 @@ void arg_free(void **argtable)
         */
         if (table[tabindex]==NULL)
             break;
-                    
+
         flag = table[tabindex]->flag;
         free(table[tabindex]);
         table[tabindex++]=NULL;
-        
+
         } while(!(flag&ARG_TERMINATOR));
     }
 
@@ -1132,9 +1132,9 @@ void arg_freetable(void **argtable, size_t n)
         {
         if (table[tabindex]==NULL)
             continue;
-                    
+
         free(table[tabindex]);
-        table[tabindex]=NULL;        
+        table[tabindex]=NULL;
         };
     }
 
