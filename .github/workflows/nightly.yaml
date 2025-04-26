@@ -44,7 +44,7 @@ jobs:
       - name: tarball build
         run: tar czvf or1ksim.tar.gz -C ./install/opt/ or1k/
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: or1ksim-nightly
           path: or1ksim.tar.gz
@@ -53,10 +53,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download all artifacts to current Directory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: or1ksim-nightly
 
