@@ -5,7 +5,7 @@
 #include <config.h>
 #endif
 
-#ifdef WORDS_BIGENDIAN
+#if defined(TARGET_BIG_ENDIAN) == defined(WORDS_BIGENDIAN)
 #define ELF_SHORT_H(ps) ((unsigned short)(ps))
 #define ELF_LONG_H(ps)  ((unsigned long)(ps))
 #else

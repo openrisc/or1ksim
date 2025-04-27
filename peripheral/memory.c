@@ -77,7 +77,7 @@ simmem_read32 (oraddr_t addr, void *dat)
 static uint16_t
 simmem_read16 (oraddr_t addr, void *dat)
 {
-#ifdef WORDS_BIGENDIAN
+#if defined(TARGET_BIG_ENDIAN) == defined(WORDS_BIGENDIAN)
   return *(uint16_t *) (dat + addr);
 #else
   return *(uint16_t *) (dat + (addr ^ 2));
@@ -87,7 +87,7 @@ simmem_read16 (oraddr_t addr, void *dat)
 static uint8_t
 simmem_read8 (oraddr_t addr, void *dat)
 {
-#ifdef WORDS_BIGENDIAN
+#if defined(TARGET_BIG_ENDIAN) == defined(WORDS_BIGENDIAN)
   return *(uint8_t *) (dat + addr);
 #else
   return *(uint8_t *) (dat + (addr ^ 3));
@@ -103,7 +103,7 @@ simmem_write32 (oraddr_t addr, uint32_t value, void *dat)
 static void
 simmem_write16 (oraddr_t addr, uint16_t value, void *dat)
 {
-#ifdef WORDS_BIGENDIAN
+#if defined(TARGET_BIG_ENDIAN) == defined(WORDS_BIGENDIAN)
   *(uint16_t *) (dat + addr) = value;
 #else
   *(uint16_t *) (dat + (addr ^ 2)) = value;
@@ -113,7 +113,7 @@ simmem_write16 (oraddr_t addr, uint16_t value, void *dat)
 static void
 simmem_write8 (oraddr_t addr, uint8_t value, void *dat)
 {
-#ifdef WORDS_BIGENDIAN
+#if defined(TARGET_BIG_ENDIAN) == defined(WORDS_BIGENDIAN)
   *(uint8_t *) (dat + addr) = value;
 #else
   *(uint8_t *) (dat + (addr ^ 3)) = value;

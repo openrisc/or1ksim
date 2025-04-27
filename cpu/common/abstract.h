@@ -64,7 +64,12 @@
 #endif /* ULONGEST */
 
 /* Endianness convenience macros */
+#define TARGET_BIG_ENDIAN
+#ifdef TARGET_BIG_ENDIAN
 #define LE16(x) bswap_16(x)
+#else
+#define LE16(x) ((uint16_t)(x))
+#endif
 
 /*! Instruction queue */
 struct iqueue_entry
